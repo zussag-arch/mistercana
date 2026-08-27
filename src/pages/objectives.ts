@@ -160,7 +160,6 @@ function renderSearchResults(
     <div
       class="objectives-search-results"
     >
-
       ${results
         .map(
           (player) => {
@@ -181,11 +180,11 @@ function renderSearchResults(
                   }
                 "
               >
-
                 <div
-                  class="objectives-search-player"
+                  class="
+                    objectives-search-player
+                  "
                 >
-
                   <span
                     class="
                       role-badge
@@ -196,7 +195,6 @@ function renderSearchResults(
                   </span>
 
                   <div>
-
                     <strong>
                       ${escapeHtml(
                         player.name,
@@ -208,16 +206,16 @@ function renderSearchResults(
                         player.team,
                       )}
                     </small>
-
                   </div>
-
                 </div>
 
                 ${
                   existing
                     ? `
                       <span
-                        class="objective-existing-label"
+                        class="
+                          objective-existing-label
+                        "
                       >
                         Già negli obiettivi
                       </span>
@@ -225,20 +223,20 @@ function renderSearchResults(
                     : `
                       <button
                         type="button"
-                        class="objective-add-button"
+                        class="
+                          objective-add-button
+                        "
                         data-add-objective="${player.id}"
                       >
                         Aggiungi
                       </button>
                     `
                 }
-
               </div>
             `
           },
         )
         .join('')}
-
     </div>
   `
 }
@@ -257,13 +255,15 @@ function renderObjectiveCard(
 
   return `
     <article
-      class="objective-player-card"
+      class="
+        objective-player-card
+      "
     >
-
       <div
-        class="objective-player-main"
+        class="
+          objective-player-main
+        "
       >
-
         <strong>
           ${escapeHtml(
             player.name,
@@ -275,19 +275,20 @@ function renderObjectiveCard(
             player.team,
           )}
         </small>
-
       </div>
 
       <div
-        class="objective-player-actions"
+        class="
+          objective-player-actions
+        "
       >
-
         <select
-          class="objective-priority-select"
+          class="
+            objective-priority-select
+          "
           data-objective-priority="${player.id}"
           aria-label="Cambia priorità"
         >
-
           ${PRIORITIES
             .map(
               (priority) => `
@@ -305,12 +306,13 @@ function renderObjectiveCard(
               `,
             )
             .join('')}
-
         </select>
 
         <button
           type="button"
-          class="objective-remove-button"
+          class="
+            objective-remove-button
+          "
           data-remove-objective="${player.id}"
           aria-label="Rimuovi ${escapeHtml(
             player.name,
@@ -319,9 +321,7 @@ function renderObjectiveCard(
         >
           ×
         </button>
-
       </div>
-
     </article>
   `
 }
@@ -375,11 +375,11 @@ function renderPrioritySection(
         priority-${priority.id}
       "
     >
-
       <div
-        class="objective-priority-header"
+        class="
+          objective-priority-header
+        "
       >
-
         <span>
           ${priority.label}
         </span>
@@ -387,13 +387,13 @@ function renderPrioritySection(
         <small>
           ${objectives.length}
         </small>
-
       </div>
 
       <div
-        class="objective-priority-list"
+        class="
+          objective-priority-list
+        "
       >
-
         ${
           objectives.length
             ? objectives
@@ -408,15 +408,15 @@ function renderPrioritySection(
                 .join('')
             : `
               <div
-                class="objective-priority-empty"
+                class="
+                  objective-priority-empty
+                "
               >
                 Nessun giocatore
               </div>
             `
         }
-
       </div>
-
     </section>
   `
 }
@@ -439,19 +439,47 @@ function getRoleTotal(
   ).length
 }
 
+function getRoleLabel(
+  role: PlayerRole,
+): string {
+  if (role === 'P') {
+    return 'Portieri'
+  }
+
+  if (role === 'D') {
+    return 'Difensori'
+  }
+
+  if (role === 'C') {
+    return 'Centrocampisti'
+  }
+
+  return 'Attaccanti'
+}
+
 export function renderObjectivesPage(
   state: AppState,
 ): string {
   return `
     <section
-      class="page objectives-page"
+      class="
+        page
+        objectives-page
+      "
     >
-
       <div
-        class="objectives-page-header"
+        class="
+          objectives-page-header
+        "
       >
-
         <div>
+          <span
+            class="
+              objectives-eyebrow
+            "
+          >
+            STRATEGIA
+          </span>
 
           <h1>
             Obiettivi
@@ -461,11 +489,12 @@ export function renderObjectivesPage(
             Costruisci la tua shortlist
             strategica per ruolo.
           </p>
-
         </div>
 
         <span
-          class="objectives-total"
+          class="
+            objectives-total
+          "
         >
           ${state.objectives.length}
 
@@ -475,23 +504,27 @@ export function renderObjectivesPage(
               : 'obiettivi'
           }
         </span>
-
       </div>
 
       <section
-        class="objectives-search-panel"
+        class="
+          objectives-search-panel
+        "
       >
-
         <div
-          class="objectives-search-row"
+          class="
+            objectives-search-row
+          "
         >
-
           <label
-            class="objectives-search-box"
+            class="
+              objectives-search-box
+            "
           >
-
             <span
-              class="objectives-search-icon"
+              class="
+                objectives-search-icon
+              "
             >
               ⌕
             </span>
@@ -499,21 +532,21 @@ export function renderObjectivesPage(
             <input
               id="objectivesSearch"
               type="search"
-              placeholder="Cerca un giocatore..."
+              placeholder="Cerca nome o squadra..."
               autocomplete="off"
               value="${escapeHtml(
                 searchValue,
               )}"
             >
-
           </label>
 
           <select
             id="objectiveAddPriority"
-            class="objective-add-priority"
+            class="
+              objective-add-priority
+            "
             aria-label="Priorità obiettivo"
           >
-
             ${PRIORITIES
               .map(
                 (priority) => `
@@ -531,30 +564,30 @@ export function renderObjectivesPage(
                 `,
               )
               .join('')}
-
           </select>
-
         </div>
 
         <p
-          class="objectives-search-help"
+          class="
+            objectives-search-help
+          "
         >
           Cerca il giocatore e scegli
           subito il livello di priorità.
-          Il ruolo viene assegnato
-          automaticamente dal database.
+          Il ruolo deriva automaticamente
+          dal database.
         </p>
 
         ${renderSearchResults(
           state,
         )}
-
       </section>
 
       <div
-        class="objectives-role-grid"
+        class="
+          objectives-role-grid
+        "
       >
-
         ${ROLES
           .map(
             (role) => `
@@ -564,15 +597,16 @@ export function renderObjectivesPage(
                   objective-role-${role.toLowerCase()}
                 "
               >
-
                 <div
-                  class="objective-role-header"
+                  class="
+                    objective-role-header
+                  "
                 >
-
                   <div
-                    class="objective-role-title"
+                    class="
+                      objective-role-title
+                    "
                   >
-
                     <span
                       class="
                         role-badge
@@ -583,34 +617,29 @@ export function renderObjectivesPage(
                     </span>
 
                     <strong>
-                      ${
-                        role === 'P'
-                          ? 'Portieri'
-                          : role === 'D'
-                            ? 'Difensori'
-                            : role === 'C'
-                              ? 'Centrocampisti'
-                              : 'Attaccanti'
-                      }
+                      ${getRoleLabel(
+                        role,
+                      )}
                     </strong>
-
                   </div>
 
                   <span
-                    class="objective-role-count"
+                    class="
+                      objective-role-count
+                    "
                   >
                     ${getRoleTotal(
                       state,
                       role,
                     )}
                   </span>
-
                 </div>
 
                 <div
-                  class="objective-role-content"
+                  class="
+                    objective-role-content
+                  "
                 >
-
                   ${PRIORITIES
                     .map(
                       (
@@ -623,23 +652,21 @@ export function renderObjectivesPage(
                         ),
                     )
                     .join('')}
-
                 </div>
-
               </section>
             `,
           )
           .join('')}
-
       </div>
 
       <div
-        class="objectives-footer-note"
+        class="
+          objectives-footer-note
+        "
       >
-        Le priorità sono per ora solo
+        Le priorità sono per ora
         classificazioni strategiche.
       </div>
-
     </section>
   `
 }

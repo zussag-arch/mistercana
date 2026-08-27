@@ -72,7 +72,8 @@ function formatNumber(
   return value.toFixed(digits)
 }
 
-function getFilteredPlayers(): Player[] {
+function getFilteredPlayers():
+  Player[] {
   const search =
     viewState.search
       .trim()
@@ -83,7 +84,8 @@ function getFilteredPlayers(): Player[] {
       (player: Player) => {
         if (
           viewState.role !== 'ALL' &&
-          player.role !== viewState.role
+          player.role !==
+            viewState.role
         ) {
           return false
         }
@@ -131,13 +133,20 @@ function getSortableValue(
 ): string | number {
   switch (key) {
     case 'name':
-      return player.name.toLowerCase()
+      return player.name
+        .toLowerCase()
 
     case 'iCa':
-      return player.iCa ?? -Infinity
+      return (
+        player.iCa ??
+        -Infinity
+      )
 
     case 'pma':
-      return player.pma ?? -Infinity
+      return (
+        player.pma ??
+        -Infinity
+      )
 
     case 'consensus':
       return (
@@ -147,7 +156,8 @@ function getSortableValue(
 
     case 'startingProbability':
       return (
-        player.startingProbability ??
+        player
+          .startingProbability ??
         -Infinity
       )
 
@@ -187,15 +197,22 @@ function comparePlayers(
   let result: number
 
   if (
-    typeof firstValue === 'number' &&
-    typeof secondValue === 'number'
+    typeof firstValue ===
+      'number' &&
+    typeof secondValue ===
+      'number'
   ) {
     result =
-      firstValue - secondValue
+      firstValue -
+      secondValue
   } else {
     result =
-      String(firstValue).localeCompare(
-        String(secondValue),
+      String(
+        firstValue,
+      ).localeCompare(
+        String(
+          secondValue,
+        ),
         'it',
       )
   }
@@ -212,11 +229,14 @@ function sortIndicator(
   key: SortKey,
 ): string {
   if (
-    viewState.sortKey !== key
+    viewState.sortKey !==
+    key
   ) {
     return `
       <span
-        class="players-sort-neutral"
+        class="
+          players-sort-neutral
+        "
       >
         ↕
       </span>
@@ -225,10 +245,13 @@ function sortIndicator(
 
   return `
     <span
-      class="players-sort-active"
+      class="
+        players-sort-active
+      "
     >
       ${
-        viewState.sortDirection ===
+        viewState
+          .sortDirection ===
         'asc'
           ? '↑'
           : '↓'
@@ -244,12 +267,18 @@ function renderSortHeader(
   return `
     <button
       type="button"
-      class="players-table-sort"
+      class="
+        players-table-sort
+      "
       data-player-sort="${key}"
     >
-      <span>${label}</span>
+      <span>
+        ${label}
+      </span>
 
-      ${sortIndicator(key)}
+      ${sortIndicator(
+        key,
+      )}
     </button>
   `
 }
@@ -260,17 +289,17 @@ function renderPlayerRow(
   return `
     <button
       type="button"
-      class="players-table-row"
+      class="
+        players-table-row
+      "
       data-player-id="${player.id}"
     >
-
       <div
         class="
           players-cell
           players-player-cell
         "
       >
-
         <span
           class="
             role-badge
@@ -281,25 +310,29 @@ function renderPlayerRow(
         </span>
 
         <div
-          class="players-player-info"
+          class="
+            players-player-info
+          "
         >
-
           <strong>
-            ${escapeHtml(player.name)}
+            ${escapeHtml(
+              player.name,
+            )}
           </strong>
 
           <small>
-            ${escapeHtml(player.team)}
+            ${escapeHtml(
+              player.team,
+            )}
           </small>
-
         </div>
-
       </div>
 
       <div
         class="
           players-cell
           players-number-cell
+          players-ica-cell
         "
       >
         ${formatNumber(
@@ -324,6 +357,7 @@ function renderPlayerRow(
         class="
           players-cell
           players-number-cell
+          players-consensus-cell
         "
       >
         ${formatNumber(
@@ -336,6 +370,7 @@ function renderPlayerRow(
         class="
           players-cell
           players-number-cell
+          players-starting-cell
         "
       >
         ${
@@ -344,7 +379,8 @@ function renderPlayerRow(
           undefined
             ? '—'
             : `${formatNumber(
-                player.startingProbability,
+                player
+                  .startingProbability,
                 0,
               )}%`
         }
@@ -357,19 +393,35 @@ function renderPlayerRow(
           players-x-cell
         "
       >
+        <span
+          class="
+            players-x-primary
+          "
+        >
+          ${formatNumber(
+            player.xMv,
+            2,
+          )}
+        </span>
 
-        ${formatNumber(
-          player.xMv,
-          2,
-        )}
+        <span
+          class="
+            players-x-separator
+          "
+        >
+          /
+        </span>
 
-        <span>/</span>
-
-        ${formatNumber(
-          player.xFmv,
-          2,
-        )}
-
+        <span
+          class="
+            players-x-secondary
+          "
+        >
+          ${formatNumber(
+            player.xFmv,
+            2,
+          )}
+        </span>
       </div>
 
       <div
@@ -378,11 +430,9 @@ function renderPlayerRow(
           players-status-cell
         "
       >
-
         <span
           class="
             player-status
-
             ${
               player.status ===
               'free'
@@ -391,185 +441,234 @@ function renderPlayerRow(
             }
           "
         >
-
           ${
-            player.status === 'free'
+            player.status ===
+            'free'
               ? 'Libero'
               : 'Assegnato'
           }
-
         </span>
-
       </div>
-
     </button>
   `
 }
 
-export function renderPlayersPage(): string {
+export function renderPlayersPage():
+  string {
   const filteredPlayers =
     getFilteredPlayers()
 
   return `
     <section
-      class="page players-page"
+      class="
+        page
+        players-page
+      "
     >
-
       <div
-        class="players-page-header"
+        class="
+          players-page-header
+        "
       >
-
         <div>
+          <span
+            class="
+              players-eyebrow
+            "
+          >
+            DATABASE
+          </span>
 
-          <h1>Giocatori</h1>
+          <h1>
+            Giocatori
+          </h1>
 
           <p>
-            Database giocatori.
+            ${filteredPlayers.length}
+            di
+            ${players.length}
+            nel listone attivo
           </p>
-
         </div>
-
-        <div
-          class="players-header-tools"
-        >
-
-          <label
-            class="players-search"
-          >
-
-            <span>⌕</span>
-
-            <input
-              id="playersSearch"
-              type="search"
-              placeholder="Cerca giocatore..."
-              value="${escapeHtml(
-                viewState.search,
-              )}"
-              autocomplete="off"
-            >
-
-          </label>
-
-        </div>
-
       </div>
 
       <div
-        class="players-toolbar"
+        class="
+          players-toolbar
+        "
       >
-
         <div
-          class="players-role-filter"
+          class="
+            players-toolbar-left
+          "
         >
-
-          ${(
-            [
-              ['ALL', 'Tutti'],
-              ['P', 'P'],
-              ['D', 'D'],
-              ['C', 'C'],
-              ['A', 'A'],
-            ] as Array<
-              [RoleFilter, string]
-            >
-          )
-            .map(
-              ([value, label]) => `
-                <button
-                  type="button"
-                  class="
-                    players-filter-button
-
-                    ${
-                      viewState.role ===
-                      value
-                        ? 'selected'
-                        : ''
-                    }
-                  "
-                  data-player-role="${value}"
-                >
-                  ${label}
-                </button>
-              `,
+          <div
+            class="
+              players-role-filter
+            "
+          >
+            ${(
+              [
+                [
+                  'ALL',
+                  'Tutti',
+                ],
+                [
+                  'P',
+                  'P',
+                ],
+                [
+                  'D',
+                  'D',
+                ],
+                [
+                  'C',
+                  'C',
+                ],
+                [
+                  'A',
+                  'A',
+                ],
+              ] as Array<
+                [
+                  RoleFilter,
+                  string,
+                ]
+              >
             )
-            .join('')}
+              .map(
+                (
+                  [
+                    value,
+                    label,
+                  ],
+                ) => `
+                  <button
+                    type="button"
+                    class="
+                      players-filter-button
+                      players-role-${value.toLowerCase()}
+                      ${
+                        viewState.role ===
+                        value
+                          ? 'selected'
+                          : ''
+                      }
+                    "
+                    data-player-role="${value}"
+                  >
+                    ${label}
+                  </button>
+                `,
+              )
+              .join('')}
+          </div>
 
+          <div
+            class="
+              players-toggle-group
+            "
+          >
+            <label
+              class="
+                players-simple-toggle
+                ${
+                  viewState.freeOnly
+                    ? 'selected'
+                    : ''
+                }
+              "
+            >
+              <input
+                id="freeOnly"
+                type="checkbox"
+                ${
+                  viewState.freeOnly
+                    ? 'checked'
+                    : ''
+                }
+              >
+
+              <span
+                class="
+                  players-toggle-dot
+                "
+              ></span>
+
+              <span>
+                Solo liberi
+              </span>
+            </label>
+
+            <label
+              class="
+                players-simple-toggle
+                players-penalty-toggle
+                ${
+                  viewState
+                    .penaltiesOnly
+                    ? 'selected'
+                    : ''
+                }
+              "
+            >
+              <input
+                id="penaltiesOnly"
+                type="checkbox"
+                ${
+                  viewState
+                    .penaltiesOnly
+                    ? 'checked'
+                    : ''
+                }
+              >
+
+              <span
+                class="
+                  players-penalty-symbol
+                "
+              >
+                R
+              </span>
+
+              <span>
+                Rigoristi
+              </span>
+            </label>
+          </div>
         </div>
 
-        <div
-          class="players-toggle-group"
+        <label
+          class="
+            players-search
+          "
         >
+          <span>
+            ⌕
+          </span>
 
-          <label
-            class="
-              players-simple-toggle
-
-              ${
-                viewState.penaltiesOnly
-                  ? 'selected'
-                  : ''
-              }
-            "
+          <input
+            id="playersSearch"
+            type="search"
+            placeholder="Cerca nome o squadra..."
+            value="${escapeHtml(
+              viewState.search,
+            )}"
+            autocomplete="off"
           >
-
-            <input
-              id="penaltiesOnly"
-              type="checkbox"
-              ${
-                viewState.penaltiesOnly
-                  ? 'checked'
-                  : ''
-              }
-            >
-
-            <span>
-              Rigoristi
-            </span>
-
-          </label>
-
-          <label
-            class="
-              players-simple-toggle
-
-              ${
-                viewState.freeOnly
-                  ? 'selected'
-                  : ''
-              }
-            "
-          >
-
-            <input
-              id="freeOnly"
-              type="checkbox"
-              ${
-                viewState.freeOnly
-                  ? 'checked'
-                  : ''
-              }
-            >
-
-            <span>
-              Liberi
-            </span>
-
-          </label>
-
-        </div>
-
+        </label>
       </div>
 
       <div
-        class="players-table-card"
+        class="
+          players-table-card
+        "
       >
-
         <div
-          class="players-table-header"
+          class="
+            players-table-header
+          "
         >
-
           <div>
             ${renderSortHeader(
               'Giocatore',
@@ -607,7 +706,7 @@ export function renderPlayersPage(): string {
 
           <div>
             ${renderSortHeader(
-              'xMV/xFMV',
+              'xMV / xFMV',
               'xFmv',
             )}
           </div>
@@ -618,19 +717,20 @@ export function renderPlayersPage(): string {
               'status',
             )}
           </div>
-
         </div>
 
         <div
-          class="players-table-body"
+          class="
+            players-table-body
+          "
         >
-
           ${
             filteredPlayers.length
               ? filteredPlayers
                   .map(
                     (
-                      player: Player,
+                      player:
+                        Player,
                     ) =>
                       renderPlayerRow(
                         player,
@@ -639,7 +739,9 @@ export function renderPlayersPage(): string {
                   .join('')
               : `
                 <div
-                  class="players-empty"
+                  class="
+                    players-empty
+                  "
                 >
                   Nessun giocatore
                   corrisponde ai filtri
@@ -647,15 +749,14 @@ export function renderPlayersPage(): string {
                 </div>
               `
           }
-
         </div>
-
       </div>
 
       <div
-        class="players-footer-info"
+        class="
+          players-footer-info
+        "
       >
-
         <span>
           ${filteredPlayers.length}
 
@@ -670,17 +771,20 @@ export function renderPlayersPage(): string {
         <span>
           Dataset demo temporaneo
         </span>
-
       </div>
 
       <div
         id="playerPreviewOverlay"
-        class="overlay hidden"
+        class="
+          overlay
+          hidden
+        "
         aria-hidden="true"
       >
-
         <div
-          class="overlay-backdrop"
+          class="
+            overlay-backdrop
+          "
         ></div>
 
         <div
@@ -689,51 +793,57 @@ export function renderPlayersPage(): string {
             player-preview-card
           "
         >
-
           <div
-            class="overlay-header"
+            class="
+              overlay-header
+            "
           >
-
             <div>
-
               <span
-                class="eyebrow"
+                class="
+                  eyebrow
+                "
               >
                 GIOCATORE
               </span>
 
               <h2
-                id="playerPreviewName"
+                id="
+                  playerPreviewName
+                "
               >
                 Giocatore
               </h2>
-
             </div>
 
             <button
               id="closePlayerPreviewButton"
               type="button"
-              class="icon-button"
+              class="
+                icon-button
+              "
               aria-label="Chiudi"
             >
               ×
             </button>
-
           </div>
 
-          <p class="muted-text">
-            Questa è una predisposizione
+          <p
+            class="
+              muted-text
+            "
+          >
+            Questa è una
+            predisposizione
             temporanea.
 
-            In seguito il click aprirà
-            la pagina dettaglio completa
+            In seguito il click
+            aprirà la pagina
+            dettaglio completa
             del giocatore.
           </p>
-
         </div>
-
       </div>
-
     </section>
   `
 }
@@ -749,26 +859,29 @@ export function bindPlayersEvents(
     .querySelectorAll<HTMLButtonElement>(
       '[data-player-role]',
     )
-    .forEach((button) => {
-      button.addEventListener(
-        'click',
-        () => {
-          const role =
-            button.dataset
-              .playerRole as
-              | RoleFilter
-              | undefined
+    .forEach(
+      (button) => {
+        button.addEventListener(
+          'click',
+          () => {
+            const role =
+              button.dataset
+                .playerRole as
+                | RoleFilter
+                | undefined
 
-          if (!role) {
-            return
-          }
+            if (!role) {
+              return
+            }
 
-          viewState.role = role
+            viewState.role =
+              role
 
-          actions.onRender()
-        },
-      )
-    })
+            actions.onRender()
+          },
+        )
+      },
+    )
 
   document
     .querySelector<HTMLInputElement>(
@@ -781,7 +894,8 @@ export function bindPlayersEvents(
           event.currentTarget as
             HTMLInputElement
 
-        viewState.penaltiesOnly =
+        viewState
+          .penaltiesOnly =
           target.checked
 
         actions.onRender()
@@ -828,12 +942,15 @@ export function bindPlayersEvents(
         newSearchInput.focus()
 
         const end =
-          newSearchInput.value.length
+          newSearchInput
+            .value
+            .length
 
-        newSearchInput.setSelectionRange(
-          end,
-          end,
-        )
+        newSearchInput
+          .setSelectionRange(
+            end,
+            end,
+          )
       }
     },
   )
@@ -842,41 +959,48 @@ export function bindPlayersEvents(
     .querySelectorAll<HTMLButtonElement>(
       '[data-player-sort]',
     )
-    .forEach((button) => {
-      button.addEventListener(
-        'click',
-        () => {
-          const key =
-            button.dataset
-              .playerSort as
-              | SortKey
-              | undefined
+    .forEach(
+      (button) => {
+        button.addEventListener(
+          'click',
+          () => {
+            const key =
+              button.dataset
+                .playerSort as
+                | SortKey
+                | undefined
 
-          if (!key) {
-            return
-          }
+            if (!key) {
+              return
+            }
 
-          if (
-            viewState.sortKey === key
-          ) {
-            viewState.sortDirection =
-              viewState.sortDirection ===
-              'asc'
-                ? 'desc'
-                : 'asc'
-          } else {
-            viewState.sortKey = key
+            if (
+              viewState.sortKey ===
+              key
+            ) {
+              viewState
+                .sortDirection =
+                viewState
+                  .sortDirection ===
+                'asc'
+                  ? 'desc'
+                  : 'asc'
+            } else {
+              viewState.sortKey =
+                key
 
-            viewState.sortDirection =
-              key === 'name'
-                ? 'asc'
-                : 'desc'
-          }
+              viewState
+                .sortDirection =
+                key === 'name'
+                  ? 'asc'
+                  : 'desc'
+            }
 
-          actions.onRender()
-        },
-      )
-    })
+            actions.onRender()
+          },
+        )
+      },
+    )
 
   const overlay =
     document.querySelector<HTMLElement>(
@@ -888,54 +1012,60 @@ export function bindPlayersEvents(
       '#playerPreviewName',
     )
 
-  const closeOverlay = () => {
-    overlay?.classList.add(
-      'hidden',
-    )
+  const closeOverlay =
+    (): void => {
+      overlay?.classList.add(
+        'hidden',
+      )
 
-    overlay?.setAttribute(
-      'aria-hidden',
-      'true',
-    )
-  }
+      overlay?.setAttribute(
+        'aria-hidden',
+        'true',
+      )
+    }
 
   document
     .querySelectorAll<HTMLButtonElement>(
       '[data-player-id]',
     )
-    .forEach((row) => {
-      row.addEventListener(
-        'click',
-        () => {
-          const player =
-            players.find(
-              (
-                item: Player,
-              ) =>
-                item.id ===
-                row.dataset.playerId,
+    .forEach(
+      (row) => {
+        row.addEventListener(
+          'click',
+          () => {
+            const player =
+              players.find(
+                (
+                  item:
+                    Player,
+                ) =>
+                  item.id ===
+                  row.dataset
+                    .playerId,
+              )
+
+            if (!player) {
+              return
+            }
+
+            if (previewName) {
+              previewName
+                .textContent =
+                player.name
+            }
+
+            overlay?.classList.remove(
+              'hidden',
             )
 
-          if (!player) {
-            return
-          }
-
-          if (previewName) {
-            previewName.textContent =
-              player.name
-          }
-
-          overlay?.classList.remove(
-            'hidden',
-          )
-
-          overlay?.setAttribute(
-            'aria-hidden',
-            'false',
-          )
-        },
-      )
-    })
+            overlay?.setAttribute(
+              'aria-hidden',
+              'false',
+            )
+          },
+        )
+      },
+    )
 
   document
     .querySelector(

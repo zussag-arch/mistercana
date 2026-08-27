@@ -147,13 +147,19 @@ function escapeHtml(
     .replaceAll("'", '&#039;')
 }
 
-function renderGoalkeeperSection(): string {
+function renderGoalkeeperSection():
+  string {
   return `
-    <section class="insight-section">
-
-      <div class="insight-section-header">
+    <section
+      class="insight-section"
+    >
+      <div
+        class="insight-section-header"
+      >
         <div>
-          <span class="insight-eyebrow">
+          <span
+            class="insight-eyebrow"
+          >
             PORTIERI
           </span>
 
@@ -168,24 +174,44 @@ function renderGoalkeeperSection(): string {
           </p>
         </div>
 
-        <span class="insight-placeholder-badge">
+        <span
+          class="
+            insight-placeholder-badge
+          "
+        >
           Dati da collegare
         </span>
       </div>
 
-      <div class="goalkeeper-table">
+      <div
+        class="goalkeeper-table"
+      >
+        <div
+          class="
+            goalkeeper-table-header
+          "
+        >
+          <span>
+            Portiere
+          </span>
 
-        <div class="goalkeeper-table-header">
-          <span>Portiere</span>
-          <span>Abbinamento</span>
-          <span>Indicazione</span>
+          <span>
+            Abbinamento
+          </span>
+
+          <span>
+            Indicazione
+          </span>
         </div>
 
         ${GOALKEEPER_ROWS
           .map(
             (row) => `
-              <div class="goalkeeper-table-row">
-
+              <div
+                class="
+                  goalkeeper-table-row
+                "
+              >
                 <strong>
                   ${escapeHtml(
                     row.primary,
@@ -203,26 +229,28 @@ function renderGoalkeeperSection(): string {
                     row.note,
                   )}
                 </small>
-
               </div>
             `,
           )
           .join('')}
-
       </div>
-
     </section>
   `
 }
 
-function renderSetPiecesSection(): string {
+function renderSetPiecesSection():
+  string {
   return `
-    <section class="insight-section">
-
-      <div class="insight-section-header">
-
+    <section
+      class="insight-section"
+    >
+      <div
+        class="insight-section-header"
+      >
         <div>
-          <span class="insight-eyebrow">
+          <span
+            class="insight-eyebrow"
+          >
             SPECIALISTI
           </span>
 
@@ -237,30 +265,43 @@ function renderSetPiecesSection(): string {
           </p>
         </div>
 
-        <span class="insight-placeholder-badge">
+        <span
+          class="
+            insight-placeholder-badge
+          "
+        >
           Ordine da fonte esterna
         </span>
-
       </div>
 
-      <div class="set-pieces-grid">
-
+      <div
+        class="set-pieces-grid"
+      >
         ${SET_PIECE_TEAMS
           .map(
             (item) => `
-              <article class="set-piece-card">
-
-                <div class="set-piece-team">
+              <article
+                class="set-piece-card"
+              >
+                <div
+                  class="set-piece-team"
+                >
                   ${escapeHtml(
                     item.team,
                   )}
                 </div>
 
-                <div class="set-piece-columns">
-
+                <div
+                  class="
+                    set-piece-columns
+                  "
+                >
                   <div>
-
-                    <span class="set-piece-label">
+                    <span
+                      class="
+                        set-piece-label
+                      "
+                    >
                       Rigori
                     </span>
 
@@ -277,12 +318,14 @@ function renderSetPiecesSection(): string {
                         )
                         .join('')}
                     </ol>
-
                   </div>
 
                   <div>
-
-                    <span class="set-piece-label">
+                    <span
+                      class="
+                        set-piece-label
+                      "
+                    >
                       Piazzati
                     </span>
 
@@ -299,28 +342,33 @@ function renderSetPiecesSection(): string {
                         )
                         .join('')}
                     </ol>
-
                   </div>
-
                 </div>
-
               </article>
             `,
           )
           .join('')}
-
       </div>
-
     </section>
   `
 }
 
-function renderCoachPitch(): string {
+function renderCoachPitch():
+  string {
   return `
-    <div class="coach-pitch">
+    <div
+      class="coach-pitch"
+    >
+      <div
+        class="
+          pitch-line
+          pitch-half
+        "
+      ></div>
 
-      <div class="pitch-line pitch-half"></div>
-      <div class="pitch-circle"></div>
+      <div
+        class="pitch-circle"
+      ></div>
 
       <div
         class="
@@ -411,20 +459,23 @@ function renderCoachPitch(): string {
       >
         Pc
       </div>
-
     </div>
   `
 }
 
-function renderCoachSection(): string {
+function renderCoachSection():
+  string {
   return `
-    <section class="insight-section">
-
-      <div class="insight-section-header">
-
+    <section
+      class="insight-section"
+    >
+      <div
+        class="insight-section-header"
+      >
         <div>
-
-          <span class="insight-eyebrow">
+          <span
+            class="insight-eyebrow"
+          >
             ALLENATORI SERIE A
           </span>
 
@@ -437,28 +488,37 @@ function renderCoachSection(): string {
             modulo, stato nuovo e impatto
             sui macro-ruoli Mantra.
           </p>
-
         </div>
 
-        <span class="insight-placeholder-badge">
+        <span
+          class="
+            insight-placeholder-badge
+          "
+        >
           Valori da collegare
         </span>
-
       </div>
 
-      <div class="coach-grid">
-
+      <div
+        class="coach-grid"
+      >
         ${COACHES
           .map(
             (coach) => `
-              <article class="coach-card">
-
-                <div class="coach-card-header">
-
+              <article
+                class="coach-card"
+              >
+                <div
+                  class="
+                    coach-card-header
+                  "
+                >
                   <div>
-
-                    <div class="coach-title-row">
-
+                    <div
+                      class="
+                        coach-title-row
+                      "
+                    >
                       <strong>
                         ${escapeHtml(
                           coach.name,
@@ -468,13 +528,16 @@ function renderCoachSection(): string {
                       ${
                         coach.isNew
                           ? `
-                            <span class="coach-new-badge">
+                            <span
+                              class="
+                                coach-new-badge
+                              "
+                            >
                               NUOVO
                             </span>
                           `
                           : ''
                       }
-
                     </div>
 
                     <small>
@@ -482,28 +545,39 @@ function renderCoachSection(): string {
                         coach.team,
                       )}
                     </small>
-
                   </div>
 
-                  <span class="coach-formation">
+                  <span
+                    class="
+                      coach-formation
+                    "
+                  >
                     ${escapeHtml(
                       coach.formation,
                     )}
                   </span>
-
                 </div>
 
-                <div class="coach-card-body">
-
+                <div
+                  class="
+                    coach-card-body
+                  "
+                >
                   ${renderCoachPitch()}
 
-                  <div class="coach-macro-role-list">
-
+                  <div
+                    class="
+                      coach-macro-role-list
+                    "
+                  >
                     ${COACH_MACRO_ROLES
                       .map(
                         (role) => `
-                          <div class="coach-macro-role-row">
-
+                          <div
+                            class="
+                              coach-macro-role-row
+                            "
+                          >
                             <div>
                               <strong>
                                 ${escapeHtml(
@@ -518,38 +592,43 @@ function renderCoachSection(): string {
                               </small>
                             </div>
 
-                            <span class="coach-impact-placeholder">
+                            <span
+                              class="
+                                coach-impact-placeholder
+                              "
+                            >
                               —
                             </span>
-
                           </div>
                         `,
                       )
                       .join('')}
-
                   </div>
-
                 </div>
-
               </article>
             `,
           )
           .join('')}
-
       </div>
-
     </section>
   `
 }
 
-export function renderInsightsPage(): string {
+export function renderInsightsPage():
+  string {
   return `
-    <section class="page insights-page">
-
-      <div class="insights-page-header">
-
+    <section
+      class="
+        page
+        insights-page
+      "
+    >
+      <div
+        class="
+          insights-page-header
+        "
+      >
         <div>
-
           <h1>
             Insights
           </h1>
@@ -558,9 +637,7 @@ export function renderInsightsPage(): string {
             Informazioni di supporto
             strategico.
           </p>
-
         </div>
-
       </div>
 
       ${renderGoalkeeperSection()}
@@ -568,7 +645,6 @@ export function renderInsightsPage(): string {
       ${renderSetPiecesSection()}
 
       ${renderCoachSection()}
-
     </section>
   `
 }
