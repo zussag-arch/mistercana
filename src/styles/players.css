@@ -3,22 +3,29 @@
    ========================= */
 
 .players-page {
-  max-width: 1320px;
+  max-width: 1240px;
 }
+
+/* =========================
+   HEADER
+   ========================= */
 
 .players-page-header {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
 
-  gap: 24px;
+  gap: 28px;
 
-  margin-bottom: 24px;
+  margin-bottom: 26px;
 }
 
 .players-page-header h1 {
+  margin: 0;
+
   text-transform: uppercase;
-  letter-spacing: 0.02em;
+
+  letter-spacing: 0.025em;
 }
 
 .players-page-header p {
@@ -29,34 +36,66 @@
   font-size: 12px;
 }
 
-/* SEARCH */
+/* =========================
+   SEARCH
+   ========================= */
 
 .players-header-tools {
   display: flex;
   align-items: center;
+
+  flex: 0 0 auto;
 }
 
 .players-search {
-  width: 255px;
-  height: 38px;
+  width: 280px;
+  height: 40px;
 
   display: flex;
   align-items: center;
 
-  gap: 8px;
+  gap: 9px;
 
-  padding: 0 12px;
+  padding: 0 13px;
 
   border: 1px solid var(--border);
   border-radius: 10px;
 
-  background: #1a1c1e;
+  background: #191b1d;
+
+  transition:
+    border-color 0.16s ease,
+    background 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.players-search:hover {
+  border-color: #484d50;
+
+  background: #1c1f21;
+}
+
+.players-search:focus-within {
+  border-color: #656b6f;
+
+  background: #1d2022;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(255, 255, 255, 0.025);
 }
 
 .players-search > span {
-  color: #747a7e;
+  color: #73797d;
 
-  font-size: 17px;
+  font-size: 16px;
+
+  transition:
+    color 0.16s ease;
+}
+
+.players-search:focus-within > span {
+  color: #c6cacc;
 }
 
 .players-search input {
@@ -72,19 +111,21 @@
 }
 
 .players-search input::placeholder {
-  color: #666c70;
+  color: #62686c;
 }
 
-/* TOOLBAR */
+/* =========================
+   TOOLBAR
+   ========================= */
 
 .players-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  gap: 20px;
+  gap: 22px;
 
-  margin-bottom: 13px;
+  margin-bottom: 12px;
 }
 
 .players-role-filter,
@@ -95,52 +136,73 @@
   gap: 6px;
 }
 
+/* =========================
+   ROLE FILTERS
+   ========================= */
+
 .players-filter-button {
-  min-width: 34px;
+  min-width: 35px;
   height: 32px;
 
-  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 11px;
 
   border: 1px solid transparent;
   border-radius: 8px;
 
   background: transparent;
-  color: #777d81;
+  color: #747a7e;
 
   font-size: 10px;
   font-weight: 750;
 
   cursor: pointer;
+
+  transition:
+    color 0.14s ease,
+    background 0.14s ease,
+    border-color 0.14s ease,
+    transform 0.14s ease;
 }
 
 .players-filter-button:hover {
-  color: #e4e6e7;
+  color: #e0e3e4;
+
+  background: #202326;
+
+  transform: translateY(-1px);
 }
 
 .players-filter-button.selected {
-  border-color: #454a4d;
+  border-color: #4a4f52;
 
-  background: #242729;
+  background: #282b2e;
   color: #ffffff;
 }
 
-/* SIMPLE TOGGLES */
+/* =========================
+   SIMPLE TOGGLES
+   ========================= */
 
 .players-simple-toggle {
   position: relative;
 
-  display: flex;
-  align-items: center;
-
   height: 32px;
 
-  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 11px;
 
   border: 1px solid #34383b;
   border-radius: 8px;
 
-  background: #1a1c1e;
-  color: #777d81;
+  background: #191b1d;
+  color: #747a7e;
 
   font-size: 10px;
   font-weight: 700;
@@ -148,6 +210,12 @@
   cursor: pointer;
 
   user-select: none;
+
+  transition:
+    color 0.14s ease,
+    background 0.14s ease,
+    border-color 0.14s ease,
+    transform 0.14s ease;
 }
 
 .players-simple-toggle input {
@@ -159,50 +227,90 @@
 
 .players-simple-toggle:hover {
   color: #e0e3e4;
+
+  background: #202326;
+
+  transform: translateY(-1px);
 }
 
 .players-simple-toggle.selected {
-  border-color: #646a6e;
+  border-color: #5b6165;
 
-  background: #282b2e;
-  color: white;
+  background: #292d30;
+  color: #ffffff;
 }
 
-/* TABLE CARD */
+/* =========================
+   TABLE CARD
+   ========================= */
 
 .players-table-card {
   width: 100%;
 
   overflow: hidden;
 
-  border: 1px solid #35393c;
+  border: 1px solid #363a3d;
   border-radius: 14px;
 
-  background: #1b1d1f;
+  background: #1a1c1e;
+
+  box-shadow:
+    0 8px 30px
+    rgba(0, 0, 0, 0.08);
+
+  animation:
+    players-card-in
+    0.22s
+    ease-out;
 }
+
+@keyframes players-card-in {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+/* =========================
+   TABLE GRID
+   ========================= */
 
 .players-table-header,
 .players-table-row {
   display: grid;
 
   grid-template-columns:
-    minmax(260px, 2.3fr)
-    minmax(70px, 0.65fr)
-    minmax(70px, 0.65fr)
-    minmax(90px, 0.85fr)
-    minmax(90px, 0.85fr)
-    minmax(110px, 1fr)
-    minmax(100px, 0.9fr);
+    minmax(290px, 2.45fr)
+    minmax(72px, 0.62fr)
+    minmax(72px, 0.62fr)
+    minmax(95px, 0.82fr)
+    minmax(100px, 0.86fr)
+    minmax(120px, 1fr)
+    minmax(105px, 0.9fr);
 
   align-items: center;
 }
 
+/* =========================
+   TABLE HEADER
+   ========================= */
+
 .players-table-header {
   min-height: 45px;
 
-  padding: 0 15px;
+  padding: 0 17px;
 
-  border-bottom: 1px solid #303437;
+  border-bottom:
+    1px solid #303437;
 
   background: #202326;
 }
@@ -222,7 +330,7 @@
   border: 0;
 
   background: transparent;
-  color: #73797d;
+  color: #777d81;
 
   font-size: 9px;
   font-weight: 800;
@@ -232,30 +340,44 @@
   letter-spacing: 0.045em;
 
   cursor: pointer;
+
+  transition:
+    color 0.14s ease;
 }
 
 .players-table-sort:hover {
-  color: #d2d5d7;
+  color: #e0e3e4;
 }
 
 .players-sort-neutral {
-  opacity: 0.35;
+  opacity: 0.3;
+
+  transition:
+    opacity 0.14s ease;
+}
+
+.players-table-sort:hover
+  .players-sort-neutral {
+  opacity: 0.65;
 }
 
 .players-sort-active {
   color: #eeeeee;
 }
 
-/* ROW */
+/* =========================
+   TABLE ROW
+   ========================= */
 
 .players-table-row {
   width: 100%;
-  min-height: 61px;
+  min-height: 62px;
 
-  padding: 0 15px;
+  padding: 0 17px;
 
   border: 0;
-  border-bottom: 1px solid #2b2e31;
+  border-bottom:
+    1px solid #2b2e31;
 
   background: transparent;
   color: inherit;
@@ -264,7 +386,9 @@
 
   cursor: pointer;
 
-  transition: background 0.12s ease;
+  transition:
+    background 0.14s ease,
+    transform 0.14s ease;
 }
 
 .players-table-row:last-child {
@@ -275,17 +399,25 @@
   background: #222528;
 }
 
+.players-table-row:active {
+  background: #262a2d;
+}
+
+/* =========================
+   CELLS
+   ========================= */
+
 .players-cell {
   min-width: 0;
 
-  padding-right: 12px;
+  padding-right: 14px;
 }
 
 .players-player-cell {
   display: flex;
   align-items: center;
 
-  gap: 11px;
+  gap: 12px;
 }
 
 .players-player-info {
@@ -300,13 +432,21 @@
 .players-player-info strong {
   overflow: hidden;
 
-  color: #eeeeee;
+  color: #ededed;
 
   font-size: 12px;
   font-weight: 720;
 
   white-space: nowrap;
   text-overflow: ellipsis;
+
+  transition:
+    color 0.14s ease;
+}
+
+.players-table-row:hover
+  .players-player-info strong {
+  color: #ffffff;
 }
 
 .players-player-info small {
@@ -320,24 +460,40 @@
   text-overflow: ellipsis;
 }
 
-/* ROLE */
+/* =========================
+   ROLE BADGES
+   ========================= */
 
 .role-badge {
-  width: 28px;
-  height: 28px;
+  width: 29px;
+  height: 29px;
 
   flex: 0 0 auto;
 
   display: grid;
   place-items: center;
 
-  border: 1px solid #44494c;
+  border: 1px solid #42474a;
   border-radius: 8px;
 
   background: #25282a;
 
   font-size: 10px;
   font-weight: 850;
+
+  transition:
+    border-color 0.14s ease,
+    background 0.14s ease,
+    transform 0.14s ease;
+}
+
+.players-table-row:hover
+  .role-badge {
+  border-color: #555b5f;
+
+  background: #2a2e31;
+
+  transform: scale(1.04);
 }
 
 .role-p {
@@ -356,14 +512,25 @@
   color: #e87979;
 }
 
-/* NUMBERS */
+/* =========================
+   NUMBERS
+   ========================= */
 
 .players-number-cell {
-  color: #c0c4c6;
+  color: #bfc3c5;
 
   font-size: 11px;
 
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric:
+    tabular-nums;
+
+  transition:
+    color 0.14s ease;
+}
+
+.players-table-row:hover
+  .players-number-cell {
+  color: #e0e3e4;
 }
 
 .players-x-cell {
@@ -377,7 +544,9 @@
   color: #555b5f;
 }
 
-/* STATUS */
+/* =========================
+   STATUS
+   ========================= */
 
 .players-status-cell {
   display: flex;
@@ -396,24 +565,38 @@
 
   font-size: 9px;
   font-weight: 750;
+
+  transition:
+    background 0.14s ease,
+    color 0.14s ease,
+    transform 0.14s ease;
+}
+
+.players-table-row:hover
+  .player-status {
+  transform: translateY(-1px);
 }
 
 .player-status-free {
-  background: rgba(52, 211, 153, 0.1);
+  background:
+    rgba(52, 211, 153, 0.1);
 
   color: #65ddb0;
 }
 
 .player-status-assigned {
-  background: rgba(232, 124, 83, 0.12);
+  background:
+    rgba(232, 124, 83, 0.12);
 
   color: #e8926d;
 }
 
-/* EMPTY */
+/* =========================
+   EMPTY STATE
+   ========================= */
 
 .players-empty {
-  padding: 50px 20px;
+  padding: 54px 20px;
 
   color: #73797d;
 
@@ -422,7 +605,9 @@
   font-size: 11px;
 }
 
-/* FOOTER */
+/* =========================
+   FOOTER
+   ========================= */
 
 .players-footer-info {
   display: flex;
@@ -438,30 +623,102 @@
   font-size: 9px;
 }
 
-/* PLAYER TEMP PREVIEW */
+/* =========================
+   PLAYER PREVIEW
+   ========================= */
 
 .player-preview-card {
   width: min(520px, 100%);
+
+  animation:
+    player-preview-in
+    0.18s
+    ease-out;
 }
 
-/* SMALLER DESKTOPS */
+#playerPreviewOverlay
+  .overlay-backdrop {
+  animation:
+    player-backdrop-in
+    0.18s
+    ease-out;
+}
 
-@media (max-width: 1050px) {
+@keyframes
+  player-preview-in {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(8px)
+      scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+@keyframes
+  player-backdrop-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* =========================
+   SMALLER DESKTOPS
+   ========================= */
+
+@media (max-width: 1100px) {
   .players-table-header,
   .players-table-row {
     grid-template-columns:
-      minmax(230px, 2fr)
-      60px
-      60px
-      80px
+      minmax(240px, 2fr)
+      65px
+      65px
       85px
-      105px
-      90px;
+      90px
+      110px
+      95px;
 
-    min-width: 900px;
+    min-width: 930px;
   }
 
   .players-table-card {
     overflow-x: auto;
+  }
+}
+
+/* =========================
+   REDUCED MOTION
+   ========================= */
+
+@media (
+  prefers-reduced-motion:
+  reduce
+) {
+  .players-table-card,
+  .player-preview-card,
+  #playerPreviewOverlay
+    .overlay-backdrop {
+    animation: none;
+  }
+
+  .players-filter-button,
+  .players-simple-toggle,
+  .players-search,
+  .players-table-row,
+  .role-badge,
+  .player-status {
+    transition: none;
   }
 }

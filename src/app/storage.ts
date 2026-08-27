@@ -8,17 +8,33 @@ import {
   defaultState,
 } from './state'
 
+import type {
+  ObjectivePriority,
+  PlayerObjective,
+} from '../domain/objective'
+
 const STORAGE_KEY =
   'mistercana_app_state_v1'
 
-type LegacyManager = Partial<Manager> & {
-  name?: unknown
-}
+type LegacyManager =
+  Partial<Manager> & {
+    name?: unknown
+  }
 
 type LegacyState =
-  Partial<Omit<AppState, 'managers' | 'auctionPhase'>> & {
+  Partial<
+    Omit<
+      AppState,
+      'managers' |
+      'auctionPhase' |
+      'objectives'
+    >
+  > & {
     auctionPhase?: unknown
+
     managers?: LegacyManager[]
+
+    objectives?: unknown
   }
 
 export function saveState(
@@ -33,16 +49,9 @@ export function saveState(
 function normalizeAuctionPhase(
   phase: unknown,
 ): AuctionPhase {
-  /*
-    Migrazione delle versioni precedenti.
-
-    Il vecchio stato "completed"
-    corrisponde ora a "finalizing":
-    l'utente deve decidere se
-    registrare o scartare l'asta.
-  */
-
-  if (phase === 'completed') {
+  if (
+    phase === 'completed'
+  ) {
     return 'finalizing'
   }
 
@@ -56,11 +65,6 @@ function normalizeAuctionPhase(
     return phase
   }
 
-  /*
-    Qualsiasi valore non riconosciuto
-    torna in setup invece di lasciare
-    la Dashboard bloccata.
-  */
   return 'setup'
 }
 
@@ -70,27 +74,42 @@ function splitLegacyName(
   firstName: string
   lastName: string
 } {
-  const clean = value.trim()
+  const clean =
+    value.trim()
 
   if (!clean) {
     return {
-      firstName: 'Allenatore',
-      lastName: '',
+      firstName:
+        'Allenatore',
+
+      lastName:
+        '',
     }
   }
 
-  const parts = clean.split(/\s+/)
+  const parts =
+    clean.split(/\s+/)
 
-  if (parts.length === 1) {
+  if (
+    parts.length === 1
+  ) {
     return {
-      firstName: parts[0],
-      lastName: '',
+      firstName:
+        parts[0],
+
+      lastName:
+        '',
     }
   }
 
   return {
-    firstName: parts[0],
-    lastName: parts.slice(1).join(' '),
+    firstName:
+      parts[0],
+
+    lastName:
+      parts
+        .slice(1)
+        .join(' '),
   }
 }
 
@@ -99,37 +118,43 @@ function migrateManager(
   index: number,
 ): Manager {
   let firstName =
-    typeof manager.firstName === 'string'
+    typeof manager.firstName ===
+      'string'
       ? manager.firstName.trim()
       : ''
 
   let lastName =
-    typeof manager.lastName === 'string'
+    typeof manager.lastName ===
+      'string'
       ? manager.lastName.trim()
       : ''
 
-  /*
-    Compatibilità con il vecchio
-    campo "name".
-  */
   if (
     !firstName &&
-    typeof manager.name === 'string'
+    typeof manager.name ===
+      'string'
   ) {
     const migrated =
-      splitLegacyName(manager.name)
+      splitLegacyName(
+        manager.name,
+      )
 
-    firstName = migrated.firstName
-    lastName = migrated.lastName
+    firstName =
+      migrated.firstName
+
+    lastName =
+      migrated.lastName
   }
 
   if (!firstName) {
-    firstName = 'Allenatore'
+    firstName =
+      'Allenatore'
   }
 
   return {
     id:
-      typeof manager.id === 'string' &&
+      typeof manager.id ===
+        'string' &&
       manager.id.trim()
         ? manager.id
         : `manager_migrated_${index}`,
@@ -139,52 +164,162 @@ function migrateManager(
     lastName,
 
     alias:
-      typeof manager.alias === 'string'
+      typeof manager.alias ===
+        'string'
         ? manager.alias.trim()
         : '',
 
     teamName:
-      typeof manager.teamName === 'string'
+      typeof manager.teamName ===
+        'string'
         ? manager.teamName.trim()
         : '',
 
     isOwner:
-      typeof manager.isOwner === 'boolean'
+      typeof manager.isOwner ===
+        'boolean'
         ? manager.isOwner
         : false,
 
     active:
-      typeof manager.active === 'boolean'
+      typeof manager.active ===
+        'boolean'
         ? manager.active
         : true,
 
     archived:
-      typeof manager.archived === 'boolean'
+      typeof manager.archived ===
+        'boolean'
         ? manager.archived
         : false,
   }
 }
 
+function isObjectivePriority(
+  value: unknown,
+): value is ObjectivePriority {
+  return (
+    value === 'primary' ||
+    value === 'secondary' ||
+    value === 'third' ||
+    value === 'fourth' ||
+    value === 'bet'
+  )
+}
+
+function migrateObjectives(
+  value: unknown,
+): PlayerObjective[] {
+  if (
+    !Array.isArray(value)
+  ) {
+    return []
+  }
+
+  const objectives:
+    PlayerObjective[] = []
+
+  const seenPlayerIds =
+    new Set<string>()
+
+  value.forEach(
+    (item) => {
+      if (
+        !item ||
+        typeof item !==
+          'object'
+      ) {
+        return
+      }
+
+      const candidate =
+        item as {
+          playerId?: unknown
+          priority?: unknown
+          weight?: unknown
+        }
+
+      if (
+        typeof candidate.playerId !==
+          'string' ||
+        !candidate.playerId.trim()
+      ) {
+        return
+      }
+
+      if (
+        !isObjectivePriority(
+          candidate.priority,
+        )
+      ) {
+        return
+      }
+
+      if (
+        seenPlayerIds.has(
+          candidate.playerId,
+        )
+      ) {
+        return
+      }
+
+      seenPlayerIds.add(
+        candidate.playerId,
+      )
+
+      objectives.push({
+        playerId:
+          candidate.playerId,
+
+        priority:
+          candidate.priority,
+
+        /*
+          Fino alla fase algoritmi
+          manteniamo sempre il
+          placeholder neutro a 1.
+        */
+        weight: 1,
+      })
+    },
+  )
+
+  return objectives
+}
+
 export function loadState(): AppState {
   const raw =
-    localStorage.getItem(STORAGE_KEY)
+    localStorage.getItem(
+      STORAGE_KEY,
+    )
 
   if (!raw) {
-    return structuredClone(defaultState)
+    return structuredClone(
+      defaultState,
+    )
   }
 
   try {
     const parsed =
-      JSON.parse(raw) as LegacyState
+      JSON.parse(
+        raw,
+      ) as LegacyState
 
     const managers =
-      Array.isArray(parsed.managers)
+      Array.isArray(
+        parsed.managers,
+      )
         ? parsed.managers.map(
             migrateManager,
           )
         : structuredClone(
             defaultState.managers,
           )
+
+    const objectives =
+      migrateObjectives(
+        parsed.objectives,
+      )
 
     return {
       auctionPhase:
@@ -207,13 +342,20 @@ export function loadState(): AppState {
         defaultState.budgetProfile,
 
       budgetDistribution: {
-        ...defaultState.budgetDistribution,
-        ...parsed.budgetDistribution,
+        ...defaultState
+          .budgetDistribution,
+
+        ...parsed
+          .budgetDistribution,
       },
 
       managers,
+
+      objectives,
     }
   } catch {
-    return structuredClone(defaultState)
+    return structuredClone(
+      defaultState,
+    )
   }
 }

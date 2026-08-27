@@ -1,3 +1,7 @@
+import type {
+  PlayerObjective,
+} from '../domain/objective'
+
 export type AuctionPhase =
   | 'setup'
   | 'live'
@@ -5,7 +9,11 @@ export type AuctionPhase =
   | 'archived'
   | 'discarded'
 
-export type BudgetRole = 'P' | 'D' | 'C' | 'A'
+export type BudgetRole =
+  | 'P'
+  | 'D'
+  | 'C'
+  | 'A'
 
 export type BudgetProfile =
   | 'prudente'
@@ -44,6 +52,17 @@ export interface AppState {
   budgetDistribution: BudgetDistribution
 
   managers: Manager[]
+
+  /*
+    Shortlist strategica personale.
+
+    Il ruolo non viene salvato qui:
+    deriva dal database giocatori.
+
+    Questo evita duplicazioni e
+    incoerenze tra obiettivi e database.
+  */
+  objectives: PlayerObjective[]
 }
 
 export const defaultState: AppState = {
@@ -75,4 +94,6 @@ export const defaultState: AppState = {
       archived: false,
     },
   ],
+
+  objectives: [],
 }

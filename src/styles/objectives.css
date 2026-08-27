@@ -1,0 +1,588 @@
+/* =========================
+   OBJECTIVES PAGE
+   ========================= */
+
+.objectives-page {
+  max-width: 1280px;
+}
+
+/* =========================
+   HEADER
+   ========================= */
+
+.objectives-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 24px;
+
+  margin-bottom: 24px;
+}
+
+.objectives-page-header h1 {
+  margin: 0;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.025em;
+}
+
+.objectives-page-header p {
+  margin: 7px 0 0;
+
+  color: var(--muted);
+
+  font-size: 12px;
+}
+
+.objectives-total {
+  padding: 7px 10px;
+
+  border: 1px solid var(--border);
+  border-radius: 8px;
+
+  background: #1c1f21;
+  color: #8f9599;
+
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* =========================
+   SEARCH PANEL
+   ========================= */
+
+.objectives-search-panel {
+  position: relative;
+
+  z-index: 10;
+
+  margin-bottom: 24px;
+}
+
+.objectives-search-row {
+  display: grid;
+
+  grid-template-columns:
+    minmax(280px, 1fr)
+    150px;
+
+  gap: 10px;
+}
+
+.objectives-search-box {
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+
+  padding: 0 13px;
+
+  border: 1px solid var(--border);
+  border-radius: 10px;
+
+  background: #191b1d;
+}
+
+.objectives-search-icon {
+  color: #73797d;
+
+  font-size: 16px;
+}
+
+.objectives-search-box input {
+  width: 100%;
+
+  border: 0;
+  outline: 0;
+
+  background: transparent;
+  color: var(--text);
+
+  font-size: 11px;
+}
+
+.objectives-search-box input::placeholder {
+  color: #62686c;
+}
+
+.objective-add-priority {
+  height: 42px;
+
+  padding: 0 11px;
+
+  border: 1px solid var(--border);
+  border-radius: 10px;
+
+  outline: none;
+
+  background: #191b1d;
+  color: #d9dcde;
+
+  font-size: 11px;
+}
+
+.objectives-search-help {
+  margin: 7px 2px 0;
+
+  color: #666c70;
+
+  font-size: 9px;
+}
+
+/* =========================
+   SEARCH RESULTS
+   ========================= */
+
+.objectives-search-results {
+  position: absolute;
+
+  top: 49px;
+  left: 0;
+  right: 160px;
+
+  overflow: hidden;
+
+  border: 1px solid #3c4043;
+  border-radius: 10px;
+
+  background: #202326;
+
+  box-shadow:
+    0 18px 50px
+    rgba(0, 0, 0, 0.4);
+}
+
+.objectives-search-result {
+  min-height: 57px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 16px;
+
+  padding: 9px 11px;
+
+  border-bottom:
+    1px solid #303437;
+}
+
+.objectives-search-result:last-child {
+  border-bottom: 0;
+}
+
+.objectives-search-result:hover {
+  background: #24282a;
+}
+
+.objectives-search-result.already-added {
+  opacity: 0.65;
+}
+
+.objectives-search-player {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+}
+
+.objectives-search-player > div {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+.objectives-search-player strong {
+  overflow: hidden;
+
+  font-size: 11px;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.objectives-search-player small {
+  color: #747a7e;
+
+  font-size: 9px;
+}
+
+.objective-add-button {
+  min-height: 29px;
+
+  flex: 0 0 auto;
+
+  padding: 0 10px;
+
+  border: 1px solid #555b5f;
+  border-radius: 7px;
+
+  background: #292d30;
+  color: #e5e7e8;
+
+  font-size: 9px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.objective-existing-label {
+  color: #6f7579;
+
+  font-size: 9px;
+}
+
+.objectives-search-empty {
+  padding: 18px;
+
+  color: #747a7e;
+
+  font-size: 10px;
+}
+
+/* =========================
+   ROLE GRID
+   ========================= */
+
+.objectives-role-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(0, 1fr)
+    );
+
+  gap: 12px;
+}
+
+/* =========================
+   ROLE COLUMN
+   ========================= */
+
+.objective-role-column {
+  min-width: 0;
+
+  overflow: hidden;
+
+  border: 1px solid #35393c;
+  border-radius: 14px;
+
+  background: #1b1d1f;
+}
+
+.objective-role-header {
+  min-height: 57px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  padding: 12px;
+
+  border-bottom:
+    1px solid #303437;
+
+  background: #202326;
+}
+
+.objective-role-title {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+}
+
+.objective-role-title strong {
+  overflow: hidden;
+
+  font-size: 11px;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.objective-role-count {
+  min-width: 24px;
+  height: 24px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 7px;
+
+  background: #292d30;
+  color: #9da2a5;
+
+  font-size: 9px;
+  font-weight: 750;
+}
+
+.objective-role-content {
+  padding: 10px;
+}
+
+/* =========================
+   PRIORITY SECTIONS
+   ========================= */
+
+.objective-priority-section {
+  margin-bottom: 10px;
+
+  overflow: hidden;
+
+  border: 1px solid #303437;
+  border-radius: 10px;
+
+  background: #191b1d;
+}
+
+.objective-priority-section:last-child {
+  margin-bottom: 0;
+}
+
+.objective-priority-header {
+  min-height: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  padding: 0 9px;
+
+  border-bottom:
+    1px solid #2d3033;
+
+  color: #969c9f;
+
+  font-size: 9px;
+  font-weight: 800;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.045em;
+}
+
+.objective-priority-header small {
+  min-width: 19px;
+  height: 19px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 5px;
+
+  background: #25282a;
+  color: #858b8f;
+
+  font-size: 8px;
+}
+
+/* =========================
+   PRIORITY COLORS
+   ========================= */
+
+.priority-primary
+  .objective-priority-header {
+  color: #e7c66c;
+}
+
+.priority-secondary
+  .objective-priority-header {
+  color: #aeb4b7;
+}
+
+.priority-third
+  .objective-priority-header {
+  color: #8e969a;
+}
+
+.priority-fourth
+  .objective-priority-header {
+  color: #777f83;
+}
+
+.priority-bet
+  .objective-priority-header {
+  color: #b58ee0;
+}
+
+/* =========================
+   PLAYER CARDS
+   ========================= */
+
+.objective-priority-list {
+  display: grid;
+
+  gap: 1px;
+}
+
+.objective-player-card {
+  min-height: 58px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+
+  padding: 9px;
+
+  border-bottom:
+    1px solid #292c2f;
+}
+
+.objective-player-card:last-child {
+  border-bottom: 0;
+}
+
+.objective-player-main {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+.objective-player-main strong {
+  overflow: hidden;
+
+  color: #e7e9ea;
+
+  font-size: 10px;
+  font-weight: 720;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.objective-player-main small {
+  color: #6d7377;
+
+  font-size: 8px;
+}
+
+.objective-player-actions {
+  display: flex;
+  align-items: center;
+
+  gap: 5px;
+}
+
+.objective-priority-select {
+  min-width: 0;
+  height: 27px;
+
+  flex: 1;
+
+  padding: 0 6px;
+
+  border: 1px solid #34383b;
+  border-radius: 6px;
+
+  outline: none;
+
+  background: #202326;
+  color: #9ba0a4;
+
+  font-size: 8px;
+}
+
+.objective-remove-button {
+  width: 27px;
+  height: 27px;
+
+  flex: 0 0 auto;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid #3b3f42;
+  border-radius: 6px;
+
+  background: #202326;
+  color: #7d8387;
+
+  font-size: 14px;
+
+  cursor: pointer;
+}
+
+.objective-remove-button:hover {
+  border-color: #6a4545;
+
+  color: #df8787;
+}
+
+/* =========================
+   EMPTY PRIORITY
+   ========================= */
+
+.objective-priority-empty {
+  padding: 13px 9px;
+
+  color: #555b5f;
+
+  font-size: 8px;
+}
+
+/* =========================
+   FOOTER
+   ========================= */
+
+.objectives-footer-note {
+  margin-top: 13px;
+
+  padding: 0 3px;
+
+  color: #62686c;
+
+  font-size: 9px;
+}
+
+.objectives-footer-note strong {
+  color: #8e9498;
+}
+
+/* =========================
+   SMALLER DESKTOPS
+   ========================= */
+
+@media (max-width: 1100px) {
+  .objectives-role-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+}
+
+@media (max-width: 700px) {
+  .objectives-search-row {
+    grid-template-columns: 1fr;
+  }
+
+  .objectives-search-results {
+    right: 0;
+  }
+
+  .objectives-role-grid {
+    grid-template-columns: 1fr;
+  }
+}

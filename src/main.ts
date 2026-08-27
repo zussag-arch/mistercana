@@ -1,5 +1,6 @@
 import './style.css'
 import './styles/players.css'
+import './styles/objectives.css'
 
 import {
   renderNavigation,
@@ -23,6 +24,7 @@ import {
 
 import {
   renderObjectivesPage,
+  bindObjectivesEvents,
 } from './pages/objectives'
 
 import {
@@ -41,7 +43,8 @@ import {
 let activePage: PageId =
   'dashboard'
 
-const state = loadState()
+const state =
+  loadState()
 
 const appElement =
   document.querySelector<HTMLDivElement>(
@@ -54,7 +57,8 @@ if (!appElement) {
   )
 }
 
-const app = appElement
+const app =
+  appElement
 
 function getPageContent(
   page: PageId,
@@ -74,7 +78,9 @@ function getPageContent(
       return renderPlayersPage()
 
     case 'objectives':
-      return renderObjectivesPage()
+      return renderObjectivesPage(
+        state,
+      )
 
     case 'insights':
       return renderInsightsPage()
@@ -90,7 +96,10 @@ function getPageContent(
 }
 
 function saveAndRender(): void {
-  saveState(state)
+  saveState(
+    state,
+  )
+
   render()
 }
 
@@ -108,7 +117,9 @@ function startAuction(): void {
         manager.active,
     )
 
-  if (total !== 100) {
+  if (
+    total !== 100
+  ) {
     return
   }
 
@@ -118,9 +129,11 @@ function startAuction(): void {
     return
   }
 
-  state.auctionPhase = 'live'
+  state.auctionPhase =
+    'live'
 
-  activePage = 'auction'
+  activePage =
+    'auction'
 
   saveAndRender()
 }
@@ -129,7 +142,8 @@ function endAuction(): void {
   state.auctionPhase =
     'finalizing'
 
-  activePage = 'auction'
+  activePage =
+    'auction'
 
   saveAndRender()
 }
@@ -138,7 +152,8 @@ function archiveAuction(): void {
   state.auctionPhase =
     'archived'
 
-  activePage = 'auction'
+  activePage =
+    'auction'
 
   saveAndRender()
 }
@@ -147,24 +162,30 @@ function discardAuction(): void {
   state.auctionPhase =
     'discarded'
 
-  activePage = 'auction'
+  activePage =
+    'auction'
 
   saveAndRender()
 }
 
 function newAuction(): void {
-  state.auctionPhase = 'setup'
+  state.auctionPhase =
+    'setup'
 
-  activePage = 'dashboard'
+  activePage =
+    'dashboard'
 
-  saveState(state)
+  saveState(
+    state,
+  )
 
   render()
 }
 
 function bindPageEvents(): void {
   if (
-    activePage === 'dashboard'
+    activePage ===
+    'dashboard'
   ) {
     bindDashboardEvents(
       state,
@@ -179,7 +200,8 @@ function bindPageEvents(): void {
   }
 
   if (
-    activePage === 'auction'
+    activePage ===
+    'auction'
   ) {
     bindAuctionEvents(
       state,
@@ -200,11 +222,26 @@ function bindPageEvents(): void {
   }
 
   if (
-    activePage === 'players'
+    activePage ===
+    'players'
   ) {
     bindPlayersEvents({
-      onRender: render,
+      onRender:
+        render,
     })
+  }
+
+  if (
+    activePage ===
+    'objectives'
+  ) {
+    bindObjectivesEvents(
+      state,
+      {
+        onStateChange:
+          saveAndRender,
+      },
+    )
   }
 }
 
@@ -213,28 +250,32 @@ function bindNavigation(): void {
     .querySelectorAll<HTMLButtonElement>(
       '[data-page]',
     )
-    .forEach((button) => {
-      button.addEventListener(
-        'click',
-        () => {
-          const page =
-            button.dataset.page as
-              | PageId
-              | undefined
+    .forEach(
+      (button) => {
+        button.addEventListener(
+          'click',
+          () => {
+            const page =
+              button.dataset
+                .page as
+                | PageId
+                | undefined
 
-          if (
-            !page ||
-            button.disabled
-          ) {
-            return
-          }
+            if (
+              !page ||
+              button.disabled
+            ) {
+              return
+            }
 
-          activePage = page
+            activePage =
+              page
 
-          render()
-        },
-      )
-    })
+            render()
+          },
+        )
+      },
+    )
 }
 
 function render(): void {
@@ -245,9 +286,11 @@ function render(): void {
     )}
 
     <main class="app-content">
+
       ${getPageContent(
         activePage,
       )}
+
     </main>
   `
 
