@@ -1,6 +1,8 @@
 import './style.css'
 import './styles/players.css'
 import './styles/objectives.css'
+import './styles/insights.css'
+import './styles/importExport.css'
 
 import {
   renderNavigation,
