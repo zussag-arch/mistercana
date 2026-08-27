@@ -1,3 +1,5 @@
+import type { AuctionPhase } from '../app/state'
+
 export type PageId =
   | 'dashboard'
   | 'auction'
@@ -6,34 +8,86 @@ export type PageId =
   | 'insights'
   | 'importExport'
 
-export function renderNavigation(activePage: PageId, auctionLive: boolean) {
-  const dashboardDot = auctionLive ? 'dot red' : 'dot green'
-  const auctionDot = auctionLive ? 'dot green' : 'dot red'
+export function renderNavigation(
+  activePage: PageId,
+  auctionPhase: AuctionPhase,
+) {
+  const dashboardDot =
+    auctionPhase === 'setup'
+      ? 'dot green'
+      : 'dot red'
 
-  const items: Array<{ id: PageId; label: string; dot?: string }> = [
-    { id: 'dashboard', label: 'DASHBOARD', dot: dashboardDot },
-    { id: 'auction', label: 'ASTA', dot: auctionDot },
-    { id: 'players', label: 'GIOCATORI' },
-    { id: 'objectives', label: 'OBIETTIVI' },
-    { id: 'insights', label: 'INSIGHTS' },
-    { id: 'importExport', label: 'IMPORT/EXPORT' },
+  const auctionDot =
+    auctionPhase === 'live'
+      ? 'dot green'
+      : 'dot red'
+
+  const auctionDisabled =
+    auctionPhase === 'setup'
+
+  const items: Array<{
+    id: PageId
+    label: string
+    dot?: string
+    disabled?: boolean
+  }> = [
+    {
+      id: 'dashboard',
+      label: 'DASHBOARD',
+      dot: dashboardDot,
+    },
+    {
+      id: 'auction',
+      label: 'ASTA',
+      dot: auctionDot,
+      disabled: auctionDisabled,
+    },
+    {
+      id: 'players',
+      label: 'GIOCATORI',
+    },
+    {
+      id: 'objectives',
+      label: 'OBIETTIVI',
+    },
+    {
+      id: 'insights',
+      label: 'INSIGHTS',
+    },
+    {
+      id: 'importExport',
+      label: 'IMPORT/EXPORT',
+    },
   ]
 
   return `
     <header class="topbar">
       <div class="brand">MisterCanà</div>
 
-      <nav class="main-nav" aria-label="Navigazione principale">
+      <nav
+        class="main-nav"
+        aria-label="Navigazione principale"
+      >
         ${items
           .map(
             (item) => `
               <button
-                class="nav-item ${item.id === activePage ? 'active' : ''}"
+                class="
+                  nav-item
+                  ${item.id === activePage ? 'active' : ''}
+                  ${item.disabled ? 'disabled' : ''}
+                "
                 data-page="${item.id}"
                 type="button"
+                ${item.disabled ? 'disabled' : ''}
               >
                 ${item.label}
-                ${item.dot ? `<span class="${item.dot}"></span>` : ''}
+
+                ${
+                  item.dot
+                    ? `<span class="${item.dot}"></span>`
+                    : ''
+                }
               </button>
             `,
           )
