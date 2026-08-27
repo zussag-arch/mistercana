@@ -1,0 +1,467 @@
+/* =========================
+   PLAYERS PAGE
+   ========================= */
+
+.players-page {
+  max-width: 1320px;
+}
+
+.players-page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 24px;
+
+  margin-bottom: 24px;
+}
+
+.players-page-header h1 {
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.players-page-header p {
+  margin: 7px 0 0;
+
+  color: var(--muted);
+
+  font-size: 12px;
+}
+
+/* SEARCH */
+
+.players-header-tools {
+  display: flex;
+  align-items: center;
+}
+
+.players-search {
+  width: 255px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  padding: 0 12px;
+
+  border: 1px solid var(--border);
+  border-radius: 10px;
+
+  background: #1a1c1e;
+}
+
+.players-search > span {
+  color: #747a7e;
+
+  font-size: 17px;
+}
+
+.players-search input {
+  width: 100%;
+
+  border: 0;
+  outline: 0;
+
+  background: transparent;
+  color: var(--text);
+
+  font-size: 11px;
+}
+
+.players-search input::placeholder {
+  color: #666c70;
+}
+
+/* TOOLBAR */
+
+.players-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-bottom: 13px;
+}
+
+.players-role-filter,
+.players-toggle-group {
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+}
+
+.players-filter-button {
+  min-width: 34px;
+  height: 32px;
+
+  padding: 0 10px;
+
+  border: 1px solid transparent;
+  border-radius: 8px;
+
+  background: transparent;
+  color: #777d81;
+
+  font-size: 10px;
+  font-weight: 750;
+
+  cursor: pointer;
+}
+
+.players-filter-button:hover {
+  color: #e4e6e7;
+}
+
+.players-filter-button.selected {
+  border-color: #454a4d;
+
+  background: #242729;
+  color: #ffffff;
+}
+
+/* SIMPLE TOGGLES */
+
+.players-simple-toggle {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+
+  height: 32px;
+
+  padding: 0 10px;
+
+  border: 1px solid #34383b;
+  border-radius: 8px;
+
+  background: #1a1c1e;
+  color: #777d81;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  user-select: none;
+}
+
+.players-simple-toggle input {
+  position: absolute;
+
+  opacity: 0;
+  pointer-events: none;
+}
+
+.players-simple-toggle:hover {
+  color: #e0e3e4;
+}
+
+.players-simple-toggle.selected {
+  border-color: #646a6e;
+
+  background: #282b2e;
+  color: white;
+}
+
+/* TABLE CARD */
+
+.players-table-card {
+  width: 100%;
+
+  overflow: hidden;
+
+  border: 1px solid #35393c;
+  border-radius: 14px;
+
+  background: #1b1d1f;
+}
+
+.players-table-header,
+.players-table-row {
+  display: grid;
+
+  grid-template-columns:
+    minmax(260px, 2.3fr)
+    minmax(70px, 0.65fr)
+    minmax(70px, 0.65fr)
+    minmax(90px, 0.85fr)
+    minmax(90px, 0.85fr)
+    minmax(110px, 1fr)
+    minmax(100px, 0.9fr);
+
+  align-items: center;
+}
+
+.players-table-header {
+  min-height: 45px;
+
+  padding: 0 15px;
+
+  border-bottom: 1px solid #303437;
+
+  background: #202326;
+}
+
+.players-table-header > div {
+  min-width: 0;
+}
+
+.players-table-sort {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 5px;
+
+  padding: 0;
+
+  border: 0;
+
+  background: transparent;
+  color: #73797d;
+
+  font-size: 9px;
+  font-weight: 800;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.045em;
+
+  cursor: pointer;
+}
+
+.players-table-sort:hover {
+  color: #d2d5d7;
+}
+
+.players-sort-neutral {
+  opacity: 0.35;
+}
+
+.players-sort-active {
+  color: #eeeeee;
+}
+
+/* ROW */
+
+.players-table-row {
+  width: 100%;
+  min-height: 61px;
+
+  padding: 0 15px;
+
+  border: 0;
+  border-bottom: 1px solid #2b2e31;
+
+  background: transparent;
+  color: inherit;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition: background 0.12s ease;
+}
+
+.players-table-row:last-child {
+  border-bottom: 0;
+}
+
+.players-table-row:hover {
+  background: #222528;
+}
+
+.players-cell {
+  min-width: 0;
+
+  padding-right: 12px;
+}
+
+.players-player-cell {
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+}
+
+.players-player-info {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.players-player-info strong {
+  overflow: hidden;
+
+  color: #eeeeee;
+
+  font-size: 12px;
+  font-weight: 720;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.players-player-info small {
+  overflow: hidden;
+
+  color: #6f7579;
+
+  font-size: 9px;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ROLE */
+
+.role-badge {
+  width: 28px;
+  height: 28px;
+
+  flex: 0 0 auto;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid #44494c;
+  border-radius: 8px;
+
+  background: #25282a;
+
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.role-p {
+  color: #f2c86a;
+}
+
+.role-d {
+  color: #72c99c;
+}
+
+.role-c {
+  color: #6eafe2;
+}
+
+.role-a {
+  color: #e87979;
+}
+
+/* NUMBERS */
+
+.players-number-cell {
+  color: #c0c4c6;
+
+  font-size: 11px;
+
+  font-variant-numeric: tabular-nums;
+}
+
+.players-x-cell {
+  display: flex;
+  align-items: center;
+
+  gap: 5px;
+}
+
+.players-x-cell span {
+  color: #555b5f;
+}
+
+/* STATUS */
+
+.players-status-cell {
+  display: flex;
+  align-items: center;
+}
+
+.player-status {
+  display: inline-flex;
+  align-items: center;
+
+  min-height: 23px;
+
+  padding: 0 8px;
+
+  border-radius: 6px;
+
+  font-size: 9px;
+  font-weight: 750;
+}
+
+.player-status-free {
+  background: rgba(52, 211, 153, 0.1);
+
+  color: #65ddb0;
+}
+
+.player-status-assigned {
+  background: rgba(232, 124, 83, 0.12);
+
+  color: #e8926d;
+}
+
+/* EMPTY */
+
+.players-empty {
+  padding: 50px 20px;
+
+  color: #73797d;
+
+  text-align: center;
+
+  font-size: 11px;
+}
+
+/* FOOTER */
+
+.players-footer-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 10px 4px 0;
+
+  color: #62686c;
+
+  font-size: 9px;
+}
+
+/* PLAYER TEMP PREVIEW */
+
+.player-preview-card {
+  width: min(520px, 100%);
+}
+
+/* SMALLER DESKTOPS */
+
+@media (max-width: 1050px) {
+  .players-table-header,
+  .players-table-row {
+    grid-template-columns:
+      minmax(230px, 2fr)
+      60px
+      60px
+      80px
+      85px
+      105px
+      90px;
+
+    min-width: 900px;
+  }
+
+  .players-table-card {
+    overflow-x: auto;
+  }
+}

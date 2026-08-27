@@ -49,7 +49,9 @@ button {
   color: inherit;
 }
 
-/* NAVIGATION */
+/* =========================
+   NAVIGATION
+   ========================= */
 
 .topbar {
   min-height: 58px;
@@ -134,15 +136,24 @@ button {
   background: var(--red);
 }
 
-/* PAGE */
+/* =========================
+   GLOBAL PAGE LAYOUT
+   ========================= */
 
 .app-content {
-  padding: 38px 68px 70px;
+  width: 100%;
+
+  padding:
+    38px
+    clamp(24px, 4vw, 68px)
+    70px;
 }
 
 .page {
   width: 100%;
   max-width: 1280px;
+
+  margin-inline: auto;
 }
 
 .page h1 {
@@ -170,7 +181,9 @@ button {
   font-size: 13px;
 }
 
-/* PANELS */
+/* =========================
+   PANELS
+   ========================= */
 
 .panel {
   padding: 22px;
@@ -213,7 +226,9 @@ button {
   font-size: 13px;
 }
 
-/* FORMS */
+/* =========================
+   FORMS
+   ========================= */
 
 .field {
   display: flex;
@@ -252,7 +267,9 @@ button {
   width: 135px;
 }
 
-/* BUDGET */
+/* =========================
+   BUDGET
+   ========================= */
 
 .profile-selector {
   display: flex;
@@ -360,7 +377,9 @@ button {
   color: var(--red);
 }
 
-/* MANAGERS */
+/* =========================
+   MANAGERS
+   ========================= */
 
 .manager-counter {
   color: var(--muted);
@@ -455,7 +474,9 @@ button {
   font-size: 9px;
 }
 
-/* MANAGER MENU */
+/* =========================
+   MANAGER MENU
+   ========================= */
 
 .manager-menu-wrapper {
   position: relative;
@@ -537,12 +558,13 @@ button {
   background: #303437;
 }
 
-.manager-menu
-  .archive-menu-action {
+.manager-menu .archive-menu-action {
   color: #eca681;
 }
 
-/* ADD MANAGER */
+/* =========================
+   ADD MANAGER
+   ========================= */
 
 .add-manager-card {
   align-items: center;
@@ -565,7 +587,9 @@ button {
   font-size: 21px;
 }
 
-/* SWITCH */
+/* =========================
+   SWITCH
+   ========================= */
 
 .switch-control {
   position: relative;
@@ -633,7 +657,9 @@ button {
   cursor: default;
 }
 
-/* ACTIONS */
+/* =========================
+   ACTIONS
+   ========================= */
 
 .dashboard-actions,
 .auction-actions {
@@ -679,7 +705,9 @@ button {
   color: #ffc291;
 }
 
-/* LOCK */
+/* =========================
+   LOCK
+   ========================= */
 
 .dashboard-locked {
   opacity: 0.62;
@@ -687,7 +715,9 @@ button {
   pointer-events: none;
 }
 
-/* STATUS */
+/* =========================
+   STATUS
+   ========================= */
 
 .auction-state-badge,
 .live-badge,
@@ -719,7 +749,9 @@ button {
     rgba(52, 211, 153, 0.12);
 }
 
-/* FINALIZATION */
+/* =========================
+   FINALIZATION
+   ========================= */
 
 .finalization-panel {
   display: flex;
@@ -760,7 +792,9 @@ button {
   font-size: 12px;
 }
 
-/* OVERLAY */
+/* =========================
+   OVERLAY
+   ========================= */
 
 .overlay {
   position: fixed;
@@ -928,7 +962,9 @@ button {
   gap: 14px;
 }
 
-/* WARNINGS */
+/* =========================
+   WARNINGS
+   ========================= */
 
 .warning-panel,
 .danger-panel {
@@ -959,4 +995,27 @@ button {
   margin: 8px 0 0;
 
   color: #b9bdc0;
+}
+
+/* =========================
+   SMALLER SCREENS
+   ========================= */
+
+@media (max-width: 900px) {
+  .app-content {
+    padding:
+      28px
+      24px
+      60px;
+  }
+
+  .budget-grid {
+    grid-template-columns:
+      repeat(2, minmax(120px, 1fr));
+  }
+
+  .manager-grid {
+    grid-template-columns:
+      repeat(2, minmax(190px, 1fr));
+  }
 }

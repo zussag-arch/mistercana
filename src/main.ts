@@ -1,4 +1,5 @@
 import './style.css'
+import './styles/players.css'
 
 import {
   renderNavigation,
@@ -17,6 +18,7 @@ import {
 
 import {
   renderPlayersPage,
+  bindPlayersEvents,
 } from './pages/players'
 
 import {
@@ -133,12 +135,6 @@ function endAuction(): void {
 }
 
 function archiveAuction(): void {
-  /*
-    Qui verrà collegato il vero
-    salvataggio storico quando
-    costruiremo il dominio Asta.
-  */
-
   state.auctionPhase =
     'archived'
 
@@ -148,13 +144,6 @@ function archiveAuction(): void {
 }
 
 function discardAuction(): void {
-  /*
-    Qui verranno eliminati i dati
-    appartenenti esclusivamente alla
-    sessione corrente quando esisterà
-    il modello dati dell'asta.
-  */
-
   state.auctionPhase =
     'discarded'
 
@@ -164,16 +153,6 @@ function discardAuction(): void {
 }
 
 function newAuction(): void {
-  /*
-    La nuova asta riapre
-    ESPLICITAMENTE la Dashboard.
-
-    Non cambiamo manager,
-    crediti o strategia:
-    diventano la base modificabile
-    della nuova configurazione.
-  */
-
   state.auctionPhase = 'setup'
 
   activePage = 'dashboard'
@@ -218,6 +197,14 @@ function bindPageEvents(): void {
           newAuction,
       },
     )
+  }
+
+  if (
+    activePage === 'players'
+  ) {
+    bindPlayersEvents({
+      onRender: render,
+    })
   }
 }
 
