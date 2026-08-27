@@ -47,6 +47,8 @@ export interface AppState {
 
   initialCredits: number
 
+  defenseModifierEnabled: boolean
+
   budgetProfile: BudgetProfile
 
   budgetDistribution: BudgetDistribution
@@ -69,6 +71,8 @@ export const defaultState: AppState = {
   auctionPhase: 'setup',
 
   initialCredits: 500,
+
+  defenseModifierEnabled: false,
 
   budgetProfile: 'equilibrata',
 

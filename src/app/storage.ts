@@ -25,9 +25,9 @@ type LegacyState =
   Partial<
     Omit<
       AppState,
-      'managers' |
-      'auctionPhase' |
-      'objectives'
+      | 'managers'
+      | 'auctionPhase'
+      | 'objectives'
     >
   > & {
     auctionPhase?: unknown
@@ -336,6 +336,15 @@ export function loadState(): AppState {
         parsed.initialCredits > 0
           ? parsed.initialCredits
           : defaultState.initialCredits,
+
+      defenseModifierEnabled:
+        typeof parsed
+          .defenseModifierEnabled ===
+          'boolean'
+          ? parsed
+              .defenseModifierEnabled
+          : defaultState
+              .defenseModifierEnabled,
 
       budgetProfile:
         parsed.budgetProfile ??

@@ -1,8 +1,10 @@
 import './style.css'
+import './styles/dashboard.css'
 import './styles/players.css'
 import './styles/objectives.css'
 import './styles/insights.css'
 import './styles/importExport.css'
+import './styles/auction.css'
 
 import {
   renderNavigation,
@@ -219,6 +221,9 @@ function bindPageEvents(): void {
 
         onNewAuction:
           newAuction,
+
+        onRender:
+          render,
       },
     )
   }

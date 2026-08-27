@@ -14,8 +14,10 @@
   text-rendering: optimizeLegibility;
 
   --bg: #17191b;
+
   --surface: #1d2022;
   --surface-light: #232629;
+
   --border: #34383b;
 
   --text: #f4f5f5;
@@ -24,6 +26,13 @@
   --green: #34d399;
   --red: #ef6a6a;
   --orange: #e98a55;
+
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --radius-pill: 999px;
 }
 
 * {
@@ -41,7 +50,8 @@ body {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
 }
 
@@ -51,7 +61,7 @@ button {
 
 /* =========================
    NAVIGATION
-   ========================= */
+========================= */
 
 .topbar {
   min-height: 58px;
@@ -63,7 +73,8 @@ button {
 
   padding: 0 32px;
 
-  border-bottom: 1px solid #292d30;
+  border-bottom:
+    1px solid #292d30;
 
   background: #191b1d;
 }
@@ -89,7 +100,8 @@ button {
   gap: 5px;
 
   border: 0;
-  border-bottom: 2px solid transparent;
+  border-bottom:
+    2px solid transparent;
 
   padding: 20px 0 18px;
 
@@ -110,7 +122,8 @@ button {
 .nav-item.active {
   color: #ffffff;
 
-  border-bottom-color: #ffffff;
+  border-bottom-color:
+    #ffffff;
 }
 
 .nav-item.disabled {
@@ -123,7 +136,8 @@ button {
   width: 7px;
   height: 7px;
 
-  border-radius: 50%;
+  border-radius:
+    var(--radius-pill);
 
   display: inline-block;
 }
@@ -138,7 +152,7 @@ button {
 
 /* =========================
    GLOBAL PAGE LAYOUT
-   ========================= */
+========================= */
 
 .app-content {
   width: 100%;
@@ -183,17 +197,21 @@ button {
 
 /* =========================
    PANELS
-   ========================= */
+========================= */
 
 .panel {
   padding: 22px;
 
   margin-bottom: 18px;
 
-  border: 1px solid var(--border);
-  border-radius: 16px;
+  border:
+    1px solid var(--border);
 
-  background: var(--surface);
+  border-radius:
+    var(--radius-lg);
+
+  background:
+    var(--surface);
 }
 
 .panel h2 {
@@ -228,7 +246,7 @@ button {
 
 /* =========================
    FORMS
-   ========================= */
+========================= */
 
 .field {
   display: flex;
@@ -241,13 +259,17 @@ button {
   font-size: 11px;
 }
 
-.field input {
+.field input,
+.field select {
   height: 40px;
 
-  padding: 0 11px;
+  padding: 0 12px;
 
-  border: 1px solid var(--border);
-  border-radius: 9px;
+  border:
+    1px solid var(--border);
+
+  border-radius:
+    var(--radius-sm);
 
   outline: none;
 
@@ -255,11 +277,13 @@ button {
   color: var(--text);
 }
 
-.field input:focus {
+.field input:focus,
+.field select:focus {
   border-color: #70767a;
 }
 
-.field input:disabled {
+.field input:disabled,
+.field select:disabled {
   opacity: 0.65;
 }
 
@@ -269,7 +293,7 @@ button {
 
 /* =========================
    BUDGET
-   ========================= */
+========================= */
 
 .profile-selector {
   display: flex;
@@ -287,9 +311,10 @@ button {
 .archive-button {
   min-height: 38px;
 
-  padding: 0 15px;
+  padding: 0 16px;
 
-  border-radius: 9px;
+  border-radius:
+    var(--radius-sm);
 
   font-size: 12px;
   font-weight: 700;
@@ -298,7 +323,8 @@ button {
 }
 
 .profile-button {
-  border: 1px solid var(--border);
+  border:
+    1px solid var(--border);
 
   background: #191b1d;
   color: var(--muted);
@@ -319,16 +345,22 @@ button {
   display: grid;
 
   grid-template-columns:
-    repeat(4, minmax(120px, 1fr));
+    repeat(
+      4,
+      minmax(120px, 1fr)
+    );
 
   gap: 12px;
 }
 
 .budget-field {
-  padding: 14px;
+  padding: 15px;
 
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  border:
+    1px solid var(--border);
+
+  border-radius:
+    var(--radius-md);
 
   background: #191b1d;
 }
@@ -379,7 +411,7 @@ button {
 
 /* =========================
    MANAGERS
-   ========================= */
+========================= */
 
 .manager-counter {
   color: var(--muted);
@@ -391,7 +423,10 @@ button {
   display: grid;
 
   grid-template-columns:
-    repeat(4, minmax(190px, 1fr));
+    repeat(
+      4,
+      minmax(190px, 1fr)
+    );
 
   gap: 12px;
 }
@@ -407,10 +442,13 @@ button {
 
   gap: 15px;
 
-  padding: 14px;
+  padding: 15px;
 
-  border: 1px solid var(--border);
-  border-radius: 13px;
+  border:
+    1px solid var(--border);
+
+  border-radius:
+    var(--radius-md);
 
   background: #191b1d;
 }
@@ -449,9 +487,10 @@ button {
 }
 
 .owner-badge {
-  padding: 2px 5px;
+  padding: 3px 7px;
 
-  border-radius: 5px;
+  border-radius:
+    var(--radius-pill);
 
   background: #34383b;
 
@@ -476,7 +515,7 @@ button {
 
 /* =========================
    MANAGER MENU
-   ========================= */
+========================= */
 
 .manager-menu-wrapper {
   position: relative;
@@ -485,14 +524,17 @@ button {
 }
 
 .manager-menu-button {
-  width: 30px;
-  height: 28px;
+  width: 32px;
+  height: 30px;
 
   display: grid;
   place-items: center;
 
-  border: 1px solid transparent;
-  border-radius: 7px;
+  border:
+    1px solid transparent;
+
+  border-radius:
+    var(--radius-sm);
 
   background: transparent;
   color: #8f9599;
@@ -504,7 +546,8 @@ button {
 }
 
 .manager-menu-button:hover {
-  border-color: var(--border);
+  border-color:
+    var(--border);
 
   background: #222527;
   color: white;
@@ -515,15 +558,18 @@ button {
 
   z-index: 20;
 
-  top: 32px;
+  top: 34px;
   right: 0;
 
-  width: 125px;
+  width: 132px;
 
-  padding: 5px;
+  padding: 6px;
 
-  border: 1px solid var(--border);
-  border-radius: 9px;
+  border:
+    1px solid var(--border);
+
+  border-radius:
+    var(--radius-md);
 
   background: #242729;
 
@@ -540,9 +586,11 @@ button {
   width: 100%;
 
   border: 0;
-  border-radius: 6px;
 
-  padding: 8px 9px;
+  border-radius:
+    var(--radius-sm);
+
+  padding: 8px 10px;
 
   background: transparent;
   color: #d4d7d9;
@@ -558,13 +606,14 @@ button {
   background: #303437;
 }
 
-.manager-menu .archive-menu-action {
+.manager-menu
+.archive-menu-action {
   color: #eca681;
 }
 
 /* =========================
    ADD MANAGER
-   ========================= */
+========================= */
 
 .add-manager-card {
   align-items: center;
@@ -589,13 +638,13 @@ button {
 
 /* =========================
    SWITCH
-   ========================= */
+========================= */
 
 .switch-control {
   position: relative;
 
-  width: 38px;
-  height: 21px;
+  width: 40px;
+  height: 22px;
 
   flex: 0 0 auto;
 }
@@ -612,7 +661,8 @@ button {
 
   inset: 0;
 
-  border-radius: 20px;
+  border-radius:
+    var(--radius-pill);
 
   background: #44494c;
 
@@ -626,13 +676,14 @@ button {
 
   position: absolute;
 
-  width: 15px;
-  height: 15px;
+  width: 16px;
+  height: 16px;
 
   left: 3px;
   top: 3px;
 
-  border-radius: 50%;
+  border-radius:
+    var(--radius-pill);
 
   background: white;
 
@@ -640,26 +691,27 @@ button {
 }
 
 .switch-control
-  input:checked
-  + .switch-slider {
+input:checked
++ .switch-slider {
   background: var(--green);
 }
 
 .switch-control
-  input:checked
-  + .switch-slider::before {
-  transform: translateX(17px);
+input:checked
++ .switch-slider::before {
+  transform:
+    translateX(18px);
 }
 
 .switch-control
-  input:disabled
-  + .switch-slider {
+input:disabled
++ .switch-slider {
   cursor: default;
 }
 
 /* =========================
    ACTIONS
-   ========================= */
+========================= */
 
 .dashboard-actions,
 .auction-actions {
@@ -672,14 +724,16 @@ button {
 }
 
 .secondary-button {
-  border: 1px solid var(--border);
+  border:
+    1px solid var(--border);
 
   background: #1b1d1f;
   color: white;
 }
 
 .primary-button {
-  border: 1px solid #eceeef;
+  border:
+    1px solid #eceeef;
 
   background: #eceeef;
   color: #151719;
@@ -692,14 +746,16 @@ button {
 }
 
 .danger-button {
-  border: 1px solid #8b4444;
+  border:
+    1px solid #8b4444;
 
   background: #502a2a;
   color: #ffb4b4;
 }
 
 .archive-button {
-  border: 1px solid #8e653f;
+  border:
+    1px solid #8e653f;
 
   background: #543b28;
   color: #ffc291;
@@ -707,7 +763,7 @@ button {
 
 /* =========================
    LOCK
-   ========================= */
+========================= */
 
 .dashboard-locked {
   opacity: 0.62;
@@ -717,16 +773,17 @@ button {
 
 /* =========================
    STATUS
-   ========================= */
+========================= */
 
 .auction-state-badge,
 .live-badge,
 .finalizing-badge,
 .archived-badge,
 .discarded-badge {
-  padding: 6px 9px;
+  padding: 6px 10px;
 
-  border-radius: 7px;
+  border-radius:
+    var(--radius-pill);
 
   font-size: 9px;
   font-weight: 800;
@@ -738,7 +795,12 @@ button {
   color: #ff9d91;
 
   background:
-    rgba(239, 106, 106, 0.12);
+    rgba(
+      239,
+      106,
+      106,
+      0.12
+    );
 }
 
 .live-badge,
@@ -746,12 +808,17 @@ button {
   color: #78e8b7;
 
   background:
-    rgba(52, 211, 153, 0.12);
+    rgba(
+      52,
+      211,
+      153,
+      0.12
+    );
 }
 
 /* =========================
    FINALIZATION
-   ========================= */
+========================= */
 
 .finalization-panel {
   display: flex;
@@ -761,16 +828,19 @@ button {
 }
 
 .finalization-icon {
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
 
   flex: 0 0 auto;
 
   display: grid;
   place-items: center;
 
-  border: 1px solid #805a3c;
-  border-radius: 50%;
+  border:
+    1px solid #805a3c;
+
+  border-radius:
+    var(--radius-pill);
 
   background: #3c2d22;
   color: #f0a46d;
@@ -794,7 +864,7 @@ button {
 
 /* =========================
    OVERLAY
-   ========================= */
+========================= */
 
 .overlay {
   position: fixed;
@@ -819,30 +889,50 @@ button {
   inset: 0;
 
   background:
-    rgba(0, 0, 0, 0.72);
+    rgba(
+      0,
+      0,
+      0,
+      0.72
+    );
 
-  backdrop-filter: blur(4px);
+  backdrop-filter:
+    blur(4px);
 }
 
 .overlay-card {
   position: relative;
 
-  width: min(650px, 100%);
+  width: min(
+    650px,
+    100%
+  );
 
-  padding: 22px;
+  padding: 24px;
 
-  border: 1px solid #404447;
-  border-radius: 16px;
+  border:
+    1px solid #404447;
+
+  border-radius:
+    var(--radius-xl);
 
   background: #1d2022;
 
   box-shadow:
     0 20px 80px
-    rgba(0, 0, 0, 0.5);
+    rgba(
+      0,
+      0,
+      0,
+      0.5
+    );
 }
 
 .small-overlay-card {
-  width: min(450px, 100%);
+  width: min(
+    450px,
+    100%
+  );
 }
 
 .overlay-header {
@@ -868,11 +958,14 @@ button {
 }
 
 .icon-button {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
 
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  border:
+    1px solid var(--border);
+
+  border-radius:
+    var(--radius-sm);
 
   background: #191b1d;
   color: white;
@@ -884,7 +977,10 @@ button {
   display: grid;
 
   grid-template-columns:
-    repeat(2, minmax(0, 1fr));
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
 
   gap: 9px;
 }
@@ -895,9 +991,10 @@ button {
 
   gap: 10px;
 
-  padding: 11px;
+  padding: 12px;
 
-  border-radius: 9px;
+  border-radius:
+    var(--radius-sm);
 
   background: #191b1d;
 
@@ -919,8 +1016,11 @@ button {
 }
 
 .recap-manager-list {
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  border:
+    1px solid var(--border);
+
+  border-radius:
+    var(--radius-md);
 
   overflow: hidden;
 }
@@ -964,30 +1064,43 @@ button {
 
 /* =========================
    WARNINGS
-   ========================= */
+========================= */
 
 .warning-panel,
 .danger-panel {
-  padding: 15px;
+  padding: 16px;
 
-  border-radius: 11px;
+  border-radius:
+    var(--radius-md);
 
   font-size: 12px;
   line-height: 1.55;
 }
 
 .warning-panel {
-  border: 1px solid #735038;
+  border:
+    1px solid #735038;
 
   background:
-    rgba(130, 82, 45, 0.14);
+    rgba(
+      130,
+      82,
+      45,
+      0.14
+    );
 }
 
 .danger-panel {
-  border: 1px solid #743f3f;
+  border:
+    1px solid #743f3f;
 
   background:
-    rgba(132, 57, 57, 0.14);
+    rgba(
+      132,
+      57,
+      57,
+      0.14
+    );
 }
 
 .warning-panel p,
@@ -999,7 +1112,7 @@ button {
 
 /* =========================
    SMALLER SCREENS
-   ========================= */
+========================= */
 
 @media (max-width: 900px) {
   .app-content {
@@ -1011,11 +1124,17 @@ button {
 
   .budget-grid {
     grid-template-columns:
-      repeat(2, minmax(120px, 1fr));
+      repeat(
+        2,
+        minmax(120px, 1fr)
+      );
   }
 
   .manager-grid {
     grid-template-columns:
-      repeat(2, minmax(190px, 1fr));
+      repeat(
+        2,
+        minmax(190px, 1fr)
+      );
   }
 }
