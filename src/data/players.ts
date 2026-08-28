@@ -1,6 +1,6 @@
 import type {
   Player,
-} from '../domain/players'
+} from '../domain/player'
 
 export const players: Player[] = [
   {

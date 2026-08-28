@@ -497,7 +497,9 @@
     rgba(0, 0, 0, 0.12);
 }
 
-/* POSITIONING ONLY */
+/* =========================
+   PITCH POSITIONS
+========================= */
 
 .zone-goalkeeper {
   bottom: 20px;
@@ -627,11 +629,68 @@
 }
 
 .coach-impact-placeholder {
-  min-width: 26px;
+  min-width: 48px;
 
-  color: #656b6f;
+  padding: 4px 7px;
+
+  border-radius:
+    var(--radius-pill);
 
   text-align: center;
+
+  font-size: 9px;
+  font-weight: 800;
+}
+
+/* =========================
+   COACH DATABASE VALUES
+========================= */
+
+.coach-impact-positive {
+  border:
+    1px solid
+    rgba(52, 211, 153, 0.14);
+
+  background:
+    rgba(52, 211, 153, 0.08);
+
+  color: #63d994;
+}
+
+.coach-impact-negative {
+  border:
+    1px solid
+    rgba(238, 119, 119, 0.14);
+
+  background:
+    rgba(238, 119, 119, 0.08);
+
+  color: #ee7777;
+}
+
+.coach-impact-neutral {
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.06);
+
+  background:
+    rgba(255, 255, 255, 0.025);
+
+  color: #777e83;
+}
+
+.coach-database-empty {
+  padding: 22px;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.06);
+
+  border-radius: 20px;
+
+  background: #181b1d;
+
+  color: #777e83;
 
   font-size: 10px;
 }
@@ -676,5 +735,9 @@
   .goalkeeper-table-header,
   .goalkeeper-table-row {
     min-width: 650px;
+  }
+
+  .coach-pitch {
+    min-height: 310px;
   }
 }

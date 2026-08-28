@@ -1,3 +1,24 @@
+import coachesCsv from '../../database/MisterCana_DB_Allenatori.csv?raw'
+
+interface Coach {
+  team: string
+  name: string
+  formation: string
+
+  impacts: {
+    goalkeeper: number
+    centreBack: number
+    fullBack: number
+    defensiveMid: number
+    wideMid: number
+    centralMid: number
+    attackingMid: number
+    winger: number
+    secondStriker: number
+    striker: number
+  }
+}
+
 const GOALKEEPER_ROWS = [
   {
     primary: 'Portiere A',
@@ -63,78 +84,56 @@ const COACH_MACRO_ROLES = [
     key: 'goalkeeper',
     label: 'Portieri',
     mantra: 'Por',
-    pitchClass: 'zone-goalkeeper',
   },
   {
     key: 'centreBack',
     label: 'Difensori centrali',
     mantra: 'Dc',
-    pitchClass: 'zone-centre-back',
   },
   {
     key: 'fullBack',
     label: 'Terzini',
     mantra: 'Ds · B · Dd',
-    pitchClass: 'zone-full-back',
   },
   {
     key: 'defensiveMid',
     label: 'Centrocampisti difensivi',
     mantra: 'M',
-    pitchClass: 'zone-defensive-mid',
   },
   {
     key: 'wideMid',
     label: 'Esterni di centrocampo',
     mantra: 'E',
-    pitchClass: 'zone-wide-mid',
   },
   {
     key: 'centralMid',
     label: 'Centrocampisti centrali',
     mantra: 'C',
-    pitchClass: 'zone-central-mid',
   },
   {
     key: 'attackingMid',
     label: 'Trequartisti',
     mantra: 'T',
-    pitchClass: 'zone-attacking-mid',
   },
   {
     key: 'winger',
     label: 'Ali d’attacco',
     mantra: 'W',
-    pitchClass: 'zone-winger',
   },
   {
     key: 'secondStriker',
     label: 'Seconde punte',
     mantra: 'A',
-    pitchClass: 'zone-second-striker',
   },
   {
     key: 'striker',
     label: 'Punte centrali',
     mantra: 'Pc',
-    pitchClass: 'zone-striker',
   },
-]
+] as const
 
-const COACHES = [
-  {
-    name: 'Allenatore Demo',
-    team: 'Squadra Demo',
-    formation: '3-4-2-1',
-    isNew: true,
-  },
-  {
-    name: 'Allenatore Demo 2',
-    team: 'Squadra Demo 2',
-    formation: '4-3-3',
-    isNew: false,
-  },
-]
+type CoachRoleKey =
+  typeof COACH_MACRO_ROLES[number]['key']
 
 function escapeHtml(
   value: string,
@@ -145,6 +144,181 @@ function escapeHtml(
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#039;')
+}
+
+function parseNumber(
+  value: string | undefined,
+): number {
+  if (!value) {
+    return 0
+  }
+
+  const normalized =
+    value
+      .trim()
+      .replace(',', '.')
+
+  const parsed =
+    Number(normalized)
+
+  return Number.isFinite(parsed)
+    ? parsed
+    : 0
+}
+
+function parseCoachesCsv(
+  csv: string,
+): Coach[] {
+  const lines =
+    csv
+      .replace(/\r/g, '')
+      .split('\n')
+      .map(
+        (line) =>
+          line.trim(),
+      )
+      .filter(Boolean)
+
+  if (lines.length < 2) {
+    return []
+  }
+
+  const rows =
+    lines.slice(1)
+
+  return rows
+    .map(
+      (line) => {
+        const columns =
+          line
+            .split(';')
+            .map(
+              (value) =>
+                value.trim(),
+            )
+
+        const [
+          team,
+          name,
+          formation,
+          goalkeeper,
+          centreBack,
+          fullBack,
+          defensiveMid,
+          wideMid,
+          centralMid,
+          attackingMid,
+          winger,
+          secondStriker,
+          striker,
+        ] = columns
+
+        if (
+          !team ||
+          !name
+        ) {
+          return null
+        }
+
+        return {
+          team,
+          name,
+          formation:
+            formation || '—',
+
+          impacts: {
+            goalkeeper:
+              parseNumber(
+                goalkeeper,
+              ),
+
+            centreBack:
+              parseNumber(
+                centreBack,
+              ),
+
+            fullBack:
+              parseNumber(
+                fullBack,
+              ),
+
+            defensiveMid:
+              parseNumber(
+                defensiveMid,
+              ),
+
+            wideMid:
+              parseNumber(
+                wideMid,
+              ),
+
+            centralMid:
+              parseNumber(
+                centralMid,
+              ),
+
+            attackingMid:
+              parseNumber(
+                attackingMid,
+              ),
+
+            winger:
+              parseNumber(
+                winger,
+              ),
+
+            secondStriker:
+              parseNumber(
+                secondStriker,
+              ),
+
+            striker:
+              parseNumber(
+                striker,
+              ),
+          },
+        }
+      },
+    )
+    .filter(
+      (
+        coach,
+      ): coach is Coach =>
+        coach !== null,
+    )
+}
+
+const COACHES =
+  parseCoachesCsv(
+    coachesCsv,
+  )
+
+function formatImpact(
+  value: number,
+): string {
+  if (value > 0) {
+    return `+${value.toFixed(2)}`
+  }
+
+  if (value < 0) {
+    return value.toFixed(2)
+  }
+
+  return '0.00'
+}
+
+function getImpactClass(
+  value: number,
+): string {
+  if (value > 0) {
+    return 'positive'
+  }
+
+  if (value < 0) {
+    return 'negative'
+  }
+
+  return 'neutral'
 }
 
 function renderGoalkeeperSection():
@@ -484,8 +658,7 @@ function renderCoachSection():
           </h2>
 
           <p>
-            Struttura predisposta per
-            modulo, stato nuovo e impatto
+            Impatto del sistema di gioco
             sui macro-ruoli Mantra.
           </p>
         </div>
@@ -495,121 +668,137 @@ function renderCoachSection():
             insight-placeholder-badge
           "
         >
-          Valori da collegare
+          ${COACHES.length}
+          allenatori dal database
         </span>
       </div>
 
-      <div
-        class="coach-grid"
-      >
-        ${COACHES
-          .map(
-            (coach) => `
-              <article
-                class="coach-card"
-              >
-                <div
-                  class="
-                    coach-card-header
-                  "
-                >
-                  <div>
-                    <div
-                      class="
-                        coach-title-row
-                      "
+      ${
+        COACHES.length
+          ? `
+            <div
+              class="coach-grid"
+            >
+              ${COACHES
+                .map(
+                  (coach) => `
+                    <article
+                      class="coach-card"
                     >
-                      <strong>
-                        ${escapeHtml(
-                          coach.name,
-                        )}
-                      </strong>
-
-                      ${
-                        coach.isNew
-                          ? `
-                            <span
-                              class="
-                                coach-new-badge
-                              "
-                            >
-                              NUOVO
-                            </span>
-                          `
-                          : ''
-                      }
-                    </div>
-
-                    <small>
-                      ${escapeHtml(
-                        coach.team,
-                      )}
-                    </small>
-                  </div>
-
-                  <span
-                    class="
-                      coach-formation
-                    "
-                  >
-                    ${escapeHtml(
-                      coach.formation,
-                    )}
-                  </span>
-                </div>
-
-                <div
-                  class="
-                    coach-card-body
-                  "
-                >
-                  ${renderCoachPitch()}
-
-                  <div
-                    class="
-                      coach-macro-role-list
-                    "
-                  >
-                    ${COACH_MACRO_ROLES
-                      .map(
-                        (role) => `
+                      <div
+                        class="
+                          coach-card-header
+                        "
+                      >
+                        <div>
                           <div
                             class="
-                              coach-macro-role-row
+                              coach-title-row
                             "
                           >
-                            <div>
-                              <strong>
-                                ${escapeHtml(
-                                  role.label,
-                                )}
-                              </strong>
-
-                              <small>
-                                ${escapeHtml(
-                                  role.mantra,
-                                )}
-                              </small>
-                            </div>
-
-                            <span
-                              class="
-                                coach-impact-placeholder
-                              "
-                            >
-                              —
-                            </span>
+                            <strong>
+                              ${escapeHtml(
+                                coach.name,
+                              )}
+                            </strong>
                           </div>
-                        `,
-                      )
-                      .join('')}
-                  </div>
-                </div>
-              </article>
-            `,
-          )
-          .join('')}
-      </div>
+
+                          <small>
+                            ${escapeHtml(
+                              coach.team,
+                            )}
+                          </small>
+                        </div>
+
+                        <span
+                          class="
+                            coach-formation
+                          "
+                        >
+                          ${escapeHtml(
+                            coach.formation,
+                          )}
+                        </span>
+                      </div>
+
+                      <div
+                        class="
+                          coach-card-body
+                        "
+                      >
+                        ${renderCoachPitch()}
+
+                        <div
+                          class="
+                            coach-macro-role-list
+                          "
+                        >
+                          ${COACH_MACRO_ROLES
+                            .map(
+                              (role) => {
+                                const value =
+                                  coach
+                                    .impacts[
+                                      role.key as
+                                        CoachRoleKey
+                                    ]
+
+                                return `
+                                  <div
+                                    class="
+                                      coach-macro-role-row
+                                    "
+                                  >
+                                    <div>
+                                      <strong>
+                                        ${escapeHtml(
+                                          role.label,
+                                        )}
+                                      </strong>
+
+                                      <small>
+                                        ${escapeHtml(
+                                          role.mantra,
+                                        )}
+                                      </small>
+                                    </div>
+
+                                    <span
+                                      class="
+                                        coach-impact-placeholder
+                                        coach-impact-${getImpactClass(
+                                          value,
+                                        )}
+                                      "
+                                    >
+                                      ${formatImpact(
+                                        value,
+                                      )}
+                                    </span>
+                                  </div>
+                                `
+                              },
+                            )
+                            .join('')}
+                        </div>
+                      </div>
+                    </article>
+                  `,
+                )
+                .join('')}
+            </div>
+          `
+          : `
+            <div
+              class="
+                coach-database-empty
+              "
+            >
+              Nessun allenatore trovato
+              nel database.
+            </div>
+          `
+      }
     </section>
   `
 }
