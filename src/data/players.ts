@@ -1,175 +1,396 @@
+import playersCsv from '../../database/MisterCana_DB_Giocatori_2026_27.csv?raw'
+
 import type {
   Player,
+  PlayerRole,
 } from '../domain/player'
 
-export const players: Player[] = [
-  {
-    id: 'demo-01',
-    name: 'Marco Portiere',
-    team: 'Torino',
-    role: 'P',
+/* =========================
+   CSV
+========================= */
 
-    iCa: 72,
-    pma: 18,
-    consensus: 78,
-    startingProbability: 96,
-    xMv: 6.18,
-    xFmv: 5.91,
+function parseCsvRow(
+  line: string,
+): string[] {
+  const values: string[] = []
 
-    penaltyTaker: false,
-    status: 'free',
-  },
+  let current = ''
+  let quoted = false
 
-  {
-    id: 'demo-02',
-    name: 'Luca Difensore',
-    team: 'Roma',
-    role: 'D',
+  for (
+    let index = 0;
+    index < line.length;
+    index += 1
+  ) {
+    const character =
+      line[index]
 
-    iCa: 81,
-    pma: 24,
-    consensus: 84,
-    startingProbability: 91,
-    xMv: 6.21,
-    xFmv: 6.48,
+    if (
+      character === '"'
+    ) {
+      if (
+        quoted &&
+        line[index + 1] === '"'
+      ) {
+        current += '"'
+        index += 1
+      } else {
+        quoted = !quoted
+      }
 
-    penaltyTaker: false,
-    status: 'free',
-  },
+      continue
+    }
 
-  {
-    id: 'demo-03',
-    name: 'Andrea Terzino',
-    team: 'Milan',
-    role: 'D',
+    if (
+      character === ';' &&
+      !quoted
+    ) {
+      values.push(
+        current.trim(),
+      )
 
-    iCa: 67,
-    pma: 15,
-    consensus: 71,
-    startingProbability: 77,
-    xMv: 6.04,
-    xFmv: 6.31,
+      current = ''
 
-    penaltyTaker: false,
-    status: 'assigned',
-  },
+      continue
+    }
 
-  {
-    id: 'demo-04',
-    name: 'Paolo Regista',
-    team: 'Inter',
-    role: 'C',
+    current += character
+  }
 
-    iCa: 74,
-    pma: 29,
-    consensus: 82,
-    startingProbability: 88,
-    xMv: 6.23,
-    xFmv: 6.55,
+  values.push(
+    current.trim(),
+  )
 
-    penaltyTaker: false,
-    status: 'free',
-  },
+  return values
+}
 
-  {
-    id: 'demo-05',
-    name: 'Davide Mezzala',
-    team: 'Atalanta',
-    role: 'C',
+function parseCsv(
+  csv: string,
+): string[][] {
+  return csv
+    .replace(/\r/g, '')
+    .split('\n')
+    .map(
+      (line) =>
+        line.trim(),
+    )
+    .filter(Boolean)
+    .map(parseCsvRow)
+}
 
-    iCa: 86,
-    pma: 42,
-    consensus: 89,
-    startingProbability: 93,
-    xMv: 6.37,
-    xFmv: 7.04,
+/* =========================
+   PARSERS
+========================= */
 
-    penaltyTaker: true,
-    status: 'free',
-  },
+function parseItalianNumber(
+  value:
+    | string
+    | undefined,
+): number | undefined {
+  if (
+    value === undefined ||
+    value.trim() === ''
+  ) {
+    return undefined
+  }
 
-  {
-    id: 'demo-06',
-    name: 'Fabio Trequartista',
-    team: 'Bologna',
-    role: 'C',
+  const normalized =
+    value
+      .trim()
+      .replace(/\./g, '')
+      .replace(',', '.')
 
-    iCa: 63,
-    pma: 19,
-    consensus: 68,
-    startingProbability: 73,
-    xMv: 6.09,
-    xFmv: 6.63,
+  const parsed =
+    Number(normalized)
 
-    penaltyTaker: false,
-    status: 'assigned',
-  },
+  return Number.isFinite(
+    parsed,
+  )
+    ? parsed
+    : undefined
+}
 
-  {
-    id: 'demo-07',
-    name: 'Matteo Punta',
-    team: 'Napoli',
-    role: 'A',
+function parsePercentage(
+  value:
+    | string
+    | undefined,
+): number | undefined {
+  if (
+    value === undefined ||
+    value.trim() === ''
+  ) {
+    return undefined
+  }
 
-    iCa: 92,
-    pma: 108,
-    consensus: 94,
-    startingProbability: 97,
-    xMv: 6.48,
-    xFmv: 8.12,
+  const normalized =
+    value
+      .trim()
+      .replace('%', '')
+      .replace(/\./g, '')
+      .replace(',', '.')
 
-    penaltyTaker: true,
-    status: 'free',
-  },
+  const parsed =
+    Number(normalized)
 
-  {
-    id: 'demo-08',
-    name: 'Simone Attaccante',
-    team: 'Lazio',
-    role: 'A',
+  return Number.isFinite(
+    parsed,
+  )
+    ? parsed
+    : undefined
+}
 
-    iCa: 78,
-    pma: 61,
-    consensus: 80,
-    startingProbability: 86,
-    xMv: 6.29,
-    xFmv: 7.21,
+function parseBooleanFlag(
+  value:
+    | string
+    | undefined,
+): boolean {
+  if (!value) {
+    return false
+  }
 
-    penaltyTaker: true,
-    status: 'assigned',
-  },
+  const normalized =
+    value
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(
+        /[\u0300-\u036f]/g,
+        '',
+      )
 
-  {
-    id: 'demo-09',
-    name: 'Enrico Ala',
-    team: 'Fiorentina',
-    role: 'A',
+  return (
+    normalized === 'si' ||
+    normalized === 'sì' ||
+    normalized === 'yes' ||
+    normalized === 'true' ||
+    normalized === '1'
+  )
+}
 
-    iCa: 70,
-    pma: 34,
-    consensus: 75,
-    startingProbability: 79,
-    xMv: 6.14,
-    xFmv: 6.81,
+function parseRole(
+  value:
+    | string
+    | undefined,
+): PlayerRole | null {
+  switch (
+    value?.trim().toUpperCase()
+  ) {
+    case 'P':
+      return 'P'
 
-    penaltyTaker: false,
-    status: 'free',
-  },
+    case 'D':
+      return 'D'
 
-  {
-    id: 'demo-10',
-    name: 'Stefano Centrale',
-    team: 'Genoa',
-    role: 'D',
+    case 'C':
+      return 'C'
 
-    iCa: 59,
-    pma: 9,
-    consensus: 64,
-    startingProbability: 82,
-    xMv: 5.98,
-    xFmv: 6.11,
+    case 'A':
+      return 'A'
 
-    penaltyTaker: false,
-    status: 'free',
-  },
-]
+    default:
+      return null
+  }
+}
+
+/* =========================
+   DATABASE
+========================= */
+
+function parsePlayersCsv(
+  csv: string,
+): Player[] {
+  const rows =
+    parseCsv(csv)
+
+  if (
+    rows.length < 2
+  ) {
+    return []
+  }
+
+  const header =
+    rows[0]
+
+  const columnIndex =
+    new Map<string, number>()
+
+  header.forEach(
+    (
+      column,
+      index,
+    ) => {
+      columnIndex.set(
+        column.trim(),
+        index,
+      )
+    },
+  )
+
+  const getValue =
+    (
+      row: string[],
+      column: string,
+    ): string => {
+      const index =
+        columnIndex.get(
+          column,
+        )
+
+      if (
+        index === undefined
+      ) {
+        return ''
+      }
+
+      return (
+        row[index] ??
+        ''
+      ).trim()
+    }
+
+  return rows
+    .slice(1)
+    .map(
+      (row): Player | null => {
+        const id =
+          getValue(
+            row,
+            'id_giocatore',
+          )
+
+        const team =
+          getValue(
+            row,
+            'Squadra',
+          )
+
+        const name =
+          getValue(
+            row,
+            'Giocatore',
+          )
+
+        const role =
+          parseRole(
+            getValue(
+              row,
+              'Ruolo',
+            ),
+          )
+
+        if (
+          !id ||
+          !team ||
+          !name ||
+          !role
+        ) {
+          return null
+        }
+
+        return {
+          id,
+          name,
+          team,
+          role,
+
+          startingProbability:
+            parsePercentage(
+              getValue(
+                row,
+                'Titolarita',
+              ),
+            ),
+
+          mv:
+            parseItalianNumber(
+              getValue(
+                row,
+                'MV',
+              ),
+            ),
+
+          fmv:
+            parseItalianNumber(
+              getValue(
+                row,
+                'FMV',
+              ),
+            ),
+
+          pmaPercent:
+            parsePercentage(
+              getValue(
+                row,
+                'PMA',
+              ),
+            ),
+
+          valorizzato:
+            parseBooleanFlag(
+              getValue(
+                row,
+                'Valorizzato',
+              ),
+            ),
+
+          penalizzato:
+            parseBooleanFlag(
+              getValue(
+                row,
+                'Penalizzato',
+              ),
+            ),
+
+          nomeNascosto:
+            parseBooleanFlag(
+              getValue(
+                row,
+                'Nome_Nascosto',
+              ),
+            ),
+
+          /*
+            Metriche MisterCanà non
+            presenti nel listone.
+
+            Non vengono inventate.
+          */
+          iCa: undefined,
+          pma: undefined,
+          consensus: undefined,
+          xMv: undefined,
+          xFmv: undefined,
+
+          /*
+            Legacy.
+
+            La pagina Giocatori usa
+            il database Battitori
+            per identificare i
+            rigoristi reali.
+          */
+          penaltyTaker: false,
+
+          /*
+            Stato temporaneo.
+
+            Verrà sostituito dallo
+            stato condiviso dell'asta.
+          */
+          status: 'free',
+        }
+      },
+    )
+    .filter(
+      (
+        player,
+      ): player is Player =>
+        player !== null,
+    )
+}
+
+export const players:
+  Player[] =
+  parsePlayersCsv(
+    playersCsv,
+  )

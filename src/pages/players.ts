@@ -1,3 +1,5 @@
+import battitoriCsv from '../../database/MisterCana_DB_Battitori.csv?raw'
+
 import {
   players,
 } from '../data/players'
@@ -14,16 +16,22 @@ type RoleFilter =
 type SortKey =
   | 'name'
   | 'iCa'
-  | 'pma'
+  | 'pmaPercent'
   | 'consensus'
   | 'startingProbability'
-  | 'xMv'
-  | 'xFmv'
+  | 'mv'
+  | 'fmv'
   | 'status'
 
 type SortDirection =
   | 'asc'
   | 'desc'
+
+type SpecialistRank =
+  | 1
+  | 2
+  | 3
+  | 4
 
 interface PlayersViewState {
   role: RoleFilter
@@ -33,6 +41,20 @@ interface PlayersViewState {
 
   sortKey: SortKey
   sortDirection: SortDirection
+}
+
+interface SpecialistEntry {
+  team: string
+  name: string
+  rank: SpecialistRank
+}
+
+interface PlayerSpecialists {
+  penaltyRank:
+    SpecialistRank | null
+
+  setPieceRank:
+    SpecialistRank | null
 }
 
 const viewState: PlayersViewState = {
@@ -47,19 +69,40 @@ const viewState: PlayersViewState = {
   sortDirection: 'asc',
 }
 
+/* =========================
+   HTML
+========================= */
+
 function escapeHtml(
   value: string,
 ): string {
   return value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;')
+    .replaceAll(
+      '&',
+      '&amp;',
+    )
+    .replaceAll(
+      '<',
+      '&lt;',
+    )
+    .replaceAll(
+      '>',
+      '&gt;',
+    )
+    .replaceAll(
+      '"',
+      '&quot;',
+    )
+    .replaceAll(
+      "'",
+      '&#039;',
+    )
 }
 
 function formatNumber(
-  value: number | undefined,
+  value:
+    | number
+    | undefined,
   digits = 0,
 ): string {
   if (
@@ -69,15 +112,542 @@ function formatNumber(
     return '—'
   }
 
-  return value.toFixed(digits)
+  return value.toFixed(
+    digits,
+  )
+}
+
+function formatItalianNumber(
+  value:
+    | number
+    | undefined,
+  digits = 2,
+): string {
+  if (
+    value === undefined ||
+    !Number.isFinite(value)
+  ) {
+    return '—'
+  }
+
+  return value
+    .toFixed(digits)
+    .replace('.', ',')
+}
+
+function formatPercent(
+  value:
+    | number
+    | undefined,
+  digits = 1,
+): string {
+  if (
+    value === undefined ||
+    !Number.isFinite(value)
+  ) {
+    return '—'
+  }
+
+  return `${value
+    .toFixed(digits)
+    .replace('.', ',')}%`
+}
+
+/* =========================
+   CSV
+========================= */
+
+function parseCsvRow(
+  line: string,
+): string[] {
+  const values: string[] = []
+
+  let current = ''
+  let quoted = false
+
+  for (
+    let index = 0;
+    index < line.length;
+    index += 1
+  ) {
+    const character =
+      line[index]
+
+    if (
+      character === '"'
+    ) {
+      if (
+        quoted &&
+        line[index + 1] === '"'
+      ) {
+        current += '"'
+        index += 1
+      } else {
+        quoted = !quoted
+      }
+
+      continue
+    }
+
+    if (
+      character === ';' &&
+      !quoted
+    ) {
+      values.push(
+        current.trim(),
+      )
+
+      current = ''
+
+      continue
+    }
+
+    current += character
+  }
+
+  values.push(
+    current.trim(),
+  )
+
+  return values
+}
+
+function parseCsv(
+  csv: string,
+): string[][] {
+  return csv
+    .replace(/\r/g, '')
+    .split('\n')
+    .map(
+      (line) =>
+        line.trim(),
+    )
+    .filter(Boolean)
+    .map(parseCsvRow)
+}
+
+/* =========================
+   SPECIALISTS DATABASE
+========================= */
+
+function parseSpecialistsCsv(
+  csv: string,
+): {
+  penalties: SpecialistEntry[]
+  setPieces: SpecialistEntry[]
+} {
+  const rows =
+    parseCsv(csv)
+
+  const penalties:
+    SpecialistEntry[] = []
+
+  const setPieces:
+    SpecialistEntry[] = []
+
+  if (
+    rows.length < 2
+  ) {
+    return {
+      penalties,
+      setPieces,
+    }
+  }
+
+  rows
+    .slice(1)
+    .forEach(
+      (columns) => {
+        const [
+          team,
+          penalty1,
+          penalty2,
+          penalty3,
+          penalty4,
+          setPiece1,
+          setPiece2,
+          setPiece3,
+        ] = columns
+
+        if (!team) {
+          return
+        }
+
+        const penaltyNames = [
+          penalty1,
+          penalty2,
+          penalty3,
+          penalty4,
+        ]
+
+        penaltyNames.forEach(
+          (
+            name,
+            index,
+          ) => {
+            if (!name) {
+              return
+            }
+
+            penalties.push({
+              team,
+              name,
+
+              rank:
+                (
+                  index + 1
+                ) as SpecialistRank,
+            })
+          },
+        )
+
+        const setPieceNames = [
+          setPiece1,
+          setPiece2,
+          setPiece3,
+        ]
+
+        setPieceNames.forEach(
+          (
+            name,
+            index,
+          ) => {
+            if (!name) {
+              return
+            }
+
+            setPieces.push({
+              team,
+              name,
+
+              rank:
+                (
+                  index + 1
+                ) as SpecialistRank,
+            })
+          },
+        )
+      },
+    )
+
+  return {
+    penalties,
+    setPieces,
+  }
+}
+
+const SPECIALISTS =
+  parseSpecialistsCsv(
+    battitoriCsv,
+  )
+
+/* =========================
+   NAME MATCHING
+========================= */
+
+function normalizeText(
+  value: string,
+): string {
+  return value
+    .normalize('NFD')
+    .replace(
+      /[\u0300-\u036f]/g,
+      '',
+    )
+    .toLowerCase()
+    .replace(
+      /[^a-z0-9]+/g,
+      ' ',
+    )
+    .trim()
+}
+
+function getNameTokens(
+  value: string,
+): string[] {
+  return normalizeText(
+    value,
+  )
+    .split(' ')
+    .filter(Boolean)
+}
+
+function namesLikelyMatch(
+  playerName: string,
+  specialistName: string,
+): boolean {
+  const playerNormalized =
+    normalizeText(
+      playerName,
+    )
+
+  const specialistNormalized =
+    normalizeText(
+      specialistName,
+    )
+
+  if (
+    !playerNormalized ||
+    !specialistNormalized
+  ) {
+    return false
+  }
+
+  if (
+    playerNormalized ===
+    specialistNormalized
+  ) {
+    return true
+  }
+
+  const playerTokens =
+    getNameTokens(
+      playerName,
+    )
+
+  const specialistTokens =
+    getNameTokens(
+      specialistName,
+    )
+
+  if (
+    specialistTokens.length === 0
+  ) {
+    return false
+  }
+
+  return specialistTokens.every(
+    (specialistToken) => {
+      if (
+        specialistToken.length <= 2
+      ) {
+        return playerTokens.some(
+          (playerToken) =>
+            playerToken.startsWith(
+              specialistToken,
+            ),
+        )
+      }
+
+      return playerTokens.some(
+        (playerToken) =>
+          playerToken ===
+          specialistToken,
+      )
+    },
+  )
+}
+
+function teamsLikelyMatch(
+  playerTeam: string,
+  specialistTeam: string,
+): boolean {
+  return (
+    normalizeText(
+      playerTeam,
+    ) ===
+    normalizeText(
+      specialistTeam,
+    )
+  )
+}
+
+function findSpecialistRank(
+  player: Player,
+  entries: SpecialistEntry[],
+): SpecialistRank | null {
+  const match =
+    entries.find(
+      (entry) =>
+        teamsLikelyMatch(
+          player.team,
+          entry.team,
+        ) &&
+        namesLikelyMatch(
+          player.name,
+          entry.name,
+        ),
+    )
+
+  return (
+    match?.rank ??
+    null
+  )
+}
+
+function getPlayerSpecialists(
+  player: Player,
+): PlayerSpecialists {
+  return {
+    penaltyRank:
+      findSpecialistRank(
+        player,
+        SPECIALISTS.penalties,
+      ),
+
+    setPieceRank:
+      findSpecialistRank(
+        player,
+        SPECIALISTS.setPieces,
+      ),
+  }
+}
+
+/* =========================
+   INDICATORS
+========================= */
+
+function getRankClass(
+  rank:
+    SpecialistRank | null,
+): string {
+  switch (rank) {
+    case 1:
+      return 'rank-gold'
+
+    case 2:
+      return 'rank-silver'
+
+    case 3:
+      return 'rank-bronze'
+
+    case 4:
+      return 'rank-neutral'
+
+    default:
+      return ''
+  }
+}
+
+function getRankLabel(
+  rank:
+    SpecialistRank | null,
+): string {
+  if (!rank) {
+    return ''
+  }
+
+  return `${rank}°`
+}
+
+function renderPlayerIndicators(
+  player: Player,
+): string {
+  const specialists =
+    getPlayerSpecialists(
+      player,
+    )
+
+  const indicators:
+    string[] = []
+
+  if (
+    player.startingProbability !==
+      undefined &&
+    player.startingProbability >= 90
+  ) {
+    indicators.push(`
+      <span
+        class="
+          player-indicator
+          player-indicator-xi
+        "
+        title="Titolarità almeno 90%"
+        aria-label="
+          Titolarità almeno 90 per cento
+        "
+      >
+        XI
+      </span>
+    `)
+  }
+
+  if (
+    specialists.penaltyRank
+  ) {
+    indicators.push(`
+      <span
+        class="
+          player-indicator
+          player-indicator-specialist
+          ${getRankClass(
+            specialists.penaltyRank,
+          )}
+        "
+        title="${getRankLabel(
+          specialists.penaltyRank,
+        )} rigorista"
+        aria-label="${getRankLabel(
+          specialists.penaltyRank,
+        )} rigorista"
+      >
+        🥅
+      </span>
+    `)
+  }
+
+  if (
+    specialists.setPieceRank
+  ) {
+    indicators.push(`
+      <span
+        class="
+          player-indicator
+          player-indicator-specialist
+          ${getRankClass(
+            specialists.setPieceRank,
+          )}
+        "
+        title="${getRankLabel(
+          specialists.setPieceRank,
+        )} battitore piazzati"
+        aria-label="${getRankLabel(
+          specialists.setPieceRank,
+        )} battitore piazzati"
+      >
+        ⚽
+      </span>
+    `)
+  }
+
+  if (
+    indicators.length === 0
+  ) {
+    return ''
+  }
+
+  return `
+    <span
+      class="
+        players-player-indicators
+      "
+    >
+      ${indicators.join('')}
+    </span>
+  `
+}
+
+/* =========================
+   FILTERS
+========================= */
+
+function isPenaltyTaker(
+  player: Player,
+): boolean {
+  return (
+    getPlayerSpecialists(
+      player,
+    ).penaltyRank !==
+    null
+  )
 }
 
 function getFilteredPlayers():
   Player[] {
   const search =
-    viewState.search
-      .trim()
-      .toLowerCase()
+    normalizeText(
+      viewState.search,
+    )
 
   const filtered =
     players.filter(
@@ -92,7 +662,9 @@ function getFilteredPlayers():
 
         if (
           viewState.penaltiesOnly &&
-          !player.penaltyTaker
+          !isPenaltyTaker(
+            player,
+          )
         ) {
           return false
         }
@@ -106,8 +678,9 @@ function getFilteredPlayers():
 
         if (search) {
           const searchable =
-            `${player.name} ${player.team}`
-              .toLowerCase()
+            normalizeText(
+              `${player.name} ${player.team}`,
+            )
 
           if (
             !searchable.includes(
@@ -127,6 +700,10 @@ function getFilteredPlayers():
   )
 }
 
+/* =========================
+   SORT
+========================= */
+
 function getSortableValue(
   player: Player,
   key: SortKey,
@@ -142,9 +719,9 @@ function getSortableValue(
         -Infinity
       )
 
-    case 'pma':
+    case 'pmaPercent':
       return (
-        player.pma ??
+        player.pmaPercent ??
         -Infinity
       )
 
@@ -161,15 +738,15 @@ function getSortableValue(
         -Infinity
       )
 
-    case 'xMv':
+    case 'mv':
       return (
-        player.xMv ??
+        player.mv ??
         -Infinity
       )
 
-    case 'xFmv':
+    case 'fmv':
       return (
-        player.xFmv ??
+        player.fmv ??
         -Infinity
       )
 
@@ -283,6 +860,10 @@ function renderSortHeader(
   `
 }
 
+/* =========================
+   PLAYER ROW
+========================= */
+
 function renderPlayerRow(
   player: Player,
 ): string {
@@ -292,7 +873,9 @@ function renderPlayerRow(
       class="
         players-table-row
       "
-      data-player-id="${player.id}"
+      data-player-id="${escapeHtml(
+        player.id,
+      )}"
     >
       <div
         class="
@@ -314,11 +897,21 @@ function renderPlayerRow(
             players-player-info
           "
         >
-          <strong>
-            ${escapeHtml(
-              player.name,
+          <div
+            class="
+              players-player-name-row
+            "
+          >
+            <strong>
+              ${escapeHtml(
+                player.name,
+              )}
+            </strong>
+
+            ${renderPlayerIndicators(
+              player,
             )}
-          </strong>
+          </div>
 
           <small>
             ${escapeHtml(
@@ -345,11 +938,12 @@ function renderPlayerRow(
         class="
           players-cell
           players-number-cell
+          players-pma-cell
         "
       >
-        ${formatNumber(
-          player.pma,
-          0,
+        ${formatPercent(
+          player.pmaPercent,
+          1,
         )}
       </div>
 
@@ -373,40 +967,33 @@ function renderPlayerRow(
           players-starting-cell
         "
       >
-        ${
-          player
-            .startingProbability ===
-          undefined
-            ? '—'
-            : `${formatNumber(
-                player
-                  .startingProbability,
-                0,
-              )}%`
-        }
+        ${formatPercent(
+          player.startingProbability,
+          0,
+        )}
       </div>
 
       <div
         class="
           players-cell
           players-number-cell
-          players-x-cell
+          players-mv-cell
         "
       >
         <span
           class="
-            players-x-primary
+            players-mv-primary
           "
         >
-          ${formatNumber(
-            player.xMv,
+          ${formatItalianNumber(
+            player.mv,
             2,
           )}
         </span>
 
         <span
           class="
-            players-x-separator
+            players-mv-separator
           "
         >
           /
@@ -414,11 +1001,11 @@ function renderPlayerRow(
 
         <span
           class="
-            players-x-secondary
+            players-mv-secondary
           "
         >
-          ${formatNumber(
-            player.xFmv,
+          ${formatItalianNumber(
+            player.fmv,
             2,
           )}
         </span>
@@ -453,6 +1040,10 @@ function renderPlayerRow(
   `
 }
 
+/* =========================
+   PAGE
+========================= */
+
 export function renderPlayersPage():
   string {
   const filteredPlayers =
@@ -476,7 +1067,7 @@ export function renderPlayersPage():
               players-eyebrow
             "
           >
-            DATABASE
+            DATABASE 2026/27
           </span>
 
           <h1>
@@ -628,7 +1219,7 @@ export function renderPlayersPage():
                   players-penalty-symbol
                 "
               >
-                R
+                🥅
               </span>
 
               <span>
@@ -638,12 +1229,16 @@ export function renderPlayersPage():
           </div>
         </div>
 
-        <label
+        <div
           class="
             players-search
           "
         >
-          <span>
+          <span
+            class="
+              players-search-icon
+            "
+          >
             ⌕
           </span>
 
@@ -656,7 +1251,24 @@ export function renderPlayersPage():
             )}"
             autocomplete="off"
           >
-        </label>
+
+          <button
+            id="clearPlayersSearch"
+            type="button"
+            class="
+              players-search-clear
+              ${
+                viewState.search
+                  ? ''
+                  : 'hidden'
+              }
+            "
+            aria-label="Cancella ricerca"
+            title="Cancella ricerca"
+          >
+            ×
+          </button>
+        </div>
       </div>
 
       <div
@@ -686,7 +1298,7 @@ export function renderPlayersPage():
           <div>
             ${renderSortHeader(
               'PMA',
-              'pma',
+              'pmaPercent',
             )}
           </div>
 
@@ -706,8 +1318,8 @@ export function renderPlayersPage():
 
           <div>
             ${renderSortHeader(
-              'xMV / xFMV',
-              'xFmv',
+              'MV / FMV',
+              'fmv',
             )}
           </div>
 
@@ -769,7 +1381,7 @@ export function renderPlayersPage():
         </span>
 
         <span>
-          Dataset demo temporaneo
+          Listone MisterCanà 2026/27
         </span>
       </div>
 
@@ -808,9 +1420,7 @@ export function renderPlayersPage():
               </span>
 
               <h2
-                id="
-                  playerPreviewName
-                "
+                id="playerPreviewName"
               >
                 Giocatore
               </h2>
@@ -833,13 +1443,11 @@ export function renderPlayersPage():
               muted-text
             "
           >
-            Questa è una
-            predisposizione
-            temporanea.
+            Questa è ancora una
+            predisposizione temporanea.
 
             In seguito il click
-            aprirà la pagina
-            dettaglio completa
+            aprirà la scheda completa
             del giocatore.
           </p>
         </div>
@@ -848,8 +1456,37 @@ export function renderPlayersPage():
   `
 }
 
+/* =========================
+   EVENTS
+========================= */
+
 interface PlayersActions {
   onRender: () => void
+}
+
+function focusSearchAtEnd():
+  void {
+  const newSearchInput =
+    document.querySelector<HTMLInputElement>(
+      '#playersSearch',
+    )
+
+  if (!newSearchInput) {
+    return
+  }
+
+  newSearchInput.focus()
+
+  const end =
+    newSearchInput
+      .value
+      .length
+
+  newSearchInput
+    .setSelectionRange(
+      end,
+      end,
+    )
 }
 
 export function bindPlayersEvents(
@@ -933,27 +1570,48 @@ export function bindPlayersEvents(
 
       actions.onRender()
 
-      const newSearchInput =
-        document.querySelector<HTMLInputElement>(
-          '#playersSearch',
-        )
-
-      if (newSearchInput) {
-        newSearchInput.focus()
-
-        const end =
-          newSearchInput
-            .value
-            .length
-
-        newSearchInput
-          .setSelectionRange(
-            end,
-            end,
-          )
-      }
+      focusSearchAtEnd()
     },
   )
+
+  searchInput?.addEventListener(
+    'search',
+    () => {
+      if (
+        viewState.search ===
+        searchInput.value
+      ) {
+        return
+      }
+
+      viewState.search =
+        searchInput.value
+
+      actions.onRender()
+
+      focusSearchAtEnd()
+    },
+  )
+
+  document
+    .querySelector<HTMLButtonElement>(
+      '#clearPlayersSearch',
+    )
+    ?.addEventListener(
+      'click',
+      () => {
+        viewState.search = ''
+
+        actions.onRender()
+
+        const newSearchInput =
+          document.querySelector<HTMLInputElement>(
+            '#playersSearch',
+          )
+
+        newSearchInput?.focus()
+      },
+    )
 
   document
     .querySelectorAll<HTMLButtonElement>(
