@@ -29,7 +29,7 @@
 }
 
 /* =========================
-   SECTION
+   SECTIONS
 ========================= */
 
 .insight-section {
@@ -91,15 +91,17 @@
   letter-spacing: 0.11em;
 }
 
-.insight-placeholder-badge {
-  flex: 0 0 auto;
+.insight-database-status,
+.insight-database-button {
+  min-height: 32px;
 
-  min-height: 30px;
+  flex: 0 0 auto;
 
   display: inline-flex;
   align-items: center;
+  justify-content: center;
 
-  padding: 0 10px;
+  padding: 0 11px;
 
   border:
     1px solid
@@ -110,18 +112,176 @@
 
   background: #1b1e20;
 
-  color: #747a7e;
+  color: #80868a;
 
   font-size: 8px;
-  font-weight: 700;
+  font-weight: 750;
+}
+
+.insight-database-button {
+  cursor: pointer;
+
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.insight-database-button:hover {
+  border-color:
+    rgba(255, 255, 255, 0.16);
+
+  background: #232629;
+
+  color: #dadddf;
 }
 
 /* =========================
-   GOALKEEPERS
+   GOALKEEPER TOOL
 ========================= */
 
-.goalkeeper-table {
+.goalkeeper-tool {
+  display: grid;
+
+  grid-template-columns:
+    minmax(260px, 0.75fr)
+    minmax(340px, 1.25fr);
+
+  gap: 14px;
+}
+
+.goalkeeper-search-area {
+  position: relative;
+
+  min-width: 0;
+}
+
+.goalkeeper-search-box {
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+
+  padding: 0 14px;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.08);
+
+  border-radius: 16px;
+
+  background: #181b1d;
+
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.goalkeeper-search-box:focus-within {
+  border-color:
+    rgba(255, 255, 255, 0.18);
+
+  background: #1d2022;
+}
+
+.goalkeeper-search-icon {
+  color: #747a7e;
+
+  font-size: 16px;
+}
+
+.goalkeeper-search-box input {
+  width: 100%;
+
+  border: 0;
+  outline: 0;
+
+  background: transparent;
+
+  color: #e1e4e5;
+
+  font-size: 11px;
+}
+
+.goalkeeper-search-box input::placeholder {
+  color: #656b6f;
+}
+
+.goalkeeper-search-suggestions {
+  position: absolute;
+
+  z-index: 30;
+
+  top: 50px;
+  right: 0;
+  left: 0;
+
   overflow: hidden;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.09);
+
+  border-radius: 18px;
+
+  background: #202326;
+
+  box-shadow:
+    0 18px 45px
+    rgba(0, 0, 0, 0.35);
+}
+
+.goalkeeper-search-suggestions:empty {
+  display: none;
+}
+
+.goalkeeper-search-suggestion {
+  width: 100%;
+  min-height: 39px;
+
+  display: flex;
+  align-items: center;
+
+  padding: 0 13px;
+
+  border: 0;
+
+  background: transparent;
+
+  color: #cbd0d2;
+
+  font-size: 10px;
+
+  text-align: left;
+
+  cursor: pointer;
+}
+
+.goalkeeper-search-suggestion:hover {
+  background:
+    rgba(255, 255, 255, 0.055);
+
+  color: #ffffff;
+}
+
+.goalkeeper-search-no-result {
+  padding: 13px;
+
+  color: #6e7478;
+
+  font-size: 9px;
+}
+
+/* =========================
+   GOALKEEPER RECOMMENDATIONS
+========================= */
+
+.goalkeeper-recommendations {
+  min-height: 134px;
+
+  padding: 13px;
 
   border:
     1px solid
@@ -132,68 +292,457 @@
   background: #181b1d;
 }
 
-.goalkeeper-table-header,
-.goalkeeper-table-row {
+.goalkeeper-recommendations-empty {
+  min-height: 106px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 5px;
+
+  color: #757b7f;
+
+  text-align: center;
+}
+
+.goalkeeper-recommendations-empty span {
+  color: #a7acae;
+
+  font-size: 10px;
+  font-weight: 750;
+}
+
+.goalkeeper-recommendations-empty small {
+  font-size: 8px;
+}
+
+.goalkeeper-selection-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  margin-bottom: 9px;
+}
+
+.goalkeeper-selection-heading span {
+  color: #73797d;
+
+  font-size: 8px;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.05em;
+}
+
+.goalkeeper-selection-heading strong {
+  color: #d9dcde;
+
+  font-size: 10px;
+}
+
+.goalkeeper-recommendations-list {
+  display: grid;
+
+  gap: 6px;
+}
+
+.goalkeeper-recommendation {
+  min-height: 42px;
+
   display: grid;
 
   grid-template-columns:
-    minmax(180px, 1fr)
-    minmax(180px, 1fr)
-    minmax(220px, 1.4fr);
+    28px
+    minmax(0, 1fr)
+    auto;
 
   align-items: center;
 
-  gap: 16px;
+  gap: 9px;
+
+  padding: 6px 8px;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.05);
+
+  border-radius: 14px;
+
+  background: #1d2022;
 }
 
-.goalkeeper-table-header {
-  min-height: 42px;
+.goalkeeper-rank {
+  width: 25px;
+  height: 25px;
 
-  padding: 0 14px;
+  display: grid;
+  place-items: center;
+
+  border-radius: 9px;
+
+  background:
+    rgba(227, 199, 72, 0.1);
+
+  color: #e4ca55;
+
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.goalkeeper-recommendation-team {
+  min-width: 0;
+}
+
+.goalkeeper-recommendation-team strong {
+  display: block;
+
+  overflow: hidden;
+
+  color: #d8dcde;
+
+  font-size: 10px;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.goalkeeper-recommendation-team small {
+  display: block;
+
+  margin-top: 2px;
+
+  color: #646a6e;
+
+  font-size: 7px;
+}
+
+.goalkeeper-score {
+  min-width: 40px;
+  height: 27px;
+
+  display: grid;
+  place-items: center;
+
+  padding: 0 7px;
+
+  border:
+    1px solid
+    rgba(52, 211, 153, 0.14);
+
+  border-radius:
+    var(--radius-pill);
+
+  background:
+    rgba(52, 211, 153, 0.07);
+
+  color: #6adaad;
+
+  font-size: 9px;
+  font-weight: 850;
+}
+
+/* =========================
+   GOALKEEPER MATRIX OVERLAY
+========================= */
+
+.insights-overlay-open {
+  overflow: hidden;
+}
+
+.goalkeeper-matrix-overlay {
+  position: fixed;
+
+  z-index: 1000;
+
+  inset: 0;
+
+  padding: 28px;
+
+  background:
+    rgba(5, 7, 8, 0.82);
+
+  backdrop-filter:
+    blur(8px);
+}
+
+.goalkeeper-matrix-overlay[hidden] {
+  display: none;
+}
+
+.goalkeeper-matrix-dialog {
+  width: min(
+    1400px,
+    100%
+  );
+
+  max-height:
+    calc(
+      100vh - 56px
+    );
+
+  margin: 0 auto;
+
+  overflow: hidden;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.09);
+
+  border-radius: 28px;
+
+  background: #121416;
+
+  box-shadow:
+    0 28px 80px
+    rgba(0, 0, 0, 0.55);
+}
+
+.goalkeeper-matrix-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 18px;
 
   border-bottom:
     1px solid
     rgba(255, 255, 255, 0.06);
+}
 
+.goalkeeper-matrix-header h2 {
+  margin: 4px 0 0;
+
+  font-size: 18px;
+}
+
+.goalkeeper-matrix-header p {
+  margin: 6px 0 0;
+
+  color: #71777b;
+
+  font-size: 9px;
+}
+
+.goalkeeper-matrix-close {
+  width: 36px;
+  height: 36px;
+
+  flex: 0 0 auto;
+
+  display: grid;
+  place-items: center;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.09);
+
+  border-radius: 14px;
+
+  background: #1b1e20;
+
+  color: #8a9094;
+
+  font-size: 18px;
+
+  cursor: pointer;
+}
+
+.goalkeeper-matrix-close:hover {
+  color: #ffffff;
+}
+
+.goalkeeper-matrix-content {
+  overflow: auto;
+
+  max-height:
+    calc(
+      100vh - 190px
+    );
+}
+
+.goalkeeper-matrix-scroll {
+  width: max-content;
+  min-width: 100%;
+}
+
+.goalkeeper-matrix-table {
+  border-collapse:
+    separate;
+
+  border-spacing: 2px;
+
+  padding: 10px;
+
+  background: #111315;
+}
+
+.goalkeeper-matrix-table th,
+.goalkeeper-matrix-table td {
+  min-width: 46px;
+  height: 37px;
+
+  padding: 0 7px;
+
+  border-radius: 8px;
+
+  text-align: center;
+
+  font-size: 8px;
+}
+
+.goalkeeper-matrix-table thead th {
+  position: sticky;
+
+  z-index: 4;
+
+  top: 0;
+
+  background: #202326;
+
+  color: #81878b;
+
+  font-weight: 800;
+}
+
+.goalkeeper-matrix-table tbody th {
+  position: sticky;
+
+  z-index: 3;
+
+  left: 0;
+
+  min-width: 105px;
+
+  background: #202326;
+
+  color: #999fa2;
+
+  text-align: left;
+}
+
+.goalkeeper-matrix-corner {
+  left: 0;
+
+  z-index: 5 !important;
+}
+
+.goalkeeper-matrix-table td {
+  color: #abb0b2;
+
+  font-weight: 750;
+
+  transition:
+    opacity 0.12s ease,
+    outline 0.12s ease;
+}
+
+.goalkeeper-matrix-table
+.is-selected {
+  outline:
+    1px solid
+    rgba(255, 255, 255, 0.2);
+
+  color: #ffffff;
+}
+
+.matrix-empty {
   background:
     rgba(255, 255, 255, 0.018);
 
-  color: #747a7e;
+  color: #44494c !important;
+}
+
+.matrix-low {
+  background:
+    rgba(226, 103, 103, 0.06);
+}
+
+.matrix-medium {
+  background:
+    rgba(227, 199, 72, 0.07);
+}
+
+.matrix-good {
+  background:
+    rgba(87, 183, 126, 0.08);
+}
+
+.matrix-excellent {
+  background:
+    rgba(52, 211, 153, 0.17);
+
+  color: #73e2b5 !important;
+}
+
+.goalkeeper-matrix-legend {
+  min-height: 44px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 16px;
+
+  padding: 0 18px;
+
+  border-top:
+    1px solid
+    rgba(255, 255, 255, 0.06);
+
+  color: #777d81;
 
   font-size: 8px;
-  font-weight: 800;
-
-  text-transform: uppercase;
 }
 
-.goalkeeper-table-row {
-  min-height: 54px;
+.goalkeeper-matrix-legend span {
+  display: inline-flex;
+  align-items: center;
 
-  padding: 0 14px;
-
-  border-bottom:
-    1px solid
-    rgba(255, 255, 255, 0.05);
+  gap: 5px;
 }
 
-.goalkeeper-table-row:last-child {
-  border-bottom: 0;
+.goalkeeper-matrix-legend i {
+  width: 9px;
+  height: 9px;
+
+  display: block;
+
+  border-radius: 3px;
 }
 
-.goalkeeper-table-row strong {
+.legend-low {
+  background:
+    rgba(226, 103, 103, 0.3);
+}
+
+.legend-medium {
+  background:
+    rgba(227, 199, 72, 0.3);
+}
+
+.legend-good {
+  background:
+    rgba(87, 183, 126, 0.34);
+}
+
+.legend-excellent {
+  background:
+    rgba(52, 211, 153, 0.66);
+}
+
+.goalkeeper-matrix-empty {
+  padding: 30px;
+
+  color: #757b7f;
+
+  text-align: center;
+
   font-size: 10px;
-}
-
-.goalkeeper-table-row span {
-  color: #c2c5c7;
-
-  font-size: 10px;
-}
-
-.goalkeeper-table-row small {
-  color: #747a7e;
-
-  font-size: 9px;
 }
 
 /* =========================
@@ -205,21 +754,21 @@
 
   grid-template-columns:
     repeat(
-      3,
+      4,
       minmax(0, 1fr)
     );
 
-  gap: 12px;
+  gap: 11px;
 }
 
 .set-piece-card {
-  padding: 14px;
+  padding: 13px;
 
   border:
     1px solid
     rgba(255, 255, 255, 0.07);
 
-  border-radius: 22px;
+  border-radius: 20px;
 
   background: #181b1d;
 }
@@ -231,8 +780,10 @@
     1px solid
     rgba(255, 255, 255, 0.06);
 
+  color: #d3d6d8;
+
   font-size: 11px;
-  font-weight: 750;
+  font-weight: 760;
 }
 
 .set-piece-columns {
@@ -244,25 +795,22 @@
       minmax(0, 1fr)
     );
 
-  gap: 14px;
+  gap: 13px;
 
-  padding-top: 12px;
+  padding-top: 11px;
 }
 
 .set-piece-label {
-  color: #7d8387;
+  color: #777d81;
 
   font-size: 8px;
-  font-weight: 800;
+  font-weight: 850;
 
   text-transform: uppercase;
 }
 
 .set-piece-columns ol {
-  margin:
-    8px
-    0
-    0;
+  margin: 8px 0 0;
 
   padding-left: 17px;
 }
@@ -270,13 +818,17 @@
 .set-piece-columns li {
   margin-bottom: 6px;
 
-  color: #c0c4c6;
+  color: #bfc3c5;
 
   font-size: 9px;
 }
 
+.set-piece-empty {
+  color: #5b6165 !important;
+}
+
 /* =========================
-   COACHES
+   COACH GRID
 ========================= */
 
 .coach-grid {
@@ -330,6 +882,8 @@
 }
 
 .coach-title-row strong {
+  color: #e1e3e4;
+
   font-size: 11px;
 }
 
@@ -343,43 +897,30 @@
   font-size: 9px;
 }
 
-.coach-new-badge {
-  padding: 4px 7px;
+.coach-formation {
+  padding: 5px 9px;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.09);
 
   border-radius:
     var(--radius-pill);
 
-  background:
-    rgba(52, 211, 153, 0.11);
-
-  color: #6addad;
-
-  font-size: 7px;
-  font-weight: 800;
-}
-
-.coach-formation {
-  padding: 5px 8px;
-
-  border:
-    1px solid #3b3f42;
-
-  border-radius: 13px;
-
   background: #191b1d;
 
-  color: #a8adb0;
+  color: #b1b5b7;
 
-  font-size: 8px;
-  font-weight: 700;
+  font-size: 9px;
+  font-weight: 800;
 }
 
 .coach-card-body {
   display: grid;
 
   grid-template-columns:
-    minmax(220px, 0.9fr)
-    minmax(220px, 1.1fr);
+    minmax(250px, 0.95fr)
+    minmax(230px, 1.05fr);
 
   gap: 14px;
 
@@ -387,22 +928,40 @@
 }
 
 /* =========================
-   MINI PITCH
+   COACH PITCH
 ========================= */
 
 .coach-pitch {
   position: relative;
 
-  min-height: 330px;
+  min-height: 355px;
 
   overflow: hidden;
 
   border:
-    1px solid #395148;
+    1px solid
+    rgba(72, 128, 102, 0.5);
 
   border-radius: 22px;
 
   background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(
+        255,
+        255,
+        255,
+        0.018
+      ) 0,
+      rgba(
+        255,
+        255,
+        255,
+        0.018
+      ) 35px,
+      transparent 35px,
+      transparent 70px
+    ),
     linear-gradient(
       180deg,
       #17372d 0%,
@@ -422,7 +981,7 @@
     1px solid
     rgba(255, 255, 255, 0.18);
 
-  border-radius: 14px;
+  border-radius: 13px;
 
   pointer-events: none;
 }
@@ -450,15 +1009,14 @@
   top: 50%;
   left: 50%;
 
-  width: 58px;
-  height: 58px;
+  width: 62px;
+  height: 62px;
 
   border:
     1px solid
     rgba(255, 255, 255, 0.18);
 
-  border-radius:
-    var(--radius-pill);
+  border-radius: 50%;
 
   transform:
     translate(
@@ -467,110 +1025,123 @@
     );
 }
 
-.coach-zone {
+.pitch-box {
   position: absolute;
+
+  left: 50%;
+
+  width: 44%;
+  height: 56px;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.16);
+
+  transform:
+    translateX(-50%);
+}
+
+.pitch-box-top {
+  top: 11px;
+
+  border-top: 0;
+
+  border-radius:
+    0 0 10px 10px;
+}
+
+.pitch-box-bottom {
+  bottom: 11px;
+
+  border-bottom: 0;
+
+  border-radius:
+    10px 10px 0 0;
+}
+
+/* =========================
+   PLAYER MARKERS
+========================= */
+
+.coach-player-marker {
+  position: absolute;
+
+  z-index: 5;
+
+  width: 42px;
+  height: 42px;
 
   display: grid;
   place-items: center;
 
-  min-width: 36px;
-  min-height: 26px;
+  border: 2px solid;
 
-  padding: 0 7px;
+  border-radius: 50%;
 
-  border:
-    1px solid
-    rgba(255, 255, 255, 0.14);
+  font-size: 8px;
+  font-weight: 950;
 
-  border-radius: 12px;
-
-  background:
-    rgba(11, 23, 19, 0.68);
-
-  color: #b8cfc5;
-
-  font-size: 7px;
-  font-weight: 800;
+  transform:
+    translate(
+      -50%,
+      -50%
+    );
 
   box-shadow:
-    0 4px 12px
-    rgba(0, 0, 0, 0.12);
+    0 5px 12px
+    rgba(0, 0, 0, 0.25);
+}
+
+/* P - GIALLO */
+
+.coach-player-p,
+.coach-role-p {
+  border-color:
+    rgba(227, 199, 72, 0.72);
+
+  background: #c8ae36;
+
+  color: #17181a;
+}
+
+/* D - BLU */
+
+.coach-player-d,
+.coach-role-d {
+  border-color:
+    rgba(97, 168, 255, 0.75);
+
+  background: #397ed5;
+
+  color: #f5f9ff;
+}
+
+/* C - VERDE */
+
+.coach-player-c,
+.coach-role-c {
+  border-color:
+    rgba(85, 216, 138, 0.72);
+
+  background: #32a967;
+
+  color: #f3fff7;
+}
+
+/* A - ROSSO */
+
+.coach-player-a,
+.coach-role-a {
+  border-color:
+    rgba(240, 113, 113, 0.75);
+
+  background: #cc4d4d;
+
+  color: #fff6f6;
 }
 
 /* =========================
-   PITCH POSITIONS
-========================= */
-
-.zone-goalkeeper {
-  bottom: 20px;
-  left: 50%;
-
-  transform:
-    translateX(-50%);
-}
-
-.zone-centre-back {
-  bottom: 67px;
-  left: 50%;
-
-  transform:
-    translateX(-50%);
-}
-
-.zone-full-back {
-  bottom: 76px;
-  left: 18px;
-}
-
-.zone-defensive-mid {
-  bottom: 118px;
-  left: 50%;
-
-  transform:
-    translateX(-50%);
-}
-
-.zone-wide-mid {
-  right: 18px;
-  bottom: 145px;
-}
-
-.zone-central-mid {
-  bottom: 165px;
-  left: 50%;
-
-  transform:
-    translateX(-50%);
-}
-
-.zone-attacking-mid {
-  top: 105px;
-  left: 50%;
-
-  transform:
-    translateX(-50%);
-}
-
-.zone-winger {
-  top: 85px;
-  left: 18px;
-}
-
-.zone-second-striker {
-  top: 55px;
-  right: 30px;
-}
-
-.zone-striker {
-  top: 25px;
-  left: 50%;
-
-  transform:
-    translateX(-50%);
-}
-
-/* =========================
-   COACH MACRO ROLE LIST
+   COACH MACRO ROLES
 ========================= */
 
 .coach-macro-role-list {
@@ -580,7 +1151,7 @@
 }
 
 .coach-macro-role-row {
-  min-height: 30px;
+  min-height: 35px;
 
   display: flex;
   align-items: center;
@@ -588,9 +1159,7 @@
 
   gap: 10px;
 
-  padding:
-    6px
-    8px;
+  padding: 5px 8px;
 
   border:
     1px solid
@@ -601,11 +1170,20 @@
   background: #191b1d;
 }
 
-.coach-macro-role-row > div {
+.coach-macro-role-name {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+}
+
+.coach-macro-role-name > div {
   min-width: 0;
 }
 
-.coach-macro-role-row strong {
+.coach-macro-role-name strong {
   display: block;
 
   overflow: hidden;
@@ -618,7 +1196,7 @@
   text-overflow: ellipsis;
 }
 
-.coach-macro-role-row small {
+.coach-macro-role-name small {
   display: block;
 
   margin-top: 2px;
@@ -628,8 +1206,25 @@
   font-size: 7px;
 }
 
-.coach-impact-placeholder {
-  min-width: 48px;
+.coach-role-dot {
+  width: 27px;
+  height: 27px;
+
+  flex: 0 0 auto;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid;
+
+  border-radius: 50%;
+
+  font-size: 6px;
+  font-weight: 900;
+}
+
+.coach-impact-value {
+  min-width: 49px;
 
   padding: 4px 7px;
 
@@ -641,10 +1236,6 @@
   font-size: 9px;
   font-weight: 800;
 }
-
-/* =========================
-   COACH DATABASE VALUES
-========================= */
 
 .coach-impact-positive {
   border:
@@ -679,7 +1270,11 @@
   color: #777e83;
 }
 
-.coach-database-empty {
+/* =========================
+   GENERIC EMPTY
+========================= */
+
+.insight-database-empty {
   padding: 22px;
 
   border:
@@ -699,11 +1294,11 @@
    RESPONSIVE
 ========================= */
 
-@media (max-width: 1100px) {
+@media (max-width: 1180px) {
   .set-pieces-grid {
     grid-template-columns:
       repeat(
-        2,
+        3,
         minmax(0, 1fr)
       );
   }
@@ -713,7 +1308,25 @@
   }
 }
 
+@media (max-width: 920px) {
+  .goalkeeper-tool {
+    grid-template-columns: 1fr;
+  }
+
+  .set-pieces-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+}
+
 @media (max-width: 760px) {
+  .insight-section {
+    padding: 15px;
+  }
+
   .insight-section-header {
     flex-direction: column;
 
@@ -728,16 +1341,59 @@
     grid-template-columns: 1fr;
   }
 
-  .goalkeeper-table {
-    overflow-x: auto;
-  }
-
-  .goalkeeper-table-header,
-  .goalkeeper-table-row {
-    min-width: 650px;
-  }
-
   .coach-pitch {
-    min-height: 310px;
+    min-height: 390px;
+  }
+
+  .goalkeeper-matrix-overlay {
+    padding: 10px;
+  }
+
+  .goalkeeper-matrix-dialog {
+    max-height:
+      calc(
+        100vh - 20px
+      );
+
+    border-radius: 22px;
+  }
+
+  .goalkeeper-matrix-content {
+    max-height:
+      calc(
+        100vh - 175px
+      );
+  }
+}
+
+@media (max-width: 520px) {
+  .insights-page-header h1 {
+    font-size: 30px;
+  }
+
+  .goalkeeper-recommendation {
+    grid-template-columns:
+      28px
+      minmax(0, 1fr)
+      auto;
+  }
+
+  .set-piece-columns {
+    gap: 8px;
+  }
+
+  .coach-player-marker {
+    width: 40px;
+    height: 40px;
+  }
+
+  .goalkeeper-matrix-legend {
+    flex-wrap: wrap;
+
+    gap: 8px 13px;
+
+    padding:
+      8px
+      14px;
   }
 }

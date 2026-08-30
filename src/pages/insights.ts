@@ -1,153 +1,260 @@
 import coachesCsv from '../../database/MisterCana_DB_Allenatori.csv?raw'
+import goalkeepersCsv from '../../database/MisterCana_DB_Portieri.csv?raw'
+import setPiecesCsv from '../../database/MisterCana_DB_Battitori.csv?raw'
+
+/* =========================
+   TYPES
+========================= */
+
+type CoachRoleKey =
+  | 'goalkeeper'
+  | 'centreBack'
+  | 'fullBack'
+  | 'defensiveMid'
+  | 'wideMid'
+  | 'centralMid'
+  | 'attackingMid'
+  | 'winger'
+  | 'secondStriker'
+  | 'striker'
+
+type MacroRoleGroup =
+  | 'P'
+  | 'D'
+  | 'C'
+  | 'A'
 
 interface Coach {
   team: string
   name: string
   formation: string
 
-  impacts: {
-    goalkeeper: number
-    centreBack: number
-    fullBack: number
-    defensiveMid: number
-    wideMid: number
-    centralMid: number
-    attackingMid: number
-    winger: number
-    secondStriker: number
-    striker: number
-  }
+  impacts: Record<
+    CoachRoleKey,
+    number
+  >
 }
 
-const GOALKEEPER_ROWS = [
-  {
-    primary: 'Portiere A',
-    pairing: 'Portiere B',
-    note: 'Compatibilità da definire',
-  },
-  {
-    primary: 'Portiere C',
-    pairing: 'Portiere D',
-    note: 'Compatibilità da definire',
-  },
-  {
-    primary: 'Portiere E',
-    pairing: 'Portiere F',
-    note: 'Compatibilità da definire',
-  },
-]
+interface CoachMacroRole {
+  key: CoachRoleKey
+  label: string
+  mantra: string
+  group: MacroRoleGroup
+}
 
-const SET_PIECE_TEAMS = [
-  {
-    team: 'Squadra A',
-    penalties: [
-      '1° rigorista',
-      '2° rigorista',
-      '3° rigorista',
-    ],
-    setPieces: [
-      '1° piazzati',
-      '2° piazzati',
-      '3° piazzati',
-    ],
-  },
-  {
-    team: 'Squadra B',
-    penalties: [
-      '1° rigorista',
-      '2° rigorista',
-      '3° rigorista',
-    ],
-    setPieces: [
-      '1° piazzati',
-      '2° piazzati',
-      '3° piazzati',
-    ],
-  },
-  {
-    team: 'Squadra C',
-    penalties: [
-      '1° rigorista',
-      '2° rigorista',
-      '3° rigorista',
-    ],
-    setPieces: [
-      '1° piazzati',
-      '2° piazzati',
-      '3° piazzati',
-    ],
-  },
-]
+interface FormationMarker {
+  role: CoachRoleKey
+  label: string
+  x: number
+  y: number
+}
 
-const COACH_MACRO_ROLES = [
-  {
-    key: 'goalkeeper',
-    label: 'Portieri',
-    mantra: 'Por',
-  },
-  {
-    key: 'centreBack',
-    label: 'Difensori centrali',
-    mantra: 'Dc',
-  },
-  {
-    key: 'fullBack',
-    label: 'Terzini',
-    mantra: 'Ds · B · Dd',
-  },
-  {
-    key: 'defensiveMid',
-    label: 'Centrocampisti difensivi',
-    mantra: 'M',
-  },
-  {
-    key: 'wideMid',
-    label: 'Esterni di centrocampo',
-    mantra: 'E',
-  },
-  {
-    key: 'centralMid',
-    label: 'Centrocampisti centrali',
-    mantra: 'C',
-  },
-  {
-    key: 'attackingMid',
-    label: 'Trequartisti',
-    mantra: 'T',
-  },
-  {
-    key: 'winger',
-    label: 'Ali d’attacco',
-    mantra: 'W',
-  },
-  {
-    key: 'secondStriker',
-    label: 'Seconde punte',
-    mantra: 'A',
-  },
-  {
-    key: 'striker',
-    label: 'Punte centrali',
-    mantra: 'Pc',
-  },
-] as const
+interface GoalkeeperMatrix {
+  teams: string[]
 
-type CoachRoleKey =
-  typeof COACH_MACRO_ROLES[number]['key']
+  scores: Record<
+    string,
+    Record<
+      string,
+      number | null
+    >
+  >
+}
+
+interface SetPieceTeam {
+  team: string
+  penalties: string[]
+  setPieces: string[]
+}
+
+/* =========================
+   MACRO ROLES
+========================= */
+
+const COACH_MACRO_ROLES:
+  CoachMacroRole[] = [
+    {
+      key: 'goalkeeper',
+      label: 'Portieri',
+      mantra: 'Por',
+      group: 'P',
+    },
+    {
+      key: 'centreBack',
+      label: 'Difensori centrali',
+      mantra: 'Dc',
+      group: 'D',
+    },
+    {
+      key: 'fullBack',
+      label: 'Terzini',
+      mantra: 'B',
+      group: 'D',
+    },
+    {
+      key: 'defensiveMid',
+      label:
+        'Centrocampisti difensivi',
+      mantra: 'M',
+      group: 'C',
+    },
+    {
+      key: 'wideMid',
+      label:
+        'Esterni di centrocampo',
+      mantra: 'E',
+      group: 'C',
+    },
+    {
+      key: 'centralMid',
+      label:
+        'Centrocampisti centrali',
+      mantra: 'C',
+      group: 'C',
+    },
+    {
+      key: 'attackingMid',
+      label: 'Trequartisti',
+      mantra: 'T',
+      group: 'A',
+    },
+    {
+      key: 'winger',
+      label: 'Ali d’attacco',
+      mantra: 'W',
+      group: 'A',
+    },
+    {
+      key: 'secondStriker',
+      label: 'Seconde punte',
+      mantra: 'A',
+      group: 'A',
+    },
+    {
+      key: 'striker',
+      label: 'Punte centrali',
+      mantra: 'Pc',
+      group: 'A',
+    },
+  ]
+
+/* =========================
+   LOCAL VIEW STATE
+========================= */
+
+let selectedGoalkeeperTeam = ''
+
+let goalkeeperSearchValue = ''
+
+let insightsEventsBound = false
+
+/* =========================
+   HTML
+========================= */
 
 function escapeHtml(
   value: string,
 ): string {
   return value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;')
+    .replaceAll(
+      '&',
+      '&amp;',
+    )
+    .replaceAll(
+      '<',
+      '&lt;',
+    )
+    .replaceAll(
+      '>',
+      '&gt;',
+    )
+    .replaceAll(
+      '"',
+      '&quot;',
+    )
+    .replaceAll(
+      "'",
+      '&#039;',
+    )
+}
+
+/* =========================
+   CSV
+========================= */
+
+function parseCsvRow(
+  line: string,
+): string[] {
+  const values: string[] = []
+
+  let value = ''
+  let quoted = false
+
+  for (
+    let index = 0;
+    index < line.length;
+    index += 1
+  ) {
+    const character =
+      line[index]
+
+    if (
+      character === '"'
+    ) {
+      if (
+        quoted &&
+        line[index + 1] === '"'
+      ) {
+        value += '"'
+        index += 1
+      } else {
+        quoted = !quoted
+      }
+
+      continue
+    }
+
+    if (
+      character === ';' &&
+      !quoted
+    ) {
+      values.push(
+        value.trim(),
+      )
+
+      value = ''
+
+      continue
+    }
+
+    value += character
+  }
+
+  values.push(
+    value.trim(),
+  )
+
+  return values
+}
+
+function parseCsv(
+  csv: string,
+): string[][] {
+  return csv
+    .replace(/\r/g, '')
+    .split('\n')
+    .map(
+      (line) =>
+        line.trim(),
+    )
+    .filter(Boolean)
+    .map(parseCsvRow)
 }
 
 function parseNumber(
-  value: string | undefined,
+  value:
+    | string
+    | undefined,
 ): number {
   if (!value) {
     return 0
@@ -161,42 +268,33 @@ function parseNumber(
   const parsed =
     Number(normalized)
 
-  return Number.isFinite(parsed)
+  return Number.isFinite(
+    parsed,
+  )
     ? parsed
     : 0
 }
 
+/* =========================
+   COACH DATABASE
+========================= */
+
 function parseCoachesCsv(
   csv: string,
 ): Coach[] {
-  const lines =
-    csv
-      .replace(/\r/g, '')
-      .split('\n')
-      .map(
-        (line) =>
-          line.trim(),
-      )
-      .filter(Boolean)
+  const rows =
+    parseCsv(csv)
 
-  if (lines.length < 2) {
+  if (
+    rows.length < 2
+  ) {
     return []
   }
 
-  const rows =
-    lines.slice(1)
-
   return rows
+    .slice(1)
     .map(
-      (line) => {
-        const columns =
-          line
-            .split(';')
-            .map(
-              (value) =>
-                value.trim(),
-            )
-
+      (columns) => {
         const [
           team,
           name,
@@ -223,8 +321,10 @@ function parseCoachesCsv(
         return {
           team,
           name,
+
           formation:
-            formation || '—',
+            formation ||
+            '—',
 
           impacts: {
             goalkeeper:
@@ -288,51 +388,624 @@ function parseCoachesCsv(
     )
 }
 
+/* =========================
+   GOALKEEPER DATABASE
+========================= */
+
+function parseGoalkeeperCsv(
+  csv: string,
+): GoalkeeperMatrix {
+  const rows =
+    parseCsv(csv)
+
+  if (
+    rows.length < 2
+  ) {
+    return {
+      teams: [],
+      scores: {},
+    }
+  }
+
+  const teams =
+    rows[0]
+      .slice(1)
+      .filter(Boolean)
+
+  const scores:
+    GoalkeeperMatrix['scores'] =
+    {}
+
+  rows
+    .slice(1)
+    .forEach(
+      (columns) => {
+        const rowTeam =
+          columns[0]
+
+        if (!rowTeam) {
+          return
+        }
+
+        scores[rowTeam] = {}
+
+        teams.forEach(
+          (
+            columnTeam,
+            index,
+          ) => {
+            const raw =
+              columns[
+                index + 1
+              ]
+
+            if (
+              !raw ||
+              rowTeam ===
+                columnTeam
+            ) {
+              scores[rowTeam][
+                columnTeam
+              ] = null
+
+              return
+            }
+
+            const parsed =
+              Number(
+                raw.replace(
+                  ',',
+                  '.',
+                ),
+              )
+
+            scores[rowTeam][
+              columnTeam
+            ] =
+              Number.isFinite(
+                parsed,
+              )
+                ? parsed
+                : null
+          },
+        )
+      },
+    )
+
+  return {
+    teams,
+    scores,
+  }
+}
+
+/* =========================
+   SET PIECES DATABASE
+========================= */
+
+function parseSetPiecesCsv(
+  csv: string,
+): SetPieceTeam[] {
+  const rows =
+    parseCsv(csv)
+
+  if (
+    rows.length < 2
+  ) {
+    return []
+  }
+
+  return rows
+    .slice(1)
+    .map(
+      (columns) => {
+        const [
+          team,
+          penalty1,
+          penalty2,
+          penalty3,
+          penalty4,
+          setPiece1,
+          setPiece2,
+          setPiece3,
+        ] = columns
+
+        if (!team) {
+          return null
+        }
+
+        return {
+          team,
+
+          penalties: [
+            penalty1,
+            penalty2,
+            penalty3,
+            penalty4,
+          ].filter(
+            (
+              value,
+            ): value is string =>
+              Boolean(value),
+          ),
+
+          setPieces: [
+            setPiece1,
+            setPiece2,
+            setPiece3,
+          ].filter(
+            (
+              value,
+            ): value is string =>
+              Boolean(value),
+          ),
+        }
+      },
+    )
+    .filter(
+      (
+        item,
+      ): item is SetPieceTeam =>
+        item !== null,
+    )
+}
+
+/* =========================
+   DATABASES
+========================= */
+
 const COACHES =
   parseCoachesCsv(
     coachesCsv,
   )
 
-function formatImpact(
-  value: number,
-): string {
-  if (value > 0) {
-    return `+${value.toFixed(2)}`
+const GOALKEEPER_MATRIX =
+  parseGoalkeeperCsv(
+    goalkeepersCsv,
+  )
+
+const SET_PIECE_TEAMS =
+  parseSetPiecesCsv(
+    setPiecesCsv,
+  )
+
+/* =========================
+   GOALKEEPER HELPERS
+========================= */
+
+function getGoalkeeperTopThree(
+  team: string,
+): Array<{
+  team: string
+  score: number
+}> {
+  const row =
+    GOALKEEPER_MATRIX
+      .scores[team]
+
+  if (!row) {
+    return []
   }
 
-  if (value < 0) {
-    return value.toFixed(2)
-  }
-
-  return '0.00'
+  return Object
+    .entries(row)
+    .filter(
+      (
+        entry,
+      ): entry is [
+        string,
+        number,
+      ] =>
+        entry[1] !== null,
+    )
+    .map(
+      ([
+        pairedTeam,
+        score,
+      ]) => ({
+        team: pairedTeam,
+        score,
+      }),
+    )
+    .sort(
+      (a, b) =>
+        b.score -
+        a.score,
+    )
+    .slice(
+      0,
+      3,
+    )
 }
 
-function getImpactClass(
-  value: number,
+function renderGoalkeeperTopThree(
+  team: string,
 ): string {
-  if (value > 0) {
-    return 'positive'
+  if (!team) {
+    return `
+      <div
+        class="
+          goalkeeper-recommendations-empty
+        "
+      >
+        <span>
+          Cerca una squadra
+        </span>
+
+        <small>
+          I tre migliori abbinamenti
+          compariranno qui.
+        </small>
+      </div>
+    `
   }
 
-  if (value < 0) {
-    return 'negative'
+  const results =
+    getGoalkeeperTopThree(
+      team,
+    )
+
+  if (
+    results.length === 0
+  ) {
+    return `
+      <div
+        class="
+          goalkeeper-recommendations-empty
+        "
+      >
+        Nessun abbinamento disponibile.
+      </div>
+    `
   }
 
-  return 'neutral'
+  return `
+    <div
+      class="
+        goalkeeper-selection-heading
+      "
+    >
+      <span>
+        Migliori abbinamenti
+      </span>
+
+      <strong>
+        ${escapeHtml(
+          team,
+        )}
+      </strong>
+    </div>
+
+    <div
+      class="
+        goalkeeper-recommendations-list
+      "
+    >
+      ${results
+        .map(
+          (
+            result,
+            index,
+          ) => `
+            <div
+              class="
+                goalkeeper-recommendation
+              "
+            >
+              <span
+                class="
+                  goalkeeper-rank
+                "
+              >
+                ${index + 1}
+              </span>
+
+              <div
+                class="
+                  goalkeeper-recommendation-team
+                "
+              >
+                <strong>
+                  ${escapeHtml(
+                    result.team,
+                  )}
+                </strong>
+
+                <small>
+                  Abbinamento
+                </small>
+              </div>
+
+              <span
+                class="
+                  goalkeeper-score
+                "
+              >
+                ${result.score}
+              </span>
+            </div>
+          `,
+        )
+        .join('')}
+    </div>
+  `
 }
+
+function getGoalkeeperMatches(
+  query: string,
+): string[] {
+  const normalized =
+    query
+      .trim()
+      .toLowerCase()
+
+  if (!normalized) {
+    return []
+  }
+
+  return GOALKEEPER_MATRIX
+    .teams
+    .filter(
+      (team) =>
+        team
+          .toLowerCase()
+          .includes(
+            normalized,
+          ),
+    )
+    .slice(
+      0,
+      8,
+    )
+}
+
+function renderGoalkeeperSuggestions(
+  query: string,
+): string {
+  const matches =
+    getGoalkeeperMatches(
+      query,
+    )
+
+  if (
+    !query.trim()
+  ) {
+    return ''
+  }
+
+  if (
+    matches.length === 0
+  ) {
+    return `
+      <div
+        class="
+          goalkeeper-search-no-result
+        "
+      >
+        Nessuna squadra trovata
+      </div>
+    `
+  }
+
+  return matches
+    .map(
+      (team) => `
+        <button
+          type="button"
+          class="
+            goalkeeper-search-suggestion
+          "
+          data-goalkeeper-team="${escapeHtml(
+            team,
+          )}"
+        >
+          ${escapeHtml(
+            team,
+          )}
+        </button>
+      `,
+    )
+    .join('')
+}
+
+function getMatrixScoreClass(
+  score: number | null,
+): string {
+  if (
+    score === null
+  ) {
+    return 'matrix-empty'
+  }
+
+  if (
+    score >= 90
+  ) {
+    return 'matrix-excellent'
+  }
+
+  if (
+    score >= 86
+  ) {
+    return 'matrix-good'
+  }
+
+  if (
+    score >= 82
+  ) {
+    return 'matrix-medium'
+  }
+
+  return 'matrix-low'
+}
+
+function renderGoalkeeperMatrix(
+  selectedTeam = '',
+): string {
+  if (
+    GOALKEEPER_MATRIX
+      .teams.length === 0
+  ) {
+    return `
+      <div
+        class="
+          goalkeeper-matrix-empty
+        "
+      >
+        Database portieri vuoto.
+      </div>
+    `
+  }
+
+  return `
+    <div
+      class="
+        goalkeeper-matrix-scroll
+      "
+    >
+      <table
+        class="
+          goalkeeper-matrix-table
+        "
+      >
+        <thead>
+          <tr>
+            <th
+              class="
+                goalkeeper-matrix-corner
+              "
+            >
+              Squadra
+            </th>
+
+            ${GOALKEEPER_MATRIX
+              .teams
+              .map(
+                (team) => `
+                  <th
+                    class="${
+                      team ===
+                      selectedTeam
+                        ? 'is-selected'
+                        : ''
+                    }"
+                    title="${escapeHtml(
+                      team,
+                    )}"
+                  >
+                    ${escapeHtml(
+                      team.slice(
+                        0,
+                        3,
+                      ).toUpperCase(),
+                    )}
+                  </th>
+                `,
+              )
+              .join('')}
+          </tr>
+        </thead>
+
+        <tbody>
+          ${GOALKEEPER_MATRIX
+            .teams
+            .map(
+              (rowTeam) => `
+                <tr
+                  class="${
+                    rowTeam ===
+                    selectedTeam
+                      ? 'is-selected'
+                      : ''
+                  }"
+                >
+                  <th>
+                    ${escapeHtml(
+                      rowTeam,
+                    )}
+                  </th>
+
+                  ${GOALKEEPER_MATRIX
+                    .teams
+                    .map(
+                      (
+                        columnTeam,
+                      ) => {
+                        const score =
+                          GOALKEEPER_MATRIX
+                            .scores[
+                              rowTeam
+                            ]?.[
+                              columnTeam
+                            ] ??
+                          null
+
+                        const selected =
+                          rowTeam ===
+                            selectedTeam ||
+                          columnTeam ===
+                            selectedTeam
+
+                        return `
+                          <td
+                            class="
+                              ${getMatrixScoreClass(
+                                score,
+                              )}
+                              ${
+                                selected
+                                  ? 'is-selected'
+                                  : ''
+                              }
+                            "
+                            title="${escapeHtml(
+                              rowTeam,
+                            )} / ${escapeHtml(
+                              columnTeam,
+                            )}"
+                          >
+                            ${
+                              score ===
+                              null
+                                ? '—'
+                                : score
+                            }
+                          </td>
+                        `
+                      },
+                    )
+                    .join('')}
+                </tr>
+              `,
+            )
+            .join('')}
+        </tbody>
+      </table>
+    </div>
+  `
+}
+
+/* =========================
+   GOALKEEPER SECTION
+========================= */
 
 function renderGoalkeeperSection():
   string {
   return `
     <section
-      class="insight-section"
+      class="
+        insight-section
+        goalkeeper-insight-section
+      "
     >
       <div
-        class="insight-section-header"
+        class="
+          insight-section-header
+        "
       >
         <div>
           <span
-            class="insight-eyebrow"
+            class="
+              insight-eyebrow
+            "
           >
             PORTIERI
           </span>
@@ -342,88 +1015,223 @@ function renderGoalkeeperSection():
           </h2>
 
           <p>
-            Struttura predisposta per la
-            futura tabella degli
-            abbinamenti.
+            Cerca una squadra e consulta
+            immediatamente i tre migliori
+            abbinamenti della griglia.
           </p>
         </div>
 
-        <span
+        <button
+          type="button"
           class="
-            insight-placeholder-badge
+            insight-database-button
           "
+          data-open-goalkeeper-matrix
         >
-          Dati da collegare
-        </span>
+          Vedi griglia
+        </button>
       </div>
 
       <div
-        class="goalkeeper-table"
+        class="
+          goalkeeper-tool
+        "
       >
         <div
           class="
-            goalkeeper-table-header
+            goalkeeper-search-area
+          "
+        >
+          <label
+            class="
+              goalkeeper-search-box
+            "
+          >
+            <span
+              class="
+                goalkeeper-search-icon
+              "
+            >
+              ⌕
+            </span>
+
+            <input
+              id="goalkeeperSearch"
+              type="search"
+              autocomplete="off"
+              placeholder="Cerca squadra..."
+              value="${escapeHtml(
+                goalkeeperSearchValue,
+              )}"
+            >
+          </label>
+
+          <div
+            id="goalkeeperSuggestions"
+            class="
+              goalkeeper-search-suggestions
+            "
+          >
+            ${renderGoalkeeperSuggestions(
+              goalkeeperSearchValue,
+            )}
+          </div>
+        </div>
+
+        <div
+          id="goalkeeperRecommendations"
+          class="
+            goalkeeper-recommendations
+          "
+        >
+          ${renderGoalkeeperTopThree(
+            selectedGoalkeeperTeam,
+          )}
+        </div>
+      </div>
+    </section>
+
+    <div
+      id="goalkeeperMatrixOverlay"
+      class="
+        goalkeeper-matrix-overlay
+      "
+      hidden
+      data-goalkeeper-overlay
+    >
+      <div
+        class="
+          goalkeeper-matrix-dialog
+        "
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="
+          goalkeeperMatrixTitle
+        "
+      >
+        <div
+          class="
+            goalkeeper-matrix-header
+          "
+        >
+          <div>
+            <span
+              class="
+                insight-eyebrow
+              "
+            >
+              PORTIERI
+            </span>
+
+            <h2
+              id="
+                goalkeeperMatrixTitle
+              "
+            >
+              Griglia abbinamenti
+            </h2>
+
+            <p>
+              Valori di compatibilità
+              tra le squadre.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            class="
+              goalkeeper-matrix-close
+            "
+            data-close-goalkeeper-matrix
+            aria-label="
+              Chiudi griglia portieri
+            "
+          >
+            ×
+          </button>
+        </div>
+
+        <div
+          id="
+            goalkeeperMatrixContent
+          "
+          class="
+            goalkeeper-matrix-content
+          "
+        >
+          ${renderGoalkeeperMatrix(
+            selectedGoalkeeperTeam,
+          )}
+        </div>
+
+        <div
+          class="
+            goalkeeper-matrix-legend
           "
         >
           <span>
-            Portiere
+            <i
+              class="
+                legend-low
+              "
+            ></i>
+            Basso
           </span>
 
           <span>
-            Abbinamento
+            <i
+              class="
+                legend-medium
+              "
+            ></i>
+            Medio
           </span>
 
           <span>
-            Indicazione
+            <i
+              class="
+                legend-good
+              "
+            ></i>
+            Buono
+          </span>
+
+          <span>
+            <i
+              class="
+                legend-excellent
+              "
+            ></i>
+            Ottimo
           </span>
         </div>
-
-        ${GOALKEEPER_ROWS
-          .map(
-            (row) => `
-              <div
-                class="
-                  goalkeeper-table-row
-                "
-              >
-                <strong>
-                  ${escapeHtml(
-                    row.primary,
-                  )}
-                </strong>
-
-                <span>
-                  ${escapeHtml(
-                    row.pairing,
-                  )}
-                </span>
-
-                <small>
-                  ${escapeHtml(
-                    row.note,
-                  )}
-                </small>
-              </div>
-            `,
-          )
-          .join('')}
       </div>
-    </section>
+    </div>
   `
 }
+
+/* =========================
+   SET PIECES
+========================= */
 
 function renderSetPiecesSection():
   string {
   return `
     <section
-      class="insight-section"
+      class="
+        insight-section
+      "
     >
       <div
-        class="insight-section-header"
+        class="
+          insight-section-header
+        "
       >
         <div>
           <span
-            class="insight-eyebrow"
+            class="
+              insight-eyebrow
+            "
           >
             SPECIALISTI
           </span>
@@ -433,105 +1241,658 @@ function renderSetPiecesSection():
           </h2>
 
           <p>
-            Ordine gerarchico per squadra.
-            I dati reali verranno collegati
-            nella fase database.
+            Gerarchie dei battitori
+            suddivise per squadra.
           </p>
         </div>
 
         <span
           class="
-            insight-placeholder-badge
+            insight-database-status
           "
         >
-          Ordine da fonte esterna
+          ${SET_PIECE_TEAMS.length}
+          squadre dal database
         </span>
       </div>
 
-      <div
-        class="set-pieces-grid"
-      >
-        ${SET_PIECE_TEAMS
-          .map(
-            (item) => `
-              <article
-                class="set-piece-card"
-              >
-                <div
-                  class="set-piece-team"
-                >
-                  ${escapeHtml(
-                    item.team,
-                  )}
-                </div>
-
-                <div
-                  class="
-                    set-piece-columns
-                  "
-                >
-                  <div>
-                    <span
+      ${
+        SET_PIECE_TEAMS.length
+          ? `
+            <div
+              class="
+                set-pieces-grid
+              "
+            >
+              ${SET_PIECE_TEAMS
+                .map(
+                  (item) => `
+                    <article
                       class="
-                        set-piece-label
+                        set-piece-card
                       "
                     >
-                      Rigori
-                    </span>
+                      <div
+                        class="
+                          set-piece-team
+                        "
+                      >
+                        ${escapeHtml(
+                          item.team,
+                        )}
+                      </div>
 
-                    <ol>
-                      ${item.penalties
-                        .map(
-                          (player) => `
-                            <li>
-                              ${escapeHtml(
-                                player,
-                              )}
-                            </li>
-                          `,
-                        )
-                        .join('')}
-                    </ol>
-                  </div>
+                      <div
+                        class="
+                          set-piece-columns
+                        "
+                      >
+                        <div>
+                          <span
+                            class="
+                              set-piece-label
+                            "
+                          >
+                            Rigori
+                          </span>
 
-                  <div>
-                    <span
-                      class="
-                        set-piece-label
-                      "
-                    >
-                      Piazzati
-                    </span>
+                          <ol>
+                            ${
+                              item
+                                .penalties
+                                .length
+                                ? item
+                                    .penalties
+                                    .map(
+                                      (
+                                        player,
+                                      ) => `
+                                        <li>
+                                          ${escapeHtml(
+                                            player,
+                                          )}
+                                        </li>
+                                      `,
+                                    )
+                                    .join(
+                                      '',
+                                    )
+                                : `
+                                  <li
+                                    class="
+                                      set-piece-empty
+                                    "
+                                  >
+                                    —
+                                  </li>
+                                `
+                            }
+                          </ol>
+                        </div>
 
-                    <ol>
-                      ${item.setPieces
-                        .map(
-                          (player) => `
-                            <li>
-                              ${escapeHtml(
-                                player,
-                              )}
-                            </li>
-                          `,
-                        )
-                        .join('')}
-                    </ol>
-                  </div>
-                </div>
-              </article>
-            `,
-          )
-          .join('')}
-      </div>
+                        <div>
+                          <span
+                            class="
+                              set-piece-label
+                            "
+                          >
+                            Piazzati
+                          </span>
+
+                          <ol>
+                            ${
+                              item
+                                .setPieces
+                                .length
+                                ? item
+                                    .setPieces
+                                    .map(
+                                      (
+                                        player,
+                                      ) => `
+                                        <li>
+                                          ${escapeHtml(
+                                            player,
+                                          )}
+                                        </li>
+                                      `,
+                                    )
+                                    .join(
+                                      '',
+                                    )
+                                : `
+                                  <li
+                                    class="
+                                      set-piece-empty
+                                    "
+                                  >
+                                    —
+                                  </li>
+                                `
+                            }
+                          </ol>
+                        </div>
+                      </div>
+                    </article>
+                  `,
+                )
+                .join('')}
+            </div>
+          `
+          : `
+            <div
+              class="
+                insight-database-empty
+              "
+            >
+              Database battitori vuoto.
+            </div>
+          `
+      }
     </section>
   `
 }
 
-function renderCoachPitch():
-  string {
+/* =========================
+   FORMATIONS
+========================= */
+
+function marker(
+  role: CoachRoleKey,
+  label: string,
+  x: number,
+  y: number,
+): FormationMarker {
+  return {
+    role,
+    label,
+    x,
+    y,
+  }
+}
+
+function getFormationMarkers(
+  formation: string,
+): FormationMarker[] {
+  switch (
+    formation.trim()
+  ) {
+    case '4-3-3':
+      return [
+        marker(
+          'goalkeeper',
+          'Por',
+          50,
+          91,
+        ),
+
+        marker(
+          'fullBack',
+          'B',
+          18,
+          73,
+        ),
+
+        marker(
+          'centreBack',
+          'Dc',
+          39,
+          78,
+        ),
+
+        marker(
+          'centreBack',
+          'Dc',
+          61,
+          78,
+        ),
+
+        marker(
+          'fullBack',
+          'B',
+          82,
+          73,
+        ),
+
+        marker(
+          'centralMid',
+          'C',
+          28,
+          51,
+        ),
+
+        marker(
+          'defensiveMid',
+          'M',
+          50,
+          57,
+        ),
+
+        marker(
+          'centralMid',
+          'C',
+          72,
+          51,
+        ),
+
+        marker(
+          'winger',
+          'W',
+          24,
+          24,
+        ),
+
+        marker(
+          'striker',
+          'Pc',
+          50,
+          15,
+        ),
+
+        marker(
+          'winger',
+          'W',
+          76,
+          24,
+        ),
+      ]
+
+    case '4-2-3-1':
+      return [
+        marker(
+          'goalkeeper',
+          'Por',
+          50,
+          91,
+        ),
+
+        marker(
+          'fullBack',
+          'B',
+          18,
+          73,
+        ),
+
+        marker(
+          'centreBack',
+          'Dc',
+          39,
+          78,
+        ),
+
+        marker(
+          'centreBack',
+          'Dc',
+          61,
+          78,
+        ),
+
+        marker(
+          'fullBack',
+          'B',
+          82,
+          73,
+        ),
+
+        marker(
+          'defensiveMid',
+          'M',
+          39,
+          56,
+        ),
+
+        marker(
+          'centralMid',
+          'C',
+          61,
+          56,
+        ),
+
+        marker(
+          'winger',
+          'W',
+          24,
+          34,
+        ),
+
+        marker(
+          'attackingMid',
+          'T',
+          50,
+          30,
+        ),
+
+        marker(
+          'winger',
+          'W',
+          76,
+          34,
+        ),
+
+        marker(
+          'striker',
+          'Pc',
+          50,
+          13,
+        ),
+      ]
+
+    case '3-4-2-1':
+      return [
+        marker(
+          'goalkeeper',
+          'Por',
+          50,
+          91,
+        ),
+
+        marker(
+          'centreBack',
+          'Dc',
+          27,
+          75,
+        ),
+
+        marker(
+          'centreBack',
+          'Dc',
+          50,
+          79,
+        ),
+
+        marker(
+          'centreBack',
+          'Dc',
+          73,
+          75,
+        ),
+
+        marker(
+          'wideMid',
+          'E',
+          16,
+          52,
+        ),
+
+        marker(
+          'centralMid',
+          'C',
+          40,
+          56,
+        ),
+
+        marker(
+          'centralMid',
+          'C',
+          60,
+          56,
+        ),
+
+        marker(
+          'wideMid',
+          'E',
+          84,
+          52,
+        ),
+
+        marker(
+          'attackingMid',
+          'T',
+          38,
+          31,
+        ),
+
+        marker(
+          'attackingMid',
+          'T',
+          62,
+          31,
+        ),
+
+        marker(
+          'striker',
+          'Pc',
+          50,
+          12,
+        ),
+      ]
+
+    case '3-5-2':
+      return [
+        marker(
+          'goalkeeper',
+          'Por',
+          50,
+          91,
+        ),
+
+        marker(
+          'centreBack',
+          'Dc',
+          27,
+          75,
+        ),
+
+        marker(
+          'centreBack',
+          'Dc',
+          50,
+          79,
+        ),
+
+        marker(
+          'centreBack',
+          'Dc',
+          73,
+          75,
+        ),
+
+        marker(
+          'wideMid',
+          'E',
+          14,
+          50,
+        ),
+
+        marker(
+          'centralMid',
+          'C',
+          34,
+          54,
+        ),
+
+        marker(
+          'defensiveMid',
+          'M',
+          50,
+          58,
+        ),
+
+        marker(
+          'centralMid',
+          'C',
+          66,
+          54,
+        ),
+
+        marker(
+          'wideMid',
+          'E',
+          86,
+          50,
+        ),
+
+        marker(
+          'secondStriker',
+          'A',
+          39,
+          19,
+        ),
+
+        marker(
+          'striker',
+          'Pc',
+          61,
+          19,
+        ),
+      ]
+
+    case '4-3-2-1':
+      return [
+        marker(
+          'goalkeeper',
+          'Por',
+          50,
+          91,
+        ),
+
+        marker(
+          'fullBack',
+          'B',
+          18,
+          73,
+        ),
+
+        marker(
+          'centreBack',
+          'Dc',
+          39,
+          78,
+        ),
+
+        marker(
+          'centreBack',
+          'Dc',
+          61,
+          78,
+        ),
+
+        marker(
+          'fullBack',
+          'B',
+          82,
+          73,
+        ),
+
+        marker(
+          'centralMid',
+          'C',
+          30,
+          53,
+        ),
+
+        marker(
+          'defensiveMid',
+          'M',
+          50,
+          58,
+        ),
+
+        marker(
+          'centralMid',
+          'C',
+          70,
+          53,
+        ),
+
+        marker(
+          'attackingMid',
+          'T',
+          39,
+          31,
+        ),
+
+        marker(
+          'attackingMid',
+          'T',
+          61,
+          31,
+        ),
+
+        marker(
+          'striker',
+          'Pc',
+          50,
+          12,
+        ),
+      ]
+
+    default:
+      return [
+        marker(
+          'goalkeeper',
+          'Por',
+          50,
+          91,
+        ),
+
+        marker(
+          'centreBack',
+          'Dc',
+          35,
+          73,
+        ),
+
+        marker(
+          'centreBack',
+          'Dc',
+          65,
+          73,
+        ),
+
+        marker(
+          'centralMid',
+          'C',
+          35,
+          50,
+        ),
+
+        marker(
+          'centralMid',
+          'C',
+          65,
+          50,
+        ),
+
+        marker(
+          'striker',
+          'Pc',
+          50,
+          18,
+        ),
+      ]
+  }
+}
+
+function getMacroRoleGroup(
+  role: CoachRoleKey,
+): MacroRoleGroup {
+  return (
+    COACH_MACRO_ROLES.find(
+      (item) =>
+        item.key === role,
+    )?.group ??
+    'C'
+  )
+}
+
+/* =========================
+   COACH PITCH
+========================= */
+
+function renderCoachPitch(
+  formation: string,
+): string {
+  const markers =
+    getFormationMarkers(
+      formation,
+    )
+
   return `
     <div
-      class="coach-pitch"
+      class="
+        coach-pitch
+      "
     >
       <div
         class="
@@ -541,114 +1902,123 @@ function renderCoachPitch():
       ></div>
 
       <div
-        class="pitch-circle"
+        class="
+          pitch-circle
+        "
       ></div>
 
       <div
         class="
-          coach-zone
-          zone-goalkeeper
+          pitch-box
+          pitch-box-top
         "
-      >
-        Por
-      </div>
+      ></div>
 
       <div
         class="
-          coach-zone
-          zone-centre-back
+          pitch-box
+          pitch-box-bottom
         "
-      >
-        Dc
-      </div>
+      ></div>
 
-      <div
-        class="
-          coach-zone
-          zone-full-back
-        "
-      >
-        Ds/B/Dd
-      </div>
+      ${markers
+        .map(
+          (item) => {
+            const group =
+              getMacroRoleGroup(
+                item.role,
+              )
 
-      <div
-        class="
-          coach-zone
-          zone-defensive-mid
-        "
-      >
-        M
-      </div>
-
-      <div
-        class="
-          coach-zone
-          zone-wide-mid
-        "
-      >
-        E
-      </div>
-
-      <div
-        class="
-          coach-zone
-          zone-central-mid
-        "
-      >
-        C
-      </div>
-
-      <div
-        class="
-          coach-zone
-          zone-attacking-mid
-        "
-      >
-        T
-      </div>
-
-      <div
-        class="
-          coach-zone
-          zone-winger
-        "
-      >
-        W
-      </div>
-
-      <div
-        class="
-          coach-zone
-          zone-second-striker
-        "
-      >
-        A
-      </div>
-
-      <div
-        class="
-          coach-zone
-          zone-striker
-        "
-      >
-        Pc
-      </div>
+            return `
+              <div
+                class="
+                  coach-player-marker
+                  coach-player-${group.toLowerCase()}
+                "
+                style="
+                  left:${item.x}%;
+                  top:${item.y}%;
+                "
+                title="${escapeHtml(
+                  item.role,
+                )}"
+              >
+                ${escapeHtml(
+                  item.label,
+                )}
+              </div>
+            `
+          },
+        )
+        .join('')}
     </div>
   `
 }
+
+/* =========================
+   COACH IMPACT
+========================= */
+
+function formatImpact(
+  value: number,
+): string {
+  if (
+    value > 0
+  ) {
+    return `+${value.toFixed(
+      2,
+    )}`
+  }
+
+  if (
+    value < 0
+  ) {
+    return value.toFixed(2)
+  }
+
+  return '0.00'
+}
+
+function getImpactClass(
+  value: number,
+): string {
+  if (
+    value > 0
+  ) {
+    return 'positive'
+  }
+
+  if (
+    value < 0
+  ) {
+    return 'negative'
+  }
+
+  return 'neutral'
+}
+
+/* =========================
+   COACH SECTION
+========================= */
 
 function renderCoachSection():
   string {
   return `
     <section
-      class="insight-section"
+      class="
+        insight-section
+      "
     >
       <div
-        class="insight-section-header"
+        class="
+          insight-section-header
+        "
       >
         <div>
           <span
-            class="insight-eyebrow"
+            class="
+              insight-eyebrow
+            "
           >
             ALLENATORI SERIE A
           </span>
@@ -658,14 +2028,14 @@ function renderCoachSection():
           </h2>
 
           <p>
-            Impatto del sistema di gioco
+            Modulo preferito e impatto
             sui macro-ruoli Mantra.
           </p>
         </div>
 
         <span
           class="
-            insight-placeholder-badge
+            insight-database-status
           "
         >
           ${COACHES.length}
@@ -677,13 +2047,17 @@ function renderCoachSection():
         COACHES.length
           ? `
             <div
-              class="coach-grid"
+              class="
+                coach-grid
+              "
             >
               ${COACHES
                 .map(
                   (coach) => `
                     <article
-                      class="coach-card"
+                      class="
+                        coach-card
+                      "
                     >
                       <div
                         class="
@@ -726,7 +2100,9 @@ function renderCoachSection():
                           coach-card-body
                         "
                       >
-                        ${renderCoachPitch()}
+                        ${renderCoachPitch(
+                          coach.formation,
+                        )}
 
                         <div
                           class="
@@ -739,8 +2115,7 @@ function renderCoachSection():
                                 const value =
                                   coach
                                     .impacts[
-                                      role.key as
-                                        CoachRoleKey
+                                      role.key
                                     ]
 
                                 return `
@@ -749,23 +2124,40 @@ function renderCoachSection():
                                       coach-macro-role-row
                                     "
                                   >
-                                    <div>
-                                      <strong>
-                                        ${escapeHtml(
-                                          role.label,
-                                        )}
-                                      </strong>
-
-                                      <small>
+                                    <div
+                                      class="
+                                        coach-macro-role-name
+                                      "
+                                    >
+                                      <span
+                                        class="
+                                          coach-role-dot
+                                          coach-role-${role.group.toLowerCase()}
+                                        "
+                                      >
                                         ${escapeHtml(
                                           role.mantra,
                                         )}
-                                      </small>
+                                      </span>
+
+                                      <div>
+                                        <strong>
+                                          ${escapeHtml(
+                                            role.label,
+                                          )}
+                                        </strong>
+
+                                        <small>
+                                          ${escapeHtml(
+                                            role.mantra,
+                                          )}
+                                        </small>
+                                      </div>
                                     </div>
 
                                     <span
                                       class="
-                                        coach-impact-placeholder
+                                        coach-impact-value
                                         coach-impact-${getImpactClass(
                                           value,
                                         )}
@@ -791,17 +2183,20 @@ function renderCoachSection():
           : `
             <div
               class="
-                coach-database-empty
+                insight-database-empty
               "
             >
-              Nessun allenatore trovato
-              nel database.
+              Database allenatori vuoto.
             </div>
           `
       }
     </section>
   `
 }
+
+/* =========================
+   PAGE
+========================= */
 
 export function renderInsightsPage():
   string {
@@ -837,3 +2232,297 @@ export function renderInsightsPage():
     </section>
   `
 }
+
+/* =========================
+   GOALKEEPER UI UPDATE
+========================= */
+
+function updateGoalkeeperUi():
+  void {
+  const recommendations =
+    document.querySelector<HTMLElement>(
+      '#goalkeeperRecommendations',
+    )
+
+  if (recommendations) {
+    recommendations.innerHTML =
+      renderGoalkeeperTopThree(
+        selectedGoalkeeperTeam,
+      )
+  }
+
+  const matrix =
+    document.querySelector<HTMLElement>(
+      '#goalkeeperMatrixContent',
+    )
+
+  if (matrix) {
+    matrix.innerHTML =
+      renderGoalkeeperMatrix(
+        selectedGoalkeeperTeam,
+      )
+  }
+
+  const input =
+    document.querySelector<HTMLInputElement>(
+      '#goalkeeperSearch',
+    )
+
+  if (
+    input &&
+    selectedGoalkeeperTeam
+  ) {
+    input.value =
+      selectedGoalkeeperTeam
+  }
+}
+
+function updateGoalkeeperSuggestions():
+  void {
+  const suggestions =
+    document.querySelector<HTMLElement>(
+      '#goalkeeperSuggestions',
+    )
+
+  if (!suggestions) {
+    return
+  }
+
+  suggestions.innerHTML =
+    renderGoalkeeperSuggestions(
+      goalkeeperSearchValue,
+    )
+}
+
+function openGoalkeeperMatrix():
+  void {
+  const overlay =
+    document.querySelector<HTMLElement>(
+      '#goalkeeperMatrixOverlay',
+    )
+
+  if (!overlay) {
+    return
+  }
+
+  overlay.hidden = false
+
+  document.body.classList.add(
+    'insights-overlay-open',
+  )
+}
+
+function closeGoalkeeperMatrix():
+  void {
+  const overlay =
+    document.querySelector<HTMLElement>(
+      '#goalkeeperMatrixOverlay',
+    )
+
+  if (!overlay) {
+    return
+  }
+
+  overlay.hidden = true
+
+  document.body.classList.remove(
+    'insights-overlay-open',
+  )
+}
+
+/* =========================
+   EVENTS
+========================= */
+
+export function bindInsightsEvents():
+  void {
+  if (
+    insightsEventsBound
+  ) {
+    return
+  }
+
+  insightsEventsBound = true
+
+  document.addEventListener(
+    'input',
+    (event) => {
+      const target =
+        event.target
+
+      if (
+        !(
+          target instanceof
+          HTMLInputElement
+        )
+      ) {
+        return
+      }
+
+      if (
+        target.id !==
+        'goalkeeperSearch'
+      ) {
+        return
+      }
+
+      goalkeeperSearchValue =
+        target.value
+
+      updateGoalkeeperSuggestions()
+    },
+  )
+
+  document.addEventListener(
+    'keydown',
+    (event) => {
+      const target =
+        event.target
+
+      if (
+        target instanceof
+          HTMLInputElement &&
+        target.id ===
+          'goalkeeperSearch' &&
+        event.key ===
+          'Enter'
+      ) {
+        const first =
+          getGoalkeeperMatches(
+            target.value,
+          )[0]
+
+        if (first) {
+          selectedGoalkeeperTeam =
+            first
+
+          goalkeeperSearchValue =
+            first
+
+          updateGoalkeeperUi()
+
+          const suggestions =
+            document
+              .querySelector<
+                HTMLElement
+              >(
+                '#goalkeeperSuggestions',
+              )
+
+          if (suggestions) {
+            suggestions.innerHTML =
+              ''
+          }
+        }
+      }
+
+      if (
+        event.key ===
+        'Escape'
+      ) {
+        closeGoalkeeperMatrix()
+      }
+    },
+  )
+
+  document.addEventListener(
+    'click',
+    (event) => {
+      const target =
+        event.target
+
+      if (
+        !(
+          target instanceof
+          Element
+        )
+      ) {
+        return
+      }
+
+      const teamButton =
+        target.closest<
+          HTMLButtonElement
+        >(
+          '[data-goalkeeper-team]',
+        )
+
+      if (teamButton) {
+        const team =
+          teamButton.dataset
+            .goalkeeperTeam
+
+        if (team) {
+          selectedGoalkeeperTeam =
+            team
+
+          goalkeeperSearchValue =
+            team
+
+          updateGoalkeeperUi()
+
+          const suggestions =
+            document
+              .querySelector<
+                HTMLElement
+              >(
+                '#goalkeeperSuggestions',
+              )
+
+          if (suggestions) {
+            suggestions.innerHTML =
+              ''
+          }
+        }
+
+        return
+      }
+
+      if (
+        target.closest(
+          '[data-open-goalkeeper-matrix]',
+        )
+      ) {
+        openGoalkeeperMatrix()
+
+        return
+      }
+
+      if (
+        target.closest(
+          '[data-close-goalkeeper-matrix]',
+        )
+      ) {
+        closeGoalkeeperMatrix()
+
+        return
+      }
+
+      const overlay =
+        target.closest<HTMLElement>(
+          '[data-goalkeeper-overlay]',
+        )
+
+      if (
+        overlay &&
+        target === overlay
+      ) {
+        closeGoalkeeperMatrix()
+      }
+    },
+  )
+}
+
+/*
+  La pagina Insights non aveva in origine
+  un binder dedicato.
+
+  Usiamo event delegation e attiviamo
+  il binder una sola volta quando il
+  modulo viene caricato.
+
+  Se in futuro main.ts chiamerà
+  bindInsightsEvents(), il guard
+  impedirà listener duplicati.
+*/
+bindInsightsEvents()
