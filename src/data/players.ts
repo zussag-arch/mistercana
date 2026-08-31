@@ -1,5 +1,19 @@
 import playersCsv from '../../database/MisterCana_DB_Giocatori_2026_27.csv?raw'
 
+import {
+  buildHistoricalBenchmarks,
+  calculateICa,
+} from '../domain/ica'
+
+import {
+  calculateConsensus,
+  getICaSaggiForPlayer,
+} from './saggi'
+
+import {
+  getCoachInput,
+} from './coaches'
+
 import type {
   Player,
   PlayerRole,
@@ -25,9 +39,7 @@ function parseCsvRow(
     const character =
       line[index]
 
-    if (
-      character === '"'
-    ) {
+    if (character === '"') {
       if (
         quoted &&
         line[index + 1] === '"'
@@ -103,9 +115,7 @@ function parseItalianNumber(
   const parsed =
     Number(normalized)
 
-  return Number.isFinite(
-    parsed,
-  )
+  return Number.isFinite(parsed)
     ? parsed
     : undefined
 }
@@ -132,9 +142,7 @@ function parsePercentage(
   const parsed =
     Number(normalized)
 
-  return Number.isFinite(
-    parsed,
-  )
+  return Number.isFinite(parsed)
     ? parsed
     : undefined
 }
@@ -160,7 +168,6 @@ function parseBooleanFlag(
 
   return (
     normalized === 'si' ||
-    normalized === 'sì' ||
     normalized === 'yes' ||
     normalized === 'true' ||
     normalized === '1'
@@ -243,15 +250,16 @@ function parsePlayersCsv(
       }
 
       return (
-        row[index] ??
-        ''
+        row[index] ?? ''
       ).trim()
     }
 
   return rows
     .slice(1)
     .map(
-      (row): Player | null => {
+      (
+        row,
+      ): Player | null => {
         const id =
           getValue(
             row,
@@ -325,6 +333,102 @@ function parsePlayersCsv(
               ),
             ),
 
+          appearances:
+            parseItalianNumber(
+              getValue(
+                row,
+                'Presenze',
+              ),
+            ),
+
+          startingPoints:
+            parseItalianNumber(
+              getValue(
+                row,
+                'Pt_Tit',
+              ),
+            ),
+
+          minutes:
+            parseItalianNumber(
+              getValue(
+                row,
+                'Minuti',
+              ),
+            ),
+
+          injuryPoints:
+            parseItalianNumber(
+              getValue(
+                row,
+                'Pt_Inf',
+              ),
+            ),
+
+          goals:
+            parseItalianNumber(
+              getValue(
+                row,
+                'Gol',
+              ),
+            ),
+
+          assists:
+            parseItalianNumber(
+              getValue(
+                row,
+                'Assist',
+              ),
+            ),
+
+          yellowCards:
+            parseItalianNumber(
+              getValue(
+                row,
+                'Ammonizioni',
+              ),
+            ),
+
+          redCards:
+            parseItalianNumber(
+              getValue(
+                row,
+                'Espulsioni',
+              ),
+            ),
+
+          penaltiesScored:
+            parseItalianNumber(
+              getValue(
+                row,
+                'Rig_Segnati',
+              ),
+            ),
+
+          penaltiesMissed:
+            parseItalianNumber(
+              getValue(
+                row,
+                'Rig_Sbagliati',
+              ),
+            ),
+
+          goalsConceded:
+            parseItalianNumber(
+              getValue(
+                row,
+                'Gol_Subiti',
+              ),
+            ),
+
+          penaltiesSaved:
+            parseItalianNumber(
+              getValue(
+                row,
+                'Rig_Parati',
+              ),
+            ),
+
           valorizzato:
             parseBooleanFlag(
               getValue(
@@ -349,34 +453,19 @@ function parsePlayersCsv(
               ),
             ),
 
-          /*
-            Metriche MisterCanà non
-            presenti nel listone.
-
-            Non vengono inventate.
-          */
           iCa: undefined,
+
           pma: undefined,
-          consensus: undefined,
+
+          consensus:
+            undefined,
+
           xMv: undefined,
+
           xFmv: undefined,
 
-          /*
-            Legacy.
-
-            La pagina Giocatori usa
-            il database Battitori
-            per identificare i
-            rigoristi reali.
-          */
           penaltyTaker: false,
 
-          /*
-            Stato temporaneo.
-
-            Verrà sostituito dallo
-            stato condiviso dell'asta.
-          */
           status: 'free',
         }
       },
@@ -389,8 +478,163 @@ function parsePlayersCsv(
     )
 }
 
-export const players:
-  Player[] =
+/* =========================
+   BASE PLAYERS
+========================= */
+
+const basePlayers =
   parsePlayersCsv(
     playersCsv,
+  )
+
+/* =========================
+   HISTORICAL BENCHMARKS
+========================= */
+
+const historicalBenchmarks =
+  buildHistoricalBenchmarks(
+    basePlayers.map(
+      (player) => ({
+        id: player.id,
+        name: player.name,
+        team: player.team,
+        role: player.role,
+
+        titolarita:
+          player.startingProbability,
+
+        mv: player.mv,
+        fmv: player.fmv,
+
+        presenze:
+          player.appearances,
+
+        ptTit:
+          player.startingPoints,
+
+        minuti:
+          player.minutes,
+
+        ptInf:
+          player.injuryPoints,
+
+        gol:
+          player.goals,
+
+        assist:
+          player.assists,
+
+        ammonizioni:
+          player.yellowCards,
+
+        espulsioni:
+          player.redCards,
+
+        rigSegnati:
+          player.penaltiesScored,
+
+        rigSbagliati:
+          player.penaltiesMissed,
+
+        golSubiti:
+          player.goalsConceded,
+
+        rigParati:
+          player.penaltiesSaved,
+      }),
+    ),
+  )
+
+/* =========================
+   ENRICHED PLAYERS
+========================= */
+
+export const players:
+  Player[] =
+  basePlayers.map(
+    (player) => {
+      const saggi =
+        getICaSaggiForPlayer(
+          player.id,
+        )
+
+      const coach =
+        getCoachInput(
+          player.team,
+          player.role,
+        )
+
+      const iCaResult =
+        calculateICa(
+          {
+            id: player.id,
+            name: player.name,
+            team: player.team,
+            role: player.role,
+
+            titolarita:
+              player.startingProbability,
+
+            mv: player.mv,
+            fmv: player.fmv,
+
+            presenze:
+              player.appearances,
+
+            ptTit:
+              player.startingPoints,
+
+            minuti:
+              player.minutes,
+
+            ptInf:
+              player.injuryPoints,
+
+            gol:
+              player.goals,
+
+            assist:
+              player.assists,
+
+            ammonizioni:
+              player.yellowCards,
+
+            espulsioni:
+              player.redCards,
+
+            rigSegnati:
+              player.penaltiesScored,
+
+            rigSbagliati:
+              player.penaltiesMissed,
+
+            golSubiti:
+              player.goalsConceded,
+
+            rigParati:
+              player.penaltiesSaved,
+          },
+          {
+            benchmarks:
+              historicalBenchmarks,
+
+            saggi,
+
+            coach,
+          },
+        )
+
+      return {
+        ...player,
+
+        iCa:
+          iCaResult.score ??
+          undefined,
+
+        consensus:
+          calculateConsensus(
+            player.id,
+          ),
+      }
+    },
   )

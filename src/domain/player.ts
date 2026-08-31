@@ -28,13 +28,6 @@ export interface Player {
     =========================
     DATI LISTONE 2026/27
     =========================
-
-    Sono dati informativi provenienti
-    dal database sorgente.
-
-    La loro presenza non implica
-    automaticamente il loro utilizzo
-    nelle formule MisterCanà.
   */
 
   /*
@@ -67,11 +60,38 @@ export interface Player {
   pmaPercent?: number
 
   /*
+    =========================
+    DATI STORICI
+    =========================
+
+    I valori mancanti restano
+    undefined e non diventano zero.
+  */
+
+  appearances?: number
+  startingPoints?: number
+  minutes?: number
+  injuryPoints?: number
+
+  goals?: number
+  assists?: number
+
+  yellowCards?: number
+  redCards?: number
+
+  penaltiesScored?: number
+  penaltiesMissed?: number
+
+  goalsConceded?: number
+  penaltiesSaved?: number
+
+  /*
     Segnali strategici provenienti
     dalla fonte del listone.
 
-    Per ora vengono soltanto
-    conservati come informazione.
+    Per ora vengono conservati come
+    informazione e non entrano
+    automaticamente nell'iCà.
   */
   valorizzato?: boolean
   penalizzato?: boolean
@@ -81,15 +101,15 @@ export interface Player {
     =========================
     METRICHE MISTERCANÀ
     =========================
-
-    Questi campi restano disponibili
-    per compatibilità con il progetto
-    e per le future formule.
-
-    Non vengono inventati se il
-    database corrente non li contiene.
   */
 
+  /*
+    Indice prospettico MisterCanà
+    su scala 0-100.
+
+    Il valore viene calcolato
+    dinamicamente dai dati disponibili.
+  */
   iCa?: number
 
   /*
@@ -101,8 +121,19 @@ export interface Player {
   pma?: number
 
   /*
-    Consenso esperti:
-    scala prevista 0-100.
+    Consenso tra i Saggi.
+
+    Scala 0-10.
+
+    È la media delle sole
+    Fascia_Valore disponibili,
+    normalizzate:
+
+    1 -> 0
+    2 -> 2.5
+    3 -> 5
+    4 -> 7.5
+    5 -> 10
   */
   consensus?: number
 

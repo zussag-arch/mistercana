@@ -1,0 +1,2416 @@
+id_giocatore;Saggio;Fascia_Originale;Fascia_Valore;Affidabilita;Integrita;Prezzo
+0379;Saggio 1;Top;5;5;5;55
+0280;Saggio 1;Top;5;5;3;47
+0183;Saggio 1;Top;5;4;5;44
+0076;Saggio 1;Top;5;5;5;43
+0329;Saggio 1;Top;5;4;2;42
+0001;Saggio 1;Top;5;5;4;36
+0105;Saggio 1;Semi-Top;4;4;5;24
+0233;Saggio 1;Semi-Top;4;4;5;22
+0025;Saggio 1;Semi-Top;4;4;3;16
+0259;Saggio 1;Terza;3;4;5;13
+0451;Saggio 1;Terza;3;3;2;11
+0049;Saggio 1;Terza;3;4;3;10
+0158;Saggio 1;Terza;3;3;2;9
+0401;Saggio 1;Quarta;2;4;3;5
+0478;Saggio 1;Quarta;2;4;3;5
+0355;Saggio 1;Quarta;2;4;5;4
+0307;Saggio 1;Quarta;2;3;5;3
+0428;Saggio 1;Quarta;2;3;5;2
+0129;Saggio 1;Quarta;2;3;5;2
+0184;Saggio 1;Scomm.;2;4;2;14
+0330;Saggio 1;Scomm.;2;5;5;11
+0427;Saggio 1;Scomm.;2;3;4;1
+0234;Saggio 1;Outsider;2;3;3;1
+0357;Saggio 1;Outsider;2;3;4;0
+0128;Saggio 1;Outsider;2;3;1;0
+0026;Saggio 1;Outsider;2;3;5;0
+0402;Saggio 1;Outsider;2;3;3;0
+0404;Saggio 1;Non Impostata;;3;3;1
+0106;Saggio 1;Non Impostata;;3;4;0
+0331;Saggio 1;Non Impostata;;3;2;0
+0380;Saggio 1;Non Impostata;;3;5;0
+0185;Saggio 1;Non Impostata;;3;3;0
+0381;Saggio 1;Non Impostata;;3;2;0
+0479;Saggio 1;Non Impostata;;3;4;0
+0027;Saggio 1;Non Impostata;;3;5;0
+0107;Saggio 1;Non Impostata;;3;2;0
+0130;Saggio 1;Non Impostata;;3;5;0
+0452;Saggio 1;Non Impostata;;3;3;0
+0260;Saggio 1;Non Impostata;;3;5;0
+0453;Saggio 1;Non Impostata;;3;5;0
+0208;Saggio 1;Non Impostata;;4;3;0
+0131;Saggio 1;Non Impostata;;3;5;0
+0480;Saggio 1;Non Impostata;;3;5;0
+0050;Saggio 1;Non Impostata;;3;3;0
+0235;Saggio 1;Non Impostata;;3;5;0
+0403;Saggio 1;Non Impostata;;3;5;0
+0051;Saggio 1;Non Impostata;;3;5;0
+0429;Saggio 1;Non Impostata;;3;3;0
+0159;Saggio 1;Non Impostata;;3;5;0
+0002;Saggio 1;Non Impostata;;3;2;0
+0160;Saggio 1;Non Impostata;;3;5;0
+0309;Saggio 1;Non Impostata;;3;5;0
+0281;Saggio 1;Non Impostata;;4;4;0
+0077;Saggio 1;Non Impostata;;3;5;0
+0282;Saggio 1;Non Impostata;;3;5;0
+0078;Saggio 1;Non Impostata;;3;4;0
+0003;Saggio 1;Non Impostata;;3;5;0
+0188;Saggio 1;Top;5;5;4;75
+0384;Saggio 1;Top;5;4;3;38
+0385;Saggio 1;Top;5;4;2;31
+0209;Saggio 1;Top;5;5;1;30
+0382;Saggio 1;Top;5;5;5;29
+0333;Saggio 1;Top;5;5;3;28
+0454;Saggio 1;Top;5;5;4;27
+0186;Saggio 1;Top;5;5;4;26
+0187;Saggio 1;Top;5;4;3;25
+0332;Saggio 1;Semi-Top;4;4;2;22
+0189;Saggio 1;Semi-Top;4;4;5;21
+0211;Saggio 1;Semi-Top;4;5;3;21
+0286;Saggio 1;Semi-Top;4;5;4;20
+0191;Saggio 1;Semi-Top;4;4;2;19
+0335;Saggio 1;Semi-Top;4;5;2;19
+0079;Saggio 1;Semi-Top;4;4;4;18
+0383;Saggio 1;Semi-Top;4;4;4;18
+0081;Saggio 1;Semi-Top;4;4;3;18
+0163;Saggio 1;Semi-Top;4;4;3;17
+0007;Saggio 1;Semi-Top;4;4;3;16
+0109;Saggio 1;Semi-Top;4;4;5;15
+0005;Saggio 1;Semi-Top;4;4;1;15
+0360;Saggio 1;Semi-Top;4;4;4;14
+0285;Saggio 1;Terza;3;4;3;12
+0164;Saggio 1;Terza;3;4;4;12
+0283;Saggio 1;Terza;3;4;5;11
+0080;Saggio 1;Terza;3;4;4;11
+0028;Saggio 1;Terza;3;4;3;11
+0456;Saggio 1;Terza;3;4;3;11
+0212;Saggio 1;Terza;3;4;4;10
+0210;Saggio 1;Terza;3;3;4;9
+0004;Saggio 1;Terza;3;4;3;8
+0162;Saggio 1;Terza;3;4;2;8
+0108;Saggio 1;Terza;3;4;2;7
+0284;Saggio 1;Terza;3;4;3;7
+0387;Saggio 1;Terza;3;4;3;7
+0214;Saggio 1;Terza;3;4;4;7
+0161;Saggio 1;Terza;3;3;5;7
+0485;Saggio 1;Terza;3;4;4;6
+0110;Saggio 1;Terza;3;3;5;6
+0085;Saggio 1;Terza;3;4;3;6
+0359;Saggio 1;Quarta;2;4;4;5
+0483;Saggio 1;Quarta;2;4;3;5
+0312;Saggio 1;Quarta;2;3;3;5
+0236;Saggio 1;Quarta;2;3;3;4
+0432;Saggio 1;Quarta;2;4;2;4
+0455;Saggio 1;Quarta;2;4;4;4
+0052;Saggio 1;Quarta;2;4;3;4
+0310;Saggio 1;Quarta;2;4;3;3
+0053;Saggio 1;Quarta;2;3;4;3
+0031;Saggio 1;Quarta;2;3;3;3
+0430;Saggio 1;Quarta;2;4;4;2
+0265;Saggio 1;Quarta;2;4;2;2
+0006;Saggio 1;Quarta;2;3;3;2
+0262;Saggio 1;Quarta;2;4;5;2
+0261;Saggio 1;Quarta;2;4;3;1
+0405;Saggio 1;Quarta;2;4;4;1
+0458;Saggio 1;Quarta;2;3;3;1
+0237;Saggio 1;Quarta;2;4;3;1
+0133;Saggio 1;Quarta;2;3;3;1
+0238;Saggio 1;Quarta;2;3;1;1
+0192;Saggio 1;Scomm.;2;4;1;7
+0190;Saggio 1;Scomm.;2;4;3;6
+0083;Saggio 1;Scomm.;2;4;3;6
+0388;Saggio 1;Scomm.;2;3;3;6
+0112;Saggio 1;Scomm.;2;3;2;4
+0389;Saggio 1;Scomm.;2;4;2;4
+0082;Saggio 1;Scomm.;2;3;5;3
+0215;Saggio 1;Scomm.;2;3;3;3
+0009;Saggio 1;Scomm.;2;3;3;2
+0113;Saggio 1;Scomm.;2;3;3;2
+0407;Saggio 1;Scomm.;2;4;2;2
+0463;Saggio 1;Scomm.;2;3;5;1
+0337;Saggio 1;Scomm.;2;4;1;1
+0484;Saggio 1;Scomm.;2;3;1;1
+0288;Saggio 1;Scomm.;2;2;3;1
+0289;Saggio 1;Scomm.;2;2;4;1
+0012;Saggio 1;Scomm.;2;4;2;1
+0334;Saggio 1;Scomm.;2;3;5;1
+0165;Saggio 1;Scomm.;2;3;3;1
+0193;Saggio 1;Scomm.;2;4;3;1
+0239;Saggio 1;Scomm.;2;4;4;1
+0240;Saggio 1;Scomm.;2;4;3;1
+0241;Saggio 1;Scomm.;2;3;2;1
+0137;Saggio 1;Scomm.;2;3;2;1
+0111;Saggio 1;Scomm.;2;3;5;1
+0315;Saggio 1;"Titolare ""Scarso""";1;3;3;1
+0481;Saggio 1;"Titolare ""Scarso""";1;3;3;1
+0134;Saggio 1;"Titolare ""Scarso""";1;3;5;1
+0313;Saggio 1;"Titolare ""Scarso""";1;3;4;1
+0140;Saggio 1;"Titolare ""Scarso""";1;3;3;1
+0431;Saggio 1;"Titolare ""Scarso""";1;3;3;1
+0314;Saggio 1;"Titolare ""Scarso""";1;3;5;1
+0409;Saggio 1;"Titolare ""Scarso""";1;3;3;1
+0029;Saggio 1;"Titolare ""Scarso""";1;3;3;1
+0036;Saggio 1;"Titolare ""Scarso""";1;2;4;1
+0311;Saggio 1;"Titolare ""Scarso""";1;3;5;1
+0136;Saggio 1;"Titolare ""Scarso""";1;3;3;1
+0364;Saggio 1;"Titolare ""Scarso""";1;2;2;1
+0054;Saggio 1;"Titolare ""Scarso""";1;2;3;1
+0482;Saggio 1;"Titolare ""Scarso""";1;3;3;1
+0264;Saggio 1;"Titolare ""Scarso""";1;3;3;1
+0361;Saggio 1;"Titolare ""Scarso""";1;2;5;1
+0263;Saggio 1;"Titolare ""Scarso""";1;3;4;1
+0055;Saggio 1;"Titolare ""Scarso""";1;2;3;1
+0008;Saggio 1;Outsider;2;3;2;1
+0132;Saggio 1;Outsider;2;3;1;1
+0457;Saggio 1;Outsider;2;3;4;1
+0336;Saggio 1;Outsider;2;3;3;1
+0435;Saggio 1;Outsider;2;3;3;1
+0362;Saggio 1;Outsider;2;3;5;1
+0216;Saggio 1;Outsider;2;3;1;1
+0460;Saggio 1;Outsider;2;2;2;1
+0242;Saggio 1;Outsider;2;3;5;1
+0488;Saggio 1;Outsider;2;3;3;1
+0213;Saggio 1;Outsider;2;4;3;1
+0386;Saggio 1;Outsider;2;4;4;1
+0010;Saggio 1;Outsider;2;3;2;1
+0033;Saggio 1;Outsider;2;4;1;1
+0057;Saggio 1;Outsider;2;3;4;1
+0011;Saggio 1;Outsider;2;4;1;1
+0243;Saggio 1;Outsider;2;3;2;1
+0339;Saggio 1;Outsider;2;3;4;1
+0166;Saggio 1;Outsider;2;4;3;1
+0340;Saggio 1;Outsider;2;3;3;1
+0410;Saggio 1;Outsider;2;3;5;1
+0461;Saggio 1;Outsider;2;3;5;1
+0487;Saggio 1;Outsider;2;3;3;1
+0338;Saggio 1;Outsider;2;3;3;1
+0462;Saggio 1;Outsider;2;3;2;1
+0116;Saggio 1;Outsider;2;4;1;1
+0245;Saggio 1;Outsider;2;3;2;1
+0114;Saggio 1;Outsider;2;3;3;1
+0115;Saggio 1;Outsider;2;3;4;1
+0169;Saggio 1;Outsider;2;3;5;1
+0084;Saggio 1;Outsider;2;3;5;1
+0287;Saggio 1;Outsider;2;4;3;1
+0365;Saggio 1;Outsider;2;4;2;1
+0087;Saggio 1;Outsider;2;3;2;1
+0030;Saggio 1;Outsider;2;3;3;1
+0406;Saggio 1;Outsider;2;3;4;1
+0459;Saggio 1;Outsider;2;4;1;1
+0390;Saggio 1;Outsider;2;4;5;1
+0135;Saggio 1;Outsider;2;3;5;0
+0434;Saggio 1;Outsider;2;3;1;0
+0316;Saggio 1;Outsider;2;3;4;0
+0168;Saggio 1;Outsider;2;3;5;0
+0408;Saggio 1;Non Impostata;;2;2;1
+0363;Saggio 1;Non Impostata;;3;5;1
+0034;Saggio 1;Non Impostata;;2;2;1
+0035;Saggio 1;Non Impostata;;3;2;1
+0088;Saggio 1;Non Impostata;;3;1;1
+0267;Saggio 1;Non Impostata;;3;3;1
+0167;Saggio 1;Non Impostata;;2;3;1
+0244;Saggio 1;Non Impostata;;3;2;1
+0411;Saggio 1;Non Impostata;;3;1;1
+0217;Saggio 1;Non Impostata;;3;1;1
+0490;Saggio 1;Non Impostata;;3;3;1
+0491;Saggio 1;Non Impostata;;2;2;1
+0032;Saggio 1;Non Impostata;;3;5;0
+0139;Saggio 1;Non Impostata;;3;4;0
+0317;Saggio 1;Non Impostata;;3;4;0
+0464;Saggio 1;Non Impostata;;3;5;0
+0059;Saggio 1;Non Impostata;;3;1;0
+0290;Saggio 1;Non Impostata;;3;5;0
+0489;Saggio 1;Non Impostata;;3;5;0
+0486;Saggio 1;Non Impostata;;3;3;0
+0058;Saggio 1;Non Impostata;;3;5;0
+0266;Saggio 1;Non Impostata;;2;5;0
+0090;Saggio 1;Top;5;5;5;82
+0195;Saggio 1;Top;5;5;2;76
+0342;Saggio 1;Top;5;5;4;67
+0037;Saggio 1;Top;5;4;3;66
+0292;Saggio 1;Top;5;4;2;56
+0293;Saggio 1;Semi-Top;4;5;3;42
+0220;Saggio 1;Semi-Top;4;3;5;41
+0091;Saggio 1;Semi-Top;4;5;5;40
+0196;Saggio 1;Semi-Top;4;5;3;39
+0089;Saggio 1;Semi-Top;4;5;5;38
+0343;Saggio 1;Semi-Top;4;4;1;37
+0117;Saggio 1;Semi-Top;4;5;3;36
+0247;Saggio 1;Semi-Top;4;3;2;36
+0222;Saggio 1;Semi-Top;4;5;2;35
+0194;Saggio 1;Semi-Top;4;5;4;32
+0467;Saggio 1;Semi-Top;4;4;1;31
+0197;Saggio 1;Semi-Top;4;4;3;30
+0219;Saggio 1;Semi-Top;4;5;3;29
+0119;Saggio 1;Semi-Top;4;4;5;28
+0436;Saggio 1;Semi-Top;4;4;3;28
+0039;Saggio 1;Semi-Top;4;5;4;27
+0096;Saggio 1;Semi-Top;4;4;4;24
+0465;Saggio 1;Semi-Top;4;4;4;22
+0345;Saggio 1;Semi-Top;4;4;2;21
+0251;Saggio 1;Semi-Top;4;3;3;20
+0120;Saggio 1;Terza;3;4;3;19
+0252;Saggio 1;Terza;3;3;3;19
+0013;Saggio 1;Terza;3;5;3;18
+0392;Saggio 1;Terza;3;5;3;17
+0143;Saggio 1;Terza;3;4;5;16
+0246;Saggio 1;Terza;3;4;4;16
+0017;Saggio 1;Terza;3;3;5;15
+0294;Saggio 1;Terza;3;4;3;14
+0291;Saggio 1;Terza;3;5;3;13
+0040;Saggio 1;Terza;3;4;3;12
+0174;Saggio 1;Terza;3;4;1;11
+0366;Saggio 1;Terza;3;4;2;10
+0439;Saggio 1;Quarta;2;3;5;8
+0061;Saggio 1;Quarta;2;4;2;7
+0221;Saggio 1;Quarta;2;4;4;6
+0015;Saggio 1;Quarta;2;4;3;5
+0092;Saggio 1;Quarta;2;4;4;4
+0492;Saggio 1;Quarta;2;3;3;3
+0322;Saggio 1;Quarta;2;4;3;3
+0062;Saggio 1;Quarta;2;3;5;3
+0493;Saggio 1;Quarta;2;3;3;2
+0437;Saggio 1;Quarta;2;4;5;2
+0144;Saggio 1;Quarta;2;3;4;2
+0417;Saggio 1;Quarta;2;3;3;1
+0391;Saggio 1;Quarta;2;4;4;1
+0118;Saggio 1;Quarta;2;4;3;1
+0065;Saggio 1;Quarta;2;4;1;1
+0438;Saggio 1;Quarta;2;4;1;1
+0276;Saggio 1;Quarta;2;3;5;1
+0218;Saggio 1;Quarta;2;5;4;1
+0121;Saggio 1;Quarta;2;4;3;1
+0295;Saggio 1;Scomm.;2;3;3;16
+0094;Saggio 1;Scomm.;2;4;5;10
+0344;Saggio 1;Scomm.;2;4;3;8
+0016;Saggio 1;Scomm.;2;3;5;7
+0346;Saggio 1;Scomm.;2;5;1;7
+0018;Saggio 1;Scomm.;2;4;3;6
+0301;Saggio 1;Scomm.;2;4;2;5
+0395;Saggio 1;Scomm.;2;4;5;5
+0414;Saggio 1;Scomm.;2;4;3;4
+0249;Saggio 1;Scomm.;2;3;3;4
+0413;Saggio 1;Scomm.;2;4;2;4
+0416;Saggio 1;Scomm.;2;4;2;3
+0153;Saggio 1;Scomm.;2;3;5;2
+0044;Saggio 1;Scomm.;2;3;3;2
+0200;Saggio 1;Scomm.;2;4;5;2
+0269;Saggio 1;Scomm.;2;4;2;1
+0041;Saggio 1;Scomm.;2;4;2;1
+0368;Saggio 1;Scomm.;2;3;5;1
+0223;Saggio 1;Scomm.;2;3;3;1
+0098;Saggio 1;Scomm.;2;3;3;1
+0271;Saggio 1;Scomm.;2;3;3;1
+0297;Saggio 1;Scomm.;2;4;2;1
+0421;Saggio 1;Scomm.;2;4;1;1
+0122;Saggio 1;Scomm.;2;3;4;1
+0445;Saggio 1;Scomm.;2;3;2;1
+0441;Saggio 1;Scomm.;2;4;3;1
+0123;Saggio 1;Scomm.;2;3;5;1
+0495;Saggio 1;Scomm.;2;3;4;1
+0318;Saggio 1;Scomm.;2;4;2;1
+0201;Saggio 1;Scomm.;2;3;5;1
+0469;Saggio 1;Scomm.;2;3;3;1
+0147;Saggio 1;Scomm.;2;4;5;1
+0226;Saggio 1;Scomm.;2;4;2;1
+0060;Saggio 1;"Titolare ""Scarso""";1;3;5;1
+0320;Saggio 1;"Titolare ""Scarso""";1;3;3;1
+0268;Saggio 1;"Titolare ""Scarso""";1;4;4;1
+0175;Saggio 1;"Titolare ""Scarso""";1;3;4;1
+0042;Saggio 1;"Titolare ""Scarso""";1;4;3;1
+0171;Saggio 1;"Titolare ""Scarso""";1;4;4;1
+0440;Saggio 1;"Titolare ""Scarso""";1;3;5;1
+0146;Saggio 1;"Titolare ""Scarso""";1;3;3;1
+0466;Saggio 1;"Titolare ""Scarso""";1;4;4;1
+0367;Saggio 1;"Titolare ""Scarso""";1;3;3;1
+0341;Saggio 1;"Titolare ""Scarso""";1;4;3;1
+0272;Saggio 1;"Titolare ""Scarso""";1;2;4;1
+0412;Saggio 1;"Titolare ""Scarso""";1;3;5;1
+0270;Saggio 1;"Titolare ""Scarso""";1;3;5;1
+0468;Saggio 1;"Titolare ""Scarso""";1;4;3;1
+0038;Saggio 1;"Titolare ""Scarso""";1;3;2;1
+0172;Saggio 1;"Titolare ""Scarso""";1;3;4;1
+0063;Saggio 1;"Titolare ""Scarso""";1;3;3;1
+0442;Saggio 1;Outsider;2;3;2;1
+0097;Saggio 1;Outsider;2;4;2;1
+0371;Saggio 1;Outsider;2;3;3;1
+0443;Saggio 1;Outsider;2;4;2;1
+0254;Saggio 1;Outsider;2;4;5;1
+0124;Saggio 1;Outsider;2;3;3;1
+0093;Saggio 1;Outsider;2;4;4;1
+0248;Saggio 1;Outsider;2;4;2;1
+0470;Saggio 1;Outsider;2;3;3;1
+0152;Saggio 1;Outsider;2;3;5;1
+0319;Saggio 1;Outsider;2;3;3;1
+0321;Saggio 1;Outsider;2;3;5;1
+0494;Saggio 1;Outsider;2;3;5;1
+0064;Saggio 1;Outsider;2;3;3;1
+0250;Saggio 1;Outsider;2;3;3;1
+0014;Saggio 1;Outsider;2;4;4;1
+0418;Saggio 1;Outsider;2;3;4;1
+0393;Saggio 1;Outsider;2;3;3;1
+0145;Saggio 1;Outsider;2;3;3;1
+0296;Saggio 1;Outsider;2;3;5;1
+0347;Saggio 1;Outsider;2;4;1;1
+0323;Saggio 1;Outsider;2;3;3;1
+0148;Saggio 1;Outsider;2;3;2;1
+0348;Saggio 1;Outsider;2;4;3;1
+0149;Saggio 1;Outsider;2;3;4;1
+0497;Saggio 1;Outsider;2;3;3;1
+0446;Saggio 1;Outsider;2;4;2;1
+0444;Saggio 1;Outsider;2;3;3;1
+0273;Saggio 1;Outsider;2;3;3;1
+0224;Saggio 1;Outsider;2;3;3;1
+0150;Saggio 1;Outsider;2;3;3;1
+0299;Saggio 1;Outsider;2;4;1;1
+0198;Saggio 1;Outsider;2;3;4;1
+0151;Saggio 1;Outsider;2;4;4;1
+0176;Saggio 1;Outsider;2;3;3;1
+0178;Saggio 1;Outsider;2;4;1;1
+0471;Saggio 1;Outsider;2;4;5;1
+0199;Saggio 1;Outsider;2;4;3;1
+0043;Saggio 1;Outsider;2;3;5;1
+0300;Saggio 1;Outsider;2;3;4;1
+0369;Saggio 1;Outsider;2;4;1;1
+0373;Saggio 1;Outsider;2;3;5;1
+0394;Saggio 1;Outsider;2;4;2;1
+0298;Saggio 1;Outsider;2;4;3;1
+0253;Saggio 1;Outsider;2;4;1;1
+0496;Saggio 1;Outsider;2;2;3;1
+0370;Saggio 1;Outsider;2;3;3;1
+0019;Saggio 1;Outsider;2;3;1;1
+0177;Saggio 1;Outsider;2;4;2;1
+0179;Saggio 1;Outsider;2;3;5;1
+0473;Saggio 1;Outsider;2;3;3;1
+0173;Saggio 1;Outsider;2;3;5;0
+0415;Saggio 1;Outsider;2;3;3;0
+0095;Saggio 1;Outsider;2;3;5;0
+0274;Saggio 1;Outsider;2;3;5;0
+0419;Saggio 1;Non Impostata;;3;2;1
+0372;Saggio 1;Non Impostata;;3;3;1
+0498;Saggio 1;Non Impostata;;3;3;1
+0046;Saggio 1;Non Impostata;;3;3;1
+0125;Saggio 1;Non Impostata;;3;3;1
+0154;Saggio 1;Non Impostata;;3;3;1
+0045;Saggio 1;Non Impostata;;3;5;0
+0275;Saggio 1;Non Impostata;;3;3;0
+0420;Saggio 1;Non Impostata;;3;5;0
+0099;Saggio 1;Non Impostata;;3;3;0
+0066;Saggio 1;Non Impostata;;2;3;0
+0255;Saggio 1;Non Impostata;;3;4;0
+0396;Saggio 1;Top;5;5;5;175
+0202;Saggio 1;Top;5;5;3;150
+0227;Saggio 1;Top;5;4;5;125
+0302;Saggio 1;Top;5;4;3;120
+0203;Saggio 1;Top;5;5;3;110
+0349;Saggio 1;Semi-Top;4;4;4;95
+0100;Saggio 1;Semi-Top;4;4;4;80
+0126;Saggio 1;Semi-Top;4;3;3;70
+0447;Saggio 1;Semi-Top;4;4;3;66
+0023;Saggio 1;Semi-Top;4;4;1;62
+0474;Saggio 1;Semi-Top;4;4;2;57
+0399;Saggio 1;Semi-Top;4;5;1;51
+0423;Saggio 1;Terza;3;4;4;48
+0350;Saggio 1;Terza;3;5;5;44
+0021;Saggio 1;Terza;3;4;3;41
+0422;Saggio 1;Terza;3;4;2;40
+0047;Saggio 1;Terza;3;4;1;38
+0101;Saggio 1;Terza;3;4;2;36
+0020;Saggio 1;Terza;3;4;2;35
+0180;Saggio 1;Terza;3;3;4;33
+0425;Saggio 1;Terza;3;3;4;31
+0499;Saggio 1;Terza;3;3;2;27
+0424;Saggio 1;Terza;3;3;3;25
+0500;Saggio 1;Quarta;2;4;5;17
+0374;Saggio 1;Quarta;2;4;2;10
+0328;Saggio 1;Quarta;2;3;5;8
+0157;Saggio 1;Quarta;2;4;5;7
+0277;Saggio 1;Quarta;2;3;3;6
+0069;Saggio 1;Quarta;2;3;3;5
+0156;Saggio 1;Quarta;2;3;3;4
+0068;Saggio 1;Quarta;2;3;3;3
+0181;Saggio 1;Quarta;2;3;2;2
+0205;Saggio 1;Scomm.;2;5;5;55
+0022;Saggio 1;Scomm.;2;4;5;50
+0228;Saggio 1;Scomm.;2;5;2;35
+0127;Saggio 1;Scomm.;2;4;4;30
+0398;Saggio 1;Scomm.;2;4;4;23
+0048;Saggio 1;Scomm.;2;3;4;19
+0352;Saggio 1;Scomm.;2;4;1;18
+0397;Saggio 1;Scomm.;2;4;3;16
+0303;Saggio 1;Scomm.;2;4;3;15
+0229;Saggio 1;Scomm.;2;4;2;13
+0204;Saggio 1;Scomm.;2;4;3;9
+0377;Saggio 1;Scomm.;2;3;1;8
+0075;Saggio 1;Scomm.;2;4;3;6
+0375;Saggio 1;Scomm.;2;4;5;3
+0448;Saggio 1;Scomm.;2;3;4;2
+0230;Saggio 1;Scomm.;2;2;4;2
+0155;Saggio 1;Scomm.;2;4;4;2
+0070;Saggio 1;Scomm.;2;3;3;1
+0305;Saggio 1;Scomm.;2;3;4;1
+0325;Saggio 1;Scomm.;2;3;4;1
+0256;Saggio 1;Scomm.;2;2;2;1
+0231;Saggio 1;Scomm.;2;3;3;1
+0450;Saggio 1;Scomm.;2;3;5;1
+0378;Saggio 1;Scomm.;2;3;5;1
+0071;Saggio 1;Scomm.;2;3;5;1
+0232;Saggio 1;Scomm.;2;4;1;1
+0324;Saggio 1;Scomm.;2;4;3;1
+0278;Saggio 1;Scomm.;2;3;3;1
+0257;Saggio 1;Scomm.;2;4;3;1
+0501;Saggio 1;Scomm.;2;3;5;1
+0449;Saggio 1;Scomm.;2;3;1;1
+0502;Saggio 1;Outsider;2;3;3;1
+0477;Saggio 1;Outsider;2;3;4;1
+0376;Saggio 1;Outsider;2;3;1;1
+0306;Saggio 1;Outsider;2;2;1;1
+0353;Saggio 1;Outsider;2;4;4;1
+0182;Saggio 1;Outsider;2;3;2;1
+0103;Saggio 1;Outsider;2;3;3;1
+0351;Saggio 1;Outsider;2;4;3;1
+0503;Saggio 1;Outsider;2;3;3;1
+0354;Saggio 1;Outsider;2;3;3;1
+0258;Saggio 1;Outsider;2;2;4;1
+0327;Saggio 1;Outsider;2;3;5;1
+0279;Saggio 1;Outsider;2;2;3;1
+0024;Saggio 1;Outsider;2;4;1;1
+0073;Saggio 1;Outsider;2;3;5;1
+0400;Saggio 1;Outsider;2;3;4;1
+0102;Saggio 1;Non Impostata;;4;5;1
+0476;Saggio 1;Non Impostata;;3;5;1
+0504;Saggio 1;Non Impostata;;3;1;1
+0072;Saggio 1;Non Impostata;;4;3;1
+0379;Saggio 2;top;5;5;5;39
+0076;Saggio 2;top;5;5;5;30
+0183;Saggio 2;top;5;4;5;30
+0329;Saggio 2;top;5;4;2;30
+0001;Saggio 2;semitop;4;5;4;27
+0280;Saggio 2;semitop;4;5;3;27
+0105;Saggio 2;da abbinare;2;4;5;15
+0233;Saggio 2;da abbinare;2;4;5;12
+0025;Saggio 2;da abbinare;2;4;3;12
+0259;Saggio 2;da abbinare;2;4;5;9
+0451;Saggio 2;da abbinare;2;3;2;9
+0158;Saggio 2;da abbinare;2;3;2;6
+0049;Saggio 2;da abbinare;2;4;3;5
+0401;Saggio 2;da abbinare;2;4;3;3
+0478;Saggio 2;da abbinare;2;4;3;3
+0355;Saggio 2;da abbinare;2;4;5;1
+0357;Saggio 2;da abbinare;2;3;4;1
+0128;Saggio 2;da abbinare;2;3;1;1
+0129;Saggio 2;da abbinare;2;3;5;1
+0307;Saggio 2;da abbinare;2;3;5;1
+0184;Saggio 2;secondi scomodi;2;4;2;6
+0330;Saggio 2;secondi scomodi;2;5;5;3
+0234;Saggio 2;Non Impostata;;3;3;1
+0427;Saggio 2;Non Impostata;;3;4;1
+0026;Saggio 2;Non Impostata;;3;5;1
+0402;Saggio 2;Non Impostata;;3;3;1
+0106;Saggio 2;Non Impostata;;3;4;0
+0331;Saggio 2;Non Impostata;;3;2;0
+0380;Saggio 2;Non Impostata;;3;5;0
+0185;Saggio 2;Non Impostata;;3;3;0
+0381;Saggio 2;Non Impostata;;3;2;0
+0479;Saggio 2;Non Impostata;;3;4;0
+0027;Saggio 2;Non Impostata;;3;5;0
+0107;Saggio 2;Non Impostata;;3;2;0
+0130;Saggio 2;Non Impostata;;3;5;0
+0428;Saggio 2;Non Impostata;;3;5;0
+0452;Saggio 2;Non Impostata;;3;3;0
+0260;Saggio 2;Non Impostata;;3;5;0
+0453;Saggio 2;Non Impostata;;3;5;0
+0208;Saggio 2;Non Impostata;;4;3;0
+0131;Saggio 2;Non Impostata;;3;5;0
+0480;Saggio 2;Non Impostata;;3;5;0
+0050;Saggio 2;Non Impostata;;3;3;0
+0235;Saggio 2;Non Impostata;;3;5;0
+0403;Saggio 2;Non Impostata;;3;5;0
+0404;Saggio 2;Non Impostata;;3;3;0
+0051;Saggio 2;Non Impostata;;3;5;0
+0429;Saggio 2;Non Impostata;;3;3;0
+0159;Saggio 2;Non Impostata;;3;5;0
+0002;Saggio 2;Non Impostata;;3;2;0
+0160;Saggio 2;Non Impostata;;3;5;0
+0309;Saggio 2;Non Impostata;;3;5;0
+0281;Saggio 2;Non Impostata;;4;4;0
+0077;Saggio 2;Non Impostata;;3;5;0
+0282;Saggio 2;Non Impostata;;3;5;0
+0078;Saggio 2;Non Impostata;;3;4;0
+0003;Saggio 2;Non Impostata;;3;5;0
+0188;Saggio 2;Dimarco;;5;4;45
+0186;Saggio 2;1° Slot Relativo;5;5;4;21
+0209;Saggio 2;1° Slot Relativo;5;5;1;21
+0384;Saggio 2;1° Slot Relativo;5;4;3;21
+0187;Saggio 2;1° Slot Relativo;5;4;3;18
+0382;Saggio 2;1° Slot Relativo;5;5;5;18
+0333;Saggio 2;1° Slot Relativo;5;5;3;18
+0079;Saggio 2;1° Slot Relativo;5;4;4;16
+0211;Saggio 2;1° Slot Relativo;5;5;3;16
+0286;Saggio 2;1° Slot Relativo;5;5;4;16
+0189;Saggio 2;2° Slot Relativo;4;4;5;15
+0163;Saggio 2;2° Slot Relativo;4;4;3;15
+0081;Saggio 2;2° Slot Relativo;4;4;3;15
+0191;Saggio 2;2° Slot Relativo;4;4;2;15
+0332;Saggio 2;2° Slot Relativo;4;4;2;14
+0385;Saggio 2;2° Slot Relativo;4;4;2;14
+0080;Saggio 2;2° Slot Relativo;4;4;4;12
+0006;Saggio 2;2° Slot Relativo;4;3;3;12
+0454;Saggio 2;2° Slot Relativo;4;5;4;12
+0110;Saggio 2;2° Slot Relativo;4;3;5;12
+0285;Saggio 2;3° Slot Relativo;4;4;3;9
+0387;Saggio 2;3° Slot Relativo;4;4;3;9
+0109;Saggio 2;3° Slot Relativo;4;4;5;9
+0388;Saggio 2;3° Slot Relativo;4;3;3;9
+0383;Saggio 2;3° Slot Relativo;4;4;4;9
+0335;Saggio 2;3° Slot Relativo;4;5;2;9
+0192;Saggio 2;3° Slot Relativo;4;4;1;9
+0456;Saggio 2;3° Slot Relativo;4;4;3;9
+0007;Saggio 2;3° Slot Relativo;4;4;3;9
+0212;Saggio 2;4° Slot Relativo;3;4;4;6
+0359;Saggio 2;4° Slot Relativo;3;4;4;6
+0458;Saggio 2;4° Slot Relativo;3;3;3;6
+0083;Saggio 2;4° Slot Relativo;3;4;3;6
+0028;Saggio 2;4° Slot Relativo;3;4;3;6
+0005;Saggio 2;4° Slot Relativo;3;4;1;6
+0262;Saggio 2;4° Slot Relativo;3;4;5;6
+0360;Saggio 2;4° Slot Relativo;3;4;4;6
+0164;Saggio 2;4° Slot Relativo;3;4;4;6
+0215;Saggio 2;4° Slot Relativo;3;3;3;5
+0210;Saggio 2;5° Slot Relativo;3;3;4;5
+0190;Saggio 2;5° Slot Relativo;3;4;3;5
+0236;Saggio 2;5° Slot Relativo;3;3;3;5
+0082;Saggio 2;5° Slot Relativo;3;3;5;5
+0161;Saggio 2;5° Slot Relativo;3;3;5;5
+0052;Saggio 2;5° Slot Relativo;3;4;3;5
+0240;Saggio 2;5° Slot Relativo;3;4;3;5
+0283;Saggio 2;5° Slot Relativo;3;4;5;3
+0108;Saggio 2;5° Slot Relativo;3;4;2;3
+0113;Saggio 2;5° Slot Relativo;3;3;3;3
+0029;Saggio 2;6° Slot Relativo;2;3;3;5
+0214;Saggio 2;6° Slot Relativo;2;4;4;5
+0004;Saggio 2;6° Slot Relativo;2;4;3;4
+0239;Saggio 2;6° Slot Relativo;2;4;4;4
+0430;Saggio 2;6° Slot Relativo;2;4;4;3
+0112;Saggio 2;6° Slot Relativo;2;3;2;3
+0485;Saggio 2;6° Slot Relativo;2;4;4;3
+0162;Saggio 2;6° Slot Relativo;2;4;2;3
+0085;Saggio 2;6° Slot Relativo;2;4;3;3
+0134;Saggio 2;7° Slot relativo;2;3;5;3
+0431;Saggio 2;7° Slot relativo;2;3;3;3
+0261;Saggio 2;7° Slot relativo;2;4;3;3
+0405;Saggio 2;7° Slot relativo;2;4;4;3
+0432;Saggio 2;7° Slot relativo;2;4;2;3
+0011;Saggio 2;7° Slot relativo;2;4;1;3
+0238;Saggio 2;7° Slot relativo;2;3;1;3
+0031;Saggio 2;7° Slot relativo;2;3;3;3
+0455;Saggio 2;7° Slot relativo;2;4;4;2
+0312;Saggio 2;7° Slot relativo;2;3;3;2
+0434;Saggio 2;8° Slot Relativo;1;3;1;3
+0361;Saggio 2;8° Slot Relativo;1;2;5;3
+0136;Saggio 2;8° Slot Relativo;1;3;3;2
+0310;Saggio 2;8° Slot Relativo;1;4;3;1
+0483;Saggio 2;8° Slot Relativo;1;4;3;1
+0010;Saggio 2;8° Slot Relativo;1;3;2;1
+0462;Saggio 2;8° Slot Relativo;1;3;2;1
+0389;Saggio 2;8° Slot Relativo;1;4;2;1
+0111;Saggio 2;8° Slot Relativo;1;3;5;1
+0009;Saggio 2;Non Impostata;;3;3;3
+0338;Saggio 2;Non Impostata;;3;3;3
+0008;Saggio 2;Non Impostata;;3;2;1
+0481;Saggio 2;Non Impostata;;3;3;1
+0284;Saggio 2;Non Impostata;;4;3;1
+0386;Saggio 2;Non Impostata;;4;4;1
+0311;Saggio 2;Non Impostata;;3;5;1
+0461;Saggio 2;Non Impostata;;3;5;1
+0053;Saggio 2;Non Impostata;;3;4;1
+0168;Saggio 2;Non Impostata;;3;5;1
+0054;Saggio 2;Non Impostata;;2;3;1
+0482;Saggio 2;Non Impostata;;3;3;1
+0459;Saggio 2;Non Impostata;;4;1;1
+0463;Saggio 2;Non Impostata;;3;5;0
+0132;Saggio 2;Non Impostata;;3;1;0
+0032;Saggio 2;Non Impostata;;3;5;0
+0139;Saggio 2;Non Impostata;;3;4;0
+0317;Saggio 2;Non Impostata;;3;4;0
+0464;Saggio 2;Non Impostata;;3;5;0
+0059;Saggio 2;Non Impostata;;3;1;0
+0315;Saggio 2;Non Impostata;;3;3;0
+0457;Saggio 2;Non Impostata;;3;4;0
+0336;Saggio 2;Non Impostata;;3;3;0
+0435;Saggio 2;Non Impostata;;3;3;0
+0362;Saggio 2;Non Impostata;;3;5;0
+0337;Saggio 2;Non Impostata;;4;1;0
+0216;Saggio 2;Non Impostata;;3;1;0
+0135;Saggio 2;Non Impostata;;3;5;0
+0408;Saggio 2;Non Impostata;;2;2;0
+0313;Saggio 2;Non Impostata;;3;4;0
+0363;Saggio 2;Non Impostata;;3;5;0
+0034;Saggio 2;Non Impostata;;2;2;0
+0140;Saggio 2;Non Impostata;;3;3;0
+0484;Saggio 2;Non Impostata;;3;1;0
+0314;Saggio 2;Non Impostata;;3;5;0
+0035;Saggio 2;Non Impostata;;3;2;0
+0288;Saggio 2;Non Impostata;;2;3;0
+0290;Saggio 2;Non Impostata;;3;5;0
+0409;Saggio 2;Non Impostata;;3;3;0
+0460;Saggio 2;Non Impostata;;2;2;0
+0289;Saggio 2;Non Impostata;;2;4;0
+0242;Saggio 2;Non Impostata;;3;5;0
+0488;Saggio 2;Non Impostata;;3;3;0
+0265;Saggio 2;Non Impostata;;4;2;0
+0213;Saggio 2;Non Impostata;;4;3;0
+0088;Saggio 2;Non Impostata;;3;1;0
+0489;Saggio 2;Non Impostata;;3;5;0
+0486;Saggio 2;Non Impostata;;3;3;0
+0036;Saggio 2;Non Impostata;;2;4;0
+0033;Saggio 2;Non Impostata;;4;1;0
+0057;Saggio 2;Non Impostata;;3;4;0
+0267;Saggio 2;Non Impostata;;3;3;0
+0058;Saggio 2;Non Impostata;;3;5;0
+0012;Saggio 2;Non Impostata;;4;2;0
+0243;Saggio 2;Non Impostata;;3;2;0
+0316;Saggio 2;Non Impostata;;3;4;0
+0339;Saggio 2;Non Impostata;;3;4;0
+0334;Saggio 2;Non Impostata;;3;5;0
+0166;Saggio 2;Non Impostata;;4;3;0
+0237;Saggio 2;Non Impostata;;4;3;0
+0340;Saggio 2;Non Impostata;;3;3;0
+0410;Saggio 2;Non Impostata;;3;5;0
+0165;Saggio 2;Non Impostata;;3;3;0
+0487;Saggio 2;Non Impostata;;3;3;0
+0266;Saggio 2;Non Impostata;;2;5;0
+0364;Saggio 2;Non Impostata;;2;2;0
+0407;Saggio 2;Non Impostata;;4;2;0
+0167;Saggio 2;Non Impostata;;2;3;0
+0133;Saggio 2;Non Impostata;;3;3;0
+0116;Saggio 2;Non Impostata;;4;1;0
+0244;Saggio 2;Non Impostata;;3;2;0
+0193;Saggio 2;Non Impostata;;4;3;0
+0245;Saggio 2;Non Impostata;;3;2;0
+0411;Saggio 2;Non Impostata;;3;1;0
+0114;Saggio 2;Non Impostata;;3;3;0
+0115;Saggio 2;Non Impostata;;3;4;0
+0217;Saggio 2;Non Impostata;;3;1;0
+0169;Saggio 2;Non Impostata;;3;5;0
+0490;Saggio 2;Non Impostata;;3;3;0
+0264;Saggio 2;Non Impostata;;3;3;0
+0084;Saggio 2;Non Impostata;;3;5;0
+0491;Saggio 2;Non Impostata;;2;2;0
+0241;Saggio 2;Non Impostata;;3;2;0
+0137;Saggio 2;Non Impostata;;3;2;0
+0287;Saggio 2;Non Impostata;;4;3;0
+0365;Saggio 2;Non Impostata;;4;2;0
+0087;Saggio 2;Non Impostata;;3;2;0
+0263;Saggio 2;Non Impostata;;3;4;0
+0030;Saggio 2;Non Impostata;;3;3;0
+0406;Saggio 2;Non Impostata;;3;4;0
+0055;Saggio 2;Non Impostata;;2;3;0
+0390;Saggio 2;Non Impostata;;4;5;0
+0342;Saggio 2;1° Slot Relativo;5;5;4;45
+0037;Saggio 2;1° Slot Relativo;5;4;3;45
+0090;Saggio 2;1° Slot Relativo;5;5;5;45
+0195;Saggio 2;1° Slot Relativo;5;5;2;36
+0292;Saggio 2;1° Slot Relativo;5;4;2;33
+0091;Saggio 2;1° Slot Relativo;5;5;5;27
+0117;Saggio 2;1° Slot Relativo;5;5;3;24
+0343;Saggio 2;1° Slot Relativo;5;4;1;22
+0119;Saggio 2;1° Slot Relativo;5;4;5;22
+0220;Saggio 2;2° Slot Relativo;4;3;5;21
+0194;Saggio 2;2° Slot Relativo;4;5;4;21
+0436;Saggio 2;2° Slot Relativo;4;4;3;21
+0467;Saggio 2;2° Slot Relativo;4;4;1;21
+0196;Saggio 2;2° Slot Relativo;4;5;3;21
+0089;Saggio 2;2° Slot Relativo;4;5;5;18
+0465;Saggio 2;2° Slot Relativo;4;4;4;18
+0293;Saggio 2;2° Slot Relativo;4;5;3;18
+0039;Saggio 2;2° Slot Relativo;4;5;4;18
+0247;Saggio 2;2° Slot Relativo;4;3;2;18
+0219;Saggio 2;3° Slot Relativo;4;5;3;17
+0251;Saggio 2;3° Slot Relativo;4;3;3;13
+0439;Saggio 2;3° Slot Relativo;4;3;5;12
+0301;Saggio 2;3° Slot Relativo;4;4;2;12
+0222;Saggio 2;3° Slot Relativo;4;5;2;12
+0013;Saggio 2;3° Slot Relativo;4;5;3;12
+0294;Saggio 2;3° Slot Relativo;4;4;3;12
+0246;Saggio 2;3° Slot Relativo;4;4;4;12
+0345;Saggio 2;3° Slot Relativo;4;4;2;12
+0120;Saggio 2;4° Slot Relativo;3;4;3;11
+0017;Saggio 2;4° Slot Relativo;3;3;5;11
+0197;Saggio 2;4° Slot Relativo;3;4;3;9
+0395;Saggio 2;4° Slot Relativo;3;4;5;9
+0346;Saggio 2;4° Slot Relativo;3;5;1;8
+0040;Saggio 2;4° Slot Relativo;3;4;3;7
+0295;Saggio 2;4° Slot Relativo;3;3;3;7
+0414;Saggio 2;5° Slot Relativo;3;4;3;7
+0061;Saggio 2;5° Slot Relativo;3;4;2;7
+0122;Saggio 2;5° Slot Relativo;3;3;4;7
+0416;Saggio 2;5° Slot Relativo;3;4;2;7
+0174;Saggio 2;5° Slot Relativo;3;4;1;6
+0437;Saggio 2;5° Slot Relativo;3;4;5;6
+0143;Saggio 2;5° Slot Relativo;3;4;5;6
+0015;Saggio 2;5° Slot Relativo;3;4;3;6
+0291;Saggio 2;5° Slot Relativo;3;5;3;6
+0172;Saggio 2;5° Slot Relativo;3;3;4;6
+0492;Saggio 2;6° Slot Relativo;2;3;3;6
+0322;Saggio 2;6° Slot Relativo;2;4;3;6
+0223;Saggio 2;6° Slot Relativo;2;3;3;6
+0252;Saggio 2;6° Slot Relativo;2;3;3;6
+0392;Saggio 2;6° Slot Relativo;2;5;3;6
+0200;Saggio 2;6° Slot Relativo;2;4;5;6
+0344;Saggio 2;6° Slot Relativo;2;4;3;5
+0096;Saggio 2;6° Slot Relativo;2;4;4;5
+0413;Saggio 2;6° Slot Relativo;2;4;2;5
+0041;Saggio 2;7° Slot relativo;2;4;2;4
+0093;Saggio 2;7° Slot relativo;2;4;4;4
+0118;Saggio 2;7° Slot relativo;2;4;3;4
+0044;Saggio 2;7° Slot relativo;2;3;3;4
+0221;Saggio 2;7° Slot relativo;2;4;4;4
+0366;Saggio 2;7° Slot relativo;2;4;2;3
+0094;Saggio 2;7° Slot relativo;2;4;5;3
+0092;Saggio 2;7° Slot relativo;2;4;4;3
+0062;Saggio 2;7° Slot relativo;2;3;5;3
+0144;Saggio 2;7° Slot relativo;2;3;4;3
+0417;Saggio 2;8° Slot Relativo;1;3;3;3
+0016;Saggio 2;8° Slot Relativo;1;3;5;3
+0176;Saggio 2;8° Slot Relativo;1;3;3;2
+0097;Saggio 2;8° Slot Relativo;1;4;2;1
+0269;Saggio 2;8° Slot Relativo;1;4;2;1
+0098;Saggio 2;8° Slot Relativo;1;3;3;1
+0218;Saggio 2;8° Slot Relativo;1;5;4;1
+0121;Saggio 2;8° Slot Relativo;1;4;3;1
+0177;Saggio 2;8° Slot Relativo;1;4;2;1
+0469;Saggio 2;8° Slot Relativo;1;3;3;1
+0178;Saggio 2;Non Impostata;;4;1;3
+0441;Saggio 2;Non Impostata;;4;3;3
+0318;Saggio 2;Non Impostata;;4;2;3
+0199;Saggio 2;Non Impostata;;4;3;2
+0495;Saggio 2;Non Impostata;;3;4;2
+0060;Saggio 2;Non Impostata;;3;5;1
+0493;Saggio 2;Non Impostata;;3;3;1
+0249;Saggio 2;Non Impostata;;3;3;1
+0248;Saggio 2;Non Impostata;;4;2;1
+0319;Saggio 2;Non Impostata;;3;3;1
+0268;Saggio 2;Non Impostata;;4;4;1
+0391;Saggio 2;Non Impostata;;4;4;1
+0494;Saggio 2;Non Impostata;;3;5;1
+0014;Saggio 2;Non Impostata;;4;4;1
+0175;Saggio 2;Non Impostata;;3;4;1
+0042;Saggio 2;Non Impostata;;4;3;1
+0438;Saggio 2;Non Impostata;;4;1;1
+0271;Saggio 2;Non Impostata;;3;3;1
+0276;Saggio 2;Non Impostata;;3;5;1
+0146;Saggio 2;Non Impostata;;3;3;1
+0297;Saggio 2;Non Impostata;;4;2;1
+0367;Saggio 2;Non Impostata;;3;3;1
+0150;Saggio 2;Non Impostata;;3;3;1
+0272;Saggio 2;Non Impostata;;2;4;1
+0471;Saggio 2;Non Impostata;;4;5;1
+0394;Saggio 2;Non Impostata;;4;2;1
+0270;Saggio 2;Non Impostata;;3;5;1
+0038;Saggio 2;Non Impostata;;3;2;1
+0255;Saggio 2;Non Impostata;;3;4;1
+0253;Saggio 2;Non Impostata;;4;1;1
+0496;Saggio 2;Non Impostata;;2;3;1
+0201;Saggio 2;Non Impostata;;3;5;1
+0018;Saggio 2;Non Impostata;;4;3;1
+0442;Saggio 2;Non Impostata;;3;2;0
+0320;Saggio 2;Non Impostata;;3;3;0
+0371;Saggio 2;Non Impostata;;3;3;0
+0045;Saggio 2;Non Impostata;;3;5;0
+0173;Saggio 2;Non Impostata;;3;5;0
+0443;Saggio 2;Non Impostata;;4;2;0
+0254;Saggio 2;Non Impostata;;4;5;0
+0419;Saggio 2;Non Impostata;;3;2;0
+0124;Saggio 2;Non Impostata;;3;3;0
+0470;Saggio 2;Non Impostata;;3;3;0
+0152;Saggio 2;Non Impostata;;3;5;0
+0321;Saggio 2;Non Impostata;;3;5;0
+0372;Saggio 2;Non Impostata;;3;3;0
+0064;Saggio 2;Non Impostata;;3;3;0
+0250;Saggio 2;Non Impostata;;3;3;0
+0368;Saggio 2;Non Impostata;;3;5;0
+0418;Saggio 2;Non Impostata;;3;4;0
+0498;Saggio 2;Non Impostata;;3;3;0
+0393;Saggio 2;Non Impostata;;3;3;0
+0145;Saggio 2;Non Impostata;;3;3;0
+0046;Saggio 2;Non Impostata;;3;3;0
+0125;Saggio 2;Non Impostata;;3;3;0
+0065;Saggio 2;Non Impostata;;4;1;0
+0153;Saggio 2;Non Impostata;;3;5;0
+0275;Saggio 2;Non Impostata;;3;3;0
+0296;Saggio 2;Non Impostata;;3;5;0
+0347;Saggio 2;Non Impostata;;4;1;0
+0323;Saggio 2;Non Impostata;;3;3;0
+0171;Saggio 2;Non Impostata;;4;4;0
+0148;Saggio 2;Non Impostata;;3;2;0
+0348;Saggio 2;Non Impostata;;4;3;0
+0440;Saggio 2;Non Impostata;;3;5;0
+0149;Saggio 2;Non Impostata;;3;4;0
+0497;Saggio 2;Non Impostata;;3;3;0
+0420;Saggio 2;Non Impostata;;3;5;0
+0446;Saggio 2;Non Impostata;;4;2;0
+0444;Saggio 2;Non Impostata;;3;3;0
+0273;Saggio 2;Non Impostata;;3;3;0
+0466;Saggio 2;Non Impostata;;4;4;0
+0154;Saggio 2;Non Impostata;;3;3;0
+0421;Saggio 2;Non Impostata;;4;1;0
+0224;Saggio 2;Non Impostata;;3;3;0
+0099;Saggio 2;Non Impostata;;3;3;0
+0415;Saggio 2;Non Impostata;;3;3;0
+0066;Saggio 2;Non Impostata;;2;3;0
+0341;Saggio 2;Non Impostata;;4;3;0
+0299;Saggio 2;Non Impostata;;4;1;0
+0198;Saggio 2;Non Impostata;;3;4;0
+0151;Saggio 2;Non Impostata;;4;4;0
+0412;Saggio 2;Non Impostata;;3;5;0
+0095;Saggio 2;Non Impostata;;3;5;0
+0043;Saggio 2;Non Impostata;;3;5;0
+0300;Saggio 2;Non Impostata;;3;4;0
+0274;Saggio 2;Non Impostata;;3;5;0
+0369;Saggio 2;Non Impostata;;4;1;0
+0445;Saggio 2;Non Impostata;;3;2;0
+0373;Saggio 2;Non Impostata;;3;5;0
+0123;Saggio 2;Non Impostata;;3;5;0
+0468;Saggio 2;Non Impostata;;4;3;0
+0298;Saggio 2;Non Impostata;;4;3;0
+0370;Saggio 2;Non Impostata;;3;3;0
+0019;Saggio 2;Non Impostata;;3;1;0
+0179;Saggio 2;Non Impostata;;3;5;0
+0063;Saggio 2;Non Impostata;;3;3;0
+0473;Saggio 2;Non Impostata;;3;3;0
+0147;Saggio 2;Non Impostata;;4;5;0
+0226;Saggio 2;Non Impostata;;4;2;0
+0396;Saggio 2;1° Slot Relativo;5;5;5;99
+0202;Saggio 2;1° Slot Relativo;5;5;3;87
+0349;Saggio 2;1° Slot Relativo;5;4;4;75
+0302;Saggio 2;1° Slot Relativo;5;4;3;75
+0203;Saggio 2;1° Slot Relativo;5;5;3;75
+0227;Saggio 2;1° Slot Relativo;5;4;5;66
+0126;Saggio 2;1° Slot Relativo;5;3;3;57
+0100;Saggio 2;1° Slot Relativo;5;4;4;39
+0205;Saggio 2;1° Slot Relativo;5;5;5;36
+0023;Saggio 2;1° Slot Relativo;5;4;1;36
+0399;Saggio 2;2° Slot Relativo;4;5;1;35
+0022;Saggio 2;2° Slot Relativo;4;4;5;35
+0422;Saggio 2;2° Slot Relativo;4;4;2;33
+0474;Saggio 2;2° Slot Relativo;4;4;2;33
+0425;Saggio 2;2° Slot Relativo;4;3;4;30
+0447;Saggio 2;2° Slot Relativo;4;4;3;30
+0047;Saggio 2;2° Slot Relativo;4;4;1;27
+0127;Saggio 2;2° Slot Relativo;4;4;4;27
+0398;Saggio 2;2° Slot Relativo;4;4;4;24
+0423;Saggio 2;2° Slot Relativo;4;4;4;24
+0180;Saggio 2;3° Slot Relativo;4;3;4;21
+0228;Saggio 2;3° Slot Relativo;4;5;2;21
+0350;Saggio 2;3° Slot Relativo;4;5;5;20
+0424;Saggio 2;3° Slot Relativo;4;3;3;16
+0020;Saggio 2;3° Slot Relativo;4;4;2;16
+0021;Saggio 2;3° Slot Relativo;4;4;3;16
+0377;Saggio 2;3° Slot Relativo;4;3;1;16
+0101;Saggio 2;3° Slot Relativo;4;4;2;15
+0303;Saggio 2;3° Slot Relativo;4;4;3;15
+0397;Saggio 2;3° Slot Relativo;4;4;3;15
+0499;Saggio 2;4° Slot Relativo;3;3;2;12
+0277;Saggio 2;4° Slot Relativo;3;3;3;12
+0374;Saggio 2;4° Slot Relativo;3;4;2;12
+0075;Saggio 2;4° Slot Relativo;3;4;3;10
+0048;Saggio 2;4° Slot Relativo;3;3;4;9
+0500;Saggio 2;4° Slot Relativo;3;4;5;9
+0448;Saggio 2;4° Slot Relativo;3;3;4;8
+0155;Saggio 2;4° Slot Relativo;3;4;4;7
+0328;Saggio 2;4° Slot Relativo;3;3;5;7
+0181;Saggio 2;4° Slot Relativo;3;3;2;7
+0204;Saggio 2;5° Slot Relativo;3;4;3;6
+0068;Saggio 2;5° Slot Relativo;3;3;3;6
+0352;Saggio 2;5° Slot Relativo;3;4;1;6
+0354;Saggio 2;5° Slot Relativo;3;3;3;5
+0229;Saggio 2;5° Slot Relativo;3;4;2;3
+0069;Saggio 2;5° Slot Relativo;3;3;3;3
+0324;Saggio 2;5° Slot Relativo;3;4;3;3
+0449;Saggio 2;5° Slot Relativo;3;3;1;3
+0258;Saggio 2;5° Slot Relativo;3;2;4;2
+0156;Saggio 2;5° Slot Relativo;3;3;3;1
+0305;Saggio 2;6° Slot Relativo;2;3;4;1
+0325;Saggio 2;6° Slot Relativo;2;3;4;1
+0230;Saggio 2;6° Slot Relativo;2;2;4;1
+0256;Saggio 2;6° Slot Relativo;2;2;2;1
+0375;Saggio 2;6° Slot Relativo;2;4;5;1
+0182;Saggio 2;6° Slot Relativo;2;3;2;1
+0378;Saggio 2;6° Slot Relativo;2;3;5;1
+0071;Saggio 2;6° Slot Relativo;2;3;5;1
+0257;Saggio 2;6° Slot Relativo;2;4;3;1
+0502;Saggio 2;Non Impostata;;3;3;1
+0070;Saggio 2;Non Impostata;;3;3;1
+0231;Saggio 2;Non Impostata;;3;3;1
+0376;Saggio 2;Non Impostata;;3;1;1
+0306;Saggio 2;Non Impostata;;2;1;1
+0157;Saggio 2;Non Impostata;;4;5;1
+0501;Saggio 2;Non Impostata;;3;5;1
+0279;Saggio 2;Non Impostata;;2;3;1
+0102;Saggio 2;Non Impostata;;4;5;0
+0477;Saggio 2;Non Impostata;;3;4;0
+0353;Saggio 2;Non Impostata;;4;4;0
+0476;Saggio 2;Non Impostata;;3;5;0
+0103;Saggio 2;Non Impostata;;3;3;0
+0450;Saggio 2;Non Impostata;;3;5;0
+0351;Saggio 2;Non Impostata;;4;3;0
+0503;Saggio 2;Non Impostata;;3;3;0
+0504;Saggio 2;Non Impostata;;3;1;0
+0232;Saggio 2;Non Impostata;;4;1;0
+0072;Saggio 2;Non Impostata;;4;3;0
+0278;Saggio 2;Non Impostata;;3;3;0
+0327;Saggio 2;Non Impostata;;3;5;0
+0024;Saggio 2;Non Impostata;;4;1;0
+0073;Saggio 2;Non Impostata;;3;5;0
+0400;Saggio 2;Non Impostata;;3;4;0
+0379;Saggio 3;"TOP ""FRANCO""";5;5;5;55
+0183;Saggio 3;"TOP ""FRANCO""";5;4;5;40
+0329;Saggio 3;"TOP ""FRANCO""";5;4;2;40
+0076;Saggio 3;"SEMI ""FRANCO""";4;5;5;40
+0280;Saggio 3;"SEMI ""FRANCO""";4;5;3;40
+0001;Saggio 3;NOI ( SI PRENDONO);3;5;4;35
+0105;Saggio 3;NOI ( SI PRENDONO);3;4;5;35
+0158;Saggio 3;NOI ( SI PRENDONO);3;3;2;10
+0451;Saggio 3;NOI ( SI PRENDONO);3;3;2;10
+0184;Saggio 3;NOI ( SI PRENDONO);3;4;2;10
+0049;Saggio 3;NOI ( SI PRENDONO);3;4;3;7
+0401;Saggio 3;NOI ( SI PRENDONO);3;4;3;6
+0233;Saggio 3;VOI ( SI LASCIANO);1;4;5;20
+0025;Saggio 3;VOI ( SI LASCIANO);1;4;3;10
+0259;Saggio 3;VOI ( SI LASCIANO);1;4;5;5
+0129;Saggio 3;VOI ( SI LASCIANO);1;3;5;5
+0307;Saggio 3;VOI ( SI LASCIANO);1;3;5;5
+0355;Saggio 3;"FRANCO ""LOW COST""";2;4;5;10
+0427;Saggio 3;"FRANCO ""LOW COST""";2;3;4;10
+0234;Saggio 3;"FRANCO ""LOW COST""";2;3;3;5
+0478;Saggio 3;"FRANCO ""LOW COST""";2;4;3;5
+0330;Saggio 3;SEMPRE IN BALLOTTAGGIO;;5;5;15
+0357;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;4;1
+0428;Saggio 3;Non Impostata;;3;5;1
+0106;Saggio 3;Non Impostata;;3;4;0
+0331;Saggio 3;Non Impostata;;3;2;0
+0380;Saggio 3;Non Impostata;;3;5;0
+0128;Saggio 3;Non Impostata;;3;1;0
+0185;Saggio 3;Non Impostata;;3;3;0
+0381;Saggio 3;Non Impostata;;3;2;0
+0479;Saggio 3;Non Impostata;;3;4;0
+0027;Saggio 3;Non Impostata;;3;5;0
+0107;Saggio 3;Non Impostata;;3;2;0
+0130;Saggio 3;Non Impostata;;3;5;0
+0452;Saggio 3;Non Impostata;;3;3;0
+0260;Saggio 3;Non Impostata;;3;5;0
+0026;Saggio 3;Non Impostata;;3;5;0
+0453;Saggio 3;Non Impostata;;3;5;0
+0208;Saggio 3;Non Impostata;;4;3;0
+0131;Saggio 3;Non Impostata;;3;5;0
+0480;Saggio 3;Non Impostata;;3;5;0
+0050;Saggio 3;Non Impostata;;3;3;0
+0235;Saggio 3;Non Impostata;;3;5;0
+0403;Saggio 3;Non Impostata;;3;5;0
+0404;Saggio 3;Non Impostata;;3;3;0
+0051;Saggio 3;Non Impostata;;3;5;0
+0429;Saggio 3;Non Impostata;;3;3;0
+0159;Saggio 3;Non Impostata;;3;5;0
+0002;Saggio 3;Non Impostata;;3;2;0
+0160;Saggio 3;Non Impostata;;3;5;0
+0309;Saggio 3;Non Impostata;;3;5;0
+0281;Saggio 3;Non Impostata;;4;4;0
+0077;Saggio 3;Non Impostata;;3;5;0
+0282;Saggio 3;Non Impostata;;3;5;0
+0402;Saggio 3;Non Impostata;;3;3;0
+0078;Saggio 3;Non Impostata;;3;4;0
+0003;Saggio 3;Non Impostata;;3;5;0
+0188;Saggio 3;"TOP ""FRANCO""";5;5;4;75
+0385;Saggio 3;"SEMI ""FRANCO""";4;4;2;30
+0332;Saggio 3;"SEMI ""FRANCO""";4;4;2;25
+0186;Saggio 3;"SEMI ""FRANCO""";4;5;4;20
+0209;Saggio 3;"SEMI ""FRANCO""";4;5;1;20
+0079;Saggio 3;"SEMI ""FRANCO""";4;4;4;20
+0333;Saggio 3;"SEMI ""FRANCO""";4;5;3;20
+0109;Saggio 3;NOI ( SI PRENDONO);3;4;5;25
+0163;Saggio 3;NOI ( SI PRENDONO);3;4;3;25
+0454;Saggio 3;NOI ( SI PRENDONO);3;5;4;23
+0382;Saggio 3;NOI ( SI PRENDONO);3;5;5;20
+0080;Saggio 3;NOI ( SI PRENDONO);3;4;4;15
+0285;Saggio 3;NOI ( SI PRENDONO);3;4;3;15
+0211;Saggio 3;NOI ( SI PRENDONO);3;5;3;15
+0383;Saggio 3;NOI ( SI PRENDONO);3;4;4;15
+0162;Saggio 3;NOI ( SI PRENDONO);3;4;2;15
+0004;Saggio 3;NOI ( SI PRENDONO);3;4;3;10
+0189;Saggio 3;NOI ( SI PRENDONO);3;4;5;10
+0262;Saggio 3;NOI ( SI PRENDONO);3;4;5;10
+0360;Saggio 3;NOI ( SI PRENDONO);3;4;4;10
+0456;Saggio 3;NOI ( SI PRENDONO);3;4;3;10
+0136;Saggio 3;NOI ( SI PRENDONO);3;3;3;5
+0164;Saggio 3;NOI ( SI PRENDONO);3;4;4;5
+0054;Saggio 3;NOI ( SI PRENDONO);3;2;3;1
+0187;Saggio 3;VOI ( SI LASCIANO);1;4;3;35
+0384;Saggio 3;VOI ( SI LASCIANO);1;4;3;35
+0286;Saggio 3;VOI ( SI LASCIANO);1;5;4;20
+0191;Saggio 3;VOI ( SI LASCIANO);1;4;2;20
+0081;Saggio 3;VOI ( SI LASCIANO);1;4;3;18
+0112;Saggio 3;VOI ( SI LASCIANO);1;3;2;15
+0192;Saggio 3;VOI ( SI LASCIANO);1;4;1;13
+0283;Saggio 3;VOI ( SI LASCIANO);1;4;5;10
+0210;Saggio 3;VOI ( SI LASCIANO);1;3;4;10
+0236;Saggio 3;VOI ( SI LASCIANO);1;3;3;10
+0108;Saggio 3;VOI ( SI LASCIANO);1;4;2;10
+0455;Saggio 3;VOI ( SI LASCIANO);1;4;4;10
+0214;Saggio 3;VOI ( SI LASCIANO);1;4;4;10
+0006;Saggio 3;VOI ( SI LASCIANO);1;3;3;10
+0335;Saggio 3;VOI ( SI LASCIANO);1;5;2;10
+0007;Saggio 3;VOI ( SI LASCIANO);1;4;3;10
+0031;Saggio 3;VOI ( SI LASCIANO);1;3;3;10
+0284;Saggio 3;VOI ( SI LASCIANO);1;4;3;8
+0337;Saggio 3;VOI ( SI LASCIANO);1;4;1;5
+0216;Saggio 3;VOI ( SI LASCIANO);1;3;1;5
+0212;Saggio 3;VOI ( SI LASCIANO);1;4;4;5
+0430;Saggio 3;VOI ( SI LASCIANO);1;4;4;5
+0431;Saggio 3;VOI ( SI LASCIANO);1;3;3;5
+0359;Saggio 3;VOI ( SI LASCIANO);1;4;4;5
+0261;Saggio 3;VOI ( SI LASCIANO);1;4;3;5
+0213;Saggio 3;VOI ( SI LASCIANO);1;4;3;5
+0029;Saggio 3;VOI ( SI LASCIANO);1;3;3;5
+0387;Saggio 3;VOI ( SI LASCIANO);1;4;3;5
+0010;Saggio 3;VOI ( SI LASCIANO);1;3;2;5
+0405;Saggio 3;VOI ( SI LASCIANO);1;4;4;5
+0458;Saggio 3;VOI ( SI LASCIANO);1;3;3;5
+0215;Saggio 3;VOI ( SI LASCIANO);1;3;3;5
+0312;Saggio 3;VOI ( SI LASCIANO);1;3;3;5
+0237;Saggio 3;VOI ( SI LASCIANO);1;4;3;5
+0052;Saggio 3;VOI ( SI LASCIANO);1;4;3;5
+0053;Saggio 3;VOI ( SI LASCIANO);1;3;4;5
+0116;Saggio 3;VOI ( SI LASCIANO);1;4;1;5
+0193;Saggio 3;VOI ( SI LASCIANO);1;4;3;5
+0240;Saggio 3;VOI ( SI LASCIANO);1;4;3;5
+0005;Saggio 3;VOI ( SI LASCIANO);1;4;1;5
+0287;Saggio 3;VOI ( SI LASCIANO);1;4;3;5
+0265;Saggio 3;VOI ( SI LASCIANO);1;4;2;2
+0289;Saggio 3;VOI ( SI LASCIANO);1;2;4;1
+0264;Saggio 3;VOI ( SI LASCIANO);1;3;3;1
+0388;Saggio 3;"FRANCO ""LOW COST""";2;3;3;13
+0110;Saggio 3;"FRANCO ""LOW COST""";2;3;5;10
+0082;Saggio 3;"FRANCO ""LOW COST""";2;3;5;8
+0481;Saggio 3;"FRANCO ""LOW COST""";2;3;3;5
+0310;Saggio 3;"FRANCO ""LOW COST""";2;4;3;5
+0134;Saggio 3;"FRANCO ""LOW COST""";2;3;5;5
+0483;Saggio 3;"FRANCO ""LOW COST""";2;4;3;5
+0161;Saggio 3;"FRANCO ""LOW COST""";2;3;5;5
+0361;Saggio 3;"FRANCO ""LOW COST""";2;2;5;5
+0111;Saggio 3;"FRANCO ""LOW COST""";2;3;5;5
+0407;Saggio 3;"FRANCO ""LOW COST""";2;4;2;3
+0009;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;3;10
+0190;Saggio 3;SEMPRE IN BALLOTTAGGIO;;4;3;10
+0083;Saggio 3;SEMPRE IN BALLOTTAGGIO;;4;3;10
+0028;Saggio 3;SEMPRE IN BALLOTTAGGIO;;4;3;10
+0008;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;2;5
+0336;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;3;5
+0386;Saggio 3;SEMPRE IN BALLOTTAGGIO;;4;4;5
+0033;Saggio 3;SEMPRE IN BALLOTTAGGIO;;4;1;5
+0432;Saggio 3;SEMPRE IN BALLOTTAGGIO;;4;2;5
+0166;Saggio 3;SEMPRE IN BALLOTTAGGIO;;4;3;5
+0238;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;1;5
+0389;Saggio 3;SEMPRE IN BALLOTTAGGIO;;4;2;5
+0085;Saggio 3;SEMPRE IN BALLOTTAGGIO;;4;3;5
+0459;Saggio 3;SEMPRE IN BALLOTTAGGIO;;4;1;5
+0434;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;1;1
+0409;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;3;1
+0113;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;3;1
+0011;Saggio 3;SEMPRE IN BALLOTTAGGIO;;4;1;1
+0165;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;3;1
+0338;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;3;1
+0168;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;5;1
+0463;Saggio 3;Non Impostata;;3;5;0
+0132;Saggio 3;Non Impostata;;3;1;0
+0032;Saggio 3;Non Impostata;;3;5;0
+0139;Saggio 3;Non Impostata;;3;4;0
+0317;Saggio 3;Non Impostata;;3;4;0
+0464;Saggio 3;Non Impostata;;3;5;0
+0059;Saggio 3;Non Impostata;;3;1;0
+0315;Saggio 3;Non Impostata;;3;3;0
+0457;Saggio 3;Non Impostata;;3;4;0
+0435;Saggio 3;Non Impostata;;3;3;0
+0362;Saggio 3;Non Impostata;;3;5;0
+0135;Saggio 3;Non Impostata;;3;5;0
+0408;Saggio 3;Non Impostata;;2;2;0
+0313;Saggio 3;Non Impostata;;3;4;0
+0363;Saggio 3;Non Impostata;;3;5;0
+0034;Saggio 3;Non Impostata;;2;2;0
+0140;Saggio 3;Non Impostata;;3;3;0
+0484;Saggio 3;Non Impostata;;3;1;0
+0314;Saggio 3;Non Impostata;;3;5;0
+0035;Saggio 3;Non Impostata;;3;2;0
+0288;Saggio 3;Non Impostata;;2;3;0
+0290;Saggio 3;Non Impostata;;3;5;0
+0460;Saggio 3;Non Impostata;;2;2;0
+0242;Saggio 3;Non Impostata;;3;5;0
+0488;Saggio 3;Non Impostata;;3;3;0
+0088;Saggio 3;Non Impostata;;3;1;0
+0489;Saggio 3;Non Impostata;;3;5;0
+0485;Saggio 3;Non Impostata;;4;4;0
+0486;Saggio 3;Non Impostata;;3;3;0
+0036;Saggio 3;Non Impostata;;2;4;0
+0057;Saggio 3;Non Impostata;;3;4;0
+0267;Saggio 3;Non Impostata;;3;3;0
+0058;Saggio 3;Non Impostata;;3;5;0
+0012;Saggio 3;Non Impostata;;4;2;0
+0311;Saggio 3;Non Impostata;;3;5;0
+0243;Saggio 3;Non Impostata;;3;2;0
+0316;Saggio 3;Non Impostata;;3;4;0
+0339;Saggio 3;Non Impostata;;3;4;0
+0334;Saggio 3;Non Impostata;;3;5;0
+0340;Saggio 3;Non Impostata;;3;3;0
+0410;Saggio 3;Non Impostata;;3;5;0
+0461;Saggio 3;Non Impostata;;3;5;0
+0487;Saggio 3;Non Impostata;;3;3;0
+0266;Saggio 3;Non Impostata;;2;5;0
+0364;Saggio 3;Non Impostata;;2;2;0
+0167;Saggio 3;Non Impostata;;2;3;0
+0133;Saggio 3;Non Impostata;;3;3;0
+0462;Saggio 3;Non Impostata;;3;2;0
+0244;Saggio 3;Non Impostata;;3;2;0
+0245;Saggio 3;Non Impostata;;3;2;0
+0411;Saggio 3;Non Impostata;;3;1;0
+0114;Saggio 3;Non Impostata;;3;3;0
+0239;Saggio 3;Non Impostata;;4;4;0
+0115;Saggio 3;Non Impostata;;3;4;0
+0217;Saggio 3;Non Impostata;;3;1;0
+0169;Saggio 3;Non Impostata;;3;5;0
+0490;Saggio 3;Non Impostata;;3;3;0
+0482;Saggio 3;Non Impostata;;3;3;0
+0084;Saggio 3;Non Impostata;;3;5;0
+0491;Saggio 3;Non Impostata;;2;2;0
+0241;Saggio 3;Non Impostata;;3;2;0
+0137;Saggio 3;Non Impostata;;3;2;0
+0365;Saggio 3;Non Impostata;;4;2;0
+0087;Saggio 3;Non Impostata;;3;2;0
+0263;Saggio 3;Non Impostata;;3;4;0
+0030;Saggio 3;Non Impostata;;3;3;0
+0406;Saggio 3;Non Impostata;;3;4;0
+0055;Saggio 3;Non Impostata;;2;3;0
+0390;Saggio 3;Non Impostata;;4;5;0
+0342;Saggio 3;"TOP ""FRANCO""";5;5;4;80
+0195;Saggio 3;"TOP ""FRANCO""";5;5;2;65
+0467;Saggio 3;"SEMI ""FRANCO""";4;4;1;45
+0117;Saggio 3;"SEMI ""FRANCO""";4;5;3;40
+0119;Saggio 3;"SEMI ""FRANCO""";4;4;5;40
+0091;Saggio 3;"SEMI ""FRANCO""";4;5;5;35
+0089;Saggio 3;"SEMI ""FRANCO""";4;5;5;35
+0219;Saggio 3;"SEMI ""FRANCO""";4;5;3;35
+0436;Saggio 3;"SEMI ""FRANCO""";4;4;3;35
+0293;Saggio 3;NOI ( SI PRENDONO);3;5;3;35
+0013;Saggio 3;NOI ( SI PRENDONO);3;5;3;25
+0017;Saggio 3;NOI ( SI PRENDONO);3;3;5;23
+0294;Saggio 3;NOI ( SI PRENDONO);3;4;3;20
+0246;Saggio 3;NOI ( SI PRENDONO);3;4;4;20
+0196;Saggio 3;NOI ( SI PRENDONO);3;5;3;20
+0040;Saggio 3;NOI ( SI PRENDONO);3;4;3;15
+0251;Saggio 3;NOI ( SI PRENDONO);3;3;3;15
+0439;Saggio 3;NOI ( SI PRENDONO);3;3;5;10
+0344;Saggio 3;NOI ( SI PRENDONO);3;4;3;10
+0346;Saggio 3;NOI ( SI PRENDONO);3;5;1;10
+0366;Saggio 3;NOI ( SI PRENDONO);3;4;2;5
+0118;Saggio 3;NOI ( SI PRENDONO);3;4;3;5
+0414;Saggio 3;NOI ( SI PRENDONO);3;4;3;2
+0493;Saggio 3;NOI ( SI PRENDONO);3;3;3;1
+0090;Saggio 3;VOI ( SI LASCIANO);1;5;5;90
+0037;Saggio 3;VOI ( SI LASCIANO);1;4;3;70
+0220;Saggio 3;VOI ( SI LASCIANO);1;3;5;48
+0247;Saggio 3;VOI ( SI LASCIANO);1;3;2;45
+0292;Saggio 3;VOI ( SI LASCIANO);1;4;2;40
+0194;Saggio 3;VOI ( SI LASCIANO);1;5;4;35
+0343;Saggio 3;VOI ( SI LASCIANO);1;4;1;35
+0120;Saggio 3;VOI ( SI LASCIANO);1;4;3;30
+0039;Saggio 3;VOI ( SI LASCIANO);1;5;4;30
+0222;Saggio 3;VOI ( SI LASCIANO);1;5;2;25
+0291;Saggio 3;VOI ( SI LASCIANO);1;5;3;20
+0197;Saggio 3;VOI ( SI LASCIANO);1;4;3;15
+0413;Saggio 3;VOI ( SI LASCIANO);1;4;2;15
+0092;Saggio 3;VOI ( SI LASCIANO);1;4;4;13
+0465;Saggio 3;VOI ( SI LASCIANO);1;4;4;10
+0252;Saggio 3;VOI ( SI LASCIANO);1;3;3;10
+0392;Saggio 3;VOI ( SI LASCIANO);1;5;3;10
+0200;Saggio 3;VOI ( SI LASCIANO);1;4;5;10
+0221;Saggio 3;VOI ( SI LASCIANO);1;4;4;10
+0391;Saggio 3;VOI ( SI LASCIANO);1;4;4;5
+0218;Saggio 3;VOI ( SI LASCIANO);1;5;4;5
+0121;Saggio 3;VOI ( SI LASCIANO);1;4;3;5
+0318;Saggio 3;VOI ( SI LASCIANO);1;4;2;5
+0223;Saggio 3;VOI ( SI LASCIANO);1;3;3;4
+0347;Saggio 3;VOI ( SI LASCIANO);1;4;1;3
+0492;Saggio 3;VOI ( SI LASCIANO);1;3;3;2
+0042;Saggio 3;VOI ( SI LASCIANO);1;4;3;2
+0421;Saggio 3;VOI ( SI LASCIANO);1;4;1;2
+0299;Saggio 3;VOI ( SI LASCIANO);1;4;1;2
+0178;Saggio 3;VOI ( SI LASCIANO);1;4;1;2
+0123;Saggio 3;VOI ( SI LASCIANO);1;3;5;2
+0226;Saggio 3;VOI ( SI LASCIANO);1;4;2;2
+0045;Saggio 3;VOI ( SI LASCIANO);1;3;5;1
+0173;Saggio 3;VOI ( SI LASCIANO);1;3;5;1
+0319;Saggio 3;VOI ( SI LASCIANO);1;3;3;1
+0321;Saggio 3;VOI ( SI LASCIANO);1;3;5;1
+0250;Saggio 3;VOI ( SI LASCIANO);1;3;3;1
+0393;Saggio 3;VOI ( SI LASCIANO);1;3;3;1
+0296;Saggio 3;VOI ( SI LASCIANO);1;3;5;1
+0171;Saggio 3;VOI ( SI LASCIANO);1;4;4;1
+0440;Saggio 3;VOI ( SI LASCIANO);1;3;5;1
+0367;Saggio 3;VOI ( SI LASCIANO);1;3;3;1
+0224;Saggio 3;VOI ( SI LASCIANO);1;3;3;1
+0150;Saggio 3;VOI ( SI LASCIANO);1;3;3;1
+0341;Saggio 3;VOI ( SI LASCIANO);1;4;3;1
+0198;Saggio 3;VOI ( SI LASCIANO);1;3;4;1
+0412;Saggio 3;VOI ( SI LASCIANO);1;3;5;1
+0095;Saggio 3;VOI ( SI LASCIANO);1;3;5;1
+0300;Saggio 3;VOI ( SI LASCIANO);1;3;4;1
+0270;Saggio 3;VOI ( SI LASCIANO);1;3;5;1
+0038;Saggio 3;VOI ( SI LASCIANO);1;3;2;1
+0298;Saggio 3;VOI ( SI LASCIANO);1;4;3;1
+0253;Saggio 3;VOI ( SI LASCIANO);1;4;1;1
+0172;Saggio 3;VOI ( SI LASCIANO);1;3;4;1
+0177;Saggio 3;VOI ( SI LASCIANO);1;4;2;1
+0469;Saggio 3;VOI ( SI LASCIANO);1;3;3;1
+0416;Saggio 3;VOI ( SI LASCIANO);1;4;2;1
+0018;Saggio 3;VOI ( SI LASCIANO);1;4;3;1
+0174;Saggio 3;"FRANCO ""LOW COST""";2;4;1;10
+0143;Saggio 3;"FRANCO ""LOW COST""";2;4;5;10
+0061;Saggio 3;"FRANCO ""LOW COST""";2;4;2;10
+0144;Saggio 3;"FRANCO ""LOW COST""";2;3;4;8
+0437;Saggio 3;"FRANCO ""LOW COST""";2;4;5;5
+0094;Saggio 3;"FRANCO ""LOW COST""";2;4;5;5
+0122;Saggio 3;"FRANCO ""LOW COST""";2;3;4;5
+0395;Saggio 3;"FRANCO ""LOW COST""";2;4;5;5
+0417;Saggio 3;"FRANCO ""LOW COST""";2;3;3;3
+0269;Saggio 3;"FRANCO ""LOW COST""";2;4;2;2
+0301;Saggio 3;"FRANCO ""LOW COST""";2;4;2;2
+0445;Saggio 3;"FRANCO ""LOW COST""";2;3;2;1
+0096;Saggio 3;SEMPRE IN BALLOTTAGGIO;;4;4;15
+0322;Saggio 3;SEMPRE IN BALLOTTAGGIO;;4;3;5
+0418;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;4;5
+0153;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;5;5
+0015;Saggio 3;SEMPRE IN BALLOTTAGGIO;;4;3;5
+0044;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;3;5
+0394;Saggio 3;SEMPRE IN BALLOTTAGGIO;;4;2;5
+0345;Saggio 3;SEMPRE IN BALLOTTAGGIO;;4;2;5
+0097;Saggio 3;SEMPRE IN BALLOTTAGGIO;;4;2;2
+0060;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;5;2
+0041;Saggio 3;SEMPRE IN BALLOTTAGGIO;;4;2;2
+0249;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;3;2
+0295;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;3;2
+0368;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;5;2
+0297;Saggio 3;SEMPRE IN BALLOTTAGGIO;;4;2;2
+0199;Saggio 3;SEMPRE IN BALLOTTAGGIO;;4;3;2
+0441;Saggio 3;SEMPRE IN BALLOTTAGGIO;;4;3;2
+0016;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;5;2
+0201;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;5;2
+0147;Saggio 3;SEMPRE IN BALLOTTAGGIO;;4;5;2
+0470;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;3;1
+0494;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;5;1
+0064;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;3;1
+0065;Saggio 3;SEMPRE IN BALLOTTAGGIO;;4;1;1
+0438;Saggio 3;SEMPRE IN BALLOTTAGGIO;;4;1;1
+0271;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;3;1
+0149;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;4;1
+0176;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;3;1
+0062;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;5;1
+0370;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;3;1
+0019;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;1;1
+0179;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;5;1
+0442;Saggio 3;Non Impostata;;3;2;0
+0320;Saggio 3;Non Impostata;;3;3;0
+0371;Saggio 3;Non Impostata;;3;3;0
+0443;Saggio 3;Non Impostata;;4;2;0
+0254;Saggio 3;Non Impostata;;4;5;0
+0419;Saggio 3;Non Impostata;;3;2;0
+0124;Saggio 3;Non Impostata;;3;3;0
+0093;Saggio 3;Non Impostata;;4;4;0
+0248;Saggio 3;Non Impostata;;4;2;0
+0152;Saggio 3;Non Impostata;;3;5;0
+0268;Saggio 3;Non Impostata;;4;4;0
+0372;Saggio 3;Non Impostata;;3;3;0
+0014;Saggio 3;Non Impostata;;4;4;0
+0498;Saggio 3;Non Impostata;;3;3;0
+0145;Saggio 3;Non Impostata;;3;3;0
+0046;Saggio 3;Non Impostata;;3;3;0
+0175;Saggio 3;Non Impostata;;3;4;0
+0125;Saggio 3;Non Impostata;;3;3;0
+0098;Saggio 3;Non Impostata;;3;3;0
+0275;Saggio 3;Non Impostata;;3;3;0
+0323;Saggio 3;Non Impostata;;3;3;0
+0148;Saggio 3;Non Impostata;;3;2;0
+0348;Saggio 3;Non Impostata;;4;3;0
+0276;Saggio 3;Non Impostata;;3;5;0
+0146;Saggio 3;Non Impostata;;3;3;0
+0497;Saggio 3;Non Impostata;;3;3;0
+0420;Saggio 3;Non Impostata;;3;5;0
+0446;Saggio 3;Non Impostata;;4;2;0
+0444;Saggio 3;Non Impostata;;3;3;0
+0273;Saggio 3;Non Impostata;;3;3;0
+0466;Saggio 3;Non Impostata;;4;4;0
+0154;Saggio 3;Non Impostata;;3;3;0
+0099;Saggio 3;Non Impostata;;3;3;0
+0415;Saggio 3;Non Impostata;;3;3;0
+0066;Saggio 3;Non Impostata;;2;3;0
+0272;Saggio 3;Non Impostata;;2;4;0
+0151;Saggio 3;Non Impostata;;4;4;0
+0471;Saggio 3;Non Impostata;;4;5;0
+0043;Saggio 3;Non Impostata;;3;5;0
+0274;Saggio 3;Non Impostata;;3;5;0
+0369;Saggio 3;Non Impostata;;4;1;0
+0373;Saggio 3;Non Impostata;;3;5;0
+0495;Saggio 3;Non Impostata;;3;4;0
+0468;Saggio 3;Non Impostata;;4;3;0
+0255;Saggio 3;Non Impostata;;3;4;0
+0496;Saggio 3;Non Impostata;;2;3;0
+0063;Saggio 3;Non Impostata;;3;3;0
+0473;Saggio 3;Non Impostata;;3;3;0
+0396;Saggio 3;"TOP ""FRANCO""";5;5;5;165
+0302;Saggio 3;"TOP ""FRANCO""";5;4;3;120
+0203;Saggio 3;"TOP ""FRANCO""";5;5;3;115
+0474;Saggio 3;"SEMI ""FRANCO""";4;4;2;50
+0100;Saggio 3;"SEMI ""FRANCO""";4;4;4;50
+0022;Saggio 3;"SEMI ""FRANCO""";4;4;5;40
+0228;Saggio 3;"SEMI ""FRANCO""";4;5;2;40
+0399;Saggio 3;"SEMI ""FRANCO""";4;5;1;35
+0447;Saggio 3;NOI ( SI PRENDONO);3;4;3;50
+0422;Saggio 3;NOI ( SI PRENDONO);3;4;2;45
+0020;Saggio 3;NOI ( SI PRENDONO);3;4;2;38
+0047;Saggio 3;NOI ( SI PRENDONO);3;4;1;35
+0180;Saggio 3;NOI ( SI PRENDONO);3;3;4;30
+0425;Saggio 3;NOI ( SI PRENDONO);3;3;4;30
+0205;Saggio 3;NOI ( SI PRENDONO);3;5;5;28
+0127;Saggio 3;NOI ( SI PRENDONO);3;4;4;20
+0202;Saggio 3;VOI ( SI LASCIANO);1;5;3;165
+0349;Saggio 3;VOI ( SI LASCIANO);1;4;4;90
+0227;Saggio 3;VOI ( SI LASCIANO);1;4;5;90
+0126;Saggio 3;VOI ( SI LASCIANO);1;3;3;75
+0023;Saggio 3;VOI ( SI LASCIANO);1;4;1;70
+0398;Saggio 3;VOI ( SI LASCIANO);1;4;4;35
+0423;Saggio 3;VOI ( SI LASCIANO);1;4;4;30
+0303;Saggio 3;VOI ( SI LASCIANO);1;4;3;25
+0021;Saggio 3;VOI ( SI LASCIANO);1;4;3;20
+0397;Saggio 3;VOI ( SI LASCIANO);1;4;3;20
+0101;Saggio 3;VOI ( SI LASCIANO);1;4;2;15
+0204;Saggio 3;VOI ( SI LASCIANO);1;4;3;10
+0352;Saggio 3;VOI ( SI LASCIANO);1;4;1;5
+0155;Saggio 3;VOI ( SI LASCIANO);1;4;4;4
+0230;Saggio 3;VOI ( SI LASCIANO);1;2;4;2
+0070;Saggio 3;VOI ( SI LASCIANO);1;3;3;1
+0256;Saggio 3;VOI ( SI LASCIANO);1;2;2;1
+0306;Saggio 3;VOI ( SI LASCIANO);1;2;1;1
+0351;Saggio 3;VOI ( SI LASCIANO);1;4;3;1
+0354;Saggio 3;VOI ( SI LASCIANO);1;3;3;1
+0501;Saggio 3;VOI ( SI LASCIANO);1;3;5;1
+0279;Saggio 3;VOI ( SI LASCIANO);1;2;3;1
+0449;Saggio 3;VOI ( SI LASCIANO);1;3;1;1
+0181;Saggio 3;VOI ( SI LASCIANO);1;3;2;0
+0499;Saggio 3;"FRANCO ""LOW COST""";2;3;2;15
+0048;Saggio 3;"FRANCO ""LOW COST""";2;3;4;15
+0377;Saggio 3;"FRANCO ""LOW COST""";2;3;1;10
+0277;Saggio 3;"FRANCO ""LOW COST""";2;3;3;5
+0424;Saggio 3;"FRANCO ""LOW COST""";2;3;3;3
+0328;Saggio 3;"FRANCO ""LOW COST""";2;3;5;2
+0375;Saggio 3;"FRANCO ""LOW COST""";2;4;5;1
+0350;Saggio 3;SEMPRE IN BALLOTTAGGIO;;5;5;25
+0075;Saggio 3;SEMPRE IN BALLOTTAGGIO;;4;3;20
+0258;Saggio 3;SEMPRE IN BALLOTTAGGIO;;2;4;10
+0374;Saggio 3;SEMPRE IN BALLOTTAGGIO;;4;2;10
+0502;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;3;5
+0229;Saggio 3;SEMPRE IN BALLOTTAGGIO;;4;2;5
+0305;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;4;5
+0068;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;3;5
+0257;Saggio 3;SEMPRE IN BALLOTTAGGIO;;4;3;5
+0156;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;3;5
+0500;Saggio 3;SEMPRE IN BALLOTTAGGIO;;4;5;5
+0069;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;3;4
+0448;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;4;3
+0325;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;4;3
+0073;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;5;3
+0231;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;3;1
+0353;Saggio 3;SEMPRE IN BALLOTTAGGIO;;4;4;1
+0450;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;5;1
+0157;Saggio 3;SEMPRE IN BALLOTTAGGIO;;4;5;1
+0071;Saggio 3;SEMPRE IN BALLOTTAGGIO;;3;5;1
+0102;Saggio 3;Non Impostata;;4;5;0
+0477;Saggio 3;Non Impostata;;3;4;0
+0376;Saggio 3;Non Impostata;;3;1;0
+0476;Saggio 3;Non Impostata;;3;5;0
+0182;Saggio 3;Non Impostata;;3;2;0
+0103;Saggio 3;Non Impostata;;3;3;0
+0503;Saggio 3;Non Impostata;;3;3;0
+0504;Saggio 3;Non Impostata;;3;1;0
+0378;Saggio 3;Non Impostata;;3;5;0
+0232;Saggio 3;Non Impostata;;4;1;0
+0324;Saggio 3;Non Impostata;;4;3;0
+0072;Saggio 3;Non Impostata;;4;3;0
+0278;Saggio 3;Non Impostata;;3;3;0
+0327;Saggio 3;Non Impostata;;3;5;0
+0024;Saggio 3;Non Impostata;;4;1;0
+0400;Saggio 3;Non Impostata;;3;4;0
+0379;Saggio 4;SUPER TOP;5;5;5;50
+0280;Saggio 4;TOP;5;5;3;40
+0183;Saggio 4;TOP;5;4;5;40
+0001;Saggio 4;TOP;5;5;4;38
+0076;Saggio 4;TOP;5;5;5;35
+0329;Saggio 4;SEMITOP;4;4;2;30
+0105;Saggio 4;FASCIA ALTA;4;4;5;16
+0233;Saggio 4;FASCIA ALTA;4;4;5;15
+0451;Saggio 4;FASCIA ALTA;4;3;2;14
+0025;Saggio 4;FASCIA ALTA;4;4;3;12
+0330;Saggio 4;JOLLY 1ª FASCIA;4;5;5;12
+0184;Saggio 4;JOLLY 1ª FASCIA;4;4;2;10
+0259;Saggio 4;FASCIA MEDIA;3;4;5;11
+0049;Saggio 4;FASCIA MEDIA;3;4;3;10
+0158;Saggio 4;SOPRA AI LOW COST;3;3;2;5
+0357;Saggio 4;JOLLY 2ª FASCIA;3;3;4;1
+0234;Saggio 4;JOLLY 2ª FASCIA;3;3;3;1
+0355;Saggio 4;LOW COST 1ª FASCIA;2;4;5;4
+0401;Saggio 4;LOW COST 1ª FASCIA;2;4;3;4
+0478;Saggio 4;LOW COST 2ª FASCIA;2;4;3;3
+0129;Saggio 4;LEGHE NUMEROSE;2;3;5;1
+0307;Saggio 4;LEGHE NUMEROSE;2;3;5;1
+0128;Saggio 4;JOLLY 3ª FASCIA;2;3;1;1
+0402;Saggio 4;JOLLY 3ª FASCIA;2;3;3;1
+0427;Saggio 4;MERCATO;;3;4;0
+0106;Saggio 4;Non Impostata;;3;4;0
+0331;Saggio 4;Non Impostata;;3;2;0
+0380;Saggio 4;Non Impostata;;3;5;0
+0185;Saggio 4;Non Impostata;;3;3;0
+0381;Saggio 4;Non Impostata;;3;2;0
+0479;Saggio 4;Non Impostata;;3;4;0
+0027;Saggio 4;Non Impostata;;3;5;0
+0107;Saggio 4;Non Impostata;;3;2;0
+0130;Saggio 4;Non Impostata;;3;5;0
+0428;Saggio 4;Non Impostata;;3;5;0
+0452;Saggio 4;Non Impostata;;3;3;0
+0260;Saggio 4;Non Impostata;;3;5;0
+0026;Saggio 4;Non Impostata;;3;5;0
+0453;Saggio 4;Non Impostata;;3;5;0
+0208;Saggio 4;Non Impostata;;4;3;0
+0131;Saggio 4;Non Impostata;;3;5;0
+0480;Saggio 4;Non Impostata;;3;5;0
+0050;Saggio 4;Non Impostata;;3;3;0
+0235;Saggio 4;Non Impostata;;3;5;0
+0403;Saggio 4;Non Impostata;;3;5;0
+0404;Saggio 4;Non Impostata;;3;3;0
+0051;Saggio 4;Non Impostata;;3;5;0
+0429;Saggio 4;Non Impostata;;3;3;0
+0159;Saggio 4;Non Impostata;;3;5;0
+0002;Saggio 4;Non Impostata;;3;2;0
+0160;Saggio 4;Non Impostata;;3;5;0
+0309;Saggio 4;Non Impostata;;3;5;0
+0281;Saggio 4;Non Impostata;;4;4;0
+0077;Saggio 4;Non Impostata;;3;5;0
+0282;Saggio 4;Non Impostata;;3;5;0
+0078;Saggio 4;Non Impostata;;3;4;0
+0003;Saggio 4;Non Impostata;;3;5;0
+0188;Saggio 4;SUPER TOP;5;5;4;70
+0384;Saggio 4;TOP;5;4;3;47
+0209;Saggio 4;TOP;5;5;2;40
+0187;Saggio 4;TOP;5;4;4;35
+0385;Saggio 4;TOP;5;4;3;33
+0286;Saggio 4;TOP;5;5;4;30
+0191;Saggio 4;TOP;5;4;2;29
+0454;Saggio 4;TOP;5;5;4;28
+0186;Saggio 4;SEMITOP;4;5;4;26
+0211;Saggio 4;SEMITOP;4;5;4;24
+0332;Saggio 4;SEMITOP;4;4;4;23
+0382;Saggio 4;SEMITOP;4;5;5;22
+0333;Saggio 4;SEMITOP;4;5;3;22
+0192;Saggio 4;SEMITOP;4;4;1;22
+0285;Saggio 4;SEMITOP;4;4;3;20
+0189;Saggio 4;SOTTO AI SEMITOP;3;4;5;19
+0383;Saggio 4;SOTTO AI SEMITOP;3;4;4;18
+0163;Saggio 4;SOTTO AI SEMITOP;3;4;3;18
+0081;Saggio 4;SOTTO AI SEMITOP;3;4;3;17
+0210;Saggio 4;SOTTO AI SEMITOP;3;3;4;14
+0335;Saggio 4;FASCIA ALTA;4;5;2;12
+0007;Saggio 4;FASCIA ALTA;4;4;4;11
+0215;Saggio 4;FASCIA ALTA;4;4;3;10
+0190;Saggio 4;JOLLY 1ª FASCIA;4;4;3;7
+0212;Saggio 4;JOLLY 1ª FASCIA;4;4;4;7
+0083;Saggio 4;JOLLY 1ª FASCIA;4;4;3;6
+0079;Saggio 4;POSSIBILI SORPRESE;2;4;4;20
+0456;Saggio 4;POSSIBILI SORPRESE;2;4;3;11
+0388;Saggio 4;POSSIBILI SORPRESE;2;3;3;8
+0387;Saggio 4;FASCIA MEDIA;3;4;3;9
+0028;Saggio 4;FASCIA MEDIA;3;4;3;8
+0162;Saggio 4;FASCIA MEDIA;3;4;2;8
+0004;Saggio 4;FASCIA MEDIA;3;4;3;7
+0359;Saggio 4;FASCIA MEDIA;3;4;4;7
+0006;Saggio 4;FASCIA MEDIA;3;3;3;7
+0085;Saggio 4;FASCIA MEDIA;3;4;3;7
+0337;Saggio 4;INFORTUNATI;;4;1;4
+0010;Saggio 4;INFORTUNATI;;3;2;1
+0116;Saggio 4;INFORTUNATI;;4;1;1
+0080;Saggio 4;SCOMMESSE;2;4;4;7
+0082;Saggio 4;SCOMMESSE;2;3;5;7
+0109;Saggio 4;SCOMMESSE;2;4;5;6
+0165;Saggio 4;SCOMMESSE;2;3;3;5
+0407;Saggio 4;SCOMMESSE;2;4;3;5
+0110;Saggio 4;SCOMMESSE;2;3;5;4
+0111;Saggio 4;SCOMMESSE;2;3;5;4
+0108;Saggio 4;SOPRA AI LOW COST;3;4;2;6
+0005;Saggio 4;SOPRA AI LOW COST;3;4;1;6
+0262;Saggio 4;SOPRA AI LOW COST;3;4;5;6
+0360;Saggio 4;SOPRA AI LOW COST;3;4;4;6
+0164;Saggio 4;SOPRA AI LOW COST;3;4;4;6
+0052;Saggio 4;SOPRA AI LOW COST;3;4;3;5
+0283;Saggio 4;JOLLY 2ª FASCIA;3;4;5;3
+0009;Saggio 4;JOLLY 2ª FASCIA;3;3;3;3
+0113;Saggio 4;JOLLY 2ª FASCIA;3;3;3;3
+0336;Saggio 4;JOLLY 2ª FASCIA;3;3;3;2
+0288;Saggio 4;JOLLY 2ª FASCIA;3;2;3;2
+0213;Saggio 4;JOLLY 2ª FASCIA;3;4;3;2
+0033;Saggio 4;JOLLY 2ª FASCIA;3;4;1;2
+0193;Saggio 4;JOLLY 2ª FASCIA;3;4;3;2
+0389;Saggio 4;JOLLY 2ª FASCIA;3;4;2;2
+0284;Saggio 4;LOW COST 1ª FASCIA;2;4;3;3
+0261;Saggio 4;LOW COST 1ª FASCIA;2;4;3;3
+0265;Saggio 4;LOW COST 1ª FASCIA;2;4;2;3
+0458;Saggio 4;LOW COST 1ª FASCIA;2;3;3;3
+0238;Saggio 4;LOW COST 1ª FASCIA;2;3;2;3
+0361;Saggio 4;LOW COST 1ª FASCIA;2;2;5;3
+0031;Saggio 4;LOW COST 1ª FASCIA;2;3;3;3
+0236;Saggio 4;LOW COST 1ª FASCIA;2;3;3;2
+0405;Saggio 4;LOW COST 1ª FASCIA;2;4;4;2
+0214;Saggio 4;LOW COST 1ª FASCIA;2;4;4;2
+0481;Saggio 4;LOW COST 2ª FASCIA;2;3;3;1
+0430;Saggio 4;LOW COST 2ª FASCIA;2;4;4;1
+0431;Saggio 4;LOW COST 2ª FASCIA;2;3;3;1
+0289;Saggio 4;LOW COST 2ª FASCIA;2;2;4;1
+0029;Saggio 4;LOW COST 2ª FASCIA;2;3;3;1
+0432;Saggio 4;LOW COST 2ª FASCIA;2;4;2;1
+0455;Saggio 4;LOW COST 2ª FASCIA;2;4;4;1
+0011;Saggio 4;LOW COST 2ª FASCIA;2;4;1;1
+0312;Saggio 4;LOW COST 2ª FASCIA;2;3;3;1
+0237;Saggio 4;LOW COST 2ª FASCIA;2;4;3;1
+0263;Saggio 4;LOW COST 2ª FASCIA;2;3;4;1
+0030;Saggio 4;LOW COST 2ª FASCIA;2;3;3;1
+0406;Saggio 4;LOW COST 2ª FASCIA;2;3;4;1
+0134;Saggio 4;LEGHE NUMEROSE;2;3;5;1
+0313;Saggio 4;LEGHE NUMEROSE;2;3;4;1
+0434;Saggio 4;LEGHE NUMEROSE;2;3;1;1
+0484;Saggio 4;LEGHE NUMEROSE;2;3;1;1
+0485;Saggio 4;LEGHE NUMEROSE;2;4;4;1
+0483;Saggio 4;LEGHE NUMEROSE;2;4;3;1
+0036;Saggio 4;LEGHE NUMEROSE;2;2;4;1
+0161;Saggio 4;LEGHE NUMEROSE;2;3;5;1
+0136;Saggio 4;LEGHE NUMEROSE;2;3;3;1
+0487;Saggio 4;LEGHE NUMEROSE;2;3;3;1
+0053;Saggio 4;LEGHE NUMEROSE;2;3;4;1
+0133;Saggio 4;LEGHE NUMEROSE;2;3;3;1
+0054;Saggio 4;LEGHE NUMEROSE;2;2;3;1
+0264;Saggio 4;LEGHE NUMEROSE;2;3;3;1
+0084;Saggio 4;LEGHE NUMEROSE;2;3;5;1
+0055;Saggio 4;LEGHE NUMEROSE;2;2;3;1
+0482;Saggio 4;LEGHE NUMEROSE;2;3;3;0
+0137;Saggio 4;LEGHE NUMEROSE;2;3;2;0
+0463;Saggio 4;JOLLY 3ª FASCIA;2;3;5;1
+0457;Saggio 4;JOLLY 3ª FASCIA;2;3;4;1
+0435;Saggio 4;JOLLY 3ª FASCIA;2;3;3;1
+0409;Saggio 4;JOLLY 3ª FASCIA;2;3;3;1
+0242;Saggio 4;JOLLY 3ª FASCIA;2;3;5;1
+0386;Saggio 4;JOLLY 3ª FASCIA;2;4;4;1
+0012;Saggio 4;JOLLY 3ª FASCIA;2;4;2;1
+0334;Saggio 4;JOLLY 3ª FASCIA;2;3;5;1
+0338;Saggio 4;JOLLY 3ª FASCIA;2;3;3;1
+0239;Saggio 4;JOLLY 3ª FASCIA;2;4;4;1
+0115;Saggio 4;JOLLY 3ª FASCIA;2;3;4;1
+0365;Saggio 4;JOLLY 3ª FASCIA;2;4;2;1
+0087;Saggio 4;JOLLY 3ª FASCIA;2;3;2;1
+0459;Saggio 4;JOLLY 3ª FASCIA;2;4;1;1
+0486;Saggio 4;JOLLY 4ª FASCIA;1;3;3;1
+0245;Saggio 4;JOLLY 4ª FASCIA;1;3;2;1
+0032;Saggio 4;JOLLY 4ª FASCIA;1;3;5;0
+0310;Saggio 4;JOLLY 4ª FASCIA;1;4;3;0
+0362;Saggio 4;JOLLY 4ª FASCIA;1;3;5;0
+0216;Saggio 4;JOLLY 4ª FASCIA;1;3;1;0
+0363;Saggio 4;JOLLY 4ª FASCIA;1;3;5;0
+0243;Saggio 4;JOLLY 4ª FASCIA;1;3;2;0
+0340;Saggio 4;JOLLY 4ª FASCIA;1;3;3;0
+0461;Saggio 4;JOLLY 4ª FASCIA;1;3;5;0
+0364;Saggio 4;JOLLY 4ª FASCIA;1;2;2;0
+0167;Saggio 4;JOLLY 4ª FASCIA;1;2;3;0
+0462;Saggio 4;JOLLY 4ª FASCIA;1;3;2;0
+0168;Saggio 4;JOLLY 4ª FASCIA;1;3;5;0
+0169;Saggio 4;JOLLY 4ª FASCIA;1;3;5;0
+0132;Saggio 4;A RISCHIO;;3;1;0
+0464;Saggio 4;A RISCHIO;;3;5;0
+0135;Saggio 4;A RISCHIO;;3;5;0
+0408;Saggio 4;A RISCHIO;;2;2;0
+0034;Saggio 4;A RISCHIO;;2;2;0
+0140;Saggio 4;A RISCHIO;;3;3;0
+0314;Saggio 4;A RISCHIO;;3;5;0
+0035;Saggio 4;A RISCHIO;;3;2;0
+0460;Saggio 4;A RISCHIO;;2;2;0
+0488;Saggio 4;A RISCHIO;;3;3;0
+0267;Saggio 4;A RISCHIO;;3;3;0
+0058;Saggio 4;A RISCHIO;;3;5;0
+0311;Saggio 4;A RISCHIO;;3;5;0
+0316;Saggio 4;A RISCHIO;;3;4;0
+0410;Saggio 4;A RISCHIO;;3;5;0
+0266;Saggio 4;A RISCHIO;;2;5;0
+0114;Saggio 4;A RISCHIO;;3;3;0
+0057;Saggio 4;DA EVITARE;1;3;4;1
+0139;Saggio 4;DA EVITARE;1;3;4;0
+0317;Saggio 4;DA EVITARE;1;3;4;0
+0059;Saggio 4;DA EVITARE;1;3;1;0
+0315;Saggio 4;DA EVITARE;1;3;3;0
+0290;Saggio 4;DA EVITARE;1;3;5;0
+0088;Saggio 4;DA EVITARE;1;3;1;0
+0489;Saggio 4;DA EVITARE;1;3;5;0
+0244;Saggio 4;DA EVITARE;1;3;2;0
+0411;Saggio 4;DA EVITARE;1;3;1;0
+0490;Saggio 4;DA EVITARE;1;3;3;0
+0491;Saggio 4;DA EVITARE;1;2;2;0
+0112;Saggio 4;MERCATO;;3;2;5
+0240;Saggio 4;MERCATO;;4;3;2
+0241;Saggio 4;MERCATO;;3;2;1
+0008;Saggio 4;MERCATO;;3;2;0
+0339;Saggio 4;MERCATO;;3;4;0
+0166;Saggio 4;MERCATO;;4;3;0
+0217;Saggio 4;MERCATO;;3;1;0
+0287;Saggio 4;MERCATO;;4;3;0
+0390;Saggio 4;MERCATO;;4;5;0
+0090;Saggio 4;SUPER TOP;5;5;5;80
+0342;Saggio 4;SUPER TOP;5;5;4;70
+0195;Saggio 4;SUPER TOP;5;5;3;68
+0292;Saggio 4;TOP;5;4;3;58
+0037;Saggio 4;TOP;5;4;3;57
+0293;Saggio 4;TOP;5;5;3;54
+0091;Saggio 4;TOP;5;5;5;50
+0343;Saggio 4;TOP;5;4;3;48
+0117;Saggio 4;SEMITOP;4;5;3;40
+0467;Saggio 4;SEMITOP;4;4;2;39
+0247;Saggio 4;SEMITOP;4;3;3;38
+0119;Saggio 4;SEMITOP;4;4;5;36
+0220;Saggio 4;SEMITOP;4;3;5;33
+0436;Saggio 4;SEMITOP;4;4;3;32
+0219;Saggio 4;SEMITOP;4;5;3;31
+0251;Saggio 4;SEMITOP;4;3;3;30
+0196;Saggio 4;SOTTO AI SEMITOP;3;5;3;27
+0222;Saggio 4;SOTTO AI SEMITOP;3;5;3;26
+0194;Saggio 4;SOTTO AI SEMITOP;3;5;4;25
+0089;Saggio 4;SOTTO AI SEMITOP;3;5;5;25
+0039;Saggio 4;SOTTO AI SEMITOP;3;5;4;24
+0246;Saggio 4;SOTTO AI SEMITOP;3;4;4;24
+0291;Saggio 4;FASCIA ALTA;4;5;3;16
+0465;Saggio 4;FASCIA ALTA;4;4;4;15
+0017;Saggio 4;FASCIA ALTA;4;3;5;15
+0346;Saggio 4;FASCIA ALTA;4;5;3;14
+0392;Saggio 4;FASCIA ALTA;4;5;3;12
+0344;Saggio 4;FASCIA ALTA;4;4;4;12
+0295;Saggio 4;FASCIA ALTA;4;3;3;11
+0252;Saggio 4;FASCIA ALTA;4;3;3;11
+0120;Saggio 4;JOLLY 1ª FASCIA;4;4;3;14
+0200;Saggio 4;JOLLY 1ª FASCIA;4;4;5;11
+0096;Saggio 4;JOLLY 1ª FASCIA;4;4;4;10
+0345;Saggio 4;JOLLY 1ª FASCIA;4;4;2;9
+0016;Saggio 4;JOLLY 1ª FASCIA;4;3;5;8
+0044;Saggio 4;JOLLY 1ª FASCIA;4;3;3;5
+0394;Saggio 4;JOLLY 1ª FASCIA;4;4;2;5
+0197;Saggio 4;POSSIBILI SORPRESE;2;4;3;28
+0301;Saggio 4;POSSIBILI SORPRESE;2;4;2;9
+0095;Saggio 4;POSSIBILI SORPRESE;2;3;5;8
+0395;Saggio 4;POSSIBILI SORPRESE;2;4;5;8
+0437;Saggio 4;POSSIBILI SORPRESE;2;4;5;7
+0013;Saggio 4;FASCIA MEDIA;3;5;3;10
+0413;Saggio 4;FASCIA MEDIA;3;4;2;9
+0174;Saggio 4;FASCIA MEDIA;3;4;1;8
+0092;Saggio 4;FASCIA MEDIA;3;4;4;8
+0294;Saggio 4;FASCIA MEDIA;3;4;3;7
+0040;Saggio 4;FASCIA MEDIA;3;4;3;6
+0221;Saggio 4;INFORTUNATI;;4;4;4
+0097;Saggio 4;INFORTUNATI;;4;2;1
+0421;Saggio 4;INFORTUNATI;;4;1;1
+0318;Saggio 4;INFORTUNATI;;4;2;1
+0414;Saggio 4;SCOMMESSE;2;4;3;5
+0143;Saggio 4;SCOMMESSE;2;4;5;5
+0094;Saggio 4;SCOMMESSE;2;4;5;5
+0123;Saggio 4;SCOMMESSE;2;3;5;5
+0062;Saggio 4;SCOMMESSE;2;3;5;5
+0122;Saggio 4;SCOMMESSE;2;3;4;4
+0045;Saggio 4;SCOMMESSE;2;3;5;2
+0417;Saggio 4;SCOMMESSE;2;3;3;2
+0177;Saggio 4;SCOMMESSE;2;4;2;2
+0439;Saggio 4;SOPRA AI LOW COST;3;3;5;5
+0015;Saggio 4;SOPRA AI LOW COST;3;4;3;5
+0366;Saggio 4;SOPRA AI LOW COST;3;4;2;4
+0125;Saggio 4;SOPRA AI LOW COST;3;3;3;4
+0118;Saggio 4;SOPRA AI LOW COST;3;4;3;4
+0438;Saggio 4;SOPRA AI LOW COST;3;4;1;4
+0347;Saggio 4;SOPRA AI LOW COST;3;4;1;4
+0218;Saggio 4;SOPRA AI LOW COST;3;5;4;4
+0144;Saggio 4;SOPRA AI LOW COST;3;3;4;4
+0041;Saggio 4;JOLLY 2ª FASCIA;3;4;2;3
+0249;Saggio 4;JOLLY 2ª FASCIA;3;3;3;3
+0093;Saggio 4;JOLLY 2ª FASCIA;3;4;4;3
+0223;Saggio 4;JOLLY 2ª FASCIA;3;3;3;3
+0121;Saggio 4;JOLLY 2ª FASCIA;3;4;3;3
+0441;Saggio 4;JOLLY 2ª FASCIA;3;4;3;3
+0201;Saggio 4;JOLLY 2ª FASCIA;3;3;5;3
+0416;Saggio 4;JOLLY 2ª FASCIA;3;4;2;3
+0018;Saggio 4;JOLLY 2ª FASCIA;3;4;3;3
+0418;Saggio 4;JOLLY 2ª FASCIA;3;3;4;2
+0299;Saggio 4;JOLLY 2ª FASCIA;3;4;1;2
+0298;Saggio 4;JOLLY 2ª FASCIA;3;4;3;2
+0322;Saggio 4;LOW COST 1ª FASCIA;2;4;3;3
+0391;Saggio 4;LOW COST 1ª FASCIA;2;4;4;3
+0061;Saggio 4;LOW COST 1ª FASCIA;2;4;2;3
+0171;Saggio 4;LOW COST 1ª FASCIA;2;4;4;3
+0493;Saggio 4;LOW COST 1ª FASCIA;2;3;3;2
+0492;Saggio 4;LOW COST 1ª FASCIA;2;3;3;2
+0268;Saggio 4;LOW COST 1ª FASCIA;2;4;4;2
+0042;Saggio 4;LOW COST 1ª FASCIA;2;4;3;2
+0271;Saggio 4;LOW COST 1ª FASCIA;2;3;3;2
+0146;Saggio 4;LOW COST 1ª FASCIA;2;3;3;2
+0341;Saggio 4;LOW COST 1ª FASCIA;2;4;3;2
+0253;Saggio 4;LOW COST 1ª FASCIA;2;4;1;2
+0496;Saggio 4;LOW COST 1ª FASCIA;2;2;3;2
+0172;Saggio 4;LOW COST 1ª FASCIA;2;3;4;2
+0063;Saggio 4;LOW COST 1ª FASCIA;2;3;3;2
+0060;Saggio 4;LOW COST 2ª FASCIA;2;3;5;1
+0175;Saggio 4;LOW COST 2ª FASCIA;2;3;4;1
+0276;Saggio 4;LOW COST 2ª FASCIA;2;3;5;1
+0149;Saggio 4;LOW COST 2ª FASCIA;2;3;4;1
+0446;Saggio 4;LOW COST 2ª FASCIA;2;4;2;1
+0466;Saggio 4;LOW COST 2ª FASCIA;2;4;4;1
+0367;Saggio 4;LOW COST 2ª FASCIA;2;3;3;1
+0412;Saggio 4;LOW COST 2ª FASCIA;2;3;5;1
+0495;Saggio 4;LOW COST 2ª FASCIA;2;3;4;1
+0270;Saggio 4;LOW COST 2ª FASCIA;2;3;5;1
+0320;Saggio 4;LEGHE NUMEROSE;2;3;3;1
+0173;Saggio 4;LEGHE NUMEROSE;2;3;5;1
+0269;Saggio 4;LEGHE NUMEROSE;2;4;2;1
+0248;Saggio 4;LEGHE NUMEROSE;2;4;2;1
+0064;Saggio 4;LEGHE NUMEROSE;2;3;3;1
+0368;Saggio 4;LEGHE NUMEROSE;2;3;5;1
+0440;Saggio 4;LEGHE NUMEROSE;2;3;5;1
+0497;Saggio 4;LEGHE NUMEROSE;2;3;3;1
+0151;Saggio 4;LEGHE NUMEROSE;2;4;4;1
+0471;Saggio 4;LEGHE NUMEROSE;2;4;5;1
+0468;Saggio 4;LEGHE NUMEROSE;2;4;3;1
+0370;Saggio 4;LEGHE NUMEROSE;2;3;3;1
+0469;Saggio 4;LEGHE NUMEROSE;2;3;3;1
+0147;Saggio 4;LEGHE NUMEROSE;2;4;5;1
+0124;Saggio 4;JOLLY 3ª FASCIA;2;3;3;1
+0321;Saggio 4;JOLLY 3ª FASCIA;2;3;5;1
+0250;Saggio 4;JOLLY 3ª FASCIA;2;3;3;1
+0348;Saggio 4;JOLLY 3ª FASCIA;2;4;3;1
+0297;Saggio 4;JOLLY 3ª FASCIA;2;4;2;1
+0224;Saggio 4;JOLLY 3ª FASCIA;2;3;3;1
+0198;Saggio 4;JOLLY 3ª FASCIA;2;3;4;1
+0176;Saggio 4;JOLLY 3ª FASCIA;2;3;3;1
+0199;Saggio 4;JOLLY 3ª FASCIA;2;4;3;1
+0043;Saggio 4;JOLLY 3ª FASCIA;2;3;5;1
+0038;Saggio 4;JOLLY 3ª FASCIA;2;3;2;1
+0442;Saggio 4;JOLLY 4ª FASCIA;1;3;2;1
+0371;Saggio 4;JOLLY 4ª FASCIA;1;3;3;1
+0443;Saggio 4;JOLLY 4ª FASCIA;1;4;2;1
+0470;Saggio 4;JOLLY 4ª FASCIA;1;3;3;1
+0152;Saggio 4;JOLLY 4ª FASCIA;1;3;5;1
+0319;Saggio 4;JOLLY 4ª FASCIA;1;3;3;1
+0046;Saggio 4;JOLLY 4ª FASCIA;1;3;3;1
+0098;Saggio 4;JOLLY 4ª FASCIA;1;3;3;1
+0065;Saggio 4;JOLLY 4ª FASCIA;1;4;1;1
+0153;Saggio 4;JOLLY 4ª FASCIA;1;3;5;1
+0275;Saggio 4;JOLLY 4ª FASCIA;1;3;3;1
+0444;Saggio 4;JOLLY 4ª FASCIA;1;3;3;1
+0273;Saggio 4;JOLLY 4ª FASCIA;1;3;3;1
+0178;Saggio 4;JOLLY 4ª FASCIA;1;4;1;1
+0300;Saggio 4;JOLLY 4ª FASCIA;1;3;4;1
+0274;Saggio 4;JOLLY 4ª FASCIA;1;3;5;1
+0369;Saggio 4;JOLLY 4ª FASCIA;1;4;1;1
+0373;Saggio 4;JOLLY 4ª FASCIA;1;3;5;1
+0255;Saggio 4;JOLLY 4ª FASCIA;1;3;4;1
+0179;Saggio 4;JOLLY 4ª FASCIA;1;3;5;1
+0473;Saggio 4;JOLLY 4ª FASCIA;1;3;3;1
+0254;Saggio 4;A RISCHIO;;4;5;0
+0419;Saggio 4;A RISCHIO;;3;2;0
+0372;Saggio 4;A RISCHIO;;3;3;0
+0498;Saggio 4;A RISCHIO;;3;3;0
+0145;Saggio 4;A RISCHIO;;3;3;0
+0148;Saggio 4;A RISCHIO;;3;2;0
+0420;Saggio 4;A RISCHIO;;3;5;0
+0150;Saggio 4;A RISCHIO;;3;3;0
+0099;Saggio 4;A RISCHIO;;3;3;0
+0415;Saggio 4;A RISCHIO;;3;3;0
+0066;Saggio 4;A RISCHIO;;2;3;0
+0272;Saggio 4;A RISCHIO;;2;4;0
+0019;Saggio 4;A RISCHIO;;3;1;0
+0494;Saggio 4;DA EVITARE;1;3;5;0
+0323;Saggio 4;DA EVITARE;1;3;3;0
+0154;Saggio 4;DA EVITARE;1;3;3;0
+0445;Saggio 4;MERCATO;;3;2;6
+0014;Saggio 4;MERCATO;;4;4;1
+0226;Saggio 4;MERCATO;;4;2;1
+0393;Saggio 4;MERCATO;;3;3;0
+0296;Saggio 4;MERCATO;;3;5;0
+0396;Saggio 4;SUPER TOP;5;5;5;200
+0202;Saggio 4;SUPER TOP;5;5;4;185
+0302;Saggio 4;TOP;5;4;4;130
+0203;Saggio 4;TOP;5;5;3;125
+0349;Saggio 4;TOP;5;4;4;115
+0227;Saggio 4;TOP;5;4;5;105
+0126;Saggio 4;SEMITOP;4;3;3;90
+0100;Saggio 4;SEMITOP;4;4;4;78
+0474;Saggio 4;SEMITOP;4;4;3;75
+0023;Saggio 4;SOTTO AI SEMITOP;3;4;1;65
+0205;Saggio 4;SOTTO AI SEMITOP;3;5;5;62
+0022;Saggio 4;SOTTO AI SEMITOP;3;4;5;60
+0399;Saggio 4;SOTTO AI SEMITOP;3;5;1;58
+0422;Saggio 4;SOTTO AI SEMITOP;3;4;2;52
+0425;Saggio 4;SOTTO AI SEMITOP;3;3;4;50
+0447;Saggio 4;FASCIA ALTA;4;4;3;46
+0350;Saggio 4;FASCIA ALTA;4;5;5;38
+0047;Saggio 4;FASCIA ALTA;4;4;2;34
+0398;Saggio 4;JOLLY 1ª FASCIA;4;4;4;27
+0127;Saggio 4;JOLLY 1ª FASCIA;4;4;4;23
+0229;Saggio 4;JOLLY 1ª FASCIA;4;4;2;21
+0352;Saggio 4;JOLLY 1ª FASCIA;4;4;1;13
+0204;Saggio 4;JOLLY 1ª FASCIA;4;4;3;11
+0397;Saggio 4;JOLLY 1ª FASCIA;4;4;3;10
+0499;Saggio 4;POSSIBILI SORPRESE;2;3;2;14
+0020;Saggio 4;FASCIA MEDIA;3;4;2;30
+0021;Saggio 4;FASCIA MEDIA;3;4;3;28
+0423;Saggio 4;FASCIA MEDIA;3;4;4;26
+0180;Saggio 4;FASCIA MEDIA;3;3;4;25
+0075;Saggio 4;FASCIA MEDIA;3;4;3;21
+0101;Saggio 4;FASCIA MEDIA;3;4;2;20
+0228;Saggio 4;INFORTUNATI;;5;3;45
+0328;Saggio 4;SCOMMESSE;2;3;5;6
+0377;Saggio 4;SCOMMESSE;2;3;1;4
+0071;Saggio 4;SCOMMESSE;2;3;5;3
+0048;Saggio 4;JOLLY 2ª FASCIA;3;3;4;8
+0354;Saggio 4;JOLLY 2ª FASCIA;3;3;3;4
+0230;Saggio 4;JOLLY 2ª FASCIA;3;2;4;3
+0353;Saggio 4;JOLLY 2ª FASCIA;3;4;4;3
+0448;Saggio 4;LOW COST 1ª FASCIA;2;3;4;7
+0325;Saggio 4;LOW COST 1ª FASCIA;2;3;4;7
+0069;Saggio 4;LOW COST 1ª FASCIA;2;3;3;7
+0424;Saggio 4;LOW COST 1ª FASCIA;2;3;3;6
+0277;Saggio 4;LOW COST 1ª FASCIA;2;3;3;6
+0156;Saggio 4;LOW COST 1ª FASCIA;2;3;3;6
+0374;Saggio 4;LOW COST 1ª FASCIA;2;4;2;6
+0375;Saggio 4;LOW COST 1ª FASCIA;2;4;5;5
+0181;Saggio 4;LOW COST 1ª FASCIA;2;3;2;5
+0068;Saggio 4;LOW COST 1ª FASCIA;2;3;3;4
+0500;Saggio 4;LOW COST 1ª FASCIA;2;4;5;4
+0157;Saggio 4;LOW COST 2ª FASCIA;2;4;5;2
+0449;Saggio 4;LOW COST 2ª FASCIA;2;3;1;2
+0502;Saggio 4;LEGHE NUMEROSE;2;3;3;1
+0182;Saggio 4;LEGHE NUMEROSE;2;3;2;1
+0324;Saggio 4;LEGHE NUMEROSE;2;4;3;1
+0501;Saggio 4;LEGHE NUMEROSE;2;3;5;1
+0279;Saggio 4;LEGHE NUMEROSE;2;2;3;1
+0070;Saggio 4;JOLLY 3ª FASCIA;2;3;3;1
+0256;Saggio 4;JOLLY 3ª FASCIA;2;2;2;1
+0231;Saggio 4;JOLLY 3ª FASCIA;2;3;3;1
+0376;Saggio 4;JOLLY 3ª FASCIA;2;3;1;1
+0103;Saggio 4;JOLLY 3ª FASCIA;2;3;3;1
+0450;Saggio 4;JOLLY 3ª FASCIA;2;3;5;1
+0378;Saggio 4;JOLLY 3ª FASCIA;2;3;5;1
+0278;Saggio 4;JOLLY 3ª FASCIA;2;3;3;1
+0257;Saggio 4;JOLLY 3ª FASCIA;2;4;3;1
+0258;Saggio 4;JOLLY 3ª FASCIA;2;2;4;1
+0024;Saggio 4;JOLLY 3ª FASCIA;2;4;1;1
+0477;Saggio 4;JOLLY 4ª FASCIA;1;3;4;1
+0305;Saggio 4;JOLLY 4ª FASCIA;1;3;4;1
+0476;Saggio 4;JOLLY 4ª FASCIA;1;3;5;1
+0102;Saggio 4;A RISCHIO;;4;5;0
+0232;Saggio 4;A RISCHIO;;4;1;0
+0072;Saggio 4;A RISCHIO;;4;3;0
+0327;Saggio 4;A RISCHIO;;3;5;0
+0503;Saggio 4;DA EVITARE;1;3;3;0
+0504;Saggio 4;DA EVITARE;1;3;1;0
+0073;Saggio 4;DA EVITARE;1;3;5;0
+0155;Saggio 4;MERCATO;;4;4;1
+0351;Saggio 4;MERCATO;;4;3;1
+0400;Saggio 4;MERCATO;;3;4;1
+0306;Saggio 4;MERCATO;;2;1;0
+0303;Saggio 4;MERCATO;;4;3;0
+0379;Saggio 5;Top;5;5;5;60
+0280;Saggio 5;Top;5;5;3;50
+0001;Saggio 5;Top;5;5;4;45
+0183;Saggio 5;Top;5;4;5;45
+0329;Saggio 5;Top;5;4;2;45
+0076;Saggio 5;Top;5;5;5;40
+0330;Saggio 5;Top;5;5;5;10
+0184;Saggio 5;Top;5;4;2;10
+0105;Saggio 5;Semi-Top;4;4;5;15
+0233;Saggio 5;Semi-Top;4;4;5;15
+0025;Saggio 5;Semi-Top;4;4;3;15
+0451;Saggio 5;Terza;3;3;2;12
+0259;Saggio 5;Terza;3;4;5;10
+0158;Saggio 5;Terza;3;3;2;8
+0049;Saggio 5;Terza;3;4;3;8
+0478;Saggio 5;Quarta;2;4;3;5
+0401;Saggio 5;Quarta;2;4;3;3
+0355;Saggio 5;Quarta;2;4;5;1
+0357;Saggio 5;Quarta;2;3;4;1
+0128;Saggio 5;Quarta;2;3;1;1
+0427;Saggio 5;Quarta;2;3;4;1
+0129;Saggio 5;Quarta;2;3;5;1
+0106;Saggio 5;Non Impostata;;3;4;0
+0331;Saggio 5;Non Impostata;;3;2;0
+0380;Saggio 5;Non Impostata;;3;5;0
+0185;Saggio 5;Non Impostata;;3;3;0
+0381;Saggio 5;Non Impostata;;3;2;0
+0479;Saggio 5;Non Impostata;;3;4;0
+0027;Saggio 5;Non Impostata;;3;5;0
+0107;Saggio 5;Non Impostata;;3;2;0
+0130;Saggio 5;Non Impostata;;3;5;0
+0428;Saggio 5;Non Impostata;;3;5;0
+0234;Saggio 5;Non Impostata;;3;3;0
+0452;Saggio 5;Non Impostata;;3;3;0
+0260;Saggio 5;Non Impostata;;3;5;0
+0026;Saggio 5;Non Impostata;;3;5;0
+0453;Saggio 5;Non Impostata;;3;5;0
+0208;Saggio 5;Non Impostata;;4;3;0
+0131;Saggio 5;Non Impostata;;3;5;0
+0480;Saggio 5;Non Impostata;;3;5;0
+0050;Saggio 5;Non Impostata;;3;3;0
+0235;Saggio 5;Non Impostata;;3;5;0
+0403;Saggio 5;Non Impostata;;3;5;0
+0404;Saggio 5;Non Impostata;;3;3;0
+0051;Saggio 5;Non Impostata;;3;5;0
+0429;Saggio 5;Non Impostata;;3;3;0
+0159;Saggio 5;Non Impostata;;3;5;0
+0002;Saggio 5;Non Impostata;;3;2;0
+0160;Saggio 5;Non Impostata;;3;5;0
+0309;Saggio 5;Non Impostata;;3;5;0
+0281;Saggio 5;Non Impostata;;4;4;0
+0307;Saggio 5;Non Impostata;;3;5;0
+0077;Saggio 5;Non Impostata;;3;5;0
+0282;Saggio 5;Non Impostata;;3;5;0
+0402;Saggio 5;Non Impostata;;3;3;0
+0078;Saggio 5;Non Impostata;;3;4;0
+0003;Saggio 5;Non Impostata;;3;5;0
+0188;Saggio 5;Top;5;5;4;75
+0384;Saggio 5;Top;5;4;3;45
+0186;Saggio 5;Top;5;5;4;35
+0209;Saggio 5;Top;5;5;1;35
+0385;Saggio 5;Semi-Top;4;4;2;32
+0187;Saggio 5;Semi-Top;4;4;3;27
+0382;Saggio 5;Semi-Top;4;5;5;27
+0189;Saggio 5;Semi-Top;4;4;5;25
+0332;Saggio 5;Semi-Top;4;4;2;25
+0211;Saggio 5;Semi-Top;4;5;3;25
+0286;Saggio 5;Semi-Top;4;5;4;25
+0333;Saggio 5;Semi-Top;4;5;3;25
+0454;Saggio 5;Semi-Top;4;5;4;25
+0079;Saggio 5;Semi-Top;4;4;4;20
+0163;Saggio 5;Semi-Top;4;4;3;20
+0081;Saggio 5;Semi-Top;4;4;3;20
+0191;Saggio 5;Semi-Top;4;4;2;20
+0285;Saggio 5;Terza;3;4;3;20
+0383;Saggio 5;Terza;3;4;4;20
+0080;Saggio 5;Terza;3;4;4;13
+0388;Saggio 5;Terza;3;3;3;13
+0007;Saggio 5;Terza;3;4;3;12
+0028;Saggio 5;Terza;3;4;3;11
+0360;Saggio 5;Terza;3;4;4;10
+0162;Saggio 5;Quarta;2;4;2;13
+0212;Saggio 5;Quarta;2;4;4;12
+0004;Saggio 5;Quarta;2;4;3;10
+0387;Saggio 5;Quarta;2;4;3;10
+0262;Saggio 5;Quarta;2;4;5;10
+0164;Saggio 5;Quarta;2;4;4;10
+0236;Saggio 5;Quarta;2;3;3;8
+0108;Saggio 5;Quarta;2;4;2;8
+0359;Saggio 5;Quarta;2;4;4;7
+0284;Saggio 5;Quarta;2;4;3;7
+0161;Saggio 5;Quarta;2;3;5;7
+0085;Saggio 5;Quarta;2;4;3;7
+0214;Saggio 5;Quarta;2;4;4;6
+0083;Saggio 5;Quarta;2;4;3;6
+0483;Saggio 5;Quarta;2;4;3;5
+0082;Saggio 5;Quarta;2;3;5;5
+0407;Saggio 5;Quarta;2;4;2;5
+0110;Saggio 5;SCOMMESSA;2;3;5;10
+0210;Saggio 5;SCOMMESSA;2;3;4;8
+0109;Saggio 5;SCOMMESSA;2;4;5;7
+0006;Saggio 5;SCOMMESSA;2;3;3;7
+0190;Saggio 5;SCOMMESSA;2;4;3;5
+0485;Saggio 5;SCOMMESSA;2;4;4;5
+0389;Saggio 5;SCOMMESSA;2;4;2;5
+0031;Saggio 5;SCOMMESSA;2;3;3;5
+0312;Saggio 5;SCOMMESSA;2;3;3;4
+0238;Saggio 5;SCOMMESSA;2;3;1;4
+0009;Saggio 5;SCOMMESSA;2;3;3;3
+0310;Saggio 5;SCOMMESSA;2;4;3;3
+0134;Saggio 5;SCOMMESSA;2;3;5;3
+0430;Saggio 5;SCOMMESSA;2;4;4;3
+0136;Saggio 5;SCOMMESSA;2;3;3;3
+0053;Saggio 5;SCOMMESSA;2;3;4;3
+0287;Saggio 5;SCOMMESSA;2;4;3;3
+0239;Saggio 5;SCOMMESSA;2;4;4;2
+0111;Saggio 5;SCOMMESSA;2;3;5;2
+0457;Saggio 5;SCOMMESSA;2;3;4;1
+0336;Saggio 5;SCOMMESSA;2;3;3;1
+0434;Saggio 5;SCOMMESSA;2;3;1;1
+0484;Saggio 5;SCOMMESSA;2;3;1;1
+0242;Saggio 5;SCOMMESSA;2;3;5;1
+0265;Saggio 5;SCOMMESSA;2;4;2;1
+0036;Saggio 5;SCOMMESSA;2;2;4;1
+0012;Saggio 5;SCOMMESSA;2;4;2;1
+0165;Saggio 5;SCOMMESSA;2;3;3;1
+0240;Saggio 5;SCOMMESSA;2;4;3;1
+0137;Saggio 5;SCOMMESSA;2;3;2;1
+0431;Saggio 5;TITOLARE;3;3;3;5
+0458;Saggio 5;TITOLARE;3;3;3;5
+0052;Saggio 5;TITOLARE;3;4;3;5
+0481;Saggio 5;TITOLARE;3;3;3;1
+0261;Saggio 5;TITOLARE;3;4;3;1
+0405;Saggio 5;TITOLARE;3;4;4;1
+0237;Saggio 5;TITOLARE;3;4;3;1
+0410;Saggio 5;TITOLARE;3;3;5;1
+0133;Saggio 5;TITOLARE;3;3;3;1
+0054;Saggio 5;TITOLARE;3;2;3;1
+0482;Saggio 5;TITOLARE;3;3;3;1
+0361;Saggio 5;TITOLARE;3;2;5;1
+0365;Saggio 5;TITOLARE;3;4;2;1
+0335;Saggio 5;FANTA ROTTO;;5;2;15
+0192;Saggio 5;FANTA ROTTO;;4;1;13
+0005;Saggio 5;FANTA ROTTO;;4;1;10
+0337;Saggio 5;FANTA ROTTO;;4;1;1
+0010;Saggio 5;FANTA ROTTO;;3;2;1
+0033;Saggio 5;FANTA ROTTO;;4;1;1
+0432;Saggio 5;FANTA ROTTO;;4;2;1
+0011;Saggio 5;FANTA ROTTO;;4;1;1
+0116;Saggio 5;FANTA ROTTO;;4;1;1
+0459;Saggio 5;FANTA ROTTO;;4;1;1
+0213;Saggio 5;ALTRI;1;4;3;1
+0115;Saggio 5;ALTRI;1;3;4;1
+0263;Saggio 5;ALTRI;1;3;4;1
+0030;Saggio 5;ALTRI;1;3;3;1
+0112;Saggio 5;POSS OCCASIONE;2;3;2;13
+0215;Saggio 5;POSS OCCASIONE;2;3;3;10
+0456;Saggio 5;POSS OCCASIONE;2;4;3;10
+0283;Saggio 5;POSS OCCASIONE;2;4;5;8
+0008;Saggio 5;POSS OCCASIONE;2;3;2;5
+0409;Saggio 5;POSS OCCASIONE;2;3;3;1
+0029;Saggio 5;POSS OCCASIONE;2;3;3;1
+0455;Saggio 5;POSS OCCASIONE;2;4;4;1
+0193;Saggio 5;POSS OCCASIONE;2;4;3;1
+0241;Saggio 5;POSS OCCASIONE;2;3;2;1
+0463;Saggio 5;Non Impostata;;3;5;0
+0132;Saggio 5;Non Impostata;;3;1;0
+0032;Saggio 5;Non Impostata;;3;5;0
+0139;Saggio 5;Non Impostata;;3;4;0
+0317;Saggio 5;Non Impostata;;3;4;0
+0464;Saggio 5;Non Impostata;;3;5;0
+0059;Saggio 5;Non Impostata;;3;1;0
+0315;Saggio 5;Non Impostata;;3;3;0
+0435;Saggio 5;Non Impostata;;3;3;0
+0362;Saggio 5;Non Impostata;;3;5;0
+0216;Saggio 5;Non Impostata;;3;1;0
+0135;Saggio 5;Non Impostata;;3;5;0
+0408;Saggio 5;Non Impostata;;2;2;0
+0313;Saggio 5;Non Impostata;;3;4;0
+0363;Saggio 5;Non Impostata;;3;5;0
+0034;Saggio 5;Non Impostata;;2;2;0
+0140;Saggio 5;Non Impostata;;3;3;0
+0314;Saggio 5;Non Impostata;;3;5;0
+0035;Saggio 5;Non Impostata;;3;2;0
+0288;Saggio 5;Non Impostata;;2;3;0
+0290;Saggio 5;Non Impostata;;3;5;0
+0460;Saggio 5;Non Impostata;;2;2;0
+0289;Saggio 5;Non Impostata;;2;4;0
+0488;Saggio 5;Non Impostata;;3;3;0
+0386;Saggio 5;Non Impostata;;4;4;0
+0088;Saggio 5;Non Impostata;;3;1;0
+0489;Saggio 5;Non Impostata;;3;5;0
+0486;Saggio 5;Non Impostata;;3;3;0
+0057;Saggio 5;Non Impostata;;3;4;0
+0267;Saggio 5;Non Impostata;;3;3;0
+0113;Saggio 5;Non Impostata;;3;3;0
+0058;Saggio 5;Non Impostata;;3;5;0
+0311;Saggio 5;Non Impostata;;3;5;0
+0243;Saggio 5;Non Impostata;;3;2;0
+0316;Saggio 5;Non Impostata;;3;4;0
+0339;Saggio 5;Non Impostata;;3;4;0
+0334;Saggio 5;Non Impostata;;3;5;0
+0166;Saggio 5;Non Impostata;;4;3;0
+0340;Saggio 5;Non Impostata;;3;3;0
+0461;Saggio 5;Non Impostata;;3;5;0
+0487;Saggio 5;Non Impostata;;3;3;0
+0266;Saggio 5;Non Impostata;;2;5;0
+0364;Saggio 5;Non Impostata;;2;2;0
+0338;Saggio 5;Non Impostata;;3;3;0
+0167;Saggio 5;Non Impostata;;2;3;0
+0462;Saggio 5;Non Impostata;;3;2;0
+0244;Saggio 5;Non Impostata;;3;2;0
+0245;Saggio 5;Non Impostata;;3;2;0
+0411;Saggio 5;Non Impostata;;3;1;0
+0114;Saggio 5;Non Impostata;;3;3;0
+0168;Saggio 5;Non Impostata;;3;5;0
+0217;Saggio 5;Non Impostata;;3;1;0
+0169;Saggio 5;Non Impostata;;3;5;0
+0490;Saggio 5;Non Impostata;;3;3;0
+0264;Saggio 5;Non Impostata;;3;3;0
+0084;Saggio 5;Non Impostata;;3;5;0
+0491;Saggio 5;Non Impostata;;2;2;0
+0087;Saggio 5;Non Impostata;;3;2;0
+0406;Saggio 5;Non Impostata;;3;4;0
+0055;Saggio 5;Non Impostata;;2;3;0
+0390;Saggio 5;Non Impostata;;4;5;0
+0090;Saggio 5;Top;5;5;5;85
+0342;Saggio 5;Top;5;5;4;80
+0195;Saggio 5;Top;5;5;2;70
+0037;Saggio 5;Top;5;4;3;65
+0292;Saggio 5;Top;5;4;2;60
+0091;Saggio 5;Semi-Top;4;5;5;50
+0293;Saggio 5;Semi-Top;4;5;3;45
+0117;Saggio 5;Semi-Top;4;5;3;40
+0343;Saggio 5;Semi-Top;4;4;1;40
+0089;Saggio 5;Semi-Top;4;5;5;35
+0119;Saggio 5;Semi-Top;4;4;5;35
+0436;Saggio 5;Semi-Top;4;4;3;35
+0194;Saggio 5;Semi-Top;4;5;4;33
+0220;Saggio 5;Semi-Top;4;3;5;30
+0467;Saggio 5;Semi-Top;4;4;1;30
+0196;Saggio 5;Terza;3;5;3;30
+0465;Saggio 5;Terza;3;4;4;25
+0251;Saggio 5;Terza;3;3;3;25
+0219;Saggio 5;Terza;3;5;3;25
+0197;Saggio 5;Terza;3;4;3;22
+0143;Saggio 5;Terza;3;4;5;20
+0013;Saggio 5;Terza;3;5;3;18
+0294;Saggio 5;Terza;3;4;3;18
+0246;Saggio 5;Terza;3;4;4;18
+0392;Saggio 5;Terza;3;5;3;17
+0291;Saggio 5;Terza;3;5;3;15
+0040;Saggio 5;Quarta;2;4;3;15
+0092;Saggio 5;Quarta;2;4;4;10
+0366;Saggio 5;Quarta;2;4;2;7
+0413;Saggio 5;Quarta;2;4;2;7
+0492;Saggio 5;Quarta;2;3;3;4
+0121;Saggio 5;Quarta;2;4;3;1
+0247;Saggio 5;ALTO POTENZIALE;3;3;2;40
+0222;Saggio 5;ALTO POTENZIALE;3;5;2;35
+0039;Saggio 5;ALTO POTENZIALE;3;5;4;25
+0017;Saggio 5;ALTO POTENZIALE;3;3;5;22
+0120;Saggio 5;ALTO POTENZIALE;3;4;3;20
+0295;Saggio 5;ALTO POTENZIALE;3;3;3;15
+0096;Saggio 5;ALTO POTENZIALE;3;4;4;13
+0344;Saggio 5;ALTO POTENZIALE;3;4;3;12
+0345;Saggio 5;ALTO POTENZIALE;3;4;2;12
+0174;Saggio 5;ALTO POTENZIALE;3;4;1;10
+0439;Saggio 5;ALTO POTENZIALE;3;3;5;10
+0414;Saggio 5;ALTO POTENZIALE;3;4;3;7
+0301;Saggio 5;ALTO POTENZIALE;3;4;2;7
+0094;Saggio 5;ALTO POTENZIALE;3;4;5;7
+0041;Saggio 5;ALTO POTENZIALE;3;4;2;5
+0249;Saggio 5;ALTO POTENZIALE;3;3;3;5
+0322;Saggio 5;ALTO POTENZIALE;3;4;3;5
+0223;Saggio 5;ALTO POTENZIALE;3;3;3;5
+0044;Saggio 5;ALTO POTENZIALE;3;3;3;5
+0016;Saggio 5;ALTO POTENZIALE;3;3;5;5
+0395;Saggio 5;ALTO POTENZIALE;3;4;5;5
+0416;Saggio 5;ALTO POTENZIALE;3;4;2;5
+0445;Saggio 5;ALTO POTENZIALE;3;3;2;3
+0418;Saggio 5;ALTO POTENZIALE;3;3;4;1
+0201;Saggio 5;ALTO POTENZIALE;3;3;5;1
+0095;Saggio 5;SCOMMESSA;2;3;5;10
+0221;Saggio 5;SCOMMESSA;2;4;4;10
+0391;Saggio 5;SCOMMESSA;2;4;4;7
+0493;Saggio 5;SCOMMESSA;2;3;3;5
+0269;Saggio 5;SCOMMESSA;2;4;2;5
+0093;Saggio 5;SCOMMESSA;2;4;4;5
+0118;Saggio 5;SCOMMESSA;2;4;3;5
+0347;Saggio 5;SCOMMESSA;2;4;1;5
+0394;Saggio 5;SCOMMESSA;2;4;2;5
+0144;Saggio 5;SCOMMESSA;2;3;4;5
+0172;Saggio 5;SCOMMESSA;2;3;4;5
+0200;Saggio 5;SCOMMESSA;2;4;5;5
+0437;Saggio 5;SCOMMESSA;2;4;5;3
+0250;Saggio 5;SCOMMESSA;2;3;3;1
+0368;Saggio 5;SCOMMESSA;2;3;5;1
+0393;Saggio 5;SCOMMESSA;2;3;3;1
+0125;Saggio 5;SCOMMESSA;2;3;3;1
+0271;Saggio 5;SCOMMESSA;2;3;3;1
+0149;Saggio 5;SCOMMESSA;2;3;4;1
+0150;Saggio 5;SCOMMESSA;2;3;3;1
+0176;Saggio 5;SCOMMESSA;2;3;3;1
+0369;Saggio 5;SCOMMESSA;2;4;1;1
+0441;Saggio 5;SCOMMESSA;2;4;3;1
+0495;Saggio 5;SCOMMESSA;2;3;4;1
+0038;Saggio 5;SCOMMESSA;2;3;2;1
+0062;Saggio 5;SCOMMESSA;2;3;5;1
+0496;Saggio 5;SCOMMESSA;2;2;3;1
+0469;Saggio 5;SCOMMESSA;2;3;3;1
+0015;Saggio 5;TITOLARE;3;4;3;7
+0218;Saggio 5;TITOLARE;3;5;4;5
+0438;Saggio 5;TITOLARE;3;4;1;2
+0060;Saggio 5;TITOLARE;3;3;5;1
+0320;Saggio 5;TITOLARE;3;3;3;1
+0045;Saggio 5;TITOLARE;3;3;5;1
+0173;Saggio 5;TITOLARE;3;3;5;1
+0268;Saggio 5;TITOLARE;3;4;4;1
+0175;Saggio 5;TITOLARE;3;3;4;1
+0042;Saggio 5;TITOLARE;3;4;3;1
+0171;Saggio 5;TITOLARE;3;4;4;1
+0466;Saggio 5;TITOLARE;3;4;4;1
+0367;Saggio 5;TITOLARE;3;3;3;1
+0341;Saggio 5;TITOLARE;3;4;3;1
+0412;Saggio 5;TITOLARE;3;3;5;1
+0270;Saggio 5;TITOLARE;3;3;5;1
+0253;Saggio 5;TITOLARE;3;4;1;1
+0063;Saggio 5;TITOLARE;3;3;3;1
+0147;Saggio 5;TITOLARE;3;4;5;1
+0252;Saggio 5;FANTA ROTTO;;3;3;10
+0061;Saggio 5;FANTA ROTTO;;4;2;5
+0065;Saggio 5;FANTA ROTTO;;4;1;1
+0421;Saggio 5;FANTA ROTTO;;4;1;1
+0178;Saggio 5;FANTA ROTTO;;4;1;1
+0318;Saggio 5;FANTA ROTTO;;4;2;1
+0177;Saggio 5;FANTA ROTTO;;4;2;1
+0417;Saggio 5;ALTRI;1;3;3;1
+0248;Saggio 5;ALTRI;1;4;2;1
+0470;Saggio 5;ALTRI;1;3;3;1
+0319;Saggio 5;ALTRI;1;3;3;1
+0494;Saggio 5;ALTRI;1;3;5;1
+0296;Saggio 5;ALTRI;1;3;5;1
+0446;Saggio 5;ALTRI;1;4;2;1
+0297;Saggio 5;ALTRI;1;4;2;1
+0224;Saggio 5;ALTRI;1;3;3;1
+0299;Saggio 5;ALTRI;1;4;1;1
+0199;Saggio 5;ALTRI;1;4;3;1
+0468;Saggio 5;ALTRI;1;4;3;1
+0298;Saggio 5;ALTRI;1;4;3;1
+0370;Saggio 5;ALTRI;1;3;3;1
+0124;Saggio 5;ALTRI;1;3;3;0
+0346;Saggio 5;POSS OCCASIONE;2;5;1;13
+0122;Saggio 5;POSS OCCASIONE;2;3;4;8
+0018;Saggio 5;POSS OCCASIONE;2;4;3;8
+0123;Saggio 5;POSS OCCASIONE;2;3;5;5
+0146;Saggio 5;Non Impostata;;3;3;1
+0442;Saggio 5;Non Impostata;;3;2;0
+0097;Saggio 5;Non Impostata;;4;2;0
+0371;Saggio 5;Non Impostata;;3;3;0
+0443;Saggio 5;Non Impostata;;4;2;0
+0254;Saggio 5;Non Impostata;;4;5;0
+0419;Saggio 5;Non Impostata;;3;2;0
+0152;Saggio 5;Non Impostata;;3;5;0
+0321;Saggio 5;Non Impostata;;3;5;0
+0372;Saggio 5;Non Impostata;;3;3;0
+0064;Saggio 5;Non Impostata;;3;3;0
+0014;Saggio 5;Non Impostata;;4;4;0
+0498;Saggio 5;Non Impostata;;3;3;0
+0145;Saggio 5;Non Impostata;;3;3;0
+0046;Saggio 5;Non Impostata;;3;3;0
+0098;Saggio 5;Non Impostata;;3;3;0
+0153;Saggio 5;Non Impostata;;3;5;0
+0275;Saggio 5;Non Impostata;;3;3;0
+0323;Saggio 5;Non Impostata;;3;3;0
+0148;Saggio 5;Non Impostata;;3;2;0
+0348;Saggio 5;Non Impostata;;4;3;0
+0440;Saggio 5;Non Impostata;;3;5;0
+0276;Saggio 5;Non Impostata;;3;5;0
+0497;Saggio 5;Non Impostata;;3;3;0
+0420;Saggio 5;Non Impostata;;3;5;0
+0444;Saggio 5;Non Impostata;;3;3;0
+0273;Saggio 5;Non Impostata;;3;3;0
+0154;Saggio 5;Non Impostata;;3;3;0
+0099;Saggio 5;Non Impostata;;3;3;0
+0415;Saggio 5;Non Impostata;;3;3;0
+0066;Saggio 5;Non Impostata;;2;3;0
+0198;Saggio 5;Non Impostata;;3;4;0
+0272;Saggio 5;Non Impostata;;2;4;0
+0151;Saggio 5;Non Impostata;;4;4;0
+0471;Saggio 5;Non Impostata;;4;5;0
+0043;Saggio 5;Non Impostata;;3;5;0
+0300;Saggio 5;Non Impostata;;3;4;0
+0274;Saggio 5;Non Impostata;;3;5;0
+0373;Saggio 5;Non Impostata;;3;5;0
+0255;Saggio 5;Non Impostata;;3;4;0
+0019;Saggio 5;Non Impostata;;3;1;0
+0179;Saggio 5;Non Impostata;;3;5;0
+0473;Saggio 5;Non Impostata;;3;3;0
+0226;Saggio 5;Non Impostata;;4;2;0
+0396;Saggio 5;Top;5;5;5;185
+0202;Saggio 5;Top;5;5;3;175
+0349;Saggio 5;Semi-Top;4;4;4;130
+0203;Saggio 5;Semi-Top;4;5;3;130
+0302;Saggio 5;Semi-Top;4;4;3;125
+0126;Saggio 5;Semi-Top;4;3;3;110
+0227;Saggio 5;Semi-Top;4;4;5;110
+0100;Saggio 5;Semi-Top;4;4;4;70
+0474;Saggio 5;Terza;3;4;2;65
+0205;Saggio 5;Terza;3;5;5;57
+0447;Saggio 5;Terza;3;4;3;55
+0422;Saggio 5;Terza;3;4;2;50
+0022;Saggio 5;Terza;3;4;5;45
+0423;Saggio 5;Terza;3;4;4;40
+0228;Saggio 5;Terza;3;5;2;40
+0020;Saggio 5;Terza;3;4;2;35
+0425;Saggio 5;Terza;3;3;4;35
+0047;Saggio 5;Terza;3;4;1;30
+0127;Saggio 5;Terza;3;4;4;30
+0021;Saggio 5;Quarta;2;4;3;35
+0350;Saggio 5;Quarta;2;5;5;30
+0180;Saggio 5;Quarta;2;3;4;27
+0398;Saggio 5;Quarta;2;4;4;25
+0499;Saggio 5;Quarta;2;3;2;20
+0424;Saggio 5;Quarta;2;3;3;20
+0101;Saggio 5;Quarta;2;4;2;20
+0075;Saggio 5;Quarta;2;4;3;20
+0377;Saggio 5;Quarta;2;3;1;20
+0397;Saggio 5;Quarta;2;4;3;20
+0328;Saggio 5;Quarta;2;3;5;20
+0500;Saggio 5;Quarta;2;4;5;18
+0204;Saggio 5;SCOMMESSA;2;4;3;15
+0048;Saggio 5;SCOMMESSA;2;3;4;15
+0277;Saggio 5;SCOMMESSA;2;3;3;10
+0374;Saggio 5;SCOMMESSA;2;4;2;10
+0156;Saggio 5;SCOMMESSA;2;3;3;7
+0230;Saggio 5;SCOMMESSA;2;2;4;5
+0068;Saggio 5;SCOMMESSA;2;3;3;5
+0157;Saggio 5;SCOMMESSA;2;4;5;5
+0069;Saggio 5;SCOMMESSA;2;3;3;5
+0071;Saggio 5;SCOMMESSA;2;3;5;1
+0325;Saggio 5;TITOLARE;3;3;4;5
+0181;Saggio 5;TITOLARE;3;3;2;5
+0399;Saggio 5;FANTA ROTTO;;5;1;60
+0023;Saggio 5;FANTA ROTTO;;4;1;60
+0352;Saggio 5;FANTA ROTTO;;4;1;15
+0376;Saggio 5;FANTA ROTTO;;3;1;1
+0449;Saggio 5;FANTA ROTTO;;3;1;1
+0231;Saggio 5;ALTRI;1;3;3;1
+0306;Saggio 5;ALTRI;1;2;1;1
+0182;Saggio 5;ALTRI;1;3;2;1
+0354;Saggio 5;ALTRI;1;3;3;1
+0324;Saggio 5;ALTRI;1;4;3;1
+0257;Saggio 5;ALTRI;1;4;3;1
+0448;Saggio 5;POSS OCCASIONE;2;3;4;15
+0229;Saggio 5;POSS OCCASIONE;2;4;2;15
+0375;Saggio 5;POSS OCCASIONE;2;4;5;5
+0501;Saggio 5;POSS OCCASIONE;2;3;5;3
+0258;Saggio 5;POSS OCCASIONE;2;2;4;1
+0303;Saggio 5;Non Impostata;;4;3;15
+0155;Saggio 5;Non Impostata;;4;4;13
+0502;Saggio 5;Non Impostata;;3;3;1
+0102;Saggio 5;Non Impostata;;4;5;0
+0477;Saggio 5;Non Impostata;;3;4;0
+0070;Saggio 5;Non Impostata;;3;3;0
+0305;Saggio 5;Non Impostata;;3;4;0
+0256;Saggio 5;Non Impostata;;2;2;0
+0353;Saggio 5;Non Impostata;;4;4;0
+0476;Saggio 5;Non Impostata;;3;5;0
+0103;Saggio 5;Non Impostata;;3;3;0
+0450;Saggio 5;Non Impostata;;3;5;0
+0351;Saggio 5;Non Impostata;;4;3;0
+0503;Saggio 5;Non Impostata;;3;3;0
+0504;Saggio 5;Non Impostata;;3;1;0
+0378;Saggio 5;Non Impostata;;3;5;0
+0232;Saggio 5;Non Impostata;;4;1;0
+0072;Saggio 5;Non Impostata;;4;3;0
+0278;Saggio 5;Non Impostata;;3;3;0
+0327;Saggio 5;Non Impostata;;3;5;0
+0279;Saggio 5;Non Impostata;;2;3;0
+0024;Saggio 5;Non Impostata;;4;1;0
+0073;Saggio 5;Non Impostata;;3;5;0
+0400;Saggio 5;Non Impostata;;3;4;0

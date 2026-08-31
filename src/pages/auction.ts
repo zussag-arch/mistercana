@@ -1,39 +1,32 @@
-import type { AppState } from '../app/state'
+import type {
+  AppState,
+} from '../app/state'
 
-type AuctionRole = 'P' | 'D' | 'C' | 'A'
+import {
+  players,
+} from '../data/players'
+
+import type {
+  Player,
+  PlayerRole,
+} from '../domain/player'
+
+type AuctionRole =
+  PlayerRole
+
+type SelectorMode =
+  | 'team'
+  | 'player'
+  | null
 
 interface AuctionActions {
   onEndAuction: () => void
   onArchiveAuction: () => void
   onDiscardAuction: () => void
   onNewAuction: () => void
+
+  onStateChange: () => void
   onRender: () => void
-}
-
-interface DemoPlayer {
-  id: string
-  name: string
-  team: string
-  role: AuctionRole
-
-  pma: number
-  consensus: number
-  iCa: number
-
-  startingProbability: number
-  xMv: number
-  xFmv: number
-
-  financialLimit: number
-  roleLimit: number
-  maxValue: number
-
-  nextScore: number
-  expectedMin: number
-  expectedMax: number
-
-  reason: string
-  interested: string[]
 }
 
 interface DemoParticipantState {
@@ -41,33 +34,44 @@ interface DemoParticipantState {
   name: string
   isOwner: boolean
 
-  spent: Record<AuctionRole, number>
-  slots: Record<AuctionRole, number>
+  spent: Record<
+    AuctionRole,
+    number
+  >
+
+  slots: Record<
+    AuctionRole,
+    number
+  >
 }
 
 interface DemoAssignment {
   id: number
+
   playerId: string
   participantId: string
+
   price: number
 }
 
-const ROLE_ORDER: AuctionRole[] = [
-  'P',
-  'D',
-  'C',
-  'A',
-]
+const ROLE_ORDER:
+  AuctionRole[] = [
+    'P',
+    'D',
+    'C',
+    'A',
+  ]
 
-const DEMO_SLOT_LIMITS: Record<
-  AuctionRole,
-  number
-> = {
-  P: 3,
-  D: 8,
-  C: 8,
-  A: 6,
-}
+const DEMO_SLOT_LIMITS:
+  Record<
+    AuctionRole,
+    number
+  > = {
+    P: 3,
+    D: 8,
+    C: 8,
+    A: 6,
+  }
 
 const DEMO_NAMES = [
   'Gianluca',
@@ -82,393 +86,6 @@ const DEMO_NAMES = [
   'Fabio',
   'Paolo',
   'Nicola',
-]
-
-const DEMO_PLAYERS: DemoPlayer[] = [
-  {
-    id: 'svilar',
-    name: 'Svilar',
-    team: 'Roma',
-    role: 'P',
-    pma: 92,
-    consensus: 88,
-    iCa: 91,
-    startingProbability: 97,
-    xMv: 6.18,
-    xFmv: 5.72,
-    financialLimit: 96,
-    roleLimit: 90,
-    maxValue: 103,
-    nextScore: 93,
-    expectedMin: 84,
-    expectedMax: 110,
-    reason:
-      'Profilo prioritario per il reparto.',
-    interested: [
-      'Gianluca',
-      'Valerio',
-    ],
-  },
-  {
-    id: 'maignan',
-    name: 'Maignan',
-    team: 'Milan',
-    role: 'P',
-    pma: 84,
-    consensus: 85,
-    iCa: 87,
-    startingProbability: 96,
-    xMv: 6.12,
-    xFmv: 5.68,
-    financialLimit: 91,
-    roleLimit: 86,
-    maxValue: 94,
-    nextScore: 91,
-    expectedMin: 72,
-    expectedMax: 93,
-    reason:
-      'Alternativa di alto livello ancora disponibile.',
-    interested: [
-      'Luca',
-      'Marco',
-    ],
-  },
-  {
-    id: 'carnesecchi',
-    name: 'Carnesecchi',
-    team: 'Atalanta',
-    role: 'P',
-    pma: 76,
-    consensus: 82,
-    iCa: 83,
-    startingProbability: 94,
-    xMv: 6.09,
-    xFmv: 5.63,
-    financialLimit: 86,
-    roleLimit: 80,
-    maxValue: 88,
-    nextScore: 78,
-    expectedMin: 66,
-    expectedMax: 92,
-    reason:
-      'Buona sostenibilità rispetto alle alternative.',
-    interested: [
-      'Stefano',
-    ],
-  },
-  {
-    id: 'provede',
-    name: 'Provedel',
-    team: 'Lazio',
-    role: 'P',
-    pma: 68,
-    consensus: 77,
-    iCa: 79,
-    startingProbability: 93,
-    xMv: 6.03,
-    xFmv: 5.55,
-    financialLimit: 78,
-    roleLimit: 74,
-    maxValue: 82,
-    nextScore: 71,
-    expectedMin: 58,
-    expectedMax: 79,
-    reason:
-      'Alternativa più economica nel ruolo.',
-    interested: [
-      'Andrea',
-    ],
-  },
-
-  {
-    id: 'wesley',
-    name: 'Wesley',
-    team: 'Roma',
-    role: 'D',
-    pma: 70,
-    consensus: 84,
-    iCa: 86,
-    startingProbability: 95,
-    xMv: 6.12,
-    xFmv: 6.47,
-    financialLimit: 81,
-    roleLimit: 86,
-    maxValue: 90,
-    nextScore: 92,
-    expectedMin: 64,
-    expectedMax: 82,
-    reason:
-      'Coerente con il piano del reparto.',
-    interested: [
-      'Valerio',
-      'Gianluca',
-    ],
-  },
-  {
-    id: 'dimarco',
-    name: 'Dimarco',
-    team: 'Inter',
-    role: 'D',
-    pma: 75,
-    consensus: 91,
-    iCa: 93,
-    startingProbability: 96,
-    xMv: 6.31,
-    xFmv: 6.88,
-    financialLimit: 79,
-    roleLimit: 88,
-    maxValue: 94,
-    nextScore: 96,
-    expectedMin: 72,
-    expectedMax: 96,
-    reason:
-      'Qualità alta e supply ridotta.',
-    interested: [
-      'Gianluca',
-      'Marco',
-      'Stefano',
-    ],
-  },
-  {
-    id: 'dilorenzo',
-    name: 'Di Lorenzo',
-    team: 'Napoli',
-    role: 'D',
-    pma: 63,
-    consensus: 82,
-    iCa: 84,
-    startingProbability: 94,
-    xMv: 6.08,
-    xFmv: 6.31,
-    financialLimit: 76,
-    roleLimit: 79,
-    maxValue: 82,
-    nextScore: 86,
-    expectedMin: 56,
-    expectedMax: 74,
-    reason:
-      'Profilo affidabile per completare la fascia.',
-    interested: [
-      'Luca',
-    ],
-  },
-  {
-    id: 'bellanova',
-    name: 'Bellanova',
-    team: 'Atalanta',
-    role: 'D',
-    pma: 54,
-    consensus: 76,
-    iCa: 78,
-    startingProbability: 91,
-    xMv: 5.98,
-    xFmv: 6.19,
-    financialLimit: 66,
-    roleLimit: 63,
-    maxValue: 69,
-    nextScore: 79,
-    expectedMin: 45,
-    expectedMax: 63,
-    reason:
-      'Alternativa efficiente nel reparto.',
-    interested: [
-      'Andrea',
-      'Davide',
-    ],
-  },
-
-  {
-    id: 'calhanoglu',
-    name: 'Calhanoglu',
-    team: 'Inter',
-    role: 'C',
-    pma: 96,
-    consensus: 94,
-    iCa: 95,
-    startingProbability: 96,
-    xMv: 6.52,
-    xFmv: 7.24,
-    financialLimit: 106,
-    roleLimit: 101,
-    maxValue: 112,
-    nextScore: 97,
-    expectedMin: 88,
-    expectedMax: 116,
-    reason:
-      'Obiettivo primario per qualità e centralità.',
-    interested: [
-      'Marco',
-      'Valerio',
-      'Stefano',
-    ],
-  },
-  {
-    id: 'pellegrini',
-    name: 'Pellegrini',
-    team: 'Roma',
-    role: 'C',
-    pma: 58,
-    consensus: 78,
-    iCa: 81,
-    startingProbability: 87,
-    xMv: 6.06,
-    xFmv: 6.35,
-    financialLimit: 68,
-    roleLimit: 66,
-    maxValue: 72,
-    nextScore: 83,
-    expectedMin: 48,
-    expectedMax: 65,
-    reason:
-      'Alternativa sostenibile nel reparto.',
-    interested: [
-      'Gianluca',
-    ],
-  },
-  {
-    id: 'ricci',
-    name: 'Ricci',
-    team: 'Torino',
-    role: 'C',
-    pma: 34,
-    consensus: 72,
-    iCa: 74,
-    startingProbability: 91,
-    xMv: 5.91,
-    xFmv: 5.98,
-    financialLimit: 46,
-    roleLimit: 43,
-    maxValue: 48,
-    nextScore: 74,
-    expectedMin: 25,
-    expectedMax: 39,
-    reason:
-      'Profilo efficiente per preservare budget.',
-    interested: [
-      'Luca',
-    ],
-  },
-  {
-    id: 'frattesi',
-    name: 'Frattesi',
-    team: 'Inter',
-    role: 'C',
-    pma: 49,
-    consensus: 75,
-    iCa: 77,
-    startingProbability: 72,
-    xMv: 6.02,
-    xFmv: 6.42,
-    financialLimit: 61,
-    roleLimit: 58,
-    maxValue: 64,
-    nextScore: 77,
-    expectedMin: 39,
-    expectedMax: 56,
-    reason:
-      'Profilo offensivo con costo intermedio.',
-    interested: [
-      'Davide',
-      'Simone',
-    ],
-  },
-
-  {
-    id: 'dovbyk',
-    name: 'Dovbyk',
-    team: 'Roma',
-    role: 'A',
-    pma: 86,
-    consensus: 86,
-    iCa: 88,
-    startingProbability: 93,
-    xMv: 6.34,
-    xFmv: 7.01,
-    financialLimit: 98,
-    roleLimit: 94,
-    maxValue: 104,
-    nextScore: 91,
-    expectedMin: 76,
-    expectedMax: 101,
-    reason:
-      'Prima punta compatibile con il piano.',
-    interested: [
-      'Marco',
-      'Valerio',
-    ],
-  },
-  {
-    id: 'lautaro',
-    name: 'Lautaro',
-    team: 'Inter',
-    role: 'A',
-    pma: 118,
-    consensus: 96,
-    iCa: 97,
-    startingProbability: 97,
-    xMv: 6.72,
-    xFmv: 7.88,
-    financialLimit: 126,
-    roleLimit: 121,
-    maxValue: 134,
-    nextScore: 98,
-    expectedMin: 108,
-    expectedMax: 138,
-    reason:
-      'Top di reparto con forte pressione attesa.',
-    interested: [
-      'Gianluca',
-      'Valerio',
-      'Stefano',
-    ],
-  },
-  {
-    id: 'piccoli',
-    name: 'Piccoli',
-    team: 'Cagliari',
-    role: 'A',
-    pma: 46,
-    consensus: 74,
-    iCa: 76,
-    startingProbability: 88,
-    xMv: 5.94,
-    xFmv: 6.21,
-    financialLimit: 58,
-    roleLimit: 55,
-    maxValue: 61,
-    nextScore: 77,
-    expectedMin: 36,
-    expectedMax: 53,
-    reason:
-      'Alternativa meno costosa nel ruolo.',
-    interested: [
-      'Luca',
-    ],
-  },
-  {
-    id: 'castellanos',
-    name: 'Castellanos',
-    team: 'Lazio',
-    role: 'A',
-    pma: 62,
-    consensus: 78,
-    iCa: 80,
-    startingProbability: 89,
-    xMv: 6.07,
-    xFmv: 6.54,
-    financialLimit: 73,
-    roleLimit: 70,
-    maxValue: 77,
-    nextScore: 82,
-    expectedMin: 52,
-    expectedMax: 71,
-    reason:
-      'Seconda fascia interessante per costo e titolarità.',
-    interested: [
-      'Andrea',
-      'Davide',
-    ],
-  },
 ]
 
 const DEMO_SPENDING_FACTORS = [
@@ -546,11 +163,13 @@ const DEMO_SPENDING_FACTORS = [
   },
 ]
 
-let activeRole: AuctionRole =
-  'D'
+let activeRole:
+  AuctionRole = 'P'
 
-let selectedPlayerId =
-  'wesley'
+let selectorMode:
+  SelectorMode = null
+
+let selectedTeamFilter = ''
 
 let auctionFeedback = ''
 
@@ -571,30 +190,39 @@ const assignments:
 const discardedRecommendations =
   new Set<string>()
 
+/* =========================
+   HELPERS
+========================= */
+
 function escapeHtml(
   value: string,
 ): string {
   return value
-    .replaceAll(
-      '&',
-      '&amp;',
-    )
-    .replaceAll(
-      '<',
-      '&lt;',
-    )
-    .replaceAll(
-      '>',
-      '&gt;',
-    )
-    .replaceAll(
-      '"',
-      '&quot;',
-    )
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
     .replaceAll(
       "'",
       '&#039;',
     )
+}
+
+function normalizeText(
+  value: string,
+): string {
+  return value
+    .normalize('NFD')
+    .replace(
+      /[\u0300-\u036f]/g,
+      '',
+    )
+    .toLowerCase()
+    .replace(
+      /[^a-z0-9]+/g,
+      ' ',
+    )
+    .trim()
 }
 
 function clamp(
@@ -616,21 +244,80 @@ function roundCredits(
 ): number {
   return Math.max(
     0,
-    Math.round(
-      value,
-    ),
+    Math.round(value),
   )
 }
 
+function formatNumber(
+  value:
+    | number
+    | undefined,
+  digits = 0,
+): string {
+  if (
+    value === undefined ||
+    !Number.isFinite(value)
+  ) {
+    return '—'
+  }
+
+  return value
+    .toFixed(digits)
+    .replace('.', ',')
+}
+
+function formatPercent(
+  value:
+    | number
+    | undefined,
+  digits = 1,
+): string {
+  if (
+    value === undefined ||
+    !Number.isFinite(value)
+  ) {
+    return '—'
+  }
+
+  return `${value
+    .toFixed(digits)
+    .replace('.', ',')}%`
+}
+
 function getPlayer(
-  playerId: string,
+  playerId:
+    | string
+    | null,
 ):
-  | DemoPlayer
+  | Player
   | undefined {
-  return DEMO_PLAYERS.find(
+  if (!playerId) {
+    return undefined
+  }
+
+  return players.find(
     (player) =>
       player.id ===
       playerId,
+  )
+}
+
+function getSelectedPlayer(
+  state: AppState,
+):
+  | Player
+  | undefined {
+  return getPlayer(
+    state.currentAuctionPlayerId,
+  )
+}
+
+function getRolePlayers(
+  role: AuctionRole,
+): Player[] {
+  return players.filter(
+    (player) =>
+      player.role === role,
   )
 }
 
@@ -701,6 +388,10 @@ function managerDisplayName(
     'Manager'
 }
 
+/* =========================
+   PARTICIPANTS DEMO
+========================= */
+
 function getRoleTargetCredits(
   state: AppState,
   role: AuctionRole,
@@ -762,13 +453,6 @@ function createParticipant(
           factors[role],
         )
 
-      const progress =
-        clamp(
-          factors[role],
-          0,
-          1,
-        )
-
       slots[role] =
         Math.min(
           DEMO_SLOT_LIMITS[
@@ -778,7 +462,11 @@ function createParticipant(
             DEMO_SLOT_LIMITS[
               role
             ] *
-            progress,
+            clamp(
+              factors[role],
+              0,
+              1,
+            ),
           ),
         )
     },
@@ -1003,16 +691,13 @@ function getBudgetBarData(
     }
   }
 
-  const normalized =
-    clamp(
-      ratio,
-      0,
-      1,
-    )
-
   const hue =
     Math.round(
-      normalized * 120,
+      clamp(
+        ratio,
+        0,
+        1,
+      ) * 120,
     )
 
   return {
@@ -1026,51 +711,9 @@ function getBudgetBarData(
   }
 }
 
-function getSelectedPlayer():
-  DemoPlayer | undefined {
-  return getPlayer(
-    selectedPlayerId,
-  )
-}
-
-function getRolePlayers(
-  role: AuctionRole,
-):
-  DemoPlayer[] {
-  return DEMO_PLAYERS.filter(
-    (player) =>
-      player.role === role,
-  )
-}
-
-function getRecommendedPlayers(
-  role: AuctionRole,
-):
-  DemoPlayer[] {
-  return getRolePlayers(
-    role,
-  )
-    .filter(
-      (player) =>
-        player.id !==
-          selectedPlayerId &&
-        !isPlayerAssigned(
-          player.id,
-        ) &&
-        !discardedRecommendations.has(
-          player.id,
-        ),
-    )
-    .sort(
-      (a, b) =>
-        b.nextScore -
-        a.nextScore,
-    )
-    .slice(
-      0,
-      3,
-    )
-}
+/* =========================
+   ASSIGNMENTS DEMO
+========================= */
 
 function applyAssignment(
   assignment:
@@ -1168,11 +811,8 @@ function removeAssignment(
     return false
   }
 
-  const assignment =
-    assignments[index]
-
   reverseAssignment(
-    assignment,
+    assignments[index],
   )
 
   assignments.splice(
@@ -1182,6 +822,10 @@ function removeAssignment(
 
   return true
 }
+
+/* =========================
+   ROLE TABS
+========================= */
 
 function renderRoleTabs():
   string {
@@ -1206,13 +850,274 @@ function renderRoleTabs():
   ).join('')
 }
 
-function renderPlayerSearch():
-  string {
-  const players =
-    getRolePlayers(
-      activeRole,
-    )
+/* =========================
+   SELECTOR
+========================= */
 
+function getTeams():
+  string[] {
+  return Array.from(
+    new Set(
+      players.map(
+        (player) =>
+          player.team,
+      ),
+    ),
+  ).sort(
+    (a, b) =>
+      a.localeCompare(
+        b,
+        'it',
+      ),
+  )
+}
+
+function renderSelector():
+  string {
+  if (!selectorMode) {
+    return ''
+  }
+
+  const teamMode =
+    selectorMode === 'team'
+
+  const visiblePlayers =
+    teamMode &&
+    selectedTeamFilter
+      ? players.filter(
+          (player) =>
+            normalizeText(
+              player.team,
+            ) ===
+            normalizeText(
+              selectedTeamFilter,
+            ),
+        )
+      : players
+
+  return `
+    <div
+      id="auctionPlayerSelectorOverlay"
+      class="overlay"
+      aria-hidden="false"
+    >
+      <div
+        class="overlay-backdrop"
+      ></div>
+
+      <div
+        class="
+          overlay-card
+          auction-selector-card
+        "
+      >
+        <div
+          class="overlay-header"
+        >
+          <div>
+            <span
+              class="eyebrow"
+            >
+              CHIAMATA
+            </span>
+
+            <h2>
+              ${
+                teamMode
+                  ? 'Seleziona squadra'
+                  : 'Seleziona giocatore'
+              }
+            </h2>
+          </div>
+
+          <button
+            id="closeAuctionSelectorButton"
+            type="button"
+            class="icon-button"
+          >
+            ×
+          </button>
+        </div>
+
+        ${
+          teamMode
+            ? `
+              <div
+                class="auction-team-selector"
+              >
+                ${getTeams()
+                  .map(
+                    (team) => `
+                      <button
+                        type="button"
+                        class="
+                          auction-team-choice
+                          ${
+                            normalizeText(
+                              team,
+                            ) ===
+                            normalizeText(
+                              selectedTeamFilter,
+                            )
+                              ? 'selected'
+                              : ''
+                          }
+                        "
+                        data-auction-team="${escapeHtml(
+                          team,
+                        )}"
+                      >
+                        ${escapeHtml(
+                          team,
+                        )}
+                      </button>
+                    `,
+                  )
+                  .join('')}
+              </div>
+            `
+            : ''
+        }
+
+        ${
+          !teamMode ||
+          selectedTeamFilter
+            ? `
+              <div
+                class="
+                  auction-selector-search
+                "
+              >
+                <input
+                  id="auctionSelectorSearch"
+                  type="search"
+                  placeholder="Cerca giocatore..."
+                  autocomplete="off"
+                >
+              </div>
+
+              ${
+                teamMode
+                  ? `
+                    <div
+                      class="
+                        auction-selected-team
+                      "
+                    >
+                      <span>
+                        Squadra
+                      </span>
+
+                      <strong>
+                        ${escapeHtml(
+                          selectedTeamFilter,
+                        )}
+                      </strong>
+
+                      <button
+                        id="changeAuctionTeamButton"
+                        type="button"
+                      >
+                        Cambia
+                      </button>
+                    </div>
+                  `
+                  : ''
+              }
+
+              <div
+                id="auctionSelectorResults"
+                class="
+                  auction-selector-results
+                "
+              >
+                ${visiblePlayers
+                  .map(
+                    (player) => `
+                      <button
+                        type="button"
+                        class="
+                          auction-selector-player
+                          ${
+                            isPlayerAssigned(
+                              player.id,
+                            )
+                              ? 'assigned'
+                              : ''
+                          }
+                        "
+                        data-auction-select-player="${escapeHtml(
+                          player.id,
+                        )}"
+                        data-search="${escapeHtml(
+                          normalizeText(
+                            `${player.name} ${player.team}`,
+                          ),
+                        )}"
+                        ${
+                          isPlayerAssigned(
+                            player.id,
+                          )
+                            ? 'disabled'
+                            : ''
+                        }
+                      >
+                        <span
+                          class="
+                            auction-role-badge
+                            role-${player.role.toLowerCase()}
+                          "
+                        >
+                          ${player.role}
+                        </span>
+
+                        <span>
+                          <strong>
+                            ${escapeHtml(
+                              player.name,
+                            )}
+                          </strong>
+
+                          <small>
+                            ${escapeHtml(
+                              player.team,
+                            )}
+                          </small>
+                        </span>
+
+                        <em>
+                          ${
+                            isPlayerAssigned(
+                              player.id,
+                            )
+                              ? 'Assegnato'
+                              : formatNumber(
+                                  player.iCa,
+                                  2,
+                                )
+                          }
+                        </em>
+                      </button>
+                    `,
+                  )
+                  .join('')}
+              </div>
+            `
+            : `
+              <p
+                class="muted-text"
+              >
+                Scegli prima una squadra.
+              </p>
+            `
+        }
+      </div>
+    </div>
+  `
+}
+
+function renderPlayerSearchStrip():
+  string {
   return `
     <section
       class="auction-search-strip"
@@ -1233,98 +1138,64 @@ function renderPlayerSearch():
       </div>
 
       <div
-        class="auction-player-search"
+        class="
+          auction-call-selectors
+        "
       >
-        <input
-          id="auctionPlayerSearch"
-          type="search"
-          placeholder="Cerca giocatore o squadra..."
-          autocomplete="off"
+        <button
+          id="selectAuctionTeamButton"
+          type="button"
+          class="
+            auction-call-selector
+          "
         >
+          <span>▦</span>
 
-        <div
-          id="auctionSearchResults"
-          class="auction-search-results"
+          <div>
+            <small>
+              Ricerca rapida
+            </small>
+
+            <strong>
+              Seleziona squadra
+            </strong>
+          </div>
+        </button>
+
+        <button
+          id="selectAuctionPlayerButton"
+          type="button"
+          class="
+            auction-call-selector
+            primary
+          "
         >
-          ${players
-            .map(
-              (player) => `
-                <button
-                  type="button"
-                  class="
-                    auction-search-result
-                    ${
-                      player.id ===
-                      selectedPlayerId
-                        ? 'selected'
-                        : ''
-                    }
-                  "
-                  data-player-id="${player.id}"
-                  data-search="${escapeHtml(
-                    (
-                      player.name +
-                      ' ' +
-                      player.team
-                    ).toLowerCase(),
-                  )}"
-                >
-                  <span
-                    class="
-                      auction-role-badge
-                      role-${player.role.toLowerCase()}
-                    "
-                  >
-                    ${player.role}
-                  </span>
+          <span>⌕</span>
 
-                  <span>
-                    <strong>
-                      ${escapeHtml(
-                        player.name,
-                      )}
-                    </strong>
+          <div>
+            <small>
+              Tutto il listone
+            </small>
 
-                    <small>
-                      ${escapeHtml(
-                        player.team,
-                      )}
-                    </small>
-                  </span>
-
-                  ${
-                    isPlayerAssigned(
-                      player.id,
-                    )
-                      ? `
-                        <em>
-                          Assegnato
-                        </em>
-                      `
-                      : ''
-                  }
-                </button>
-              `,
-            )
-            .join('')}
-        </div>
+            <strong>
+              Seleziona giocatore
+            </strong>
+          </div>
+        </button>
       </div>
     </section>
   `
 }
 
+/* =========================
+   PLAYER CARD
+========================= */
+
 function renderPlayerCard(
-  player: DemoPlayer,
+  player: Player,
   participants:
     DemoParticipantState[],
 ): string {
-  const ceiling =
-    Math.min(
-      player.financialLimit,
-      player.roleLimit,
-      player.maxValue,
-    )
-
   const assignment =
     getAssignmentByPlayer(
       player.id,
@@ -1399,18 +1270,10 @@ function renderPlayerCard(
           </span>
 
           <span
-            class="auction-demo-label"
+            class="auction-real-label"
           >
-            DATI DEMO
+            DATABASE REALE
           </span>
-
-          <button
-            type="button"
-            class="auction-text-button"
-            disabled
-          >
-            Scheda completa
-          </button>
         </div>
       </div>
 
@@ -1424,15 +1287,18 @@ function renderPlayerCard(
           "
         >
           <span>
-            Tetto consigliato
+            iCà
           </span>
 
           <strong>
-            ${ceiling}
+            ${formatNumber(
+              player.iCa,
+              2,
+            )}
           </strong>
 
           <small>
-            vincolo più restrittivo
+            indice prospettico
           </small>
         </div>
 
@@ -1444,7 +1310,10 @@ function renderPlayerCard(
           </span>
 
           <strong>
-            ${player.pma}
+            ${formatPercent(
+              player.pmaPercent,
+              1,
+            )}
           </strong>
         </div>
 
@@ -1456,7 +1325,10 @@ function renderPlayerCard(
           </span>
 
           <strong>
-            ${player.consensus}
+            ${formatNumber(
+              player.consensus,
+              2,
+            )}
           </strong>
         </div>
 
@@ -1464,11 +1336,14 @@ function renderPlayerCard(
           class="auction-main-value"
         >
           <span>
-            iCà
+            Titolarità
           </span>
 
           <strong>
-            ${player.iCa}
+            ${formatPercent(
+              player.startingProbability,
+              0,
+            )}
           </strong>
         </div>
       </div>
@@ -1484,17 +1359,22 @@ function renderPlayerCard(
           </span>
 
           <strong>
-            ${player.startingProbability}%
+            ${formatPercent(
+              player.startingProbability,
+              0,
+            )}
           </strong>
 
           <div
             class="auction-insight-progress"
-            aria-label="Titolarità ${player.startingProbability}%"
           >
             <span
               style="
                 width:
-                ${player.startingProbability}%;
+                ${
+                  player.startingProbability ??
+                  0
+                }%;
               "
             ></span>
           </div>
@@ -1504,11 +1384,12 @@ function renderPlayerCard(
           class="auction-insight-metric"
         >
           <span>
-            xMV
+            MV
           </span>
 
           <strong>
-            ${player.xMv.toFixed(
+            ${formatNumber(
+              player.mv,
               2,
             )}
           </strong>
@@ -1518,11 +1399,12 @@ function renderPlayerCard(
           class="auction-insight-metric"
         >
           <span>
-            xFMV
+            FMV
           </span>
 
           <strong>
-            ${player.xFmv.toFixed(
+            ${formatNumber(
+              player.fmv,
               2,
             )}
           </strong>
@@ -1530,7 +1412,10 @@ function renderPlayerCard(
       </div>
 
       <div
-        class="auction-recommendation"
+        class="
+          auction-recommendation
+          auction-recommendation-pending
+        "
       >
         <div
           class="
@@ -1542,8 +1427,8 @@ function renderPlayerCard(
           </span>
 
           <strong>
-            RILANCIA FINO A
-            ${ceiling}
+            ALGORITMO PREZZO
+            NON ANCORA ATTIVO
           </strong>
         </div>
 
@@ -1560,9 +1445,7 @@ function renderPlayerCard(
               Limite finanziario
             </span>
 
-            <strong>
-              ${player.financialLimit}
-            </strong>
+            <strong>—</strong>
           </div>
 
           <div
@@ -1575,9 +1458,7 @@ function renderPlayerCard(
               Limite reparto
             </span>
 
-            <strong>
-              ${player.roleLimit}
-            </strong>
+            <strong>—</strong>
           </div>
 
           <div
@@ -1590,42 +1471,8 @@ function renderPlayerCard(
               Massimo valore
             </span>
 
-            <strong>
-              ${player.maxValue}
-            </strong>
+            <strong>—</strong>
           </div>
-        </div>
-
-        <div
-          class="auction-reasons"
-        >
-          <span>
-            Qualità
-
-            <strong>
-              Consenso
-              ${player.consensus}
-            </strong>
-          </span>
-
-          <span>
-            Sostenibilità
-
-            <strong>
-              Tetto
-              ${ceiling}
-            </strong>
-          </span>
-
-          <span>
-            Reparto
-
-            <strong>
-              ${escapeHtml(
-                player.reason,
-              )}
-            </strong>
-          </span>
         </div>
       </div>
 
@@ -1737,6 +1584,7 @@ function renderPlayerCard(
               "
             >
               Assegnato a
+
               <strong>
                 ${escapeHtml(
                   getParticipant(
@@ -1745,7 +1593,9 @@ function renderPlayerCard(
                     'Manager',
                 )}
               </strong>
+
               per
+
               <strong>
                 ${assignment.price}
                 crediti
@@ -1787,22 +1637,40 @@ function renderPlayerCard(
   `
 }
 
+/* =========================
+   RECOMMENDATIONS
+========================= */
+
 function renderRecommendations():
   string {
-  const recommendations =
-    getRecommendedPlayers(
-      activeRole,
-    )
-
-  const discardedCount =
+  const candidates =
     getRolePlayers(
       activeRole,
-    ).filter(
-      (player) =>
-        discardedRecommendations.has(
-          player.id,
-        ),
-    ).length
+    )
+      .filter(
+        (player) =>
+          !isPlayerAssigned(
+            player.id,
+          ) &&
+          !discardedRecommendations.has(
+            player.id,
+          ),
+      )
+      .sort(
+        (a, b) =>
+          (
+            b.iCa ??
+            -Infinity
+          ) -
+          (
+            a.iCa ??
+            -Infinity
+          ),
+      )
+      .slice(
+        0,
+        3,
+      )
 
   return `
     <aside
@@ -1820,148 +1688,110 @@ function renderRecommendations():
 
           <h3>
             Prossime chiamate
-            consigliate
           </h3>
         </div>
 
         <span
-          class="auction-demo-label"
+          class="auction-real-label"
         >
-          DEMO
+          iCà
         </span>
       </div>
 
       <div
         class="auction-next-list"
       >
-        ${
-          recommendations.length
-            ? recommendations
-                .map(
-                  (
-                    player,
-                    index,
-                  ) => `
-                    <article
-                      class="
-                        auction-next-card
-                        ${
-                          index === 0
-                            ? 'primary'
-                            : ''
-                        }
-                      "
-                    >
-                      <div
-                        class="
-                          auction-next-card-top
-                        "
-                      >
-                        <div>
-                          <strong>
-                            ${escapeHtml(
-                              player.name,
-                            )}
-                          </strong>
-
-                          <span>
-                            ${escapeHtml(
-                              player.team,
-                            )}
-                          </span>
-                        </div>
-
-                        <b>
-                          ~${player.nextScore}
-                        </b>
-                      </div>
-
-                      <div
-                        class="
-                          auction-next-range
-                        "
-                      >
-                        Fascia
-                        ${player.expectedMin}
-                        –
-                        ${player.expectedMax}
-                      </div>
-
-                      <p>
-                        ${escapeHtml(
-                          player.reason,
-                        )}
-                      </p>
-
-                      <small>
-                        Interessati:
-                        ${
-                          player.interested.length
-                            ? escapeHtml(
-                                player.interested.join(
-                                  ', ',
-                                ),
-                              )
-                            : '—'
-                        }
-                      </small>
-
-                      <div
-                        class="
-                          auction-next-actions
-                        "
-                      >
-                        <button
-                          type="button"
-                          data-select-recommended="${player.id}"
-                        >
-                          Chiama
-                        </button>
-
-                        <button
-                          type="button"
-                          data-discard-recommended="${player.id}"
-                        >
-                          Scarta
-                        </button>
-                      </div>
-                    </article>
-                  `,
-                )
-                .join('')
-            : `
-              <div
+        ${candidates
+          .map(
+            (
+              player,
+              index,
+            ) => `
+              <article
                 class="
-                  auction-empty-state
+                  auction-next-card
+                  ${
+                    index === 0
+                      ? 'primary'
+                      : ''
+                  }
                 "
               >
-                Nessun altro candidato
-                disponibile nel ruolo
-                ${activeRole}.
-              </div>
-            `
-        }
-      </div>
+                <div
+                  class="
+                    auction-next-card-top
+                  "
+                >
+                  <div>
+                    <strong>
+                      ${escapeHtml(
+                        player.name,
+                      )}
+                    </strong>
 
-      ${
-        discardedCount > 0
-          ? `
-            <button
-              id="restoreDiscardedButton"
-              type="button"
-              class="
-                auction-restore-button
-              "
-            >
-              Riabilita scartati
-              (${discardedCount})
-            </button>
-          `
-          : ''
-      }
+                    <span>
+                      ${escapeHtml(
+                        player.team,
+                      )}
+                    </span>
+                  </div>
+
+                  <b>
+                    ${formatNumber(
+                      player.iCa,
+                      2,
+                    )}
+                  </b>
+                </div>
+
+                <p>
+                  Consenso
+                  ${formatNumber(
+                    player.consensus,
+                    2,
+                  )}
+                  · Titolarità
+                  ${formatPercent(
+                    player.startingProbability,
+                    0,
+                  )}
+                </p>
+
+                <div
+                  class="
+                    auction-next-actions
+                  "
+                >
+                  <button
+                    type="button"
+                    data-select-recommended="${escapeHtml(
+                      player.id,
+                    )}"
+                  >
+                    Chiama
+                  </button>
+
+                  <button
+                    type="button"
+                    data-discard-recommended="${escapeHtml(
+                      player.id,
+                    )}"
+                  >
+                    Scarta
+                  </button>
+                </div>
+              </article>
+            `,
+          )
+          .join('')}
+      </div>
     </aside>
   `
 }
+
+/* =========================
+   PARTICIPANTS
+========================= */
 
 function renderParticipants(
   state: AppState,
@@ -1975,9 +1805,7 @@ function renderParticipants(
       "
     >
       <div
-        class="
-          auction-section-heading
-        "
+        class="auction-section-heading"
       >
         <div>
           <span
@@ -1992,9 +1820,7 @@ function renderParticipants(
         </div>
 
         <div
-          class="
-            auction-bar-legend
-          "
+          class="auction-bar-legend"
         >
           <span
             class="legend-blue"
@@ -2023,15 +1849,11 @@ function renderParticipants(
       </div>
 
       <div
-        class="
-          auction-participant-grid
-        "
+        class="auction-participant-grid"
       >
         ${participants
           .map(
-            (
-              participant,
-            ) => {
+            (participant) => {
               const remaining =
                 getRemainingCredits(
                   participant,
@@ -2094,9 +1916,7 @@ function renderParticipants(
                   </div>
 
                   <div
-                    class="
-                      auction-slot-row
-                    "
+                    class="auction-slot-row"
                   >
                     ${ROLE_ORDER.map(
                       (role) => `
@@ -2113,6 +1933,7 @@ function renderParticipants(
                           "
                         >
                           ${role}
+
                           ${
                             participant.slots[
                               role
@@ -2136,6 +1957,10 @@ function renderParticipants(
   `
 }
 
+/* =========================
+   HISTORY
+========================= */
+
 function renderAssignmentHistory():
   string {
   return `
@@ -2145,9 +1970,7 @@ function renderAssignmentHistory():
       "
     >
       <div
-        class="
-          auction-history-heading
-        "
+        class="auction-history-heading"
       >
         <div>
           <span
@@ -2306,6 +2129,10 @@ function renderAssignmentHistory():
   `
 }
 
+/* =========================
+   EDIT OVERLAY
+========================= */
+
 function renderEditAssignmentOverlay(
   participants:
     DemoParticipantState[],
@@ -2375,16 +2202,13 @@ function renderEditAssignmentOverlay(
             id="closeEditAssignmentButton"
             type="button"
             class="icon-button"
-            aria-label="Chiudi"
           >
             ×
           </button>
         </div>
 
         <div
-          class="
-            auction-edit-form
-          "
+          class="auction-edit-form"
         >
           <label>
             <span>
@@ -2458,6 +2282,10 @@ function renderEditAssignmentOverlay(
   `
 }
 
+/* =========================
+   LIVE PAGE
+========================= */
+
 function renderLiveAuction(
   state: AppState,
 ): string {
@@ -2467,7 +2295,14 @@ function renderLiveAuction(
     )
 
   const selectedPlayer =
-    getSelectedPlayer()
+    getSelectedPlayer(
+      state,
+    )
+
+  if (selectedPlayer) {
+    activeRole =
+      selectedPlayer.role
+  }
 
   const owner =
     participants.find(
@@ -2484,9 +2319,6 @@ function renderLiveAuction(
         )
       : state.initialCredits
 
-  const hasAssignments =
-    assignments.length > 0
-
   return `
     <section
       class="
@@ -2495,14 +2327,10 @@ function renderLiveAuction(
       "
     >
       <div
-        class="
-          auction-live-toolbar
-        "
+        class="auction-live-toolbar"
       >
         <div
-          class="
-            auction-live-title
-          "
+          class="auction-live-title"
         >
           <div>
             <span
@@ -2524,9 +2352,7 @@ function renderLiveAuction(
         </div>
 
         <div
-          class="
-            auction-role-switcher
-          "
+          class="auction-role-switcher"
         >
           <span>
             Ruolo attivo
@@ -2538,9 +2364,7 @@ function renderLiveAuction(
         </div>
 
         <div
-          class="
-            auction-toolbar-stat
-          "
+          class="auction-toolbar-stat"
         >
           <span>
             Crediti owner
@@ -2552,18 +2376,14 @@ function renderLiveAuction(
         </div>
 
         <div
-          class="
-            auction-toolbar-actions
-          "
+          class="auction-toolbar-actions"
         >
           <button
             id="undoLastAssignmentButton"
             type="button"
-            class="
-              auction-toolbar-button
-            "
+            class="auction-toolbar-button"
             ${
-              hasAssignments
+              assignments.length
                 ? ''
                 : 'disabled'
             }
@@ -2581,7 +2401,7 @@ function renderLiveAuction(
         </div>
       </div>
 
-      ${renderPlayerSearch()}
+      ${renderPlayerSearchStrip()}
 
       <div
         class="auction-workspace"
@@ -2605,9 +2425,7 @@ function renderLiveAuction(
                   "
                 >
                   <span
-                    class="
-                      auction-kicker
-                    "
+                    class="auction-kicker"
                   >
                     CHIAMATA CORRENTE
                   </span>
@@ -2618,9 +2436,8 @@ function renderLiveAuction(
                   </h2>
 
                   <p>
-                    Cerca un giocatore
-                    del ruolo
-                    ${activeRole}.
+                    Usa “Seleziona squadra”
+                    o “Seleziona giocatore”.
                   </p>
                 </section>
               `
@@ -2638,22 +2455,25 @@ function renderLiveAuction(
       ${renderAssignmentHistory()}
 
       <div
-        class="
-          auction-prototype-note
-        "
+        class="auction-prototype-note"
       >
-        Prototipo visivo:
-        assegnazioni e correzioni
-        restano solo nella memoria
-        della demo.
+        Partecipanti, budget e
+        assegnazioni sono ancora
+        memoria demo.
       </div>
 
       ${renderEditAssignmentOverlay(
         participants,
       )}
+
+      ${renderSelector()}
     </section>
   `
 }
+
+/* =========================
+   PAGE
+========================= */
 
 export function renderAuctionPage(
   state: AppState,
@@ -2675,10 +2495,7 @@ export function renderAuctionPage(
       <section class="page">
         <div class="page-heading">
           <div>
-            <h1>
-              Asta
-            </h1>
-
+            <h1>Asta</h1>
             <p>
               Sessione terminata.
             </p>
@@ -2698,36 +2515,30 @@ export function renderAuctionPage(
           "
         >
           <div
-            class="
-              finalization-icon
-            "
+            class="finalization-icon"
           >
             !
           </div>
 
           <div
-            class="
-              finalization-copy
-            "
+            class="finalization-copy"
           >
             <h2>
               Asta terminata
             </h2>
 
             <p>
-              La sessione non è
-              ancora stata
-              registrata.
+              La sessione non è ancora
+              stata registrata.
             </p>
 
             <p>
-              Prima di iniziare
-              una nuova asta devi
-              scegliere se salvare
-              definitivamente i
-              dati nello storico
-              oppure scartare
-              questa sessione.
+              Prima di iniziare una
+              nuova asta devi scegliere
+              se salvare definitivamente
+              i dati nello storico
+              oppure scartare questa
+              sessione.
             </p>
           </div>
         </section>
@@ -2758,9 +2569,7 @@ export function renderAuctionPage(
           aria-hidden="true"
         >
           <div
-            class="
-              overlay-backdrop
-            "
+            class="overlay-backdrop"
           ></div>
 
           <div
@@ -2770,9 +2579,7 @@ export function renderAuctionPage(
             "
           >
             <div
-              class="
-                overlay-header
-              "
+              class="overlay-header"
             >
               <div>
                 <span
@@ -2782,8 +2589,7 @@ export function renderAuctionPage(
                 </span>
 
                 <h2>
-                  Conferma
-                  eliminazione
+                  Conferma eliminazione
                 </h2>
               </div>
 
@@ -2791,7 +2597,6 @@ export function renderAuctionPage(
                 id="closeDiscardAuctionButton"
                 type="button"
                 class="icon-button"
-                aria-label="Chiudi"
               >
                 ×
               </button>
@@ -2805,30 +2610,15 @@ export function renderAuctionPage(
                 non verrà aggiunta
                 allo storico.
               </p>
-
-              <p>
-                <strong>
-                  I dati
-                  appartenenti
-                  esclusivamente
-                  a questa asta
-                  verranno
-                  scartati.
-                </strong>
-              </p>
             </div>
 
             <div
-              class="
-                overlay-actions
-              "
+              class="overlay-actions"
             >
               <button
                 id="cancelDiscardAuctionButton"
                 type="button"
-                class="
-                  secondary-button
-                "
+                class="secondary-button"
               >
                 Annulla
               </button>
@@ -2836,9 +2626,7 @@ export function renderAuctionPage(
               <button
                 id="confirmDiscardAuctionButton"
                 type="button"
-                class="
-                  danger-button
-                "
+                class="danger-button"
               >
                 Scarta asta
               </button>
@@ -2851,98 +2639,38 @@ export function renderAuctionPage(
 
   if (
     state.auctionPhase ===
-    'archived'
-  ) {
-    return `
-      <section class="page">
-        <div class="page-heading">
-          <div>
-            <h1>
-              Asta
-            </h1>
-
-            <p>
-              Sessione registrata.
-            </p>
-          </div>
-
-          <span
-            class="archived-badge"
-          >
-            REGISTRATA
-          </span>
-        </div>
-
-        <section
-          class="panel"
-        >
-          <h2>
-            Asta registrata
-          </h2>
-
-          <p
-            class="muted-text"
-          >
-            La sessione è stata
-            chiusa correttamente
-            ed è pronta per essere
-            conservata nello
-            storico.
-          </p>
-        </section>
-
-        <div
-          class="auction-actions"
-        >
-          <button
-            id="newAuctionButton"
-            type="button"
-            class="primary-button"
-          >
-            Nuova asta
-          </button>
-        </div>
-      </section>
-    `
-  }
-
-  if (
+      'archived' ||
     state.auctionPhase ===
-    'discarded'
+      'discarded'
   ) {
+    const archived =
+      state.auctionPhase ===
+      'archived'
+
     return `
       <section class="page">
         <div class="page-heading">
           <div>
-            <h1>
-              Asta
-            </h1>
+            <h1>Asta</h1>
 
             <p>
-              Sessione scartata.
+              ${
+                archived
+                  ? 'Sessione registrata.'
+                  : 'Sessione scartata.'
+              }
             </p>
           </div>
-
-          <span
-            class="discarded-badge"
-          >
-            SCARTATA
-          </span>
         </div>
 
-        <section
-          class="panel"
-        >
+        <section class="panel">
           <h2>
-            Asta scartata
+            ${
+              archived
+                ? 'Asta registrata'
+                : 'Asta scartata'
+            }
           </h2>
-
-          <p
-            class="muted-text"
-          >
-            La sessione non verrà
-            aggiunta allo storico.
-          </p>
         </section>
 
         <div
@@ -2962,9 +2690,7 @@ export function renderAuctionPage(
 
   return `
     <section class="page">
-      <h1>
-        Asta
-      </h1>
+      <h1>Asta</h1>
 
       <p>
         Asta non ancora avviata.
@@ -2973,785 +2699,843 @@ export function renderAuctionPage(
   `
 }
 
+/* =========================
+   EVENTS
+========================= */
+
 export function bindAuctionEvents(
   state: AppState,
   actions: AuctionActions,
 ): void {
   if (
-    state.auctionPhase ===
+    state.auctionPhase !==
     'live'
   ) {
-    document
-      .querySelector(
-        '#endAuctionButton',
-      )
-      ?.addEventListener(
-        'click',
-        actions.onEndAuction,
-      )
+    if (
+      state.auctionPhase ===
+      'finalizing'
+    ) {
+      document
+        .querySelector(
+          '#archiveAuctionButton',
+        )
+        ?.addEventListener(
+          'click',
+          actions.onArchiveAuction,
+        )
 
-    document
-      .querySelector(
-        '#undoLastAssignmentButton',
-      )
-      ?.addEventListener(
-        'click',
+      const overlay =
+        document.querySelector<HTMLElement>(
+          '#discardAuctionOverlay',
+        )
+
+      const openOverlay =
         () => {
-          const last =
-            assignments[
-              assignments.length -
-              1
-            ]
-
-          if (!last) {
-            return
-          }
-
-          const player =
-            getPlayer(
-              last.playerId,
-            )
-
-          removeAssignment(
-            last.id,
+          overlay?.classList.remove(
+            'hidden',
           )
 
-          auctionFeedback =
-            player
-              ? `Annullata l'ultima assegnazione: ${player.name}.`
-              : 'Ultima assegnazione annullata.'
-
-          actions.onRender()
-        },
-      )
-
-    document
-      .querySelectorAll<HTMLButtonElement>(
-        '[data-auction-role]',
-      )
-      .forEach(
-        (button) => {
-          button.addEventListener(
-            'click',
-            () => {
-              const role =
-                button.dataset
-                  .auctionRole as
-                  | AuctionRole
-                  | undefined
-
-              if (!role) {
-                return
-              }
-
-              activeRole = role
-
-              const nextPlayer =
-                getRolePlayers(
-                  role,
-                ).find(
-                  (player) =>
-                    !isPlayerAssigned(
-                      player.id,
-                    ),
-                )
-
-              selectedPlayerId =
-                nextPlayer?.id ??
-                ''
-
-              auctionFeedback =
-                ''
-
-              actions.onRender()
-            },
+          overlay?.setAttribute(
+            'aria-hidden',
+            'false',
           )
-        },
-      )
+        }
 
-    const searchInput =
-      document.querySelector<HTMLInputElement>(
-        '#auctionPlayerSearch',
-      )
-
-    const searchResults =
-      document.querySelector<HTMLElement>(
-        '#auctionSearchResults',
-      )
-
-    searchInput?.addEventListener(
-      'input',
-      () => {
-        const query =
-          searchInput.value
-            .trim()
-            .toLowerCase()
-
-        searchResults
-          ?.querySelectorAll<HTMLElement>(
-            '[data-search]',
+      const closeOverlay =
+        () => {
+          overlay?.classList.add(
+            'hidden',
           )
-          .forEach(
-            (result) => {
-              const value =
-                result.dataset
-                  .search ??
-                ''
 
-              result.hidden =
-                Boolean(
-                  query,
-                ) &&
-                !value.includes(
-                  query,
-                )
-            },
+          overlay?.setAttribute(
+            'aria-hidden',
+            'true',
           )
+        }
+
+      document
+        .querySelector(
+          '#discardAuctionButton',
+        )
+        ?.addEventListener(
+          'click',
+          openOverlay,
+        )
+
+      document
+        .querySelector(
+          '#closeDiscardAuctionButton',
+        )
+        ?.addEventListener(
+          'click',
+          closeOverlay,
+        )
+
+      document
+        .querySelector(
+          '#cancelDiscardAuctionButton',
+        )
+        ?.addEventListener(
+          'click',
+          closeOverlay,
+        )
+
+      document
+        .querySelector(
+          '#confirmDiscardAuctionButton',
+        )
+        ?.addEventListener(
+          'click',
+          actions.onDiscardAuction,
+        )
+    }
+
+    if (
+      state.auctionPhase ===
+        'archived' ||
+      state.auctionPhase ===
+        'discarded'
+    ) {
+      document
+        .querySelector(
+          '#newAuctionButton',
+        )
+        ?.addEventListener(
+          'click',
+          actions.onNewAuction,
+        )
+    }
+
+    return
+  }
+
+  document
+    .querySelector(
+      '#endAuctionButton',
+    )
+    ?.addEventListener(
+      'click',
+      actions.onEndAuction,
+    )
+
+  document
+    .querySelectorAll<HTMLButtonElement>(
+      '[data-auction-role]',
+    )
+    .forEach(
+      (button) => {
+        button.addEventListener(
+          'click',
+          () => {
+            const role =
+              button.dataset
+                .auctionRole as
+                | AuctionRole
+                | undefined
+
+            if (!role) {
+              return
+            }
+
+            /*
+              Cambiare ruolo NON
+              avvia automaticamente
+              una chiamata.
+            */
+            activeRole =
+              role
+
+            state.currentAuctionPlayerId =
+              null
+
+            auctionFeedback = ''
+
+            actions.onStateChange()
+          },
+        )
       },
     )
 
-    document
-      .querySelectorAll<HTMLButtonElement>(
-        '[data-player-id]',
-      )
-      .forEach(
-        (button) => {
-          button.addEventListener(
-            'click',
-            () => {
-              const playerId =
-                button.dataset
-                  .playerId
+  document
+    .querySelector(
+      '#selectAuctionTeamButton',
+    )
+    ?.addEventListener(
+      'click',
+      () => {
+        selectorMode =
+          'team'
 
-              if (!playerId) {
-                return
-              }
+        selectedTeamFilter =
+          ''
 
-              selectedPlayerId =
-                playerId
+        actions.onRender()
+      },
+    )
 
-              auctionFeedback =
-                ''
+  document
+    .querySelector(
+      '#selectAuctionPlayerButton',
+    )
+    ?.addEventListener(
+      'click',
+      () => {
+        selectorMode =
+          'player'
 
-              actions.onRender()
-            },
-          )
-        },
-      )
+        selectedTeamFilter =
+          ''
 
-    document
-      .querySelectorAll<HTMLButtonElement>(
-        '[data-select-recommended]',
-      )
-      .forEach(
-        (button) => {
-          button.addEventListener(
-            'click',
-            () => {
-              const playerId =
-                button.dataset
-                  .selectRecommended
+        actions.onRender()
+      },
+    )
 
-              if (!playerId) {
-                return
-              }
+  document
+    .querySelector(
+      '#closeAuctionSelectorButton',
+    )
+    ?.addEventListener(
+      'click',
+      () => {
+        selectorMode =
+          null
 
-              selectedPlayerId =
-                playerId
+        selectedTeamFilter =
+          ''
 
-              auctionFeedback =
-                ''
+        actions.onRender()
+      },
+    )
 
-              actions.onRender()
-            },
-          )
-        },
-      )
+  document
+    .querySelector(
+      '#auctionPlayerSelectorOverlay .overlay-backdrop',
+    )
+    ?.addEventListener(
+      'click',
+      () => {
+        selectorMode =
+          null
 
-    document
-      .querySelectorAll<HTMLButtonElement>(
-        '[data-discard-recommended]',
-      )
-      .forEach(
-        (button) => {
-          button.addEventListener(
-            'click',
-            () => {
-              const playerId =
-                button.dataset
-                  .discardRecommended
+        selectedTeamFilter =
+          ''
 
-              if (!playerId) {
-                return
-              }
+        actions.onRender()
+      },
+    )
 
-              discardedRecommendations.add(
-                playerId,
+  document
+    .querySelectorAll<HTMLButtonElement>(
+      '[data-auction-team]',
+    )
+    .forEach(
+      (button) => {
+        button.addEventListener(
+          'click',
+          () => {
+            selectedTeamFilter =
+              button.dataset
+                .auctionTeam ??
+              ''
+
+            actions.onRender()
+          },
+        )
+      },
+    )
+
+  document
+    .querySelector(
+      '#changeAuctionTeamButton',
+    )
+    ?.addEventListener(
+      'click',
+      () => {
+        selectedTeamFilter =
+          ''
+
+        actions.onRender()
+      },
+    )
+
+  const selectorSearch =
+    document.querySelector<HTMLInputElement>(
+      '#auctionSelectorSearch',
+    )
+
+  const selectorResults =
+    document.querySelector<HTMLElement>(
+      '#auctionSelectorResults',
+    )
+
+  selectorSearch?.addEventListener(
+    'input',
+    () => {
+      const query =
+        normalizeText(
+          selectorSearch.value,
+        )
+
+      selectorResults
+        ?.querySelectorAll<HTMLElement>(
+          '[data-search]',
+        )
+        .forEach(
+          (result) => {
+            const searchable =
+              result.dataset
+                .search ??
+              ''
+
+            result.hidden =
+              Boolean(query) &&
+              !searchable.includes(
+                query,
+              )
+          },
+        )
+    },
+  )
+
+  document
+    .querySelectorAll<HTMLButtonElement>(
+      '[data-auction-select-player]',
+    )
+    .forEach(
+      (button) => {
+        button.addEventListener(
+          'click',
+          () => {
+            const playerId =
+              button.dataset
+                .auctionSelectPlayer
+
+            const player =
+              getPlayer(
+                playerId ??
+                null,
               )
 
-              actions.onRender()
-            },
-          )
-        },
-      )
-
-    document
-      .querySelector(
-        '#restoreDiscardedButton',
-      )
-      ?.addEventListener(
-        'click',
-        () => {
-          getRolePlayers(
-            activeRole,
-          ).forEach(
-            (player) => {
-              discardedRecommendations.delete(
+            if (
+              !player ||
+              isPlayerAssigned(
                 player.id,
               )
-            },
-          )
-
-          actions.onRender()
-        },
-      )
-
-    document
-      .querySelector(
-        '#auctionCancelCallButton',
-      )
-      ?.addEventListener(
-        'click',
-        () => {
-          selectedPlayerId =
-            ''
-
-          auctionFeedback =
-            ''
-
-          actions.onRender()
-        },
-      )
-
-    document
-      .querySelector(
-        '#auctionUnsoldButton',
-      )
-      ?.addEventListener(
-        'click',
-        () => {
-          const player =
-            getSelectedPlayer()
-
-          if (!player) {
-            return
-          }
-
-          auctionFeedback =
-            `${player.name} segnato come invenduto nella demo.`
-
-          selectedPlayerId =
-            ''
-
-          actions.onRender()
-        },
-      )
-
-    document
-      .querySelector(
-        '#auctionAssignButton',
-      )
-      ?.addEventListener(
-        'click',
-        () => {
-          const player =
-            getSelectedPlayer()
-
-          const buyerSelect =
-            document.querySelector<HTMLSelectElement>(
-              '#auctionBuyerSelect',
-            )
-
-          const priceInput =
-            document.querySelector<HTMLInputElement>(
-              '#auctionPriceInput',
-            )
-
-          if (
-            !player ||
-            !buyerSelect ||
-            !priceInput
-          ) {
-            return
-          }
-
-          if (
-            isPlayerAssigned(
-              player.id,
-            )
-          ) {
-            auctionFeedback =
-              'Il giocatore è già assegnato.'
-
-            actions.onRender()
-
-            return
-          }
-
-          const participant =
-            getParticipant(
-              buyerSelect.value,
-            )
-
-          const price =
-            Number(
-              priceInput.value,
-            )
-
-          if (!participant) {
-            auctionFeedback =
-              'Seleziona un acquirente.'
-
-            actions.onRender()
-
-            return
-          }
-
-          if (
-            !Number.isInteger(
-              price,
-            ) ||
-            price <= 0
-          ) {
-            auctionFeedback =
-              'Inserisci un prezzo intero positivo.'
-
-            actions.onRender()
-
-            return
-          }
-
-          const remaining =
-            getRemainingCredits(
-              participant,
-              state,
-            )
-
-          if (
-            price >
-            remaining
-          ) {
-            auctionFeedback =
-              `Il manager ha solo ${remaining} crediti residui.`
-
-            actions.onRender()
-
-            return
-          }
-
-          if (
-            participant.slots[
-              player.role
-            ] >=
-            DEMO_SLOT_LIMITS[
-              player.role
-            ]
-          ) {
-            auctionFeedback =
-              `Il manager non ha più slot ${player.role} disponibili.`
-
-            actions.onRender()
-
-            return
-          }
-
-          const assignment:
-            DemoAssignment = {
-              id:
-                nextAssignmentId,
-
-              playerId:
-                player.id,
-
-              participantId:
-                participant.id,
-
-              price,
+            ) {
+              return
             }
 
-          nextAssignmentId += 1
+            state.currentAuctionPlayerId =
+              player.id
 
-          assignments.push(
-            assignment,
+            activeRole =
+              player.role
+
+            selectorMode =
+              null
+
+            selectedTeamFilter =
+              ''
+
+            auctionFeedback =
+              ''
+
+            actions.onStateChange()
+          },
+        )
+      },
+    )
+
+  document
+    .querySelectorAll<HTMLButtonElement>(
+      '[data-select-recommended]',
+    )
+    .forEach(
+      (button) => {
+        button.addEventListener(
+          'click',
+          () => {
+            const player =
+              getPlayer(
+                button.dataset
+                  .selectRecommended ??
+                  null,
+              )
+
+            if (!player) {
+              return
+            }
+
+            state.currentAuctionPlayerId =
+              player.id
+
+            activeRole =
+              player.role
+
+            auctionFeedback =
+              ''
+
+            actions.onStateChange()
+          },
+        )
+      },
+    )
+
+  document
+    .querySelectorAll<HTMLButtonElement>(
+      '[data-discard-recommended]',
+    )
+    .forEach(
+      (button) => {
+        button.addEventListener(
+          'click',
+          () => {
+            const playerId =
+              button.dataset
+                .discardRecommended
+
+            if (!playerId) {
+              return
+            }
+
+            discardedRecommendations.add(
+              playerId,
+            )
+
+            actions.onRender()
+          },
+        )
+      },
+    )
+
+  document
+    .querySelector(
+      '#auctionCancelCallButton',
+    )
+    ?.addEventListener(
+      'click',
+      () => {
+        state.currentAuctionPlayerId =
+          null
+
+        auctionFeedback =
+          ''
+
+        actions.onStateChange()
+      },
+    )
+
+  document
+    .querySelector(
+      '#auctionUnsoldButton',
+    )
+    ?.addEventListener(
+      'click',
+      () => {
+        const player =
+          getSelectedPlayer(
+            state,
           )
 
+        if (!player) {
+          return
+        }
+
+        auctionFeedback =
+          `${player.name} segnato come invenduto nella demo.`
+
+        state.currentAuctionPlayerId =
+          null
+
+        actions.onStateChange()
+      },
+    )
+
+  document
+    .querySelector(
+      '#auctionAssignButton',
+    )
+    ?.addEventListener(
+      'click',
+      () => {
+        const player =
+          getSelectedPlayer(
+            state,
+          )
+
+        const buyerSelect =
+          document.querySelector<HTMLSelectElement>(
+            '#auctionBuyerSelect',
+          )
+
+        const priceInput =
+          document.querySelector<HTMLInputElement>(
+            '#auctionPriceInput',
+          )
+
+        if (
+          !player ||
+          !buyerSelect ||
+          !priceInput
+        ) {
+          return
+        }
+
+        if (
+          isPlayerAssigned(
+            player.id,
+          )
+        ) {
+          auctionFeedback =
+            'Il giocatore è già assegnato.'
+
+          actions.onRender()
+
+          return
+        }
+
+        const participant =
+          getParticipant(
+            buyerSelect.value,
+          )
+
+        const price =
+          Number(
+            priceInput.value,
+          )
+
+        if (!participant) {
+          auctionFeedback =
+            'Seleziona un acquirente.'
+
+          actions.onRender()
+
+          return
+        }
+
+        if (
+          !Number.isInteger(
+            price,
+          ) ||
+          price <= 0
+        ) {
+          auctionFeedback =
+            'Inserisci un prezzo intero positivo.'
+
+          actions.onRender()
+
+          return
+        }
+
+        const remaining =
+          getRemainingCredits(
+            participant,
+            state,
+          )
+
+        if (
+          price >
+          remaining
+        ) {
+          auctionFeedback =
+            `Il manager ha solo ${remaining} crediti residui.`
+
+          actions.onRender()
+
+          return
+        }
+
+        if (
+          participant.slots[
+            player.role
+          ] >=
+          DEMO_SLOT_LIMITS[
+            player.role
+          ]
+        ) {
+          auctionFeedback =
+            `Il manager non ha più slot ${player.role} disponibili.`
+
+          actions.onRender()
+
+          return
+        }
+
+        const assignment:
+          DemoAssignment = {
+            id:
+              nextAssignmentId,
+
+            playerId:
+              player.id,
+
+            participantId:
+              participant.id,
+
+            price,
+          }
+
+        nextAssignmentId += 1
+
+        assignments.push(
+          assignment,
+        )
+
+        applyAssignment(
+          assignment,
+        )
+
+        auctionFeedback =
+          `${player.name} aggiudicato a ${participant.name} per ${price} crediti.`
+
+        actions.onRender()
+      },
+    )
+
+  document
+    .querySelector(
+      '#undoLastAssignmentButton',
+    )
+    ?.addEventListener(
+      'click',
+      () => {
+        const last =
+          assignments[
+            assignments.length -
+            1
+          ]
+
+        if (!last) {
+          return
+        }
+
+        const player =
+          getPlayer(
+            last.playerId,
+          )
+
+        removeAssignment(
+          last.id,
+        )
+
+        auctionFeedback =
+          player
+            ? `Annullata l'ultima assegnazione: ${player.name}.`
+            : 'Ultima assegnazione annullata.'
+
+        actions.onRender()
+      },
+    )
+
+  document
+    .querySelectorAll<HTMLButtonElement>(
+      '[data-remove-assignment]',
+    )
+    .forEach(
+      (button) => {
+        button.addEventListener(
+          'click',
+          () => {
+            const id =
+              Number(
+                button.dataset
+                  .removeAssignment,
+              )
+
+            if (
+              !Number.isFinite(id)
+            ) {
+              return
+            }
+
+            removeAssignment(
+              id,
+            )
+
+            actions.onRender()
+          },
+        )
+      },
+    )
+
+  document
+    .querySelectorAll<HTMLButtonElement>(
+      '[data-edit-assignment]',
+    )
+    .forEach(
+      (button) => {
+        button.addEventListener(
+          'click',
+          () => {
+            const id =
+              Number(
+                button.dataset
+                  .editAssignment,
+              )
+
+            if (
+              !assignments.some(
+                (item) =>
+                  item.id === id,
+              )
+            ) {
+              return
+            }
+
+            editingAssignmentId =
+              id
+
+            actions.onRender()
+          },
+        )
+      },
+    )
+
+  const closeEdit =
+    (): void => {
+      editingAssignmentId =
+        null
+
+      actions.onRender()
+    }
+
+  document
+    .querySelector(
+      '#closeEditAssignmentButton',
+    )
+    ?.addEventListener(
+      'click',
+      closeEdit,
+    )
+
+  document
+    .querySelector(
+      '#cancelEditAssignmentButton',
+    )
+    ?.addEventListener(
+      'click',
+      closeEdit,
+    )
+
+  document
+    .querySelector(
+      '#saveEditAssignmentButton',
+    )
+    ?.addEventListener(
+      'click',
+      () => {
+        if (
+          editingAssignmentId ===
+          null
+        ) {
+          return
+        }
+
+        const assignment =
+          assignments.find(
+            (item) =>
+              item.id ===
+              editingAssignmentId,
+          )
+
+        const buyerSelect =
+          document.querySelector<HTMLSelectElement>(
+            '#editAssignmentBuyer',
+          )
+
+        const priceInput =
+          document.querySelector<HTMLInputElement>(
+            '#editAssignmentPrice',
+          )
+
+        if (
+          !assignment ||
+          !buyerSelect ||
+          !priceInput
+        ) {
+          return
+        }
+
+        const player =
+          getPlayer(
+            assignment.playerId,
+          )
+
+        const newParticipant =
+          getParticipant(
+            buyerSelect.value,
+          )
+
+        const newPrice =
+          Number(
+            priceInput.value,
+          )
+
+        if (
+          !player ||
+          !newParticipant ||
+          !Number.isInteger(
+            newPrice,
+          ) ||
+          newPrice <= 0
+        ) {
+          return
+        }
+
+        reverseAssignment(
+          assignment,
+        )
+
+        const availableCredits =
+          getRemainingCredits(
+            newParticipant,
+            state,
+          )
+
+        const roleHasSpace =
+          newParticipant.slots[
+            player.role
+          ] <
+          DEMO_SLOT_LIMITS[
+            player.role
+          ]
+
+        if (
+          newPrice >
+            availableCredits ||
+          !roleHasSpace
+        ) {
           applyAssignment(
             assignment,
           )
 
           auctionFeedback =
-            `${player.name} aggiudicato a ${participant.name} per ${price} crediti.`
-
-          actions.onRender()
-        },
-      )
-
-    document
-      .querySelectorAll<HTMLButtonElement>(
-        '[data-remove-assignment]',
-      )
-      .forEach(
-        (button) => {
-          button.addEventListener(
-            'click',
-            () => {
-              const id =
-                Number(
-                  button.dataset
-                    .removeAssignment,
-                )
-
-              const assignment =
-                assignments.find(
-                  (item) =>
-                    item.id === id,
-                )
-
-              const player =
-                assignment
-                  ? getPlayer(
-                      assignment.playerId,
-                    )
-                  : undefined
-
-              if (
-                !assignment ||
-                !removeAssignment(
-                  id,
-                )
-              ) {
-                return
-              }
-
-              auctionFeedback =
-                player
-                  ? `Assegnazione di ${player.name} annullata.`
-                  : 'Assegnazione annullata.'
-
-              actions.onRender()
-            },
-          )
-        },
-      )
-
-    document
-      .querySelectorAll<HTMLButtonElement>(
-        '[data-edit-assignment]',
-      )
-      .forEach(
-        (button) => {
-          button.addEventListener(
-            'click',
-            () => {
-              const id =
-                Number(
-                  button.dataset
-                    .editAssignment,
-                )
-
-              if (
-                !assignments.some(
-                  (item) =>
-                    item.id === id,
-                )
-              ) {
-                return
-              }
-
-              editingAssignmentId =
-                id
-
-              actions.onRender()
-            },
-          )
-        },
-      )
-
-    document
-      .querySelector(
-        '#closeEditAssignmentButton',
-      )
-      ?.addEventListener(
-        'click',
-        () => {
-          editingAssignmentId =
-            null
-
-          actions.onRender()
-        },
-      )
-
-    document
-      .querySelector(
-        '#cancelEditAssignmentButton',
-      )
-      ?.addEventListener(
-        'click',
-        () => {
-          editingAssignmentId =
-            null
-
-          actions.onRender()
-        },
-      )
-
-    document
-      .querySelector(
-        '#saveEditAssignmentButton',
-      )
-      ?.addEventListener(
-        'click',
-        () => {
-          if (
-            editingAssignmentId ===
-            null
-          ) {
-            return
-          }
-
-          const assignment =
-            assignments.find(
-              (item) =>
-                item.id ===
-                editingAssignmentId,
-            )
-
-          const buyerSelect =
-            document.querySelector<HTMLSelectElement>(
-              '#editAssignmentBuyer',
-            )
-
-          const priceInput =
-            document.querySelector<HTMLInputElement>(
-              '#editAssignmentPrice',
-            )
-
-          if (
-            !assignment ||
-            !buyerSelect ||
-            !priceInput
-          ) {
-            return
-          }
-
-          const player =
-            getPlayer(
-              assignment.playerId,
-            )
-
-          const newParticipant =
-            getParticipant(
-              buyerSelect.value,
-            )
-
-          const newPrice =
-            Number(
-              priceInput.value,
-            )
-
-          if (
-            !player ||
-            !newParticipant
-          ) {
-            return
-          }
-
-          if (
-            !Number.isInteger(
-              newPrice,
-            ) ||
-            newPrice <= 0
-          ) {
-            auctionFeedback =
-              'Inserisci un prezzo intero positivo.'
-
-            editingAssignmentId =
-              null
-
-            actions.onRender()
-
-            return
-          }
-
-          /*
-            Prima annulliamo
-            temporaneamente il
-            vecchio movimento,
-            così il controllo
-            economico viene fatto
-            sullo stato corretto.
-          */
-          reverseAssignment(
-            assignment,
-          )
-
-          const availableCredits =
-            getRemainingCredits(
-              newParticipant,
-              state,
-            )
-
-          const roleHasSpace =
-            newParticipant.slots[
-              player.role
-            ] <
-            DEMO_SLOT_LIMITS[
-              player.role
-            ]
-
-          if (
-            newPrice >
-              availableCredits ||
             !roleHasSpace
-          ) {
-            /*
-              Ripristino completo
-              del vecchio stato.
-            */
-            applyAssignment(
-              assignment,
-            )
-
-            auctionFeedback =
-              !roleHasSpace
-                ? `Il manager selezionato non ha più slot ${player.role} disponibili.`
-                : `Il manager selezionato ha solo ${availableCredits} crediti disponibili.`
-
-            editingAssignmentId =
-              null
-
-            actions.onRender()
-
-            return
-          }
-
-          assignment.participantId =
-            newParticipant.id
-
-          assignment.price =
-            newPrice
-
-          applyAssignment(
-            assignment,
-          )
-
-          auctionFeedback =
-            `Assegnazione di ${player.name} modificata: ${newParticipant.name}, ${newPrice} crediti.`
+              ? `Il manager selezionato non ha più slot ${player.role} disponibili.`
+              : `Il manager selezionato ha solo ${availableCredits} crediti disponibili.`
 
           editingAssignmentId =
             null
 
           actions.onRender()
-        },
-      )
 
-    return
-  }
+          return
+        }
 
-  if (
-    state.auctionPhase ===
-    'finalizing'
-  ) {
-    document
-      .querySelector(
-        '#archiveAuctionButton',
-      )
-      ?.addEventListener(
-        'click',
-        actions.onArchiveAuction,
-      )
+        assignment.participantId =
+          newParticipant.id
 
-    const overlay =
-      document.querySelector<HTMLElement>(
-        '#discardAuctionOverlay',
-      )
+        assignment.price =
+          newPrice
 
-    const openOverlay =
-      () => {
-        overlay?.classList.remove(
-          'hidden',
+        applyAssignment(
+          assignment,
         )
 
-        overlay?.setAttribute(
-          'aria-hidden',
-          'false',
-        )
-      }
+        editingAssignmentId =
+          null
 
-    const closeOverlay =
-      () => {
-        overlay?.classList.add(
-          'hidden',
-        )
-
-        overlay?.setAttribute(
-          'aria-hidden',
-          'true',
-        )
-      }
-
-    document
-      .querySelector(
-        '#discardAuctionButton',
-      )
-      ?.addEventListener(
-        'click',
-        openOverlay,
-      )
-
-    document
-      .querySelector(
-        '#closeDiscardAuctionButton',
-      )
-      ?.addEventListener(
-        'click',
-        closeOverlay,
-      )
-
-    document
-      .querySelector(
-        '#cancelDiscardAuctionButton',
-      )
-      ?.addEventListener(
-        'click',
-        closeOverlay,
-      )
-
-    document
-      .querySelector(
-        '#confirmDiscardAuctionButton',
-      )
-      ?.addEventListener(
-        'click',
-        actions.onDiscardAuction,
-      )
-
-    return
-  }
-
-  if (
-    state.auctionPhase ===
-      'archived' ||
-    state.auctionPhase ===
-      'discarded'
-  ) {
-    document
-      .querySelector(
-        '#newAuctionButton',
-      )
-      ?.addEventListener(
-        'click',
-        actions.onNewAuction,
-      )
-  }
+        actions.onRender()
+      },
+    )
 }

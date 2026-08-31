@@ -28,9 +28,12 @@ type LegacyState =
       | 'managers'
       | 'auctionPhase'
       | 'objectives'
+      | 'currentAuctionPlayerId'
     >
   > & {
     auctionPhase?: unknown
+
+    currentAuctionPlayerId?: unknown
 
     managers?: LegacyManager[]
 
@@ -66,6 +69,23 @@ function normalizeAuctionPhase(
   }
 
   return 'setup'
+}
+
+function normalizeCurrentAuctionPlayerId(
+  value: unknown,
+): string | null {
+  if (
+    typeof value !== 'string'
+  ) {
+    return null
+  }
+
+  const clean =
+    value.trim()
+
+  return clean
+    ? clean
+    : null
 }
 
 function splitLegacyName(
@@ -325,6 +345,11 @@ export function loadState(): AppState {
       auctionPhase:
         normalizeAuctionPhase(
           parsed.auctionPhase,
+        ),
+
+      currentAuctionPlayerId:
+        normalizeCurrentAuctionPlayerId(
+          parsed.currentAuctionPlayerId,
         ),
 
       initialCredits:

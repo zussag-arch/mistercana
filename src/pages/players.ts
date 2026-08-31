@@ -5,6 +5,10 @@ import {
 } from '../data/players'
 
 import type {
+  AppState,
+} from '../app/state'
+
+import type {
   Player,
   PlayerRole,
 } from '../domain/player'
@@ -35,12 +39,16 @@ type SpecialistRank =
 
 interface PlayersViewState {
   role: RoleFilter
+
   penaltiesOnly: boolean
   freeOnly: boolean
+
   search: string
 
   sortKey: SortKey
   sortDirection: SortDirection
+
+  defaultRoleIcaOrder: boolean
 }
 
 interface SpecialistEntry {
@@ -57,6 +65,13 @@ interface PlayerSpecialists {
     SpecialistRank | null
 }
 
+interface PlayersActions {
+  onRender: () => void
+
+  onCallPlayer:
+    (playerId: string) => void
+}
+
 const viewState: PlayersViewState = {
   role: 'ALL',
 
@@ -65,9 +80,14 @@ const viewState: PlayersViewState = {
 
   search: '',
 
-  sortKey: 'name',
-  sortDirection: 'asc',
+  sortKey: 'iCa',
+  sortDirection: 'desc',
+
+  defaultRoleIcaOrder: true,
 }
+
+let previewPlayerId:
+  string | null = null
 
 /* =========================
    HTML
@@ -99,6 +119,10 @@ function escapeHtml(
     )
 }
 
+/* =========================
+   FORMATTERS
+========================= */
+
 function formatNumber(
   value:
     | number
@@ -112,9 +136,9 @@ function formatNumber(
     return '—'
   }
 
-  return value.toFixed(
-    digits,
-  )
+  return value
+    .toFixed(digits)
+    .replace('.', ',')
 }
 
 function formatItalianNumber(
@@ -227,7 +251,7 @@ function parseCsv(
 }
 
 /* =========================
-   SPECIALISTS DATABASE
+   SPECIALISTS
 ========================= */
 
 function parseSpecialistsCsv(
@@ -273,14 +297,12 @@ function parseSpecialistsCsv(
           return
         }
 
-        const penaltyNames = [
+        ;[
           penalty1,
           penalty2,
           penalty3,
           penalty4,
-        ]
-
-        penaltyNames.forEach(
+        ].forEach(
           (
             name,
             index,
@@ -301,13 +323,11 @@ function parseSpecialistsCsv(
           },
         )
 
-        const setPieceNames = [
+        ;[
           setPiece1,
           setPiece2,
           setPiece3,
-        ]
-
-        setPieceNames.forEach(
+        ].forEach(
           (
             name,
             index,
@@ -342,7 +362,7 @@ const SPECIALISTS =
   )
 
 /* =========================
-   NAME MATCHING
+   MATCHING
 ========================= */
 
 function normalizeText(
@@ -651,7 +671,7 @@ function getFilteredPlayers():
 
   const filtered =
     players.filter(
-      (player: Player) => {
+      (player) => {
         if (
           viewState.role !== 'ALL' &&
           player.role !==
@@ -703,6 +723,75 @@ function getFilteredPlayers():
 /* =========================
    SORT
 ========================= */
+
+const ROLE_ORDER:
+  Record<PlayerRole, number> = {
+    P: 0,
+    D: 1,
+    C: 2,
+    A: 3,
+  }
+
+function compareDefaultRoleIca(
+  first: Player,
+  second: Player,
+): number {
+  const roleDifference =
+    ROLE_ORDER[first.role] -
+    ROLE_ORDER[second.role]
+
+  if (
+    roleDifference !== 0
+  ) {
+    return roleDifference
+  }
+
+  const firstIca =
+    first.iCa
+
+  const secondIca =
+    second.iCa
+
+  const firstHasIca =
+    typeof firstIca ===
+      'number' &&
+    Number.isFinite(firstIca)
+
+  const secondHasIca =
+    typeof secondIca ===
+      'number' &&
+    Number.isFinite(secondIca)
+
+  if (
+    firstHasIca &&
+    !secondHasIca
+  ) {
+    return -1
+  }
+
+  if (
+    !firstHasIca &&
+    secondHasIca
+  ) {
+    return 1
+  }
+
+  if (
+    firstHasIca &&
+    secondHasIca &&
+    firstIca !== secondIca
+  ) {
+    return (
+      (secondIca ?? 0) -
+      (firstIca ?? 0)
+    )
+  }
+
+  return first.name.localeCompare(
+    second.name,
+    'it',
+  )
+}
 
 function getSortableValue(
   player: Player,
@@ -759,6 +848,15 @@ function comparePlayers(
   first: Player,
   second: Player,
 ): number {
+  if (
+    viewState.defaultRoleIcaOrder
+  ) {
+    return compareDefaultRoleIca(
+      first,
+      second,
+    )
+  }
+
   const firstValue =
     getSortableValue(
       first,
@@ -806,8 +904,8 @@ function sortIndicator(
   key: SortKey,
 ): string {
   if (
-    viewState.sortKey !==
-    key
+    viewState.defaultRoleIcaOrder ||
+    viewState.sortKey !== key
   ) {
     return `
       <span
@@ -930,7 +1028,7 @@ function renderPlayerRow(
       >
         ${formatNumber(
           player.iCa,
-          0,
+          2,
         )}
       </div>
 
@@ -956,7 +1054,7 @@ function renderPlayerRow(
       >
         ${formatNumber(
           player.consensus,
-          0,
+          2,
         )}
       </div>
 
@@ -1041,11 +1139,206 @@ function renderPlayerRow(
 }
 
 /* =========================
+   PLAYER PREVIEW
+========================= */
+
+function renderPlayerPreview(
+  state: AppState,
+): string {
+  const player =
+    previewPlayerId
+      ? players.find(
+          (item) =>
+            item.id ===
+            previewPlayerId,
+        )
+      : undefined
+
+  if (!player) {
+    return `
+      <div
+        id="playerPreviewOverlay"
+        class="
+          overlay
+          hidden
+        "
+        aria-hidden="true"
+      ></div>
+    `
+  }
+
+  const auctionLive =
+    state.auctionPhase ===
+    'live'
+
+  return `
+    <div
+      id="playerPreviewOverlay"
+      class="overlay"
+      aria-hidden="false"
+    >
+      <div
+        class="overlay-backdrop"
+      ></div>
+
+      <div
+        class="
+          overlay-card
+          player-preview-card
+        "
+      >
+        <div
+          class="overlay-header"
+        >
+          <div>
+            <span
+              class="eyebrow"
+            >
+              GIOCATORE
+            </span>
+
+            <h2>
+              ${escapeHtml(
+                player.name,
+              )}
+            </h2>
+
+            <p
+              class="muted-text"
+            >
+              ${escapeHtml(
+                player.team,
+              )}
+              ·
+              ${player.role}
+            </p>
+          </div>
+
+          <button
+            id="closePlayerPreviewButton"
+            type="button"
+            class="icon-button"
+            aria-label="Chiudi"
+          >
+            ×
+          </button>
+        </div>
+
+        <div
+          class="
+            player-preview-metrics
+          "
+        >
+          <div>
+            <span>
+              iCà
+            </span>
+
+            <strong>
+              ${formatNumber(
+                player.iCa,
+                2,
+              )}
+            </strong>
+          </div>
+
+          <div>
+            <span>
+              Consenso
+            </span>
+
+            <strong>
+              ${formatNumber(
+                player.consensus,
+                2,
+              )}
+            </strong>
+          </div>
+
+          <div>
+            <span>
+              Titolarità
+            </span>
+
+            <strong>
+              ${formatPercent(
+                player.startingProbability,
+                0,
+              )}
+            </strong>
+          </div>
+
+          <div>
+            <span>
+              PMA
+            </span>
+
+            <strong>
+              ${formatPercent(
+                player.pmaPercent,
+                1,
+              )}
+            </strong>
+          </div>
+        </div>
+
+        <p
+          class="muted-text"
+        >
+          La scheda completa del
+          giocatore verrà sviluppata
+          in un passaggio successivo.
+        </p>
+
+        <div
+          class="overlay-actions"
+        >
+          <button
+            id="closePlayerPreviewSecondaryButton"
+            type="button"
+            class="secondary-button"
+          >
+            Chiudi
+          </button>
+
+          ${
+            auctionLive
+              ? `
+                <button
+                  id="callPlayerInAuctionButton"
+                  type="button"
+                  class="primary-button"
+                  data-call-player="${escapeHtml(
+                    player.id,
+                  )}"
+                >
+                  Chiama in asta
+                </button>
+              `
+              : `
+                <button
+                  type="button"
+                  class="primary-button"
+                  disabled
+                  title="Avvia prima un'asta"
+                >
+                  Asta non attiva
+                </button>
+              `
+          }
+        </div>
+      </div>
+    </div>
+  `
+}
+
+/* =========================
    PAGE
 ========================= */
 
-export function renderPlayersPage():
-  string {
+export function renderPlayersPage(
+  state: AppState,
+): string {
   const filteredPlayers =
     getFilteredPlayers()
 
@@ -1385,73 +1678,9 @@ export function renderPlayersPage():
         </span>
       </div>
 
-      <div
-        id="playerPreviewOverlay"
-        class="
-          overlay
-          hidden
-        "
-        aria-hidden="true"
-      >
-        <div
-          class="
-            overlay-backdrop
-          "
-        ></div>
-
-        <div
-          class="
-            overlay-card
-            player-preview-card
-          "
-        >
-          <div
-            class="
-              overlay-header
-            "
-          >
-            <div>
-              <span
-                class="
-                  eyebrow
-                "
-              >
-                GIOCATORE
-              </span>
-
-              <h2
-                id="playerPreviewName"
-              >
-                Giocatore
-              </h2>
-            </div>
-
-            <button
-              id="closePlayerPreviewButton"
-              type="button"
-              class="
-                icon-button
-              "
-              aria-label="Chiudi"
-            >
-              ×
-            </button>
-          </div>
-
-          <p
-            class="
-              muted-text
-            "
-          >
-            Questa è ancora una
-            predisposizione temporanea.
-
-            In seguito il click
-            aprirà la scheda completa
-            del giocatore.
-          </p>
-        </div>
-      </div>
+      ${renderPlayerPreview(
+        state,
+      )}
     </section>
   `
 }
@@ -1459,10 +1688,6 @@ export function renderPlayersPage():
 /* =========================
    EVENTS
 ========================= */
-
-interface PlayersActions {
-  onRender: () => void
-}
 
 function focusSearchAtEnd():
   void {
@@ -1490,6 +1715,7 @@ function focusSearchAtEnd():
 }
 
 export function bindPlayersEvents(
+  state: AppState,
   actions: PlayersActions,
 ): void {
   document
@@ -1633,6 +1859,8 @@ export function bindPlayersEvents(
             }
 
             if (
+              !viewState
+                .defaultRoleIcaOrder &&
               viewState.sortKey ===
               key
             ) {
@@ -1654,33 +1882,15 @@ export function bindPlayersEvents(
                   : 'desc'
             }
 
+            viewState
+              .defaultRoleIcaOrder =
+              false
+
             actions.onRender()
           },
         )
       },
     )
-
-  const overlay =
-    document.querySelector<HTMLElement>(
-      '#playerPreviewOverlay',
-    )
-
-  const previewName =
-    document.querySelector<HTMLElement>(
-      '#playerPreviewName',
-    )
-
-  const closeOverlay =
-    (): void => {
-      overlay?.classList.add(
-        'hidden',
-      )
-
-      overlay?.setAttribute(
-        'aria-hidden',
-        'true',
-      )
-    }
 
   document
     .querySelectorAll<HTMLButtonElement>(
@@ -1691,39 +1901,30 @@ export function bindPlayersEvents(
         row.addEventListener(
           'click',
           () => {
-            const player =
-              players.find(
-                (
-                  item:
-                    Player,
-                ) =>
-                  item.id ===
-                  row.dataset
-                    .playerId,
-              )
+            const playerId =
+              row.dataset
+                .playerId
 
-            if (!player) {
+            if (!playerId) {
               return
             }
 
-            if (previewName) {
-              previewName
-                .textContent =
-                player.name
-            }
+            previewPlayerId =
+              playerId
 
-            overlay?.classList.remove(
-              'hidden',
-            )
-
-            overlay?.setAttribute(
-              'aria-hidden',
-              'false',
-            )
+            actions.onRender()
           },
         )
       },
     )
+
+  const closePreview =
+    (): void => {
+      previewPlayerId =
+        null
+
+      actions.onRender()
+    }
 
   document
     .querySelector(
@@ -1731,7 +1932,16 @@ export function bindPlayersEvents(
     )
     ?.addEventListener(
       'click',
-      closeOverlay,
+      closePreview,
+    )
+
+  document
+    .querySelector(
+      '#closePlayerPreviewSecondaryButton',
+    )
+    ?.addEventListener(
+      'click',
+      closePreview,
     )
 
   document
@@ -1740,6 +1950,41 @@ export function bindPlayersEvents(
     )
     ?.addEventListener(
       'click',
-      closeOverlay,
+      closePreview,
+    )
+
+  document
+    .querySelector<HTMLButtonElement>(
+      '[data-call-player]',
+    )
+    ?.addEventListener(
+      'click',
+      (event) => {
+        if (
+          state.auctionPhase !==
+          'live'
+        ) {
+          return
+        }
+
+        const button =
+          event.currentTarget as
+            HTMLButtonElement
+
+        const playerId =
+          button.dataset
+            .callPlayer
+
+        if (!playerId) {
+          return
+        }
+
+        previewPlayerId =
+          null
+
+        actions.onCallPlayer(
+          playerId,
+        )
+      },
     )
 }

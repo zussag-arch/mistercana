@@ -40,12 +40,19 @@ import {
 } from './pages/importExport'
 
 import {
+  players,
+} from './data/players'
+
+import {
   loadState,
   saveState,
 } from './app/storage'
 
-let activePage: PageId =
-  'dashboard'
+import {
+  getActivePage,
+  isActivePage,
+  navigateTo,
+} from './app/router'
 
 const state =
   loadState()
@@ -79,7 +86,9 @@ function getPageContent(
       )
 
     case 'players':
-      return renderPlayersPage()
+      return renderPlayersPage(
+        state,
+      )
 
     case 'objectives':
       return renderObjectivesPage(
@@ -105,6 +114,47 @@ function saveAndRender(): void {
   )
 
   render()
+}
+
+function navigateAndRender(
+  page: PageId,
+): void {
+  navigateTo(
+    page,
+  )
+
+  render()
+}
+
+function callPlayerInAuction(
+  playerId: string,
+): void {
+  if (
+    state.auctionPhase !==
+    'live'
+  ) {
+    return
+  }
+
+  const playerExists =
+    players.some(
+      (player) =>
+        player.id ===
+        playerId,
+    )
+
+  if (!playerExists) {
+    return
+  }
+
+  state.currentAuctionPlayerId =
+    playerId
+
+  navigateTo(
+    'auction',
+  )
+
+  saveAndRender()
 }
 
 function startAuction(): void {
@@ -136,8 +186,12 @@ function startAuction(): void {
   state.auctionPhase =
     'live'
 
-  activePage =
-    'auction'
+  state.currentAuctionPlayerId =
+    null
+
+  navigateTo(
+    'auction',
+  )
 
   saveAndRender()
 }
@@ -146,8 +200,12 @@ function endAuction(): void {
   state.auctionPhase =
     'finalizing'
 
-  activePage =
-    'auction'
+  state.currentAuctionPlayerId =
+    null
+
+  navigateTo(
+    'auction',
+  )
 
   saveAndRender()
 }
@@ -156,8 +214,12 @@ function archiveAuction(): void {
   state.auctionPhase =
     'archived'
 
-  activePage =
-    'auction'
+  state.currentAuctionPlayerId =
+    null
+
+  navigateTo(
+    'auction',
+  )
 
   saveAndRender()
 }
@@ -166,8 +228,12 @@ function discardAuction(): void {
   state.auctionPhase =
     'discarded'
 
-  activePage =
-    'auction'
+  state.currentAuctionPlayerId =
+    null
+
+  navigateTo(
+    'auction',
+  )
 
   saveAndRender()
 }
@@ -176,20 +242,21 @@ function newAuction(): void {
   state.auctionPhase =
     'setup'
 
-  activePage =
-    'dashboard'
+  state.currentAuctionPlayerId =
+    null
 
-  saveState(
-    state,
+  navigateTo(
+    'dashboard',
   )
 
-  render()
+  saveAndRender()
 }
 
 function bindPageEvents(): void {
   if (
-    activePage ===
-    'dashboard'
+    isActivePage(
+      'dashboard',
+    )
   ) {
     bindDashboardEvents(
       state,
@@ -204,8 +271,9 @@ function bindPageEvents(): void {
   }
 
   if (
-    activePage ===
-    'auction'
+    isActivePage(
+      'auction',
+    )
   ) {
     bindAuctionEvents(
       state,
@@ -222,6 +290,9 @@ function bindPageEvents(): void {
         onNewAuction:
           newAuction,
 
+        onStateChange:
+          saveAndRender,
+
         onRender:
           render,
       },
@@ -229,18 +300,26 @@ function bindPageEvents(): void {
   }
 
   if (
-    activePage ===
-    'players'
+    isActivePage(
+      'players',
+    )
   ) {
-    bindPlayersEvents({
-      onRender:
-        render,
-    })
+    bindPlayersEvents(
+      state,
+      {
+        onRender:
+          render,
+
+        onCallPlayer:
+          callPlayerInAuction,
+      },
+    )
   }
 
   if (
-    activePage ===
-    'objectives'
+    isActivePage(
+      'objectives',
+    )
   ) {
     bindObjectivesEvents(
       state,
@@ -275,10 +354,9 @@ function bindNavigation(): void {
               return
             }
 
-            activePage =
-              page
-
-            render()
+            navigateAndRender(
+              page,
+            )
           },
         )
       },
@@ -286,6 +364,9 @@ function bindNavigation(): void {
 }
 
 function render(): void {
+  const activePage =
+    getActivePage()
+
   app.innerHTML = `
     ${renderNavigation(
       activePage,
@@ -293,11 +374,9 @@ function render(): void {
     )}
 
     <main class="app-content">
-
       ${getPageContent(
         activePage,
       )}
-
     </main>
   `
 

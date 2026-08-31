@@ -45,6 +45,19 @@ export interface Manager {
 export interface AppState {
   auctionPhase: AuctionPhase
 
+  /*
+    ID permanente del giocatore
+    attualmente chiamato.
+
+    Nome, squadra e ruolo NON vengono
+    duplicati nello stato:
+    derivano sempre dal database
+    centrale dei giocatori.
+  */
+  currentAuctionPlayerId:
+    | string
+    | null
+
   initialCredits: number
 
   defenseModifierEnabled: boolean
@@ -69,6 +82,8 @@ export interface AppState {
 
 export const defaultState: AppState = {
   auctionPhase: 'setup',
+
+  currentAuctionPlayerId: null,
 
   initialCredits: 500,
 
