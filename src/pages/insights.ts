@@ -8,6 +8,10 @@ import setPiecesCsv
   from '../../database/MisterCana_DB_Battitori.csv?raw'
 
 import {
+  runOverlayExit,
+} from '../app/motion'
+
+import {
   calculateGoalkeeperPairCoverage,
   goalkeeperCalendarTeams,
 } from '../data/goalkeeperCalendar'
@@ -1239,6 +1243,7 @@ function renderGoalkeeperSection():
         goalkeeper-matrix-overlay
       "
       hidden
+      aria-hidden="true"
       data-goalkeeper-overlay
     >
       <div
@@ -2454,7 +2459,16 @@ function openGoalkeeperMatrix():
     return
   }
 
+  overlay.classList.remove(
+    'is-closing',
+  )
+
   overlay.hidden = false
+
+  overlay.setAttribute(
+    'aria-hidden',
+    'false',
+  )
 
   document.body.classList.add(
     'insights-overlay-open',
@@ -2468,14 +2482,31 @@ function closeGoalkeeperMatrix():
       '#goalkeeperMatrixOverlay',
     )
 
-  if (!overlay) {
+  if (
+    !overlay ||
+    overlay.hidden
+  ) {
     return
   }
 
-  overlay.hidden = true
+  runOverlayExit(
+    '#goalkeeperMatrixOverlay',
+    () => {
+      overlay.hidden = true
 
-  document.body.classList.remove(
-    'insights-overlay-open',
+      overlay.classList.remove(
+        'is-closing',
+      )
+
+      overlay.setAttribute(
+        'aria-hidden',
+        'true',
+      )
+
+      document.body.classList.remove(
+        'insights-overlay-open',
+      )
+    },
   )
 }
 

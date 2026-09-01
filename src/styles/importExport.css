@@ -66,6 +66,14 @@
   box-shadow:
     inset 0 1px 0
     rgba(255, 255, 255, 0.025);
+
+  transition:
+    border-color
+      var(--motion-fast)
+      var(--ease-standard),
+    background
+      var(--motion-fast)
+      var(--ease-standard);
 }
 
 .data-transfer-section-header {
@@ -147,6 +155,14 @@
   box-shadow:
     inset 0 1px 0
     rgba(255, 255, 255, 0.018);
+
+  transition:
+    border-color
+      var(--motion-fast)
+      var(--ease-standard),
+    background
+      var(--motion-fast)
+      var(--ease-standard);
 }
 
 .data-transfer-card-header {
@@ -176,6 +192,17 @@
 
   font-size: 15px;
   font-weight: 800;
+
+  transition:
+    border-color
+      var(--motion-fast)
+      var(--ease-standard),
+    background
+      var(--motion-fast)
+      var(--ease-standard),
+    color
+      var(--motion-fast)
+      var(--ease-standard);
 }
 
 .data-transfer-icon-import {
@@ -190,6 +217,15 @@
 
   background:
     rgba(77, 145, 231, 0.08);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .data-transfer-card:hover {
+    border-color:
+      rgba(255, 255, 255, 0.11);
+
+    background: #1a1d1f;
+  }
 }
 
 /* =========================
@@ -211,6 +247,17 @@
   font-weight: 750;
 
   white-space: nowrap;
+
+  transition:
+    border-color
+      var(--motion-fast)
+      var(--ease-standard),
+    background
+      var(--motion-fast)
+      var(--ease-standard),
+    color
+      var(--motion-fast)
+      var(--ease-standard);
 }
 
 .status-pending {
@@ -343,6 +390,23 @@
   font-weight: 750;
 
   cursor: default;
+
+  transition:
+    color
+      var(--motion-fast)
+      var(--ease-standard),
+    border-color
+      var(--motion-fast)
+      var(--ease-standard),
+    background
+      var(--motion-fast)
+      var(--ease-standard),
+    box-shadow
+      var(--motion-fast)
+      var(--ease-standard),
+    transform
+      var(--motion-instant)
+      var(--ease-out);
 }
 
 .data-transfer-button-primary {
@@ -350,19 +414,11 @@
     rgba(90, 168, 255, 0.22);
 
   background:
-    rgba(90, 168, 255, 0.10);
+    rgba(90, 168, 255, 0.1);
 
   color: #82b9f5;
 
   cursor: pointer;
-}
-
-.data-transfer-button-primary:hover {
-  border-color:
-    rgba(90, 168, 255, 0.38);
-
-  background:
-    rgba(90, 168, 255, 0.15);
 }
 
 .data-transfer-button-secondary {
@@ -383,18 +439,54 @@
   cursor: pointer;
 }
 
-.data-transfer-button-danger:hover {
-  border-color:
-    rgba(228, 94, 94, 0.42);
+.data-transfer-button:not(:disabled):active {
+  transform: scale(0.96);
+}
 
-  background:
-    rgba(228, 94, 94, 0.16);
+.data-transfer-button:focus-visible {
+  outline: none;
+
+  box-shadow:
+    var(--focus-ring);
 }
 
 .data-transfer-button:disabled {
   opacity: 0.62;
 
   cursor: default;
+
+  transform: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .data-transfer-button-primary:hover:not(:disabled) {
+    border-color:
+      rgba(90, 168, 255, 0.38);
+
+    background:
+      rgba(90, 168, 255, 0.15);
+
+    color: #9ac9fb;
+  }
+
+  .data-transfer-button-secondary:hover:not(:disabled) {
+    border-color:
+      rgba(255, 255, 255, 0.14);
+
+    background: #262a2d;
+
+    color: #d6dadd;
+  }
+
+  .data-transfer-button-danger:hover:not(:disabled) {
+    border-color:
+      rgba(228, 94, 94, 0.42);
+
+    background:
+      rgba(228, 94, 94, 0.16);
+
+    color: #f08f8f;
+  }
 }
 
 .data-transfer-file-input {
@@ -418,6 +510,32 @@
   border-radius: 16px;
 
   font-size: 9px;
+
+  transform-origin:
+    top center;
+
+  animation:
+    dataTransferFeedbackEnter
+    var(--motion-base)
+    var(--ease-out);
+}
+
+@keyframes dataTransferFeedbackEnter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(-3px)
+      scale(0.995);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
 }
 
 .data-transfer-feedback strong {
@@ -487,6 +605,32 @@
   border-radius: 20px;
 
   background: #15181a;
+
+  transform-origin:
+    top center;
+
+  animation:
+    restorePreviewEnter
+    var(--motion-base)
+    var(--ease-out);
+}
+
+@keyframes restorePreviewEnter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(-4px)
+      scale(0.995);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
 }
 
 .restore-preview-header {
@@ -552,6 +696,14 @@
   border-radius: 14px;
 
   background: #191c1e;
+
+  transition:
+    border-color
+      var(--motion-fast)
+      var(--ease-standard),
+    background
+      var(--motion-fast)
+      var(--ease-standard);
 }
 
 .restore-preview-grid span {
@@ -562,6 +714,9 @@
 
 .restore-preview-grid strong {
   font-size: 10px;
+
+  font-variant-numeric:
+    tabular-nums;
 }
 
 .restore-preview-warning {
@@ -591,6 +746,15 @@
   gap: 8px;
 
   margin-top: 12px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .restore-preview-grid > div:hover {
+    border-color:
+      rgba(255, 255, 255, 0.09);
+
+    background: #1b1f21;
+  }
 }
 
 /* =========================
@@ -701,8 +865,9 @@
 
   .data-transfer-button {
     width: 100%;
+    min-height: 44px;
 
-    min-height: 40px;
+    font-size: 9px;
   }
 
   .data-transfer-feedback {
@@ -735,5 +900,28 @@
 @media (max-width: 420px) {
   .restore-preview-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* =========================
+   REDUCED MOTION
+========================= */
+
+@media (
+  prefers-reduced-motion:
+  reduce
+) {
+  .data-transfer-section,
+  .data-transfer-card,
+  .data-transfer-icon,
+  .data-transfer-status,
+  .data-transfer-button,
+  .restore-preview-grid > div {
+    transition: none;
+  }
+
+  .data-transfer-feedback,
+  .restore-preview {
+    animation: none;
   }
 }
