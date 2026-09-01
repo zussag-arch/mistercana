@@ -2,10 +2,30 @@ import type {
   AppState,
 } from '../app/state'
 
+import {
+  calculateDemand,
+  calculateSupply,
+  getFilledRosterCount,
+  getOwnerRemainingCredits,
+  getOwnerRemainingStrategicSlots,
+  getPlayerById,
+  getPlayerSlot,
+  getPmaCredits,
+  getSlotBenchmark,
+  getSpentByRole,
+  median,
+  ROLE_ORDER,
+  ROSTER_SLOT_LIMITS,
+} from './auctionContext'
+
 import type {
   Player,
   PlayerRole,
 } from './player'
+
+export {
+  ROSTER_SLOT_LIMITS,
+} from './auctionContext'
 
 export type PriceConstraint =
   | 'financial'
@@ -27,31 +47,9 @@ export interface PriceAdviceParameters {
 
   minimumFutureSlotCost: number
 
-  /*
-    Scarsità.
-
-    Pressione =
-    domanda / supply
-
-    Fattore =
-    1 + k * max(0, pressione - 1)
-
-    con cap massimo.
-  */
   scarcityK: number
   scarcityFactorCap: number
 
-  /*
-    Peso del Limite reparto
-    nel tetto operativo morbido.
-
-    0   -> segue soltanto Valore asta
-    0.5 -> media fra Valore asta
-           e Limite reparto
-    1   -> segue Limite reparto
-
-    Parametro V1 configurabile.
-  */
   roleBlendWeight: number
 }
 
@@ -59,53 +57,45 @@ export const DEFAULT_PRICE_ADVICE_PARAMETERS:
   PriceAdviceParameters = {
     reserveFactor: 0.9,
 
-    baseRoleElasticity: 1.08,
+    baseRoleElasticity:
+      1.08,
 
-    topSlotElasticity: 1.22,
+    topSlotElasticity:
+      1.22,
 
-    sameRoleMinSample: 3,
+    sameRoleMinSample:
+      3,
 
-    minimumFutureSlotCost: 1,
+    minimumFutureSlotCost:
+      1,
 
-    scarcityK: 0.10,
+    scarcityK:
+      0.10,
 
-    scarcityFactorCap: 1.25,
+    scarcityFactorCap:
+      1.25,
 
-    roleBlendWeight: 0.50,
+    roleBlendWeight:
+      0.50,
   }
-
-export const ROSTER_SLOT_LIMITS:
-  Record<
-    PlayerRole,
-    number
-  > = {
-    P: 3,
-    D: 8,
-    C: 8,
-    A: 6,
-  }
-
-const ROLE_ORDER:
-  PlayerRole[] = [
-    'P',
-    'D',
-    'C',
-    'A',
-  ]
 
 export interface PriceAdvice {
   pmaCredits?: number
 
-  auctionMarketFactor: number
+  auctionMarketFactor:
+    number
 
   auctionMarketSource:
     AuctionMarketSource
 
-  auctionMarketSampleSize: number
+  auctionMarketSampleSize:
+    number
 
-  roleMarketSampleSize: number
+  roleMarketSampleSize:
+    number
 
-  overallMarketSampleSize: number
+  overallMarketSampleSize:
+    number
 
   baseAuctionValue?: number
 
@@ -115,47 +105,34 @@ export interface PriceAdvice {
 
   scarcityFactor: number
 
-  expectedAuctionValue?: number
+  expectedAuctionValue?:
+    number
 
   financialLimit?: number
-
   roleLimit?: number
-
   valueLimit?: number
 
-  /*
-    Tetto morbido ottenuto
-    combinando Valore asta
-    e Limite reparto.
-  */
-  softRecommendedCeiling?: number
+  softRecommendedCeiling?:
+    number
 
-  /*
-    Tetto operativo finale.
-
-    Può essere abbassato dal
-    Limite finanziario, che resta
-    il vero hard cap.
-  */
-  recommendedCeiling?: number
+  recommendedCeiling?:
+    number
 
   bindingConstraints:
     PriceConstraint[]
 
   playerSlot?: number
 
-  ownerRemainingCredits?: number
+  ownerRemainingCredits?:
+    number
 
-  dynamicRoleTarget?: number
+  dynamicRoleTarget?:
+    number
 
   roleReserve?: number
 
   globalReserve?: number
 }
-
-/* =========================
-   BASIC HELPERS
-========================= */
 
 function clamp(
   value: number,
@@ -171,400 +148,6 @@ function clamp(
   )
 }
 
-function median(
-  values: number[],
-):
-  number | undefined {
-  const valid =
-    values
-      .filter(
-        (value) =>
-          Number.isFinite(
-            value,
-          ),
-      )
-      .sort(
-        (
-          first,
-          second,
-        ) =>
-          first - second,
-      )
-
-  if (!valid.length) {
-    return undefined
-  }
-
-  const middle =
-    Math.floor(
-      valid.length / 2,
-    )
-
-  if (
-    valid.length % 2 ===
-    1
-  ) {
-    return valid[
-      middle
-    ]
-  }
-
-  return (
-    valid[
-      middle - 1
-    ] +
-    valid[
-      middle
-    ]
-  ) / 2
-}
-
-function getPmaCredits(
-  player: Player,
-  initialCredits: number,
-):
-  number | undefined {
-  if (
-    player.pmaPercent ===
-      undefined ||
-    !Number.isFinite(
-      player.pmaPercent,
-    ) ||
-    player.pmaPercent <= 0 ||
-    !Number.isFinite(
-      initialCredits,
-    ) ||
-    initialCredits <= 0
-  ) {
-    return undefined
-  }
-
-  return (
-    initialCredits *
-    player.pmaPercent /
-    100
-  )
-}
-
-function getPlayerById(
-  allPlayers: Player[],
-  playerId: string,
-):
-  Player | undefined {
-  return allPlayers.find(
-    (player) =>
-      player.id ===
-      playerId,
-  )
-}
-
-function getActiveManagers(
-  state: AppState,
-) {
-  return state.managers.filter(
-    (manager) =>
-      manager.active &&
-      !manager.archived,
-  )
-}
-
-function getOwnerManagerId(
-  state: AppState,
-):
-  string | undefined {
-  const managers =
-    getActiveManagers(
-      state,
-    )
-
-  return (
-    managers.find(
-      (manager) =>
-        manager.isOwner,
-    ) ??
-    managers[0]
-  )?.id
-}
-
-function getManagerAssignments(
-  state: AppState,
-  managerId: string,
-) {
-  return state
-    .auctionAssignments
-    .filter(
-      (assignment) =>
-        assignment.managerId ===
-        managerId,
-    )
-}
-
-function getOwnerAssignments(
-  state: AppState,
-) {
-  const ownerId =
-    getOwnerManagerId(
-      state,
-    )
-
-  if (!ownerId) {
-    return []
-  }
-
-  return getManagerAssignments(
-    state,
-    ownerId,
-  )
-}
-
-function isPlayerAssigned(
-  state: AppState,
-  playerId: string,
-): boolean {
-  return state
-    .auctionAssignments
-    .some(
-      (assignment) =>
-        assignment.playerId ===
-        playerId,
-    )
-}
-
-function getSpentByRole(
-  state: AppState,
-  allPlayers: Player[],
-):
-  Record<
-    PlayerRole,
-    number
-  > {
-  const spent:
-    Record<
-      PlayerRole,
-      number
-    > = {
-      P: 0,
-      D: 0,
-      C: 0,
-      A: 0,
-    }
-
-  getOwnerAssignments(
-    state,
-  ).forEach(
-    (assignment) => {
-      const player =
-        getPlayerById(
-          allPlayers,
-          assignment.playerId,
-        )
-
-      if (!player) {
-        return
-      }
-
-      spent[
-        player.role
-      ] +=
-        assignment.price
-    },
-  )
-
-  return spent
-}
-
-function getOwnerRemainingCredits(
-  state: AppState,
-):
-  number | undefined {
-  const ownerId =
-    getOwnerManagerId(
-      state,
-    )
-
-  if (!ownerId) {
-    return undefined
-  }
-
-  const spent =
-    getManagerAssignments(
-      state,
-      ownerId,
-    ).reduce(
-      (
-        total,
-        assignment,
-      ) =>
-        total +
-        assignment.price,
-      0,
-    )
-
-  return Math.max(
-    0,
-    state.initialCredits -
-      spent,
-  )
-}
-
-/* =========================
-   PLAYER MARKET SLOT
-========================= */
-
-function getLeagueSize(
-  state: AppState,
-): number {
-  return Math.max(
-    1,
-    getActiveManagers(
-      state,
-    ).length,
-  )
-}
-
-function getSortedRolePlayers(
-  role: PlayerRole,
-  allPlayers: Player[],
-  initialCredits: number,
-): Player[] {
-  return allPlayers
-    .filter(
-      (player) =>
-        player.role ===
-        role &&
-        getPmaCredits(
-          player,
-          initialCredits,
-        ) !== undefined,
-    )
-    .sort(
-      (
-        first,
-        second,
-      ) =>
-        (
-          getPmaCredits(
-            second,
-            initialCredits,
-          ) ??
-          -Infinity
-        ) -
-        (
-          getPmaCredits(
-            first,
-            initialCredits,
-          ) ??
-          -Infinity
-        ),
-    )
-}
-
-function getPlayerSlot(
-  state: AppState,
-  player: Player,
-  allPlayers: Player[],
-):
-  number | undefined {
-  const pma =
-    getPmaCredits(
-      player,
-      state.initialCredits,
-    )
-
-  if (pma === undefined) {
-    return undefined
-  }
-
-  const sorted =
-    getSortedRolePlayers(
-      player.role,
-      allPlayers,
-      state.initialCredits,
-    )
-
-  const index =
-    sorted.findIndex(
-      (candidate) =>
-        candidate.id ===
-        player.id,
-    )
-
-  if (index < 0) {
-    return undefined
-  }
-
-  const leagueSize =
-    getLeagueSize(
-      state,
-    )
-
-  return (
-    Math.floor(
-      index /
-      leagueSize,
-    ) + 1
-  )
-}
-
-function getSlotBenchmark(
-  state: AppState,
-  role: PlayerRole,
-  slot: number,
-  allPlayers: Player[],
-):
-  number | undefined {
-  if (slot <= 0) {
-    return undefined
-  }
-
-  const leagueSize =
-    getLeagueSize(
-      state,
-    )
-
-  const sorted =
-    getSortedRolePlayers(
-      role,
-      allPlayers,
-      state.initialCredits,
-    )
-
-  const start =
-    (
-      slot - 1
-    ) *
-    leagueSize
-
-  const end =
-    start +
-    leagueSize
-
-  const values =
-    sorted
-      .slice(
-        start,
-        end,
-      )
-      .map(
-        (player) =>
-          getPmaCredits(
-            player,
-            state.initialCredits,
-          ),
-      )
-      .filter(
-        (
-          value,
-        ): value is number =>
-          value !==
-          undefined,
-      )
-
-  return median(
-    values,
-  )
-}
-
 /* =========================
    MARKET OBSERVATION
 ========================= */
@@ -572,8 +155,7 @@ function getSlotBenchmark(
 function getMarketRatios(
   state: AppState,
   allPlayers: Player[],
-  role?:
-    PlayerRole,
+  role?: PlayerRole,
 ): number[] {
   return state
     .auctionAssignments
@@ -591,8 +173,7 @@ function getMarketRatios(
 
         if (
           role &&
-          player.role !==
-            role
+          player.role !== role
         ) {
           return undefined
         }
@@ -621,11 +202,8 @@ function getMarketRatios(
       (
         value,
       ): value is number =>
-        value !==
-          undefined &&
-        Number.isFinite(
-          value,
-        ) &&
+        value !== undefined &&
+        Number.isFinite(value) &&
         value > 0,
     )
 }
@@ -657,21 +235,16 @@ function calculateAuctionMarket(
     )
 
   const roleMedian =
-    median(
-      roleRatios,
-    )
+    median(roleRatios)
 
   const overallMedian =
-    median(
-      overallRatios,
-    )
+    median(overallRatios)
 
   if (
     roleRatios.length >=
       parameters
         .sameRoleMinSample &&
-    roleMedian !==
-      undefined
+    roleMedian !== undefined
   ) {
     return {
       factor:
@@ -717,8 +290,7 @@ function calculateAuctionMarket(
   }
 
   if (
-    roleMedian !==
-    undefined
+    roleMedian !== undefined
   ) {
     return {
       factor:
@@ -780,11 +352,10 @@ function calculateAuctionMarket(
 
 function getBaseRoleTargets(
   state: AppState,
-):
-  Record<
-    PlayerRole,
-    number
-  > {
+): Record<
+  PlayerRole,
+  number
+> {
   return {
     P:
       state.initialCredits *
@@ -816,88 +387,17 @@ function getBaseRoleTargets(
   }
 }
 
-function getManagerRolePlayers(
-  state: AppState,
-  allPlayers: Player[],
-  managerId: string,
-  role: PlayerRole,
-): Player[] {
-  return getManagerAssignments(
-    state,
-    managerId,
-  )
-    .map(
-      (assignment) =>
-        getPlayerById(
-          allPlayers,
-          assignment.playerId,
-        ),
-    )
-    .filter(
-      (
-        player,
-      ): player is Player =>
-        Boolean(
-          player &&
-          player.role ===
-            role,
-        ),
-    )
-}
-
-function getOwnerRolePlayers(
-  state: AppState,
-  allPlayers: Player[],
-  role: PlayerRole,
-): Player[] {
-  const ownerId =
-    getOwnerManagerId(
-      state,
-    )
-
-  if (!ownerId) {
-    return []
-  }
-
-  return getManagerRolePlayers(
-    state,
-    allPlayers,
-    ownerId,
-    role,
-  )
-}
-
-function getFilledRosterCount(
-  state: AppState,
-  allPlayers: Player[],
-  role: PlayerRole,
-): number {
-  return Math.min(
-    ROSTER_SLOT_LIMITS[
-      role
-    ],
-    getOwnerRolePlayers(
-      state,
-      allPlayers,
-      role,
-    ).length,
-  )
-}
-
 function getAdjustedRoleTargets(
   state: AppState,
   allPlayers: Player[],
   parameters:
     PriceAdviceParameters,
-):
-  Record<
-    PlayerRole,
-    number
-  > {
+): Record<
+  PlayerRole,
+  number
+> {
   const targets =
-    getBaseRoleTargets(
-      state,
-    )
+    getBaseRoleTargets(state)
 
   const spent =
     getSpentByRole(
@@ -932,17 +432,11 @@ function getAdjustedRoleTargets(
       }
 
       const delta =
-        targets[
-          role
-        ] -
-        spent[
-          role
-        ]
+        targets[role] -
+        spent[role]
 
       if (
-        Math.abs(
-          delta,
-        ) <
+        Math.abs(delta) <
         0.0001
       ) {
         return
@@ -995,9 +489,7 @@ function getAdjustedRoleTargets(
       }
 
       let deficit =
-        Math.abs(
-          delta,
-        )
+        Math.abs(delta)
 
       for (
         const futureRole
@@ -1156,183 +648,8 @@ function getRoleStrategicQuotas(
 }
 
 /* =========================
-   STRATEGIC SLOT COVERAGE
+   ROLE RESERVE
 ========================= */
-
-function coverRemainingSlots(
-  state: AppState,
-  role: PlayerRole,
-  allPlayers: Player[],
-  rolePlayers: Player[],
-): number[] {
-  const limit =
-    ROSTER_SLOT_LIMITS[
-      role
-    ]
-
-  const remaining =
-    Array.from(
-      {
-        length:
-          limit,
-      },
-      (
-        _,
-        index,
-      ) =>
-        index + 1,
-    )
-
-  const marketSlots =
-    rolePlayers
-      .map(
-        (player) => ({
-          slot:
-            getPlayerSlot(
-              state,
-              player,
-              allPlayers,
-            ),
-        }),
-      )
-      .sort(
-        (
-          first,
-          second,
-        ) =>
-          (
-            first.slot ??
-            Infinity
-          ) -
-          (
-            second.slot ??
-            Infinity
-          ),
-      )
-
-  for (
-    const item
-    of marketSlots
-  ) {
-    if (!remaining.length) {
-      break
-    }
-
-    const marketSlot =
-      item.slot
-
-    if (
-      marketSlot ===
-      undefined
-    ) {
-      remaining.pop()
-
-      continue
-    }
-
-    const compatibleIndex =
-      remaining.findIndex(
-        (requiredSlot) =>
-          marketSlot <=
-          requiredSlot,
-      )
-
-    if (
-      compatibleIndex >= 0
-    ) {
-      remaining.splice(
-        compatibleIndex,
-        1,
-      )
-
-      continue
-    }
-
-    remaining.pop()
-  }
-
-  return remaining
-}
-
-function getRemainingStrategicSlotsForManager(
-  state: AppState,
-  role: PlayerRole,
-  allPlayers: Player[],
-  managerId: string,
-  simulatedPlayer?:
-    Player,
-): number[] {
-  const owned =
-    getManagerRolePlayers(
-      state,
-      allPlayers,
-      managerId,
-      role,
-    )
-
-  const coveringPlayers =
-    [
-      ...owned,
-    ]
-
-  if (
-    simulatedPlayer &&
-    simulatedPlayer.role ===
-      role &&
-    !isPlayerAssigned(
-      state,
-      simulatedPlayer.id,
-    )
-  ) {
-    coveringPlayers.push(
-      simulatedPlayer,
-    )
-  }
-
-  return coverRemainingSlots(
-    state,
-    role,
-    allPlayers,
-    coveringPlayers,
-  )
-}
-
-function getOwnerRemainingStrategicSlots(
-  state: AppState,
-  role: PlayerRole,
-  allPlayers: Player[],
-  simulatedPlayer?:
-    Player,
-): number[] {
-  const ownerId =
-    getOwnerManagerId(
-      state,
-    )
-
-  if (!ownerId) {
-    return Array.from(
-      {
-        length:
-          ROSTER_SLOT_LIMITS[
-            role
-          ],
-      },
-      (
-        _,
-        index,
-      ) =>
-        index + 1,
-    )
-  }
-
-  return getRemainingStrategicSlotsForManager(
-    state,
-    role,
-    allPlayers,
-    ownerId,
-    simulatedPlayer,
-  )
-}
 
 function getRoleReserve(
   state: AppState,
@@ -1388,7 +705,7 @@ function getRoleReserve(
 }
 
 /* =========================
-   GLOBAL FINANCIAL RESERVE
+   GLOBAL RESERVE
 ========================= */
 
 function calculateGlobalReserve(
@@ -1418,8 +735,7 @@ function calculateGlobalReserve(
             role
           ],
           parameters,
-          player.role ===
-            role
+          player.role === role
             ? player
             : undefined,
         )
@@ -1448,123 +764,8 @@ function calculateGlobalReserve(
 }
 
 /* =========================
-   SUPPLY / DEMAND
+   SCARCITY
 ========================= */
-
-function calculateSupply(
-  state: AppState,
-  player: Player,
-  allPlayers: Player[],
-  playerSlot:
-    number | undefined,
-): number | undefined {
-  if (
-    playerSlot ===
-    undefined
-  ) {
-    return undefined
-  }
-
-  return allPlayers.filter(
-    (candidate) => {
-      if (
-        candidate.role !==
-        player.role
-      ) {
-        return false
-      }
-
-      if (
-        isPlayerAssigned(
-          state,
-          candidate.id,
-        )
-      ) {
-        return false
-      }
-
-      const candidateSlot =
-        getPlayerSlot(
-          state,
-          candidate,
-          allPlayers,
-        )
-
-      if (
-        candidateSlot ===
-        undefined
-      ) {
-        return false
-      }
-
-      /*
-        Supply dello stesso slot
-        o migliore.
-
-        Slot 1 è migliore di Slot 2.
-      */
-      return (
-        candidateSlot <=
-        playerSlot
-      )
-    },
-  ).length
-}
-
-function calculateDemand(
-  state: AppState,
-  player: Player,
-  allPlayers: Player[],
-  playerSlot:
-    number | undefined,
-): number | undefined {
-  if (
-    playerSlot ===
-    undefined
-  ) {
-    return undefined
-  }
-
-  const managers =
-    getActiveManagers(
-      state,
-    )
-
-  return managers.filter(
-    (manager) => {
-      const remaining =
-        getRemainingStrategicSlotsForManager(
-          state,
-          player.role,
-          allPlayers,
-          manager.id,
-        )
-
-      if (!remaining.length) {
-        return false
-      }
-
-      /*
-        Una squadra conta come
-        domanda per Slot X se deve
-        ancora coprire Slot X
-        oppure una fascia migliore.
-
-        Esempio P1:
-        deve ancora mancare P1.
-
-        Esempio P2:
-        deve ancora mancare
-        P1 oppure P2.
-      */
-      return remaining.some(
-        (requiredSlot) =>
-          requiredSlot <=
-          playerSlot,
-      )
-    },
-  ).length
-}
 
 function calculateScarcity(
   supply:
@@ -1615,7 +816,7 @@ function calculateScarcity(
 }
 
 /* =========================
-   DYNAMIC RECOMMENDED CEILING
+   DYNAMIC CEILING
 ========================= */
 
 function calculateSoftCeiling(
@@ -1625,8 +826,7 @@ function calculateSoftCeiling(
     number | undefined,
   parameters:
     PriceAdviceParameters,
-):
-  number | undefined {
+): number | undefined {
   if (
     valueLimit === undefined &&
     roleLimit === undefined
@@ -1671,7 +871,7 @@ function calculateSoftCeiling(
 }
 
 /* =========================
-   MAIN CALCULATION
+   MAIN
 ========================= */
 
 export function calculatePriceAdvice(
@@ -1682,10 +882,6 @@ export function calculatePriceAdvice(
     PriceAdviceParameters =
       DEFAULT_PRICE_ADVICE_PARAMETERS,
 ): PriceAdvice {
-  /* -------------------------
-     PMA / MARKET
-  ------------------------- */
-
   const pmaCredits =
     getPmaCredits(
       player,
@@ -1701,17 +897,12 @@ export function calculatePriceAdvice(
     )
 
   const baseAuctionValue =
-    pmaCredits ===
-      undefined
+    pmaCredits === undefined
       ? undefined
       : (
           pmaCredits *
           market.factor
         )
-
-  /* -------------------------
-     SLOT / SCARCITY
-  ------------------------- */
 
   const playerSlot =
     getPlayerSlot(
@@ -1744,8 +935,7 @@ export function calculatePriceAdvice(
     )
 
   const expectedAuctionValue =
-    baseAuctionValue ===
-      undefined
+    baseAuctionValue === undefined
       ? undefined
       : (
           baseAuctionValue *
@@ -1753,8 +943,7 @@ export function calculatePriceAdvice(
         )
 
   const valueLimit =
-    expectedAuctionValue ===
-      undefined
+    expectedAuctionValue === undefined
       ? undefined
       : Math.max(
           1,
@@ -1762,10 +951,6 @@ export function calculatePriceAdvice(
             expectedAuctionValue,
           ),
         )
-
-  /* -------------------------
-     OWNER / STRATEGY
-  ------------------------- */
 
   const ownerRemainingCredits =
     getOwnerRemainingCredits(
@@ -1789,10 +974,6 @@ export function calculatePriceAdvice(
     adjustedTargets[
       player.role
     ]
-
-  /* -------------------------
-     FINANCIAL LIMIT
-  ------------------------- */
 
   const globalReserve =
     ownerRemainingCredits ===
@@ -1819,10 +1000,6 @@ export function calculatePriceAdvice(
               globalReserve,
           ),
         )
-
-  /* -------------------------
-     ROLE LIMIT
-  ------------------------- */
 
   const roleReserveData =
     getRoleReserve(
@@ -1861,10 +1038,6 @@ export function calculatePriceAdvice(
       ),
     )
 
-  /* -------------------------
-     DYNAMIC CEILING
-  ------------------------- */
-
   const softRecommendedCeiling =
     calculateSoftCeiling(
       valueLimit,
@@ -1872,14 +1045,6 @@ export function calculatePriceAdvice(
       parameters,
     )
 
-  /*
-    Il finanziario è il vero
-    hard cap.
-
-    Valore e reparto sono invece
-    segnali morbidi che concorrono
-    al tetto dinamico.
-  */
   const recommendedCeiling =
     softRecommendedCeiling ===
       undefined
@@ -1914,42 +1079,29 @@ export function calculatePriceAdvice(
       bindingConstraints.push(
         'financial',
       )
-    } else {
-      /*
-        Il tetto nasce dal blend
-        dei due segnali morbidi.
-
-        Indichiamo quale dei due
-        sta tirando maggiormente
-        verso il basso.
-      */
-      if (
-        valueLimit !==
-          undefined &&
-        roleLimit !==
-          undefined
-      ) {
-        bindingConstraints.push(
-          valueLimit <=
-            roleLimit
-            ? 'value'
-            : 'role',
-        )
-      } else if (
-        valueLimit !==
+    } else if (
+      valueLimit !==
+        undefined &&
+      roleLimit !==
         undefined
-      ) {
-        bindingConstraints.push(
-          'value',
-        )
-      } else if (
-        roleLimit !==
-        undefined
-      ) {
-        bindingConstraints.push(
-          'role',
-        )
-      }
+    ) {
+      bindingConstraints.push(
+        valueLimit <= roleLimit
+          ? 'value'
+          : 'role',
+      )
+    } else if (
+      valueLimit !== undefined
+    ) {
+      bindingConstraints.push(
+        'value',
+      )
+    } else if (
+      roleLimit !== undefined
+    ) {
+      bindingConstraints.push(
+        'role',
+      )
     }
   }
 

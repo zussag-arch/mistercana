@@ -17,10 +17,18 @@ import type {
   PriceConstraint,
 } from '../domain/priceAdvice'
 
+import {
+  calculateRecommendation,
+} from '../domain/recommendation'
+
 import type {
   Player,
   PlayerRole,
 } from '../domain/player'
+
+import {
+  renderPlayerDetailOverlay,
+} from '../components/playerDetailOverlay'
 
 type AuctionRole =
   PlayerRole
@@ -95,6 +103,18 @@ let auctionFeedback = ''
 let editingAssignmentId:
   string | null = null
 
+let discardedPanelOpen =
+  false
+
+let awardOverlayOpen =
+  false
+
+let pendingAwardPrice:
+  number | null = null
+
+let detailPlayerId:
+  string | null = null
+
 /* =========================
    HELPERS
 ========================= */
@@ -103,22 +123,10 @@ function escapeHtml(
   value: string,
 ): string {
   return value
-    .replaceAll(
-      '&',
-      '&amp;',
-    )
-    .replaceAll(
-      '<',
-      '&lt;',
-    )
-    .replaceAll(
-      '>',
-      '&gt;',
-    )
-    .replaceAll(
-      '"',
-      '&quot;',
-    )
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
     .replaceAll(
       "'",
       '&#039;',
@@ -171,10 +179,7 @@ function formatNumber(
 
   return value
     .toFixed(digits)
-    .replace(
-      '.',
-      ',',
-    )
+    .replace('.', ',')
 }
 
 function formatCredits(
@@ -184,9 +189,7 @@ function formatCredits(
 ): string {
   if (
     value === undefined ||
-    !Number.isFinite(
-      value,
-    )
+    !Number.isFinite(value)
   ) {
     return '—'
   }
@@ -211,10 +214,7 @@ function formatPercent(
 
   return `${value
     .toFixed(digits)
-    .replace(
-      '.',
-      ',',
-    )}%`
+    .replace('.', ',')}%`
 }
 
 function formatMarketFactor(
@@ -222,10 +222,7 @@ function formatMarketFactor(
 ): string {
   return `×${value
     .toFixed(2)
-    .replace(
-      '.',
-      ',',
-    )}`
+    .replace('.', ',')}`
 }
 
 function getConstraintLabel(
@@ -297,8 +294,7 @@ function getRolePlayers(
 ): Player[] {
   return players.filter(
     (player) =>
-      player.role ===
-      role,
+      player.role === role,
   )
 }
 
@@ -387,6 +383,86 @@ function getManagerById(
   )
 }
 
+function getDiscardedPlayersForRole(
+  state: AppState,
+  role: AuctionRole,
+): Player[] {
+  return state
+    .recommendedDiscards
+    .map(
+      (playerId) =>
+        getPlayer(
+          playerId,
+        ),
+    )
+    .filter(
+      (
+        player,
+      ): player is Player => {
+        if (!player) {
+          return false
+        }
+
+        return (
+          player.role === role &&
+          !isPlayerAssigned(
+            state,
+            player.id,
+          )
+        )
+      },
+    )
+}
+
+function callPlayer(
+  state: AppState,
+  playerId:
+    | string
+    | undefined,
+  actions: AuctionActions,
+): void {
+  const player =
+    getPlayer(
+      playerId ?? null,
+    )
+
+  if (
+    !player ||
+    isPlayerAssigned(
+      state,
+      player.id,
+    )
+  ) {
+    return
+  }
+
+  state.currentAuctionPlayerId =
+    player.id
+
+  activeRole =
+    player.role
+
+  selectorMode =
+    null
+
+  selectedTeamFilter =
+    ''
+
+  auctionFeedback =
+    ''
+
+  awardOverlayOpen =
+    false
+
+  pendingAwardPrice =
+    null
+
+  detailPlayerId =
+    null
+
+  actions.onStateChange()
+}
+
 /* =========================
    BID SIGNAL
 ========================= */
@@ -415,59 +491,33 @@ function getBidSignal(
   const ceiling =
     advice.recommendedCeiling
 
-  /*
-    Il limite finanziario
-    è sempre hard cap.
-  */
   if (
     financial !== undefined &&
     safePrice > financial
   ) {
     return {
-      state:
-        'stop',
-
-      icon:
-        '⛔',
-
-      label:
-        'STOP',
-
-      color:
-        '#E45E5E',
-
+      state: 'stop',
+      icon: '⛔',
+      label: 'STOP',
+      color: '#E45E5E',
       borderColor:
         'rgba(228, 94, 94, 0.72)',
-
       background:
         'rgba(228, 94, 94, 0.10)',
     }
   }
 
-  /*
-    Superamento del tetto
-    operativo dinamico.
-  */
   if (
     ceiling !== undefined &&
     safePrice > ceiling
   ) {
     return {
-      state:
-        'stop',
-
-      icon:
-        '⛔',
-
-      label:
-        'STOP',
-
-      color:
-        '#E45E5E',
-
+      state: 'stop',
+      icon: '⛔',
+      label: 'STOP',
+      color: '#E45E5E',
       borderColor:
         'rgba(228, 94, 94, 0.72)',
-
       background:
         'rgba(228, 94, 94, 0.10)',
     }
@@ -481,8 +531,7 @@ function getBidSignal(
       (
         item,
       ): item is number =>
-        item !==
-        undefined,
+        item !== undefined,
     )
 
   const comfortLimit =
@@ -492,58 +541,30 @@ function getBidSignal(
         )
       : undefined
 
-  /*
-    Dentro sia Valore asta
-    sia Limite reparto:
-    si può continuare a salire.
-  */
   if (
     comfortLimit === undefined ||
     safePrice <=
       comfortLimit
   ) {
     return {
-      state:
-        'go',
-
-      icon:
-        '↑',
-
-      label:
-        'SALI',
-
-      color:
-        '#46E6A1',
-
+      state: 'go',
+      icon: '↑',
+      label: 'SALI',
+      color: '#46E6A1',
       borderColor:
         'rgba(70, 230, 161, 0.72)',
-
       background:
         'rgba(70, 230, 161, 0.10)',
     }
   }
 
-  /*
-    Almeno un segnale morbido
-    è stato superato, ma il tetto
-    dinamico non è ancora superato.
-  */
   return {
-    state:
-      'attention',
-
-    icon:
-      '—',
-
-    label:
-      'ATTENZIONE',
-
-    color:
-      '#FFFFFF',
-
+    state: 'attention',
+    icon: '—',
+    label: 'ATTENZIONE',
+    color: '#FFFFFF',
     borderColor:
       'rgba(255, 255, 255, 0.52)',
-
     background:
       'rgba(255, 255, 255, 0.055)',
   }
@@ -639,16 +660,13 @@ function updateBidSignalElement(
     return
   }
 
-  container.dataset
-    .signalState =
+  container.dataset.signalState =
     signal.state
 
-  container.style
-    .borderColor =
+  container.style.borderColor =
     signal.borderColor
 
-  container.style
-    .background =
+  container.style.background =
     signal.background
 
   icon.textContent =
@@ -664,8 +682,67 @@ function updateBidSignalElement(
     signal.color
 }
 
+function updateLiveBidPrice(
+  state: AppState,
+  amount: number,
+): void {
+  const input =
+    document.querySelector<HTMLInputElement>(
+      '#auctionPriceInput',
+    )
+
+  const player =
+    getSelectedPlayer(
+      state,
+    )
+
+  if (
+    !input ||
+    !player
+  ) {
+    return
+  }
+
+  const current =
+    Number(
+      input.value,
+    )
+
+  const safeCurrent =
+    Number.isFinite(
+      current,
+    ) &&
+    current > 0
+      ? current
+      : 0
+
+  const next =
+    Math.max(
+      0,
+      Math.round(
+        safeCurrent +
+        amount,
+      ),
+    )
+
+  input.value =
+    String(next)
+
+  const advice =
+    calculatePriceAdvice(
+      state,
+      player,
+      players,
+    )
+
+  updateBidSignalElement(
+    advice,
+    next,
+  )
+}
+
 /* =========================
-   REAL PARTICIPANTS
+   PARTICIPANTS
 ========================= */
 
 function buildParticipants(
@@ -911,10 +988,7 @@ function getBudgetBarData(
   if (ratio > 1) {
     return {
       width,
-
-      color:
-        '#5AA8FF',
-
+      color: '#5AA8FF',
       description:
         'Più margine del piano nel ruolo attivo',
     }
@@ -923,10 +997,7 @@ function getBudgetBarData(
   if (ratio > 0.55) {
     return {
       width,
-
-      color:
-        '#46E6A1',
-
+      color: '#46E6A1',
       description:
         'Margine alto nel ruolo attivo',
     }
@@ -935,10 +1006,7 @@ function getBudgetBarData(
   if (ratio > 0.2) {
     return {
       width,
-
-      color:
-        '#E7C94C',
-
+      color: '#E7C94C',
       description:
         'Margine ridotto nel ruolo attivo',
     }
@@ -946,10 +1014,7 @@ function getBudgetBarData(
 
   return {
     width,
-
-    color:
-      '#E45E5E',
-
+    color: '#E45E5E',
     description:
       'Budget del ruolo in tensione',
   }
@@ -1048,13 +1113,9 @@ function renderSelector(
           auction-selector-card
         "
       >
-        <div
-          class="overlay-header"
-        >
+        <div class="overlay-header">
           <div>
-            <span
-              class="eyebrow"
-            >
+            <span class="eyebrow">
               CHIAMATA
             </span>
 
@@ -1122,9 +1183,7 @@ function renderSelector(
           selectedTeamFilter
             ? `
               <div
-                class="
-                  auction-selector-search
-                "
+                class="auction-selector-search"
               >
                 <input
                   id="auctionSelectorSearch"
@@ -1138,9 +1197,7 @@ function renderSelector(
                 teamMode
                   ? `
                     <div
-                      class="
-                        auction-selected-team
-                      "
+                      class="auction-selected-team"
                     >
                       <span>
                         Squadra
@@ -1165,9 +1222,7 @@ function renderSelector(
 
               <div
                 id="auctionSelectorResults"
-                class="
-                  auction-selector-results
-                "
+                class="auction-selector-results"
               >
                 ${visiblePlayers
                   .map(
@@ -1244,9 +1299,7 @@ function renderSelector(
               </div>
             `
             : `
-              <p
-                class="muted-text"
-              >
+              <p class="muted-text">
                 Scegli prima una squadra.
               </p>
             `
@@ -1265,9 +1318,7 @@ function renderPlayerSearchStrip():
       <div
         class="auction-search-copy"
       >
-        <span
-          class="auction-kicker"
-        >
+        <span class="auction-kicker">
           CHIAMATA CORRENTE
         </span>
 
@@ -1278,16 +1329,12 @@ function renderPlayerSearchStrip():
       </div>
 
       <div
-        class="
-          auction-call-selectors
-        "
+        class="auction-call-selectors"
       >
         <button
           id="selectAuctionTeamButton"
           type="button"
-          class="
-            auction-call-selector
-          "
+          class="auction-call-selector"
         >
           <span>▦</span>
 
@@ -1334,8 +1381,6 @@ function renderPlayerSearchStrip():
 function renderPlayerCard(
   state: AppState,
   player: Player,
-  participants:
-    AuctionParticipantState[],
 ): string {
   const assignment =
     getAssignmentByPlayer(
@@ -1393,6 +1438,14 @@ function renderPlayerCard(
       ? `${priceAdvice.auctionMarketSampleSize} acquisti`
       : 'nessun acquisto utile'
 
+  const startingWidth =
+    clamp(
+      player.startingProbability ??
+        0,
+      0,
+      100,
+    )
+
   return `
     <section
       class="auction-player-card"
@@ -1414,9 +1467,7 @@ function renderPlayerCard(
           </span>
 
           <div>
-            <span
-              class="auction-kicker"
-            >
+            <span class="auction-kicker">
               GIOCATORE IN ASTA
             </span>
 
@@ -1430,16 +1481,24 @@ function renderPlayerCard(
               ${escapeHtml(
                 player.team,
               )}
-              ·
-              ${player.role}
+              · ${player.role}
 
               ${
-                priceAdvice
-                  .playerSlot
+                priceAdvice.playerSlot
                   ? ` · Slot ${priceAdvice.playerSlot}`
                   : ''
               }
             </p>
+
+            <button
+              type="button"
+              class="auction-player-detail-trigger"
+              data-open-player-detail="${escapeHtml(
+                player.id,
+              )}"
+            >
+              Apri scheda completa
+            </button>
           </div>
         </div>
 
@@ -1462,12 +1521,6 @@ function renderPlayerCard(
                 : 'DA ASSEGNARE'
             }
           </span>
-
-          <span
-            class="auction-real-label"
-          >
-            DATABASE REALE
-          </span>
         </div>
       </div>
 
@@ -1480,9 +1533,7 @@ function renderPlayerCard(
             featured
           "
         >
-          <span>
-            iCà
-          </span>
+          <span>iCà</span>
 
           <strong>
             ${formatNumber(
@@ -1490,18 +1541,10 @@ function renderPlayerCard(
               2,
             )}
           </strong>
-
-          <small>
-            indice prospettico
-          </small>
         </div>
 
-        <div
-          class="auction-main-value"
-        >
-          <span>
-            PMA
-          </span>
+        <div class="auction-main-value">
+          <span>PMA</span>
 
           <strong>
             ${formatPercent(
@@ -1509,21 +1552,10 @@ function renderPlayerCard(
               1,
             )}
           </strong>
-
-          <small>
-            ${formatCredits(
-              priceAdvice
-                .pmaCredits,
-            )}
-          </small>
         </div>
 
-        <div
-          class="auction-main-value"
-        >
-          <span>
-            Consenso
-          </span>
+        <div class="auction-main-value">
+          <span>Consenso</span>
 
           <strong>
             ${formatNumber(
@@ -1534,53 +1566,28 @@ function renderPlayerCard(
         </div>
 
         <div
-          class="auction-main-value"
+          class="
+            auction-main-value
+            auction-history-value
+          "
         >
           <span>
-            Titolarità
+            Prezzo passata stagione
           </span>
 
           <strong>
-            ${formatPercent(
-              player.startingProbability,
-              0,
-            )}
+            —
           </strong>
+
+          <small>
+            storico non disponibile
+          </small>
         </div>
       </div>
 
       <div
         class="auction-insight-row"
       >
-        <div
-          class="auction-starting-insight"
-        >
-          <span>
-            Titolarità
-          </span>
-
-          <strong>
-            ${formatPercent(
-              player.startingProbability,
-              0,
-            )}
-          </strong>
-
-          <div
-            class="auction-insight-progress"
-          >
-            <span
-              style="
-                width:
-                ${
-                  player.startingProbability ??
-                  0
-                }%;
-              "
-            ></span>
-          </div>
-        </div>
-
         <div
           class="auction-insight-metric"
         >
@@ -1610,27 +1617,46 @@ function renderPlayerCard(
             )}
           </strong>
         </div>
+
+        <div
+          class="auction-starting-insight"
+        >
+          <span>
+            Titolarità
+          </span>
+
+          <div
+            class="auction-insight-progress"
+            aria-label="Titolarità ${formatPercent(
+              player.startingProbability,
+              0,
+            )}"
+          >
+            <span
+              style="
+                width:
+                ${startingWidth}%;
+              "
+            ></span>
+          </div>
+
+          <strong>
+            ${formatPercent(
+              player.startingProbability,
+              0,
+            )}
+          </strong>
+        </div>
       </div>
 
       <div
         class="auction-recommendation"
       >
         <div
-          style="
-            display: flex;
-            gap: 18px;
-            align-items: stretch;
-            justify-content: space-between;
-            flex-wrap: wrap;
-          "
+          class="auction-price-summary"
         >
           <div
-            class="
-              auction-recommendation-primary
-            "
-            style="
-              flex: 1 1 260px;
-            "
+            class="auction-recommendation-primary"
           >
             <span>
               Tetto consigliato
@@ -1644,15 +1670,10 @@ function renderPlayerCard(
             </strong>
 
             <small>
-              Segnale dominante:
               ${escapeHtml(
                 bindingLabel,
               )}
-            </small>
-
-            <small>
-              Il limite finanziario
-              resta l'hard cap.
+              · hard cap finanziario
             </small>
           </div>
 
@@ -1669,88 +1690,50 @@ function renderPlayerCard(
               auction-price-limit
               value
             "
-            style="
-              border-color:
-              rgba(70, 230, 161, 0.45);
-            "
           >
             <span>
               Valore asta
             </span>
 
-            <strong
-              style="
-                color: #46E6A1;
-              "
-            >
+            <strong>
               ${formatCredits(
-                priceAdvice
-                  .valueLimit,
+                priceAdvice.valueLimit,
               )}
             </strong>
 
             <small>
               PMA
               ${formatCredits(
-                priceAdvice
-                  .pmaCredits,
+                priceAdvice.pmaCredits,
               )}
-            </small>
-
-            <small>
-              Mercato
+              ·
               ${formatMarketFactor(
                 priceAdvice
                   .auctionMarketFactor,
               )}
-              ·
-              ${escapeHtml(
-                marketSourceLabel,
-              )}
             </small>
 
             <small>
-              Scarsità
-              ${formatMarketFactor(
-                priceAdvice
-                  .scarcityFactor,
+              ${escapeHtml(
+                marketSourceLabel,
+              )}
+              ·
+              ${escapeHtml(
+                marketSampleLabel,
               )}
             </small>
 
             <small>
               Supply
               ${
-                priceAdvice
-                  .supply ??
+                priceAdvice.supply ??
                 '—'
               }
-              ·
-              Domanda
+              · Domanda
               ${
-                priceAdvice
-                  .demand ??
+                priceAdvice.demand ??
                 '—'
               }
-            </small>
-
-            <small>
-              ${
-                priceAdvice
-                  .pressure !==
-                  undefined
-                  ? `Pressione ${formatNumber(
-                      priceAdvice
-                        .pressure,
-                      2,
-                    )}`
-                  : 'Pressione —'
-              }
-            </small>
-
-            <small>
-              ${escapeHtml(
-                marketSampleLabel,
-              )}
             </small>
           </div>
 
@@ -1759,28 +1742,19 @@ function renderPlayerCard(
               auction-price-limit
               role
             "
-            style="
-              border-color:
-              rgba(231, 201, 76, 0.52);
-            "
           >
             <span>
               Limite reparto
             </span>
 
-            <strong
-              style="
-                color: #E7C94C;
-              "
-            >
+            <strong>
               ${formatCredits(
-                priceAdvice
-                  .roleLimit,
+                priceAdvice.roleLimit,
               )}
             </strong>
 
             <small>
-              linea strategica
+              strategia
               ${player.role}
             </small>
           </div>
@@ -1790,20 +1764,12 @@ function renderPlayerCard(
               auction-price-limit
               financial
             "
-            style="
-              border-color:
-              rgba(228, 94, 94, 0.52);
-            "
           >
             <span>
               Limite finanziario
             </span>
 
-            <strong
-              style="
-                color: #E45E5E;
-              "
-            >
+            <strong>
               ${formatCredits(
                 priceAdvice
                   .financialLimit,
@@ -1818,44 +1784,11 @@ function renderPlayerCard(
       </div>
 
       <div
-        class="auction-sale-form"
+        class="auction-live-price-row"
       >
-        <label>
-          <span>
-            Acquirente
-          </span>
-
-          <select
-            id="auctionBuyerSelect"
-            ${
-              isAssigned
-                ? 'disabled'
-                : ''
-            }
-          >
-            <option value="">
-              Seleziona manager
-            </option>
-
-            ${participants
-              .map(
-                (participant) => `
-                  <option
-                    value="${escapeHtml(
-                      participant.id,
-                    )}"
-                  >
-                    ${escapeHtml(
-                      participant.name,
-                    )}
-                  </option>
-                `,
-              )
-              .join('')}
-          </select>
-        </label>
-
-        <label>
+        <label
+          class="auction-live-price-field"
+        >
           <span>
             Prezzo corrente
           </span>
@@ -1864,7 +1797,7 @@ function renderPlayerCard(
             id="auctionPriceInput"
             type="number"
             inputmode="numeric"
-            min="1"
+            min="0"
             step="1"
             placeholder="0"
             ${
@@ -1875,27 +1808,51 @@ function renderPlayerCard(
           >
         </label>
 
+        <div
+          class="auction-price-stepper"
+        >
+          <button
+            id="auctionPricePlusOneButton"
+            type="button"
+            ${
+              isAssigned
+                ? 'disabled'
+                : ''
+            }
+          >
+            +1
+          </button>
+
+          <button
+            id="auctionPricePlusTenButton"
+            type="button"
+            ${
+              isAssigned
+                ? 'disabled'
+                : ''
+            }
+          >
+            +10
+          </button>
+        </div>
+
         <button
-          id="auctionAssignButton"
+          id="auctionOpenAwardButton"
           type="button"
-          class="
-            auction-primary-action
-          "
+          class="auction-primary-action"
           ${
             isAssigned
               ? 'disabled'
               : ''
           }
         >
-          Aggiudica
+          Aggiudicato
         </button>
 
         <button
           id="auctionUnsoldButton"
           type="button"
-          class="
-            auction-secondary-action
-          "
+          class="auction-secondary-action"
           ${
             isAssigned
               ? 'disabled'
@@ -1908,11 +1865,9 @@ function renderPlayerCard(
         <button
           id="auctionCancelCallButton"
           type="button"
-          class="
-            auction-secondary-action
-          "
+          class="auction-secondary-action"
         >
-          Annulla chiamata
+          Annulla
         </button>
       </div>
 
@@ -1920,11 +1875,11 @@ function renderPlayerCard(
         assignment
           ? `
             <div
-              class="
-                auction-current-assignment
-              "
+              class="auction-current-assignment"
             >
-              Assegnato a
+              <span>
+                Assegnato a
+              </span>
 
               <strong>
                 ${escapeHtml(
@@ -1936,11 +1891,12 @@ function renderPlayerCard(
                 )}
               </strong>
 
-              per
+              <span>
+                per
+              </span>
 
               <strong>
-                ${assignment.price}
-                crediti
+                ${assignment.price} cr
               </strong>
 
               <button
@@ -1958,7 +1914,7 @@ function renderPlayerCard(
                   assignment.id,
                 )}"
               >
-                Annulla assegnazione
+                Annulla
               </button>
             </div>
           `
@@ -1984,11 +1940,533 @@ function renderPlayerCard(
 }
 
 /* =========================
-   SIDE PANELS
+   AWARD OVERLAY
 ========================= */
 
-function renderSuggestedPlayersPanel():
-  string {
+function renderAwardOverlay(
+  state: AppState,
+  participants:
+    AuctionParticipantState[],
+): string {
+  if (!awardOverlayOpen) {
+    return ''
+  }
+
+  const player =
+    getSelectedPlayer(
+      state,
+    )
+
+  if (!player) {
+    return ''
+  }
+
+  const price =
+    pendingAwardPrice ??
+    0
+
+  return `
+    <div
+      id="auctionAwardOverlay"
+      class="overlay"
+      aria-hidden="false"
+    >
+      <div
+        class="overlay-backdrop"
+      ></div>
+
+      <div
+        class="
+          overlay-card
+          auction-award-overlay
+        "
+      >
+        <div
+          class="overlay-header"
+        >
+          <div>
+            <span class="eyebrow">
+              AGGIUDICAZIONE
+            </span>
+
+            <h2>
+              ${escapeHtml(
+                player.name,
+              )}
+            </h2>
+
+            <p>
+              ${escapeHtml(
+                player.team,
+              )}
+              · ${player.role}
+            </p>
+          </div>
+
+          <button
+            id="closeAuctionAwardButton"
+            type="button"
+            class="icon-button"
+            aria-label="Chiudi"
+          >
+            ×
+          </button>
+        </div>
+
+        <section
+          class="
+            auction-award-section
+            auction-award-winner-section
+          "
+        >
+          <div
+            class="auction-award-section-heading"
+          >
+            <div>
+              <span
+                class="auction-award-section-kicker"
+              >
+                VINCITORE
+              </span>
+
+              <strong>
+                Assegnazione definitiva
+              </strong>
+            </div>
+
+            <span
+              class="auction-award-winner-icon"
+              aria-hidden="true"
+            >
+              ✓
+            </span>
+          </div>
+
+          <div
+            class="auction-award-winner-grid"
+          >
+            <label
+              class="auction-award-field"
+            >
+              <span>
+                Prezzo finale
+              </span>
+
+              <div
+                class="
+                  auction-award-price-input-wrap
+                "
+              >
+                <input
+                  id="auctionAwardPrice"
+                  type="number"
+                  inputmode="numeric"
+                  min="1"
+                  step="1"
+                  value="${price}"
+                >
+
+                <span>
+                  cr
+                </span>
+              </div>
+            </label>
+
+            <label
+              class="auction-award-field"
+            >
+              <span>
+                Manager vincitore
+              </span>
+
+              <select
+                id="auctionAwardWinner"
+              >
+                <option value="">
+                  Seleziona manager
+                </option>
+
+                ${participants
+                  .map(
+                    (participant) => `
+                      <option
+                        value="${escapeHtml(
+                          participant.id,
+                        )}"
+                      >
+                        ${escapeHtml(
+                          participant.name,
+                        )}
+                      </option>
+                    `,
+                  )
+                  .join('')}
+              </select>
+            </label>
+          </div>
+        </section>
+
+        <section
+          class="
+            auction-award-section
+            auction-award-rival-section
+          "
+        >
+          <div
+            class="auction-award-section-heading"
+          >
+            <div>
+              <div
+                class="auction-award-rival-title-row"
+              >
+                <span
+                  class="auction-award-section-kicker"
+                >
+                  ULTIMO RILANCIO AVVERSARIO
+                </span>
+
+                <span
+                  class="auction-award-optional-badge"
+                >
+                  OPZIONALE
+                </span>
+              </div>
+
+              <strong>
+                Informazione di mercato
+              </strong>
+            </div>
+          </div>
+
+          <div
+            class="auction-award-rival-grid"
+          >
+            <label
+              class="auction-award-field"
+            >
+              <span>
+                Manager
+              </span>
+
+              <select
+                id="auctionSecondBidder"
+              >
+                <option value="">
+                  Nessuno / non inserito
+                </option>
+
+                ${participants
+                  .map(
+                    (participant) => `
+                      <option
+                        value="${escapeHtml(
+                          participant.id,
+                        )}"
+                      >
+                        ${escapeHtml(
+                          participant.name,
+                        )}
+                      </option>
+                    `,
+                  )
+                  .join('')}
+              </select>
+            </label>
+
+            <label
+              class="auction-award-field"
+            >
+              <span>
+                Sua ultima offerta
+              </span>
+
+              <div
+                class="
+                  auction-award-price-input-wrap
+                  auction-award-rival-price-wrap
+                "
+              >
+                <input
+                  id="auctionSecondBidPrice"
+                  type="number"
+                  inputmode="numeric"
+                  min="1"
+                  step="1"
+                  placeholder="—"
+                >
+
+                <span>
+                  cr
+                </span>
+              </div>
+            </label>
+          </div>
+        </section>
+
+        <div
+          class="auction-award-note"
+        >
+          <strong>
+            Il giocatore viene assegnato
+            solo al vincitore.
+          </strong>
+
+          <span>
+            L'ultimo rilancio avversario
+            è un dato opzionale salvato
+            nello storico e non modifica
+            ancora gli algoritmi.
+          </span>
+        </div>
+
+        <div
+          class="
+            overlay-actions
+            auction-award-actions
+          "
+        >
+          <button
+            id="cancelAuctionAwardButton"
+            type="button"
+            class="secondary-button"
+          >
+            Annulla
+          </button>
+
+          <button
+            id="confirmAuctionAwardButton"
+            type="button"
+            class="
+              primary-button
+              auction-award-confirm-button
+            "
+          >
+            Registra aggiudicazione
+          </button>
+        </div>
+      </div>
+    </div>
+  `
+}
+
+/* =========================
+   DISCARDS
+========================= */
+
+function renderDiscardedPlayers(
+  state: AppState,
+): string {
+  const discarded =
+    getDiscardedPlayersForRole(
+      state,
+      activeRole,
+    )
+
+  if (
+    discarded.length === 0
+  ) {
+    return ''
+  }
+
+  return `
+    <div
+      class="auction-discarded-block"
+    >
+      <button
+        type="button"
+        class="auction-discarded-toggle"
+        id="toggleDiscardedPlayersButton"
+      >
+        <span>
+          Scartati ${activeRole}
+          · ${discarded.length}
+        </span>
+
+        <b>
+          ${
+            discardedPanelOpen
+              ? '−'
+              : '+'
+          }
+        </b>
+      </button>
+
+      ${
+        discardedPanelOpen
+          ? `
+            <div
+              class="auction-discarded-list"
+            >
+              ${discarded
+                .map(
+                  (player) => `
+                    <div
+                      class="auction-discarded-row"
+                    >
+                      <div>
+                        <strong>
+                          ${escapeHtml(
+                            player.name,
+                          )}
+                        </strong>
+
+                        <span>
+                          ${escapeHtml(
+                            player.team,
+                          )}
+                        </span>
+                      </div>
+
+                      <button
+                        type="button"
+                        data-restore-recommended="${escapeHtml(
+                          player.id,
+                        )}"
+                      >
+                        Riabilita
+                      </button>
+                    </div>
+                  `,
+                )
+                .join('')}
+
+              <button
+                type="button"
+                id="restoreAllRecommendedButton"
+                class="auction-restore-all"
+              >
+                Riabilita tutti
+              </button>
+            </div>
+          `
+          : ''
+      }
+    </div>
+  `
+}
+
+/* =========================
+   RECOMMENDED CALL
+========================= */
+
+function renderSuggestedPlayersPanel(
+  state: AppState,
+): string {
+  if (
+    activeRole === 'P'
+  ) {
+    return `
+      <aside
+        class="
+          auction-next-panel
+          auction-suggested-panel
+        "
+      >
+        <div
+          class="auction-panel-title"
+        >
+          <div>
+            <span
+              class="auction-kicker"
+            >
+              RUOLO P
+            </span>
+
+            <h3>
+              Chiamata consigliata
+            </h3>
+          </div>
+        </div>
+
+        <div
+          class="auction-next-list"
+        >
+          <div
+            class="auction-recommendation-placeholder"
+          >
+            P1, P2 e P3 richiedono
+            una logica dedicata.
+          </div>
+        </div>
+      </aside>
+    `
+  }
+
+  const recommendation =
+    calculateRecommendation(
+      state,
+      activeRole,
+      players,
+    )
+
+  const recommended =
+    recommendation.recommended
+
+  const discarded =
+    getDiscardedPlayersForRole(
+      state,
+      activeRole,
+    )
+
+  if (!recommended) {
+    const roleCompleted =
+      recommendation.targetSlot ===
+      undefined
+
+    return `
+      <aside
+        class="
+          auction-next-panel
+          auction-suggested-panel
+        "
+      >
+        <div
+          class="auction-panel-title"
+        >
+          <div>
+            <span
+              class="auction-kicker"
+            >
+              RUOLO ${activeRole}
+            </span>
+
+            <h3>
+              Chiamata consigliata
+            </h3>
+          </div>
+        </div>
+
+        <div
+          class="auction-next-list"
+        >
+          <div
+            class="auction-recommendation-placeholder"
+          >
+            ${
+              roleCompleted
+                ? `Il reparto ${activeRole} è già strategicamente completo.`
+                : discarded.length
+                  ? `Non ci sono altri candidati automatici: controlla gli scartati ${activeRole}.`
+                  : 'Nessun candidato disponibile.'
+            }
+          </div>
+        </div>
+
+        ${renderDiscardedPlayers(
+          state,
+        )}
+      </aside>
+    `
+  }
+
+  const player =
+    recommended.player
+
+  const targetLabel =
+    recommendation.targetSlot
+      ? `${activeRole}${recommendation.targetSlot}`
+      : activeRole
+
   return `
     <aside
       class="
@@ -2003,42 +2481,219 @@ function renderSuggestedPlayersPanel():
           <span
             class="auction-kicker"
           >
-            RUOLO ${activeRole}
+            SERVE ${targetLabel}
           </span>
 
           <h3>
-            Giocatori consigliati
+            Chiamata consigliata
           </h3>
         </div>
-
-        <span
-          class="
-            auction-demo-label
-          "
-        >
-          NON ATTIVO
-        </span>
       </div>
 
       <div
-        class="
-          auction-next-list
-        "
+        class="auction-call-recommendation"
       >
         <div
-          class="
-            auction-recommendation-placeholder
-          "
+          class="auction-call-recommendation-head"
         >
-          La chiamata consigliata
-          verrà calcolata da un
-          algoritmo dedicato e
-          resterà distinta dall’iCà.
+          <div>
+            <button
+              type="button"
+              class="auction-recommendation-name-button"
+              data-open-player-detail="${escapeHtml(
+                player.id,
+              )}"
+            >
+              <strong>
+                ${escapeHtml(
+                  player.name,
+                )}
+              </strong>
+            </button>
+
+            <span>
+              ${escapeHtml(
+                player.team,
+              )}
+              ·
+              ${
+                recommended.playerSlot
+                  ? `${player.role}${recommended.playerSlot}`
+                  : player.role
+              }
+            </span>
+          </div>
+
+          <span
+            class="
+              auction-role-badge
+              role-${player.role.toLowerCase()}
+            "
+          >
+            ${player.role}
+          </span>
+        </div>
+
+        <div
+          class="auction-call-reasons"
+        >
+          ${recommended.reasons
+            .map(
+              (reason) => `
+                <div
+                  class="auction-call-reason"
+                >
+                  <span>✓</span>
+
+                  <p>
+                    ${escapeHtml(
+                      reason,
+                    )}
+                  </p>
+                </div>
+              `,
+            )
+            .join('')}
+        </div>
+
+        <div
+          class="auction-call-meta"
+        >
+          <span>
+            iCà
+            <strong>
+              ${formatNumber(
+                player.iCa,
+                2,
+              )}
+            </strong>
+          </span>
+
+          <span>
+            Valore
+            <strong>
+              ${formatCredits(
+                recommended
+                  .priceAdvice
+                  .valueLimit,
+              )}
+            </strong>
+          </span>
+
+          <span>
+            Slot
+            <strong>
+              ${
+                recommended.playerSlot ??
+                '—'
+              }
+            </strong>
+          </span>
+        </div>
+
+        <div
+          class="auction-call-actions"
+        >
+          <button
+            type="button"
+            class="auction-call-primary-button"
+            data-call-recommended="${escapeHtml(
+              player.id,
+            )}"
+          >
+            CHIAMA
+          </button>
+
+          <button
+            type="button"
+            class="auction-call-discard-button"
+            data-discard-recommended="${escapeHtml(
+              player.id,
+            )}"
+          >
+            SCARTA
+          </button>
         </div>
       </div>
+
+      ${
+        recommendation
+          .alternatives
+          .length
+          ? `
+            <div
+              class="auction-call-alternatives"
+            >
+              <span
+                class="auction-call-alternatives-title"
+              >
+                Alternative
+              </span>
+
+              ${recommendation
+                .alternatives
+                .map(
+                  (candidate) => `
+                    <div
+                      class="auction-call-alternative"
+                    >
+                      <div>
+                        <button
+                          type="button"
+                          class="auction-recommendation-name-button"
+                          data-open-player-detail="${escapeHtml(
+                            candidate
+                              .player
+                              .id,
+                          )}"
+                        >
+                          <strong>
+                            ${escapeHtml(
+                              candidate
+                                .player
+                                .name,
+                            )}
+                          </strong>
+                        </button>
+
+                        <span>
+                          ${escapeHtml(
+                            candidate
+                              .player
+                              .team,
+                          )}
+                        </span>
+                      </div>
+
+                      <button
+                        type="button"
+                        data-call-recommended="${escapeHtml(
+                          candidate
+                            .player
+                            .id,
+                        )}"
+                      >
+                        Chiama
+                      </button>
+                    </div>
+                  `,
+                )
+                .join('')}
+            </div>
+          `
+          : ''
+      }
+
+      ${renderDiscardedPlayers(
+        state,
+      )}
     </aside>
   `
 }
+
+/* =========================
+   TOP ICA
+========================= */
 
 function renderTopICaPanel(
   state: AppState,
@@ -2052,6 +2707,11 @@ function renderTopICaPanel(
           !isPlayerAssigned(
             state,
             player.id,
+          ) &&
+          player.iCa !==
+            undefined &&
+          Number.isFinite(
+            player.iCa,
           ),
       )
       .sort(
@@ -2070,7 +2730,7 @@ function renderTopICaPanel(
       )
       .slice(
         0,
-        3,
+        5,
       )
 
   return `
@@ -2084,115 +2744,58 @@ function renderTopICaPanel(
         class="auction-panel-title"
       >
         <div>
-          <span
-            class="auction-kicker"
-          >
-            SOLO NON ASSEGNATI
+          <span class="auction-kicker">
+            NON ASSEGNATI
           </span>
 
           <h3>
             Top iCà · ${activeRole}
           </h3>
         </div>
-
-        <span
-          class="auction-real-label"
-        >
-          iCà
-        </span>
       </div>
 
       <div
-        class="auction-next-list"
+        class="auction-top-ica-list"
       >
-        ${
-          candidates.length
-            ? candidates
-                .map(
-                  (
-                    player,
-                    index,
-                  ) => `
-                    <article
-                      class="
-                        auction-next-card
-                        ${
-                          index === 0
-                            ? 'primary'
-                            : ''
-                        }
-                      "
-                    >
-                      <div
-                        class="
-                          auction-next-card-top
-                        "
-                      >
-                        <div>
-                          <strong>
-                            ${escapeHtml(
-                              player.name,
-                            )}
-                          </strong>
-
-                          <span>
-                            ${escapeHtml(
-                              player.team,
-                            )}
-                          </span>
-                        </div>
-
-                        <b>
-                          ${formatNumber(
-                            player.iCa,
-                            2,
-                          )}
-                        </b>
-                      </div>
-
-                      <p>
-                        Consenso
-                        ${formatNumber(
-                          player.consensus,
-                          2,
-                        )}
-                        · Titolarità
-                        ${formatPercent(
-                          player.startingProbability,
-                          0,
-                        )}
-                      </p>
-
-                      <div
-                        class="
-                          auction-next-actions
-                        "
-                      >
-                        <button
-                          type="button"
-                          data-call-top-ica="${escapeHtml(
-                            player.id,
-                          )}"
-                        >
-                          Chiama
-                        </button>
-                      </div>
-                    </article>
-                  `,
-                )
-                .join('')
-            : `
+        ${candidates
+          .map(
+            (player) => `
               <div
-                class="
-                  auction-recommendation-placeholder
-                "
+                class="auction-top-ica-row"
               >
-                Nessun giocatore
-                disponibile nel ruolo
-                ${activeRole}.
+                <button
+                  type="button"
+                  class="auction-top-ica-name-button"
+                  data-open-player-detail="${escapeHtml(
+                    player.id,
+                  )}"
+                >
+                  <strong>
+                    ${escapeHtml(
+                      player.name,
+                    )}
+                  </strong>
+                </button>
+
+                <b>
+                  ${formatNumber(
+                    player.iCa,
+                    2,
+                  )}
+                </b>
+
+                <button
+                  type="button"
+                  data-call-top-ica="${escapeHtml(
+                    player.id,
+                  )}"
+                >
+                  Chiama
+                </button>
               </div>
-            `
-        }
+            `,
+          )
+          .join('')}
       </div>
     </aside>
   `
@@ -2205,7 +2808,9 @@ function renderSidePanels(
     <div
       class="auction-side-panels"
     >
-      ${renderSuggestedPlayersPanel()}
+      ${renderSuggestedPlayersPanel(
+        state,
+      )}
 
       ${renderTopICaPanel(
         state,
@@ -2225,17 +2830,13 @@ function renderParticipants(
 ): string {
   return `
     <section
-      class="
-        auction-participants-section
-      "
+      class="auction-participants-section"
     >
       <div
         class="auction-section-heading"
       >
         <div>
-          <span
-            class="auction-kicker"
-          >
+          <span class="auction-kicker">
             MERCATO LIVE
           </span>
 
@@ -2243,158 +2844,111 @@ function renderParticipants(
             Partecipanti
           </h3>
         </div>
-
-        <div
-          class="auction-bar-legend"
-        >
-          <span
-            class="legend-blue"
-          >
-            sopra piano
-          </span>
-
-          <span
-            class="legend-green"
-          >
-            margine alto
-          </span>
-
-          <span
-            class="legend-yellow"
-          >
-            margine ridotto
-          </span>
-
-          <span
-            class="legend-red"
-          >
-            tensione
-          </span>
-        </div>
       </div>
 
-      ${
-        participants.length === 0
-          ? `
-            <div
-              class="
-                auction-history-empty
-              "
-            >
-              Nessun partecipante
-              attivo configurato.
-            </div>
-          `
-          : `
-            <div
-              class="auction-participant-grid"
-            >
-              ${participants
-                .map(
-                  (participant) => {
-                    const remaining =
-                      getRemainingCredits(
-                        participant,
-                        state,
-                      )
-
-                    const bar =
-                      getBudgetBarData(
-                        participant,
-                        state,
-                        activeRole,
-                      )
-
-                    return `
-                      <article
-                        class="
-                          auction-participant-card
-                          ${
-                            participant.isOwner
-                              ? 'owner'
-                              : ''
-                          }
-                        "
-                      >
-                        <div
-                          class="
-                            auction-participant-top
-                          "
-                        >
-                          <strong>
-                            ${escapeHtml(
-                              participant.name,
-                            )}
-                          </strong>
-
-                          <span>
-                            ${remaining}
-                          </span>
-                        </div>
-
-                        <div
-                          class="
-                            auction-budget-track
-                          "
-                          title="${escapeHtml(
-                            bar.description,
-                          )}"
-                        >
-                          <span
-                            style="
-                              width:
-                              ${bar.width.toFixed(
-                                2,
-                              )}%;
-
-                              background:
-                              ${bar.color};
-                            "
-                          ></span>
-                        </div>
-
-                        <div
-                          class="auction-slot-row"
-                        >
-                          ${ROLE_ORDER
-                            .map(
-                              (role) => `
-                                <span
-                                  class="
-                                    auction-slot
-                                    role-${role.toLowerCase()}
-                                    ${
-                                      role ===
-                                      activeRole
-                                        ? 'active'
-                                        : ''
-                                    }
-                                  "
-                                >
-                                  ${role}
-
-                                  ${
-                                    participant.slots[
-                                      role
-                                    ]
-                                  }/${
-                                    ROSTER_SLOT_LIMITS[
-                                      role
-                                    ]
-                                  }
-                                </span>
-                              `,
-                            )
-                            .join('')}
-                        </div>
-                      </article>
-                    `
-                  },
+      <div
+        class="auction-participant-grid"
+      >
+        ${participants
+          .map(
+            (participant) => {
+              const remaining =
+                getRemainingCredits(
+                  participant,
+                  state,
                 )
-                .join('')}
-            </div>
-          `
-      }
+
+              const bar =
+                getBudgetBarData(
+                  participant,
+                  state,
+                  activeRole,
+                )
+
+              return `
+                <article
+                  class="
+                    auction-participant-card
+                    ${
+                      participant.isOwner
+                        ? 'owner'
+                        : ''
+                    }
+                  "
+                >
+                  <div
+                    class="auction-participant-top"
+                  >
+                    <strong>
+                      ${escapeHtml(
+                        participant.name,
+                      )}
+                    </strong>
+
+                    <span>
+                      ${remaining}
+                    </span>
+                  </div>
+
+                  <div
+                    class="auction-budget-track"
+                    title="${escapeHtml(
+                      bar.description,
+                    )}"
+                  >
+                    <span
+                      style="
+                        width:
+                        ${bar.width.toFixed(
+                          2,
+                        )}%;
+
+                        background:
+                        ${bar.color};
+                      "
+                    ></span>
+                  </div>
+
+                  <div
+                    class="auction-slot-row"
+                  >
+                    ${ROLE_ORDER
+                      .map(
+                        (role) => `
+                          <span
+                            class="
+                              auction-slot
+                              role-${role.toLowerCase()}
+                              ${
+                                role ===
+                                activeRole
+                                  ? 'active'
+                                  : ''
+                              }
+                            "
+                          >
+                            ${role}
+
+                            ${
+                              participant.slots[
+                                role
+                              ]
+                            }/${
+                              ROSTER_SLOT_LIMITS[
+                                role
+                              ]
+                            }
+                          </span>
+                        `,
+                      )
+                      .join('')}
+                  </div>
+                </article>
+              `
+            },
+          )
+          .join('')}
+      </div>
     </section>
   `
 }
@@ -2411,17 +2965,13 @@ function renderAssignmentHistory(
 
   return `
     <section
-      class="
-        auction-history-section
-      "
+      class="auction-history-section"
     >
       <div
         class="auction-history-heading"
       >
         <div>
-          <span
-            class="auction-kicker"
-          >
+          <span class="auction-kicker">
             SESSIONE LIVE
           </span>
 
@@ -2431,12 +2981,9 @@ function renderAssignmentHistory(
         </div>
 
         <span
-          class="
-            auction-history-count
-          "
+          class="auction-history-count"
         >
           ${assignments.length}
-          assegnazioni
         </span>
       </div>
 
@@ -2445,20 +2992,14 @@ function renderAssignmentHistory(
         0
           ? `
             <div
-              class="
-                auction-history-empty
-              "
+              class="auction-history-empty"
             >
-              Nessuna assegnazione
-              registrata in questa
-              sessione.
+              Nessuna assegnazione.
             </div>
           `
           : `
             <div
-              class="
-                auction-history-list
-              "
+              class="auction-history-list"
             >
               ${[...assignments]
                 .reverse()
@@ -2475,15 +3016,23 @@ function renderAssignmentHistory(
                         assignment.managerId,
                       )
 
+                    const secondManager =
+                      assignment
+                        .secondBidderManagerId
+                        ? getManagerById(
+                            state,
+                            assignment
+                              .secondBidderManagerId,
+                          )
+                        : undefined
+
                     if (!player) {
                       return ''
                     }
 
                     return `
                       <article
-                        class="
-                          auction-history-row
-                        "
+                        class="auction-history-row"
                       >
                         <span
                           class="
@@ -2495,9 +3044,7 @@ function renderAssignmentHistory(
                         </span>
 
                         <div
-                          class="
-                            auction-history-player
-                          "
+                          class="auction-history-player"
                         >
                           <strong>
                             ${escapeHtml(
@@ -2513,12 +3060,10 @@ function renderAssignmentHistory(
                         </div>
 
                         <div
-                          class="
-                            auction-history-manager
-                          "
+                          class="auction-history-manager"
                         >
                           <span>
-                            Acquirente
+                            Vincitore
                           </span>
 
                           <strong>
@@ -2527,19 +3072,37 @@ function renderAssignmentHistory(
                                 ? managerDisplayName(
                                     manager,
                                   )
-                                : 'Manager non disponibile',
+                                : '—',
                             )}
                           </strong>
+
+                          ${
+                            secondManager
+                              ? `
+                                <small>
+                                  2° rilancio:
+                                  ${escapeHtml(
+                                    managerDisplayName(
+                                      secondManager,
+                                    ),
+                                  )}
+                                  ${
+                                    assignment
+                                      .secondBidPrice !==
+                                    undefined
+                                      ? ` · ${assignment.secondBidPrice} cr`
+                                      : ''
+                                  }
+                                </small>
+                              `
+                              : ''
+                          }
                         </div>
 
                         <div
-                          class="
-                            auction-history-price
-                          "
+                          class="auction-history-price"
                         >
-                          <span>
-                            Prezzo
-                          </span>
+                          <span>Prezzo</span>
 
                           <strong>
                             ${assignment.price}
@@ -2547,9 +3110,7 @@ function renderAssignmentHistory(
                         </div>
 
                         <div
-                          class="
-                            auction-history-actions
-                          "
+                          class="auction-history-actions"
                         >
                           <button
                             type="button"
@@ -2630,17 +3191,12 @@ function renderEditAssignmentOverlay(
       <div
         class="
           overlay-card
-          small-overlay-card
-          auction-edit-overlay
+          auction-award-overlay
         "
       >
-        <div
-          class="overlay-header"
-        >
+        <div class="overlay-header">
           <div>
-            <span
-              class="eyebrow"
-            >
+            <span class="eyebrow">
               MODIFICA ASSEGNAZIONE
             </span>
 
@@ -2662,11 +3218,26 @@ function renderEditAssignmentOverlay(
         </div>
 
         <div
-          class="auction-edit-form"
+          class="auction-award-grid"
         >
           <label>
             <span>
-              Acquirente
+              Prezzo finale
+            </span>
+
+            <input
+              id="editAssignmentPrice"
+              type="number"
+              inputmode="numeric"
+              min="1"
+              step="1"
+              value="${assignment.price}"
+            >
+          </label>
+
+          <label>
+            <span>
+              Vincitore
             </span>
 
             <select
@@ -2698,23 +3269,63 @@ function renderEditAssignmentOverlay(
 
           <label>
             <span>
-              Prezzo
+              Secondo offerente
+            </span>
+
+            <select
+              id="editSecondBidder"
+            >
+              <option value="">
+                Nessuno
+              </option>
+
+              ${participants
+                .map(
+                  (participant) => `
+                    <option
+                      value="${escapeHtml(
+                        participant.id,
+                      )}"
+                      ${
+                        participant.id ===
+                        assignment
+                          .secondBidderManagerId
+                          ? 'selected'
+                          : ''
+                      }
+                    >
+                      ${escapeHtml(
+                        participant.name,
+                      )}
+                    </option>
+                  `,
+                )
+                .join('')}
+            </select>
+          </label>
+
+          <label>
+            <span>
+              Offerta secondo
             </span>
 
             <input
-              id="editAssignmentPrice"
+              id="editSecondBidPrice"
               type="number"
               inputmode="numeric"
               min="1"
               step="1"
-              value="${assignment.price}"
+              value="${
+                assignment
+                  .secondBidPrice ??
+                ''
+              }"
+              placeholder="—"
             >
           </label>
         </div>
 
-        <div
-          class="overlay-actions"
-        >
+        <div class="overlay-actions">
           <button
             id="cancelEditAssignmentButton"
             type="button"
@@ -2728,7 +3339,7 @@ function renderEditAssignmentOverlay(
             type="button"
             class="primary-button"
           >
-            Salva modifica
+            Salva
           </button>
         </div>
       </div>
@@ -2737,7 +3348,7 @@ function renderEditAssignmentOverlay(
 }
 
 /* =========================
-   FINALIZATION OVERLAYS
+   FINALIZATION
 ========================= */
 
 function renderFinalizationOverlay():
@@ -2762,13 +3373,9 @@ function renderFinalizationOverlay():
           auction-finalization-overlay
         "
       >
-        <div
-          class="overlay-header"
-        >
+        <div class="overlay-header">
           <div>
-            <span
-              class="eyebrow"
-            >
+            <span class="eyebrow">
               ASTA TERMINATA
             </span>
 
@@ -2780,9 +3387,7 @@ function renderFinalizationOverlay():
         </div>
 
         <div
-          class="
-            auction-finalization-summary
-          "
+          class="auction-finalization-summary"
         >
           <p>
             Registra conserva le
@@ -2791,13 +3396,11 @@ function renderFinalizationOverlay():
 
           <p>
             Scarta elimina la sessione
-            corrente senza archiviarla.
+            corrente.
           </p>
         </div>
 
-        <div
-          class="overlay-actions"
-        >
+        <div class="overlay-actions">
           <button
             id="discardAuctionButton"
             type="button"
@@ -2832,13 +3435,9 @@ function renderFinalizationOverlay():
           small-overlay-card
         "
       >
-        <div
-          class="overlay-header"
-        >
+        <div class="overlay-header">
           <div>
-            <span
-              class="eyebrow"
-            >
+            <span class="eyebrow">
               SCARTA ASTA
             </span>
 
@@ -2857,20 +3456,15 @@ function renderFinalizationOverlay():
           </button>
         </div>
 
-        <div
-          class="danger-panel"
-        >
+        <div class="danger-panel">
           <p>
             Le assegnazioni della
             sessione corrente verranno
-            eliminate e l’asta non
-            entrerà nello storico.
+            eliminate.
           </p>
         </div>
 
-        <div
-          class="overlay-actions"
-        >
+        <div class="overlay-actions">
           <button
             id="cancelDiscardAuctionButton"
             type="button"
@@ -2893,7 +3487,7 @@ function renderFinalizationOverlay():
 }
 
 /* =========================
-   LIVE CONTEXT
+   LIVE
 ========================= */
 
 function renderLiveAuction(
@@ -2930,6 +3524,11 @@ function renderLiveAuction(
         )
       : state.initialCredits
 
+  const detailPlayer =
+    getPlayer(
+      detailPlayerId,
+    )
+
   return `
     <section
       class="
@@ -2942,22 +3541,14 @@ function renderLiveAuction(
         }
       "
     >
-      <div
-        class="auction-live-toolbar"
-      >
-        <div
-          class="auction-live-title"
-        >
+      <div class="auction-live-toolbar">
+        <div class="auction-live-title">
           <div>
-            <span
-              class="auction-kicker"
-            >
+            <span class="auction-kicker">
               MISTERCANÀ
             </span>
 
-            <h1>
-              Asta
-            </h1>
+            <h1>Asta</h1>
           </div>
 
           <span
@@ -3054,20 +3645,15 @@ function renderLiveAuction(
 
       ${renderPlayerSearchStrip()}
 
-      <div
-        class="auction-workspace"
-      >
+      <div class="auction-workspace">
         <div
-          class="
-            auction-workspace-main
-          "
+          class="auction-workspace-main"
         >
           ${
             selectedPlayer
               ? renderPlayerCard(
                   state,
                   selectedPlayer,
-                  participants,
                 )
               : `
                 <section
@@ -3076,9 +3662,7 @@ function renderLiveAuction(
                     auction-no-player
                   "
                 >
-                  <span
-                    class="auction-kicker"
-                  >
+                  <span class="auction-kicker">
                     CHIAMATA CORRENTE
                   </span>
 
@@ -3088,8 +3672,8 @@ function renderLiveAuction(
                   </h2>
 
                   <p>
-                    Usa “Seleziona squadra”
-                    o “Seleziona giocatore”.
+                    Seleziona squadra
+                    o giocatore.
                   </p>
                 </section>
               `
@@ -3110,22 +3694,14 @@ function renderLiveAuction(
         state,
       )}
 
-      <div
-        class="auction-prototype-note"
-      >
-        Valore asta, limite reparto,
-        limite finanziario e tetto
-        consigliato vengono ricalcolati
-        in tempo reale.
-
-        Il Valore asta incorpora PMA,
-        andamento osservato del mercato,
-        supply, domanda e scarsità.
-
-        La chiamata consigliata resta
-        un algoritmo separato e non è
-        ancora attiva.
-      </div>
+      ${
+        finalizing
+          ? ''
+          : renderAwardOverlay(
+              state,
+              participants,
+            )
+      }
 
       ${
         finalizing
@@ -3142,6 +3718,19 @@ function renderLiveAuction(
           : renderSelector(
               state,
             )
+      }
+
+      ${
+        !finalizing &&
+        detailPlayer
+          ? renderPlayerDetailOverlay(
+              detailPlayer,
+              isPlayerAssigned(
+                state,
+                detailPlayer.id,
+              ),
+            )
+          : ''
       }
 
       ${
@@ -3182,9 +3771,7 @@ export function renderAuctionPage(
 
   return `
     <section class="page">
-      <h1>
-        Asta
-      </h1>
+      <h1>Asta</h1>
 
       <p>
         Asta non attiva.
@@ -3201,14 +3788,6 @@ export function bindAuctionEvents(
   state: AppState,
   actions: AuctionActions,
 ): void {
-  /*
-    In finalizzazione l'asta resta
-    visibile come contesto, ma tutte
-    le operazioni live sono bloccate.
-
-    Restano attivi solo Registra e
-    Scarta.
-  */
   if (
     state.auctionPhase ===
     'finalizing'
@@ -3219,7 +3798,12 @@ export function bindAuctionEvents(
       )
       ?.addEventListener(
         'click',
-        actions.onArchiveAuction,
+        () => {
+          state.recommendedDiscards =
+            []
+
+          actions.onArchiveAuction()
+        },
       )
 
     const discardOverlay =
@@ -3286,20 +3870,16 @@ export function bindAuctionEvents(
 
     document
       .querySelector(
-        '#discardAuctionOverlay .overlay-backdrop',
-      )
-      ?.addEventListener(
-        'click',
-        closeDiscardOverlay,
-      )
-
-    document
-      .querySelector(
         '#confirmDiscardAuctionButton',
       )
       ?.addEventListener(
         'click',
-        actions.onDiscardAuction,
+        () => {
+          state.recommendedDiscards =
+            []
+
+          actions.onDiscardAuction()
+        },
       )
 
     return
@@ -3311,6 +3891,86 @@ export function bindAuctionEvents(
   ) {
     return
   }
+
+  /* =========================
+     PLAYER DETAIL
+  ========================= */
+
+  document
+    .querySelectorAll<HTMLButtonElement>(
+      '[data-open-player-detail]',
+    )
+    .forEach(
+      (button) => {
+        button.addEventListener(
+          'click',
+          () => {
+            const playerId =
+              button.dataset
+                .openPlayerDetail
+
+            if (
+              !playerId ||
+              !getPlayer(
+                playerId,
+              )
+            ) {
+              return
+            }
+
+            detailPlayerId =
+              playerId
+
+            actions.onRender()
+          },
+        )
+      },
+    )
+
+  document
+    .querySelectorAll<HTMLButtonElement>(
+      '[data-close-player-detail]',
+    )
+    .forEach(
+      (button) => {
+        button.addEventListener(
+          'click',
+          () => {
+            detailPlayerId =
+              null
+
+            actions.onRender()
+          },
+        )
+      },
+    )
+
+  document
+    .querySelector<HTMLButtonElement>(
+      '[data-player-detail-call]',
+    )
+    ?.addEventListener(
+      'click',
+      (event) => {
+        const button =
+          event.currentTarget as
+            HTMLButtonElement | null
+
+        const playerId =
+          button?.dataset
+            .playerDetailCall
+
+        if (!playerId) {
+          return
+        }
+
+        callPlayer(
+          state,
+          playerId,
+          actions,
+        )
+      },
+    )
 
   document
     .querySelector(
@@ -3361,6 +4021,18 @@ export function bindAuctionEvents(
             activeRole =
               role
 
+            discardedPanelOpen =
+              false
+
+            awardOverlayOpen =
+              false
+
+            pendingAwardPrice =
+              null
+
+            detailPlayerId =
+              null
+
             state.currentAuctionPlayerId =
               null
 
@@ -3386,6 +4058,9 @@ export function bindAuctionEvents(
         selectedTeamFilter =
           ''
 
+        detailPlayerId =
+          null
+
         actions.onRender()
       },
     )
@@ -3402,6 +4077,9 @@ export function bindAuctionEvents(
 
         selectedTeamFilter =
           ''
+
+        detailPlayerId =
+          null
 
         actions.onRender()
       },
@@ -3519,42 +4197,12 @@ export function bindAuctionEvents(
         button.addEventListener(
           'click',
           () => {
-            const playerId =
+            callPlayer(
+              state,
               button.dataset
-                .auctionSelectPlayer
-
-            const player =
-              getPlayer(
-                playerId ??
-                null,
-              )
-
-            if (
-              !player ||
-              isPlayerAssigned(
-                state,
-                player.id,
-              )
-            ) {
-              return
-            }
-
-            state.currentAuctionPlayerId =
-              player.id
-
-            activeRole =
-              player.role
-
-            selectorMode =
-              null
-
-            selectedTeamFilter =
-              ''
-
-            auctionFeedback =
-              ''
-
-            actions.onStateChange()
+                .auctionSelectPlayer,
+              actions,
+            )
           },
         )
       },
@@ -3569,31 +4217,73 @@ export function bindAuctionEvents(
         button.addEventListener(
           'click',
           () => {
+            callPlayer(
+              state,
+              button.dataset
+                .callTopIca,
+              actions,
+            )
+          },
+        )
+      },
+    )
+
+  document
+    .querySelectorAll<HTMLButtonElement>(
+      '[data-call-recommended]',
+    )
+    .forEach(
+      (button) => {
+        button.addEventListener(
+          'click',
+          () => {
+            callPlayer(
+              state,
+              button.dataset
+                .callRecommended,
+              actions,
+            )
+          },
+        )
+      },
+    )
+
+  document
+    .querySelectorAll<HTMLButtonElement>(
+      '[data-discard-recommended]',
+    )
+    .forEach(
+      (button) => {
+        button.addEventListener(
+          'click',
+          () => {
             const player =
               getPlayer(
                 button.dataset
-                  .callTopIca ??
+                  .discardRecommended ??
                   null,
               )
 
-            if (
-              !player ||
-              isPlayerAssigned(
-                state,
-                player.id,
-              )
-            ) {
+            if (!player) {
               return
             }
 
-            state.currentAuctionPlayerId =
-              player.id
-
-            activeRole =
-              player.role
+            if (
+              !state
+                .recommendedDiscards
+                .includes(
+                  player.id,
+                )
+            ) {
+              state
+                .recommendedDiscards
+                .push(
+                  player.id,
+                )
+            }
 
             auctionFeedback =
-              ''
+              `${player.name} escluso dalla Chiamata consigliata.`
 
             actions.onStateChange()
           },
@@ -3603,55 +4293,82 @@ export function bindAuctionEvents(
 
   document
     .querySelector(
-      '#auctionCancelCallButton',
+      '#toggleDiscardedPlayersButton',
     )
     ?.addEventListener(
       'click',
       () => {
-        state.currentAuctionPlayerId =
-          null
+        discardedPanelOpen =
+          !discardedPanelOpen
 
-        auctionFeedback =
-          ''
+        actions.onRender()
+      },
+    )
 
-        actions.onStateChange()
+  document
+    .querySelectorAll<HTMLButtonElement>(
+      '[data-restore-recommended]',
+    )
+    .forEach(
+      (button) => {
+        button.addEventListener(
+          'click',
+          () => {
+            const playerId =
+              button.dataset
+                .restoreRecommended
+
+            if (!playerId) {
+              return
+            }
+
+            state.recommendedDiscards =
+              state
+                .recommendedDiscards
+                .filter(
+                  (id) =>
+                    id !==
+                    playerId,
+                )
+
+            actions.onStateChange()
+          },
+        )
       },
     )
 
   document
     .querySelector(
-      '#auctionUnsoldButton',
+      '#restoreAllRecommendedButton',
     )
     ?.addEventListener(
       'click',
       () => {
-        const player =
-          getSelectedPlayer(
-            state,
-          )
+        state.recommendedDiscards =
+          state
+            .recommendedDiscards
+            .filter(
+              (playerId) => {
+                const player =
+                  getPlayer(
+                    playerId,
+                  )
 
-        if (!player) {
-          return
-        }
+                return (
+                  !player ||
+                  player.role !==
+                    activeRole
+                )
+              },
+            )
 
-        auctionFeedback =
-          `${player.name} non assegnato.`
-
-        state.currentAuctionPlayerId =
-          null
+        discardedPanelOpen =
+          false
 
         actions.onStateChange()
       },
     )
 
-  /*
-    SEGNALE LIVE DEL PREZZO
-
-    Viene aggiornato ad ogni
-    variazione del campo numerico,
-    senza modificare lo stato
-    persistente dell'asta.
-  */
   const livePriceInput =
     document.querySelector<HTMLInputElement>(
       '#auctionPriceInput',
@@ -3695,7 +4412,35 @@ export function bindAuctionEvents(
 
   document
     .querySelector(
-      '#auctionAssignButton',
+      '#auctionPricePlusOneButton',
+    )
+    ?.addEventListener(
+      'click',
+      () => {
+        updateLiveBidPrice(
+          state,
+          1,
+        )
+      },
+    )
+
+  document
+    .querySelector(
+      '#auctionPricePlusTenButton',
+    )
+    ?.addEventListener(
+      'click',
+      () => {
+        updateLiveBidPrice(
+          state,
+          10,
+        )
+      },
+    )
+
+  document
+    .querySelector(
+      '#auctionOpenAwardButton',
     )
     ?.addEventListener(
       'click',
@@ -3705,11 +4450,6 @@ export function bindAuctionEvents(
             state,
           )
 
-        const buyerSelect =
-          document.querySelector<HTMLSelectElement>(
-            '#auctionBuyerSelect',
-          )
-
         const priceInput =
           document.querySelector<HTMLInputElement>(
             '#auctionPriceInput',
@@ -3717,23 +4457,177 @@ export function bindAuctionEvents(
 
         if (
           !player ||
-          !buyerSelect ||
           !priceInput
         ) {
           return
         }
 
-        if (
-          isPlayerAssigned(
-            state,
-            player.id,
+        const price =
+          Number(
+            priceInput.value,
           )
+
+        if (
+          !Number.isInteger(
+            price,
+          ) ||
+          price <= 0
         ) {
           auctionFeedback =
-            'Il giocatore è già assegnato.'
+            'Inserisci prima il prezzo finale.'
 
           actions.onRender()
 
+          return
+        }
+
+        pendingAwardPrice =
+          price
+
+        awardOverlayOpen =
+          true
+
+        detailPlayerId =
+          null
+
+        actions.onRender()
+      },
+    )
+
+  const closeAwardOverlay =
+    (): void => {
+      awardOverlayOpen =
+        false
+
+      actions.onRender()
+    }
+
+  document
+    .querySelector(
+      '#closeAuctionAwardButton',
+    )
+    ?.addEventListener(
+      'click',
+      closeAwardOverlay,
+    )
+
+  document
+    .querySelector(
+      '#cancelAuctionAwardButton',
+    )
+    ?.addEventListener(
+      'click',
+      closeAwardOverlay,
+    )
+
+  document
+    .querySelector(
+      '#auctionAwardOverlay .overlay-backdrop',
+    )
+    ?.addEventListener(
+      'click',
+      closeAwardOverlay,
+    )
+
+  const awardWinnerSelect =
+    document.querySelector<HTMLSelectElement>(
+      '#auctionAwardWinner',
+    )
+
+  const awardSecondSelect =
+    document.querySelector<HTMLSelectElement>(
+      '#auctionSecondBidder',
+    )
+
+  const syncAwardSecondBidder =
+    (): void => {
+      if (
+        !awardWinnerSelect ||
+        !awardSecondSelect
+      ) {
+        return
+      }
+
+      const winnerId =
+        awardWinnerSelect.value
+
+      Array.from(
+        awardSecondSelect.options,
+      ).forEach(
+        (option) => {
+          if (!option.value) {
+            option.disabled =
+              false
+
+            return
+          }
+
+          option.disabled =
+            Boolean(
+              winnerId &&
+              option.value ===
+                winnerId,
+            )
+        },
+      )
+
+      if (
+        winnerId &&
+        awardSecondSelect.value ===
+          winnerId
+      ) {
+        awardSecondSelect.value =
+          ''
+      }
+    }
+
+  awardWinnerSelect
+    ?.addEventListener(
+      'change',
+      syncAwardSecondBidder,
+    )
+
+  syncAwardSecondBidder()
+
+  document
+    .querySelector(
+      '#confirmAuctionAwardButton',
+    )
+    ?.addEventListener(
+      'click',
+      () => {
+        const player =
+          getSelectedPlayer(
+            state,
+          )
+
+        const winnerSelect =
+          document.querySelector<HTMLSelectElement>(
+            '#auctionAwardWinner',
+          )
+
+        const priceInput =
+          document.querySelector<HTMLInputElement>(
+            '#auctionAwardPrice',
+          )
+
+        const secondBidderSelect =
+          document.querySelector<HTMLSelectElement>(
+            '#auctionSecondBidder',
+          )
+
+        const secondPriceInput =
+          document.querySelector<HTMLInputElement>(
+            '#auctionSecondBidPrice',
+          )
+
+        if (
+          !player ||
+          !winnerSelect ||
+          !priceInput ||
+          !secondBidderSelect ||
+          !secondPriceInput
+        ) {
           return
         }
 
@@ -3742,10 +4636,10 @@ export function bindAuctionEvents(
             state,
           )
 
-        const participant =
+        const winner =
           getParticipant(
             participants,
-            buyerSelect.value,
+            winnerSelect.value,
           )
 
         const price =
@@ -3753,9 +4647,12 @@ export function bindAuctionEvents(
             priceInput.value,
           )
 
-        if (!participant) {
+        if (!winner) {
           auctionFeedback =
-            'Seleziona un acquirente.'
+            'Seleziona il vincitore.'
+
+          awardOverlayOpen =
+            false
 
           actions.onRender()
 
@@ -3769,7 +4666,10 @@ export function bindAuctionEvents(
           price <= 0
         ) {
           auctionFeedback =
-            'Inserisci un prezzo intero positivo.'
+            'Inserisci un prezzo finale valido.'
+
+          awardOverlayOpen =
+            false
 
           actions.onRender()
 
@@ -3778,7 +4678,7 @@ export function bindAuctionEvents(
 
         const remaining =
           getRemainingCredits(
-            participant,
+            winner,
             state,
           )
 
@@ -3787,7 +4687,10 @@ export function bindAuctionEvents(
           remaining
         ) {
           auctionFeedback =
-            `Il manager ha solo ${remaining} crediti residui.`
+            `${winner.name} ha solo ${remaining} crediti residui.`
+
+          awardOverlayOpen =
+            false
 
           actions.onRender()
 
@@ -3795,7 +4698,7 @@ export function bindAuctionEvents(
         }
 
         if (
-          participant.slots[
+          winner.slots[
             player.role
           ] >=
           ROSTER_SLOT_LIMITS[
@@ -3803,7 +4706,98 @@ export function bindAuctionEvents(
           ]
         ) {
           auctionFeedback =
-            `Il manager non ha più slot ${player.role} disponibili.`
+            `${winner.name} non ha più slot ${player.role}.`
+
+          awardOverlayOpen =
+            false
+
+          actions.onRender()
+
+          return
+        }
+
+        const secondBidderId =
+          secondBidderSelect
+            .value
+            .trim()
+
+        const secondBidPriceRaw =
+          secondPriceInput
+            .value
+            .trim()
+
+        const secondBidPrice =
+          secondBidPriceRaw
+            ? Number(
+                secondBidPriceRaw,
+              )
+            : undefined
+
+        if (
+          secondBidderId &&
+          secondBidderId ===
+            winner.id
+        ) {
+          auctionFeedback =
+            'Il vincitore non può essere anche il manager dell’ultimo rilancio avversario.'
+
+          awardOverlayOpen =
+            false
+
+          actions.onRender()
+
+          return
+        }
+
+        if (
+          secondBidderId &&
+          (
+            secondBidPrice ===
+              undefined ||
+            !Number.isInteger(
+              secondBidPrice,
+            ) ||
+            secondBidPrice <= 0
+          )
+        ) {
+          auctionFeedback =
+            'Inserisci l’ultima offerta del manager avversario.'
+
+          awardOverlayOpen =
+            false
+
+          actions.onRender()
+
+          return
+        }
+
+        if (
+          !secondBidderId &&
+          secondBidPrice !==
+            undefined
+        ) {
+          auctionFeedback =
+            'Seleziona il manager dell’ultimo rilancio oppure cancella la sua offerta.'
+
+          awardOverlayOpen =
+            false
+
+          actions.onRender()
+
+          return
+        }
+
+        if (
+          secondBidPrice !==
+            undefined &&
+          secondBidPrice >
+            price
+        ) {
+          auctionFeedback =
+            'L’ultimo rilancio avversario non può superare il prezzo finale.'
+
+          awardOverlayOpen =
+            false
 
           actions.onRender()
 
@@ -3820,13 +4814,103 @@ export function bindAuctionEvents(
               player.id,
 
             managerId:
-              participant.id,
+              winner.id,
 
             price,
+
+            ...(secondBidderId
+              ? {
+                  secondBidderManagerId:
+                    secondBidderId,
+                }
+              : {}),
+
+            ...(secondBidPrice !==
+            undefined
+              ? {
+                  secondBidPrice,
+                }
+              : {}),
           })
 
+        state.recommendedDiscards =
+          state
+            .recommendedDiscards
+            .filter(
+              (playerId) =>
+                playerId !==
+                player.id,
+            )
+
+        awardOverlayOpen =
+          false
+
+        pendingAwardPrice =
+          null
+
         auctionFeedback =
-          `${player.name} aggiudicato a ${participant.name} per ${price} crediti.`
+          `${player.name} aggiudicato a ${winner.name} per ${price} crediti.`
+
+        actions.onStateChange()
+      },
+    )
+
+  document
+    .querySelector(
+      '#auctionCancelCallButton',
+    )
+    ?.addEventListener(
+      'click',
+      () => {
+        state.currentAuctionPlayerId =
+          null
+
+        awardOverlayOpen =
+          false
+
+        pendingAwardPrice =
+          null
+
+        detailPlayerId =
+          null
+
+        auctionFeedback =
+          ''
+
+        actions.onStateChange()
+      },
+    )
+
+  document
+    .querySelector(
+      '#auctionUnsoldButton',
+    )
+    ?.addEventListener(
+      'click',
+      () => {
+        const player =
+          getSelectedPlayer(
+            state,
+          )
+
+        if (!player) {
+          return
+        }
+
+        auctionFeedback =
+          `${player.name} non assegnato.`
+
+        state.currentAuctionPlayerId =
+          null
+
+        awardOverlayOpen =
+          false
+
+        pendingAwardPrice =
+          null
+
+        detailPlayerId =
+          null
 
         actions.onStateChange()
       },
@@ -3851,19 +4935,9 @@ export function bindAuctionEvents(
           return
         }
 
-        const player =
-          getPlayer(
-            last.playerId,
-          )
-
         state
           .auctionAssignments
           .pop()
-
-        auctionFeedback =
-          player
-            ? `Annullata l'ultima assegnazione: ${player.name}.`
-            : 'Ultima assegnazione annullata.'
 
         actions.onStateChange()
       },
@@ -3886,41 +4960,14 @@ export function bindAuctionEvents(
               return
             }
 
-            const index =
+            state.auctionAssignments =
               state
                 .auctionAssignments
-                .findIndex(
+                .filter(
                   (assignment) =>
-                    assignment.id ===
+                    assignment.id !==
                     assignmentId,
                 )
-
-            if (index < 0) {
-              return
-            }
-
-            const assignment =
-              state
-                .auctionAssignments[
-                index
-              ]
-
-            const player =
-              getPlayer(
-                assignment.playerId,
-              )
-
-            state
-              .auctionAssignments
-              .splice(
-                index,
-                1,
-              )
-
-            auctionFeedback =
-              player
-                ? `Assegnazione annullata: ${player.name} torna da assegnare.`
-                : 'Assegnazione annullata.'
 
             actions.onStateChange()
           },
@@ -3937,22 +4984,13 @@ export function bindAuctionEvents(
         button.addEventListener(
           'click',
           () => {
-            const assignmentId =
-              button.dataset
-                .editAssignment
-
-            if (
-              !assignmentId ||
-              !getAssignmentById(
-                state,
-                assignmentId,
-              )
-            ) {
-              return
-            }
-
             editingAssignmentId =
-              assignmentId
+              button.dataset
+                .editAssignment ??
+              null
+
+            detailPlayerId =
+              null
 
             actions.onRender()
           },
@@ -3980,15 +5018,6 @@ export function bindAuctionEvents(
   document
     .querySelector(
       '#cancelEditAssignmentButton',
-    )
-    ?.addEventListener(
-      'click',
-      closeEdit,
-    )
-
-  document
-    .querySelector(
-      '#editAssignmentOverlay .overlay-backdrop',
     )
     ?.addEventListener(
       'click',
@@ -4025,117 +5054,95 @@ export function bindAuctionEvents(
             '#editAssignmentPrice',
           )
 
+        const secondSelect =
+          document.querySelector<HTMLSelectElement>(
+            '#editSecondBidder',
+          )
+
+        const secondPriceInput =
+          document.querySelector<HTMLInputElement>(
+            '#editSecondBidPrice',
+          )
+
         if (
           !assignment ||
           !buyerSelect ||
-          !priceInput
+          !priceInput ||
+          !secondSelect ||
+          !secondPriceInput
         ) {
           return
         }
 
-        const player =
-          getPlayer(
-            assignment.playerId,
-          )
-
-        const newPrice =
+        const price =
           Number(
             priceInput.value,
           )
 
         if (
-          !player ||
           !Number.isInteger(
-            newPrice,
+            price,
           ) ||
-          newPrice <= 0
+          price <= 0
         ) {
           return
         }
 
-        /*
-          Per verificare correttamente
-          crediti e slot togliamo
-          temporaneamente l'assegnazione
-          che stiamo modificando dal
-          calcolo.
-        */
-        const originalManagerId =
-          assignment.managerId
+        const secondBidderId =
+          secondSelect
+            .value
+            .trim()
 
-        const originalPrice =
-          assignment.price
+        const secondPriceText =
+          secondPriceInput
+            .value
+            .trim()
 
-        assignment.managerId =
-          '__editing__'
-
-        assignment.price =
-          0
-
-        const participants =
-          buildParticipants(
-            state,
-          )
-
-        assignment.managerId =
-          originalManagerId
-
-        assignment.price =
-          originalPrice
-
-        const newParticipant =
-          getParticipant(
-            participants,
-            buyerSelect.value,
-          )
-
-        if (!newParticipant) {
-          return
-        }
-
-        const availableCredits =
-          getRemainingCredits(
-            newParticipant,
-            state,
-          )
-
-        const roleHasSpace =
-          newParticipant.slots[
-            player.role
-          ] <
-          ROSTER_SLOT_LIMITS[
-            player.role
-          ]
+        const secondBidPrice =
+          secondPriceText
+            ? Number(
+                secondPriceText,
+              )
+            : undefined
 
         if (
-          newPrice >
-            availableCredits ||
-          !roleHasSpace
+          secondBidderId ===
+          buyerSelect.value
         ) {
-          auctionFeedback =
-            !roleHasSpace
-              ? `Il manager selezionato non ha più slot ${player.role} disponibili.`
-              : `Il manager selezionato ha solo ${availableCredits} crediti disponibili.`
-
-          editingAssignmentId =
-            null
-
-          actions.onRender()
-
           return
         }
 
         assignment.managerId =
-          newParticipant.id
+          buyerSelect.value
 
         assignment.price =
-          newPrice
+          price
+
+        if (secondBidderId) {
+          assignment.secondBidderManagerId =
+            secondBidderId
+        } else {
+          delete assignment
+            .secondBidderManagerId
+        }
+
+        if (
+          secondBidPrice !==
+            undefined &&
+          Number.isInteger(
+            secondBidPrice,
+          ) &&
+          secondBidPrice > 0
+        ) {
+          assignment.secondBidPrice =
+            secondBidPrice
+        } else {
+          delete assignment
+            .secondBidPrice
+        }
 
         editingAssignmentId =
           null
-
-        auctionFeedback =
-          `${player.name}: assegnazione aggiornata.`
 
         actions.onStateChange()
       },

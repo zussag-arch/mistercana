@@ -33,6 +33,7 @@ type LegacyState =
       | 'currentAuctionPlayerId'
       | 'auctionAssignments'
       | 'archivedAuctions'
+      | 'recommendedDiscards'
     >
   > & {
     auctionPhase?: unknown
@@ -42,6 +43,8 @@ type LegacyState =
     auctionAssignments?: unknown
 
     archivedAuctions?: unknown
+
+    recommendedDiscards?: unknown
 
     managers?: LegacyManager[]
 
@@ -64,30 +67,12 @@ export function saveState(
 function normalizeAuctionPhase(
   phase: unknown,
 ): AuctionPhase {
-  /*
-    Vecchia fase "completed":
-    la sessione era conclusa ma
-    non ancora finalizzata.
-  */
   if (
     phase === 'completed'
   ) {
     return 'finalizing'
   }
 
-  /*
-    Il nuovo flusso non lascia più
-    l'app ferma nelle pagine
-    archived/discarded.
-
-    Dopo Registra o Scarta si torna
-    direttamente alla Dashboard
-    pronta per una nuova sessione.
-
-    Quindi eventuali salvataggi
-    legacy in questi due stati
-    vengono migrati a setup.
-  */
   if (
     phase === 'archived' ||
     phase === 'discarded'
@@ -110,7 +95,8 @@ function normalizeCurrentAuctionPlayerId(
   value: unknown,
 ): string | null {
   if (
-    typeof value !== 'string'
+    typeof value !==
+    'string'
   ) {
     return null
   }
@@ -121,6 +107,59 @@ function normalizeCurrentAuctionPlayerId(
   return clean
     ? clean
     : null
+}
+
+/* =========================
+   RECOMMENDATION DISCARDS
+========================= */
+
+function migrateRecommendedDiscards(
+  value: unknown,
+): string[] {
+  if (
+    !Array.isArray(value)
+  ) {
+    return []
+  }
+
+  const result:
+    string[] = []
+
+  const seen =
+    new Set<string>()
+
+  value.forEach(
+    (item) => {
+      if (
+        typeof item !==
+        'string'
+      ) {
+        return
+      }
+
+      const playerId =
+        item.trim()
+
+      if (
+        !playerId ||
+        seen.has(
+          playerId,
+        )
+      ) {
+        return
+      }
+
+      seen.add(
+        playerId,
+      )
+
+      result.push(
+        playerId,
+      )
+    },
+  )
+
+  return result
 }
 
 /* =========================
@@ -339,12 +378,8 @@ function migrateObjectives(
         priority:
           candidate.priority,
 
-        /*
-          Fino alla fase algoritmi
-          manteniamo sempre il
-          placeholder neutro a 1.
-        */
-        weight: 1,
+        weight:
+          1,
       })
     },
   )
@@ -360,7 +395,8 @@ function normalizeManagerId(
   value: unknown,
 ): string {
   if (
-    typeof value !== 'string'
+    typeof value !==
+    'string'
   ) {
     return ''
   }
@@ -408,6 +444,9 @@ function migrateAuctionAssignments(
           managerId?: unknown
           participantId?: unknown
           price?: unknown
+
+          secondBidderManagerId?: unknown
+          secondBidPrice?: unknown
         }
 
       if (
@@ -421,16 +460,6 @@ function migrateAuctionAssignments(
       const playerId =
         candidate.playerId.trim()
 
-      /*
-        Supportiamo sia il nuovo
-        managerId sia l'eventuale
-        participantId di versioni
-        intermedie.
-
-        Il vecchio prefisso manager-
-        viene rimosso in entrambi
-        i casi.
-      */
       const managerId =
         normalizeManagerId(
           candidate.managerId,
@@ -455,11 +484,6 @@ function migrateAuctionAssignments(
         return
       }
 
-      /*
-        Nella stessa asta un giocatore
-        può avere una sola assegnazione
-        attiva.
-      */
       if (
         seenPlayerIds.has(
           playerId,
@@ -471,6 +495,31 @@ function migrateAuctionAssignments(
       seenPlayerIds.add(
         playerId,
       )
+
+      const secondBidderManagerId =
+        normalizeManagerId(
+          candidate
+            .secondBidderManagerId,
+        )
+
+      const parsedSecondBidPrice =
+        typeof candidate
+          .secondBidPrice ===
+          'number'
+          ? candidate
+              .secondBidPrice
+          : Number(
+              candidate
+                .secondBidPrice,
+            )
+
+      const secondBidPrice =
+        Number.isInteger(
+          parsedSecondBidPrice,
+        ) &&
+        parsedSecondBidPrice > 0
+          ? parsedSecondBidPrice
+          : undefined
 
       assignments.push({
         id:
@@ -485,6 +534,19 @@ function migrateAuctionAssignments(
         managerId,
 
         price,
+
+        ...(secondBidderManagerId
+          ? {
+              secondBidderManagerId,
+            }
+          : {}),
+
+        ...(secondBidPrice !==
+        undefined
+          ? {
+              secondBidPrice,
+            }
+          : {}),
       })
     },
   )
@@ -603,21 +665,19 @@ export function loadState():
         parsed.objectives,
       )
 
-    /*
-      Le assegnazioni correnti hanno
-      senso soltanto se la sessione
-      era ancora LIVE o FINALIZING.
-
-      Un vecchio archived/discarded
-      viene migrato a setup e non deve
-      trascinarsi dietro assegnazioni
-      operative della sessione chiusa.
-    */
     const auctionAssignments =
       auctionPhase === 'live' ||
       auctionPhase === 'finalizing'
         ? migrateAuctionAssignments(
             parsed.auctionAssignments,
+          )
+        : []
+
+    const recommendedDiscards =
+      auctionPhase === 'live' ||
+      auctionPhase === 'finalizing'
+        ? migrateRecommendedDiscards(
+            parsed.recommendedDiscards,
           )
         : []
 
@@ -642,6 +702,8 @@ export function loadState():
       auctionAssignments,
 
       archivedAuctions,
+
+      recommendedDiscards,
 
       initialCredits:
         typeof parsed.initialCredits ===

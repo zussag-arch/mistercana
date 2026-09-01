@@ -1,4 +1,5 @@
-import battitoriCsv from '../../database/MisterCana_DB_Battitori.csv?raw'
+import battitoriCsv
+  from '../../database/MisterCana_DB_Battitori.csv?raw'
 
 import {
   players,
@@ -12,6 +13,10 @@ import type {
   Player,
   PlayerRole,
 } from '../domain/player'
+
+import {
+  renderPlayerDetailOverlay,
+} from '../components/playerDetailOverlay'
 
 type RoleFilter =
   | 'ALL'
@@ -756,14 +761,6 @@ function getFilteredPlayers(
           return false
         }
 
-        /*
-          "Solo liberi" ha significato
-          soltanto durante una sessione
-          live.
-
-          Fuori LIVE non usiamo mai
-          player.status come fallback.
-        */
         if (
           state.auctionPhase ===
             'live' &&
@@ -1129,6 +1126,9 @@ function renderPlayerRow(
       data-player-id="${escapeHtml(
         player.id,
       )}"
+      aria-label="Apri scheda di ${escapeHtml(
+        player.name,
+      )}"
     >
       <div
         class="
@@ -1280,32 +1280,25 @@ function renderPlayerRow(
 }
 
 /* =========================
-   PLAYER PREVIEW
+   PLAYER DETAIL
 ========================= */
 
-function renderPlayerPreview(
+function renderPlayersDetail(
   state: AppState,
 ): string {
+  if (!previewPlayerId) {
+    return ''
+  }
+
   const player =
-    previewPlayerId
-      ? players.find(
-          (item) =>
-            item.id ===
-            previewPlayerId,
-        )
-      : undefined
+    players.find(
+      (item) =>
+        item.id ===
+        previewPlayerId,
+    )
 
   if (!player) {
-    return `
-      <div
-        id="playerPreviewOverlay"
-        class="
-          overlay
-          hidden
-        "
-        aria-hidden="true"
-      ></div>
-    `
+    return ''
   }
 
   const auctionLive =
@@ -1319,187 +1312,12 @@ function renderPlayerPreview(
       player.id,
     )
 
-  return `
-    <div
-      id="playerPreviewOverlay"
-      class="overlay"
-      aria-hidden="false"
-    >
-      <div
-        class="overlay-backdrop"
-      ></div>
-
-      <div
-        class="
-          overlay-card
-          player-preview-card
-        "
-      >
-        <div
-          class="overlay-header"
-        >
-          <div>
-            <span
-              class="eyebrow"
-            >
-              GIOCATORE
-            </span>
-
-            <h2>
-              ${escapeHtml(
-                player.name,
-              )}
-            </h2>
-
-            <p
-              class="muted-text"
-            >
-              ${escapeHtml(
-                player.team,
-              )}
-              ·
-              ${player.role}
-            </p>
-          </div>
-
-          <button
-            id="closePlayerPreviewButton"
-            type="button"
-            class="icon-button"
-            aria-label="Chiudi"
-          >
-            ×
-          </button>
-        </div>
-
-        <div
-          class="
-            player-preview-metrics
-          "
-        >
-          <div>
-            <span>
-              iCà
-            </span>
-
-            <strong>
-              ${formatNumber(
-                player.iCa,
-                2,
-              )}
-            </strong>
-          </div>
-
-          <div>
-            <span>
-              Consenso
-            </span>
-
-            <strong>
-              ${formatNumber(
-                player.consensus,
-                2,
-              )}
-            </strong>
-          </div>
-
-          <div>
-            <span>
-              Titolarità
-            </span>
-
-            <strong>
-              ${formatPercent(
-                player.startingProbability,
-                0,
-              )}
-            </strong>
-          </div>
-
-          <div>
-            <span>
-              PMA
-            </span>
-
-            <strong>
-              ${formatPercent(
-                player.pmaPercent,
-                1,
-              )}
-            </strong>
-          </div>
-        </div>
-
-        <div
-          class="
-            players-preview-auction-status
-          "
-        >
-          ${renderPlayerStatus(
-            state,
-            player,
-          )}
-        </div>
-
-        <p
-          class="muted-text"
-        >
-          La scheda completa del
-          giocatore verrà sviluppata
-          in un passaggio successivo.
-        </p>
-
-        <div
-          class="overlay-actions"
-        >
-          <button
-            id="closePlayerPreviewSecondaryButton"
-            type="button"
-            class="secondary-button"
-          >
-            Chiudi
-          </button>
-
-          ${
-            !auctionLive
-              ? `
-                <button
-                  type="button"
-                  class="primary-button"
-                  disabled
-                  title="Avvia prima un'asta"
-                >
-                  Asta non attiva
-                </button>
-              `
-              : assigned
-                ? `
-                  <button
-                    type="button"
-                    class="primary-button"
-                    disabled
-                    title="Giocatore già assegnato"
-                  >
-                    Già assegnato
-                  </button>
-                `
-                : `
-                  <button
-                    id="callPlayerInAuctionButton"
-                    type="button"
-                    class="primary-button"
-                    data-call-player="${escapeHtml(
-                      player.id,
-                    )}"
-                  >
-                    Chiama in asta
-                  </button>
-                `
-          }
-        </div>
-      </div>
-    </div>
-  `
+  return renderPlayerDetailOverlay(
+    player,
+    assigned,
+    auctionLive &&
+      !assigned,
+  )
 }
 
 /* =========================
@@ -1513,13 +1331,6 @@ export function renderPlayersPage(
     state.auctionPhase ===
     'live'
 
-  /*
-    Il filtro non deve sopravvivere
-    silenziosamente alla fine
-    dell'asta.
-
-    Fuori LIVE torna realmente spento.
-  */
   if (
     !auctionLive &&
     viewState.freeOnly
@@ -1919,7 +1730,7 @@ export function renderPlayersPage(
         </span>
       </div>
 
-      ${renderPlayerPreview(
+      ${renderPlayersDetail(
         state,
       )}
     </section>
@@ -2196,35 +2007,21 @@ export function bindPlayersEvents(
     }
 
   document
-    .querySelector(
-      '#closePlayerPreviewButton',
+    .querySelectorAll<HTMLButtonElement>(
+      '[data-close-player-detail]',
     )
-    ?.addEventListener(
-      'click',
-      closePreview,
-    )
-
-  document
-    .querySelector(
-      '#closePlayerPreviewSecondaryButton',
-    )
-    ?.addEventListener(
-      'click',
-      closePreview,
-    )
-
-  document
-    .querySelector(
-      '#playerPreviewOverlay .overlay-backdrop',
-    )
-    ?.addEventListener(
-      'click',
-      closePreview,
+    .forEach(
+      (button) => {
+        button.addEventListener(
+          'click',
+          closePreview,
+        )
+      },
     )
 
   document
     .querySelector<HTMLButtonElement>(
-      '[data-call-player]',
+      '[data-player-detail-call]',
     )
     ?.addEventListener(
       'click',
@@ -2238,23 +2035,16 @@ export function bindPlayersEvents(
 
         const button =
           event.currentTarget as
-            HTMLButtonElement
+            HTMLButtonElement | null
 
         const playerId =
-          button.dataset
-            .callPlayer
+          button?.dataset
+            .playerDetailCall
 
         if (!playerId) {
           return
         }
 
-        /*
-          Doppia protezione:
-          anche se la UI fosse
-          desincronizzata, un
-          assegnato non viene
-          richiamato.
-        */
         if (
           isPlayerAssigned(
             state,
