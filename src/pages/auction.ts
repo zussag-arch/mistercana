@@ -7,6 +7,16 @@ import {
   players,
 } from '../data/players'
 
+import {
+  calculatePriceAdvice,
+  ROSTER_SLOT_LIMITS,
+} from '../domain/priceAdvice'
+
+import type {
+  PriceAdvice,
+  PriceConstraint,
+} from '../domain/priceAdvice'
+
 import type {
   Player,
   PlayerRole,
@@ -19,6 +29,11 @@ type SelectorMode =
   | 'team'
   | 'player'
   | null
+
+type AuctionBidSignal =
+  | 'go'
+  | 'attention'
+  | 'stop'
 
 interface AuctionActions {
   onEndAuction: () => void
@@ -48,24 +63,16 @@ interface AuctionParticipantState {
   >
 }
 
-/*
-  Limiti rosa attualmente usati
-  dall'interfaccia.
+interface AuctionBidSignalView {
+  state: AuctionBidSignal
 
-  Restano parametri correnti del
-  prototipo e non vengono trattati
-  come invarianti dell'algoritmo.
-*/
-const SLOT_LIMITS:
-  Record<
-    AuctionRole,
-    number
-  > = {
-    P: 3,
-    D: 8,
-    C: 8,
-    A: 6,
-  }
+  icon: string
+  label: string
+
+  color: string
+  borderColor: string
+  background: string
+}
 
 const ROLE_ORDER:
   AuctionRole[] = [
@@ -170,6 +177,25 @@ function formatNumber(
     )
 }
 
+function formatCredits(
+  value:
+    | number
+    | undefined,
+): string {
+  if (
+    value === undefined ||
+    !Number.isFinite(
+      value,
+    )
+  ) {
+    return '—'
+  }
+
+  return `${Math.round(
+    value,
+  )} cr`
+}
+
 function formatPercent(
   value:
     | number
@@ -189,6 +215,33 @@ function formatPercent(
       '.',
       ',',
     )}%`
+}
+
+function formatMarketFactor(
+  value: number,
+): string {
+  return `×${value
+    .toFixed(2)
+    .replace(
+      '.',
+      ',',
+    )}`
+}
+
+function getConstraintLabel(
+  constraint:
+    PriceConstraint,
+): string {
+  switch (constraint) {
+    case 'financial':
+      return 'finanziario'
+
+    case 'role':
+      return 'reparto'
+
+    case 'value':
+      return 'valore asta'
+  }
 }
 
 function createAssignmentId():
@@ -332,6 +385,283 @@ function getManagerById(
       manager.id ===
       managerId,
   )
+}
+
+/* =========================
+   BID SIGNAL
+========================= */
+
+function getBidSignal(
+  advice: PriceAdvice,
+  currentPrice: number,
+): AuctionBidSignalView {
+  const safePrice =
+    Number.isFinite(
+      currentPrice,
+    ) &&
+    currentPrice > 0
+      ? currentPrice
+      : 0
+
+  const financial =
+    advice.financialLimit
+
+  const value =
+    advice.valueLimit
+
+  const role =
+    advice.roleLimit
+
+  const ceiling =
+    advice.recommendedCeiling
+
+  /*
+    Il limite finanziario
+    è sempre hard cap.
+  */
+  if (
+    financial !== undefined &&
+    safePrice > financial
+  ) {
+    return {
+      state:
+        'stop',
+
+      icon:
+        '⛔',
+
+      label:
+        'STOP',
+
+      color:
+        '#E45E5E',
+
+      borderColor:
+        'rgba(228, 94, 94, 0.72)',
+
+      background:
+        'rgba(228, 94, 94, 0.10)',
+    }
+  }
+
+  /*
+    Superamento del tetto
+    operativo dinamico.
+  */
+  if (
+    ceiling !== undefined &&
+    safePrice > ceiling
+  ) {
+    return {
+      state:
+        'stop',
+
+      icon:
+        '⛔',
+
+      label:
+        'STOP',
+
+      color:
+        '#E45E5E',
+
+      borderColor:
+        'rgba(228, 94, 94, 0.72)',
+
+      background:
+        'rgba(228, 94, 94, 0.10)',
+    }
+  }
+
+  const comfortLimits =
+    [
+      value,
+      role,
+    ].filter(
+      (
+        item,
+      ): item is number =>
+        item !==
+        undefined,
+    )
+
+  const comfortLimit =
+    comfortLimits.length
+      ? Math.min(
+          ...comfortLimits,
+        )
+      : undefined
+
+  /*
+    Dentro sia Valore asta
+    sia Limite reparto:
+    si può continuare a salire.
+  */
+  if (
+    comfortLimit === undefined ||
+    safePrice <=
+      comfortLimit
+  ) {
+    return {
+      state:
+        'go',
+
+      icon:
+        '↑',
+
+      label:
+        'SALI',
+
+      color:
+        '#46E6A1',
+
+      borderColor:
+        'rgba(70, 230, 161, 0.72)',
+
+      background:
+        'rgba(70, 230, 161, 0.10)',
+    }
+  }
+
+  /*
+    Almeno un segnale morbido
+    è stato superato, ma il tetto
+    dinamico non è ancora superato.
+  */
+  return {
+    state:
+      'attention',
+
+    icon:
+      '—',
+
+    label:
+      'ATTENZIONE',
+
+    color:
+      '#FFFFFF',
+
+    borderColor:
+      'rgba(255, 255, 255, 0.52)',
+
+    background:
+      'rgba(255, 255, 255, 0.055)',
+  }
+}
+
+function renderBidSignal(
+  advice: PriceAdvice,
+  currentPrice = 0,
+): string {
+  const signal =
+    getBidSignal(
+      advice,
+      currentPrice,
+    )
+
+  return `
+    <div
+      id="auctionBidSignal"
+      data-signal-state="${signal.state}"
+      style="
+        min-width: 168px;
+        min-height: 116px;
+        padding: 14px 18px;
+        border-radius: 18px;
+        border: 2px solid ${signal.borderColor};
+        background: ${signal.background};
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        text-align: center;
+      "
+    >
+      <span
+        id="auctionBidSignalIcon"
+        style="
+          display: block;
+          color: ${signal.color};
+          font-size: 46px;
+          font-weight: 900;
+          line-height: 0.95;
+        "
+      >
+        ${signal.icon}
+      </span>
+
+      <strong
+        id="auctionBidSignalLabel"
+        style="
+          color: ${signal.color};
+          font-size: 15px;
+          font-weight: 900;
+          letter-spacing: 0.12em;
+        "
+      >
+        ${signal.label}
+      </strong>
+    </div>
+  `
+}
+
+function updateBidSignalElement(
+  advice: PriceAdvice,
+  currentPrice: number,
+): void {
+  const signal =
+    getBidSignal(
+      advice,
+      currentPrice,
+    )
+
+  const container =
+    document.querySelector<HTMLElement>(
+      '#auctionBidSignal',
+    )
+
+  const icon =
+    document.querySelector<HTMLElement>(
+      '#auctionBidSignalIcon',
+    )
+
+  const label =
+    document.querySelector<HTMLElement>(
+      '#auctionBidSignalLabel',
+    )
+
+  if (
+    !container ||
+    !icon ||
+    !label
+  ) {
+    return
+  }
+
+  container.dataset
+    .signalState =
+    signal.state
+
+  container.style
+    .borderColor =
+    signal.borderColor
+
+  container.style
+    .background =
+    signal.background
+
+  icon.textContent =
+    signal.icon
+
+  icon.style.color =
+    signal.color
+
+  label.textContent =
+    signal.label
+
+  label.style.color =
+    signal.color
 }
 
 /* =========================
@@ -1026,6 +1356,43 @@ function renderPlayerCard(
         )
       : undefined
 
+  const priceAdvice =
+    calculatePriceAdvice(
+      state,
+      player,
+      players,
+    )
+
+  const bindingLabel =
+    priceAdvice
+      .bindingConstraints
+      .length
+      ? priceAdvice
+          .bindingConstraints
+          .map(
+            getConstraintLabel,
+          )
+          .join(' + ')
+      : 'dinamico'
+
+  const marketSourceLabel =
+    priceAdvice
+      .auctionMarketSource ===
+      'role'
+      ? `ruolo ${player.role}`
+      : priceAdvice
+          .auctionMarketSource ===
+          'overall'
+        ? 'asta generale'
+        : 'PMA base'
+
+  const marketSampleLabel =
+    priceAdvice
+      .auctionMarketSampleSize >
+    0
+      ? `${priceAdvice.auctionMarketSampleSize} acquisti`
+      : 'nessun acquisto utile'
+
   return `
     <section
       class="auction-player-card"
@@ -1065,6 +1432,13 @@ function renderPlayerCard(
               )}
               ·
               ${player.role}
+
+              ${
+                priceAdvice
+                  .playerSlot
+                  ? ` · Slot ${priceAdvice.playerSlot}`
+                  : ''
+              }
             </p>
           </div>
         </div>
@@ -1135,6 +1509,13 @@ function renderPlayerCard(
               1,
             )}
           </strong>
+
+          <small>
+            ${formatCredits(
+              priceAdvice
+                .pmaCredits,
+            )}
+          </small>
         </div>
 
         <div
@@ -1232,24 +1613,52 @@ function renderPlayerCard(
       </div>
 
       <div
-        class="
-          auction-recommendation
-          auction-recommendation-pending
-        "
+        class="auction-recommendation"
       >
         <div
-          class="
-            auction-recommendation-primary
+          style="
+            display: flex;
+            gap: 18px;
+            align-items: stretch;
+            justify-content: space-between;
+            flex-wrap: wrap;
           "
         >
-          <span>
-            Indicazione operativa
-          </span>
+          <div
+            class="
+              auction-recommendation-primary
+            "
+            style="
+              flex: 1 1 260px;
+            "
+          >
+            <span>
+              Tetto consigliato
+            </span>
 
-          <strong>
-            ALGORITMO PREZZO
-            NON ANCORA ATTIVO
-          </strong>
+            <strong>
+              ${formatCredits(
+                priceAdvice
+                  .recommendedCeiling,
+              )}
+            </strong>
+
+            <small>
+              Segnale dominante:
+              ${escapeHtml(
+                bindingLabel,
+              )}
+            </small>
+
+            <small>
+              Il limite finanziario
+              resta l'hard cap.
+            </small>
+          </div>
+
+          ${renderBidSignal(
+            priceAdvice,
+          )}
         </div>
 
         <div
@@ -1258,14 +1667,91 @@ function renderPlayerCard(
           <div
             class="
               auction-price-limit
-              financial
+              value
+            "
+            style="
+              border-color:
+              rgba(70, 230, 161, 0.45);
             "
           >
             <span>
-              Limite finanziario
+              Valore asta
             </span>
 
-            <strong>—</strong>
+            <strong
+              style="
+                color: #46E6A1;
+              "
+            >
+              ${formatCredits(
+                priceAdvice
+                  .valueLimit,
+              )}
+            </strong>
+
+            <small>
+              PMA
+              ${formatCredits(
+                priceAdvice
+                  .pmaCredits,
+              )}
+            </small>
+
+            <small>
+              Mercato
+              ${formatMarketFactor(
+                priceAdvice
+                  .auctionMarketFactor,
+              )}
+              ·
+              ${escapeHtml(
+                marketSourceLabel,
+              )}
+            </small>
+
+            <small>
+              Scarsità
+              ${formatMarketFactor(
+                priceAdvice
+                  .scarcityFactor,
+              )}
+            </small>
+
+            <small>
+              Supply
+              ${
+                priceAdvice
+                  .supply ??
+                '—'
+              }
+              ·
+              Domanda
+              ${
+                priceAdvice
+                  .demand ??
+                '—'
+              }
+            </small>
+
+            <small>
+              ${
+                priceAdvice
+                  .pressure !==
+                  undefined
+                  ? `Pressione ${formatNumber(
+                      priceAdvice
+                        .pressure,
+                      2,
+                    )}`
+                  : 'Pressione —'
+              }
+            </small>
+
+            <small>
+              ${escapeHtml(
+                marketSampleLabel,
+              )}
+            </small>
           </div>
 
           <div
@@ -1273,25 +1759,60 @@ function renderPlayerCard(
               auction-price-limit
               role
             "
+            style="
+              border-color:
+              rgba(231, 201, 76, 0.52);
+            "
           >
             <span>
               Limite reparto
             </span>
 
-            <strong>—</strong>
+            <strong
+              style="
+                color: #E7C94C;
+              "
+            >
+              ${formatCredits(
+                priceAdvice
+                  .roleLimit,
+              )}
+            </strong>
+
+            <small>
+              linea strategica
+              ${player.role}
+            </small>
           </div>
 
           <div
             class="
               auction-price-limit
-              value
+              financial
+            "
+            style="
+              border-color:
+              rgba(228, 94, 94, 0.52);
             "
           >
             <span>
-              Massimo valore
+              Limite finanziario
             </span>
 
-            <strong>—</strong>
+            <strong
+              style="
+                color: #E45E5E;
+              "
+            >
+              ${formatCredits(
+                priceAdvice
+                  .financialLimit,
+              )}
+            </strong>
+
+            <small>
+              hard cap rosa
+            </small>
           </div>
         </div>
       </div>
@@ -1336,7 +1857,7 @@ function renderPlayerCard(
 
         <label>
           <span>
-            Prezzo finale
+            Prezzo corrente
           </span>
 
           <input
@@ -1857,7 +2378,7 @@ function renderParticipants(
                                       role
                                     ]
                                   }/${
-                                    SLOT_LIMITS[
+                                    ROSTER_SLOT_LIMITS[
                                       role
                                     ]
                                   }
@@ -2592,11 +3113,18 @@ function renderLiveAuction(
       <div
         class="auction-prototype-note"
       >
-        Assegnazioni, crediti residui
-        e slot occupati derivano ora
-        dallo stato reale della
-        sessione. L’algoritmo di
-        consiglio resta non attivo.
+        Valore asta, limite reparto,
+        limite finanziario e tetto
+        consigliato vengono ricalcolati
+        in tempo reale.
+
+        Il Valore asta incorpora PMA,
+        andamento osservato del mercato,
+        supply, domanda e scarsità.
+
+        La chiamata consigliata resta
+        un algoritmo separato e non è
+        ancora attiva.
       </div>
 
       ${
@@ -3116,6 +3644,55 @@ export function bindAuctionEvents(
       },
     )
 
+  /*
+    SEGNALE LIVE DEL PREZZO
+
+    Viene aggiornato ad ogni
+    variazione del campo numerico,
+    senza modificare lo stato
+    persistente dell'asta.
+  */
+  const livePriceInput =
+    document.querySelector<HTMLInputElement>(
+      '#auctionPriceInput',
+    )
+
+  livePriceInput
+    ?.addEventListener(
+      'input',
+      () => {
+        const player =
+          getSelectedPlayer(
+            state,
+          )
+
+        if (!player) {
+          return
+        }
+
+        const advice =
+          calculatePriceAdvice(
+            state,
+            player,
+            players,
+          )
+
+        const currentPrice =
+          Number(
+            livePriceInput.value,
+          )
+
+        updateBidSignalElement(
+          advice,
+          Number.isFinite(
+            currentPrice,
+          )
+            ? currentPrice
+            : 0,
+        )
+      },
+    )
+
   document
     .querySelector(
       '#auctionAssignButton',
@@ -3221,7 +3798,7 @@ export function bindAuctionEvents(
           participant.slots[
             player.role
           ] >=
-          SLOT_LIMITS[
+          ROSTER_SLOT_LIMITS[
             player.role
           ]
         ) {
@@ -3526,7 +4103,7 @@ export function bindAuctionEvents(
           newParticipant.slots[
             player.role
           ] <
-          SLOT_LIMITS[
+          ROSTER_SLOT_LIMITS[
             player.role
           ]
 
