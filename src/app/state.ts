@@ -42,21 +42,84 @@ export interface Manager {
   archived: boolean
 }
 
+/*
+  Assegnazione reale della sessione
+  d'asta corrente.
+
+  Giocatore e manager vengono
+  identificati tramite i rispettivi
+  ID permanenti.
+
+  Nome, squadra, ruolo e nome del
+  manager NON vengono duplicati qui.
+*/
+export interface AuctionAssignment {
+  id: string
+
+  playerId: string
+  managerId: string
+
+  price: number
+}
+
+/*
+  Snapshot minimo di un'asta
+  registrata.
+
+  Per ora conserviamo le
+  assegnazioni reali della sessione.
+
+  La struttura può essere estesa
+  in futuro con divisione,
+  strategie, scarti e altri dati
+  senza modificare l'identità delle
+  assegnazioni già archiviate.
+*/
+export interface ArchivedAuction {
+  id: string
+
+  archivedAt: string
+
+  assignments:
+    AuctionAssignment[]
+}
+
 export interface AppState {
   auctionPhase: AuctionPhase
 
   /*
-    ID permanente del giocatore
-    attualmente chiamato.
+  ID permanente del giocatore
+  attualmente chiamato.
 
-    Nome, squadra e ruolo NON vengono
-    duplicati nello stato:
-    derivano sempre dal database
-    centrale dei giocatori.
+  Nome, squadra e ruolo NON vengono
+  duplicati nello stato:
+  derivano sempre dal database
+  centrale dei giocatori.
   */
   currentAuctionPlayerId:
     | string
     | null
+
+  /*
+  Fonte unica di verità per lo stato
+  Libero / Assegnato della sessione
+  corrente.
+
+  Tutte le pagine operative devono
+  leggere questa struttura e non
+  Player.status.
+  */
+  auctionAssignments:
+    AuctionAssignment[]
+
+  /*
+  Aste registrate.
+
+  Una sessione scartata non viene
+  aggiunta a questo archivio.
+  */
+  archivedAuctions:
+    ArchivedAuction[]
 
   initialCredits: number
 
@@ -64,26 +127,32 @@ export interface AppState {
 
   budgetProfile: BudgetProfile
 
-  budgetDistribution: BudgetDistribution
+  budgetDistribution:
+    BudgetDistribution
 
   managers: Manager[]
 
   /*
-    Shortlist strategica personale.
+  Shortlist strategica personale.
 
-    Il ruolo non viene salvato qui:
-    deriva dal database giocatori.
+  Il ruolo non viene salvato qui:
+  deriva dal database giocatori.
 
-    Questo evita duplicazioni e
-    incoerenze tra obiettivi e database.
+  Questo evita duplicazioni e
+  incoerenze tra obiettivi e database.
   */
-  objectives: PlayerObjective[]
+  objectives:
+    PlayerObjective[]
 }
 
 export const defaultState: AppState = {
   auctionPhase: 'setup',
 
   currentAuctionPlayerId: null,
+
+  auctionAssignments: [],
+
+  archivedAuctions: [],
 
   initialCredits: 500,
 

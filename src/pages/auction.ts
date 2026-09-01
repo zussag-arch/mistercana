@@ -1,5 +1,6 @@
 import type {
   AppState,
+  AuctionAssignment,
 } from '../app/state'
 
 import {
@@ -23,13 +24,15 @@ interface AuctionActions {
   onEndAuction: () => void
   onArchiveAuction: () => void
   onDiscardAuction: () => void
-  onNewAuction: () => void
 
   onStateChange: () => void
   onRender: () => void
+
+  onGoToPlayers: () => void
+  onGoToObjectives: () => void
 }
 
-interface DemoParticipantState {
+interface AuctionParticipantState {
   id: string
   name: string
   isOwner: boolean
@@ -45,24 +48,15 @@ interface DemoParticipantState {
   >
 }
 
-interface DemoAssignment {
-  id: number
+/*
+  Limiti rosa attualmente usati
+  dall'interfaccia.
 
-  playerId: string
-  participantId: string
-
-  price: number
-}
-
-const ROLE_ORDER:
-  AuctionRole[] = [
-    'P',
-    'D',
-    'C',
-    'A',
-  ]
-
-const DEMO_SLOT_LIMITS:
+  Restano parametri correnti del
+  prototipo e non vengono trattati
+  come invarianti dell'algoritmo.
+*/
+const SLOT_LIMITS:
   Record<
     AuctionRole,
     number
@@ -73,95 +67,13 @@ const DEMO_SLOT_LIMITS:
     A: 6,
   }
 
-const DEMO_NAMES = [
-  'Gianluca',
-  'Valerio',
-  'Marco',
-  'Stefano',
-  'Luca',
-  'Andrea',
-  'Davide',
-  'Simone',
-  'Matteo',
-  'Fabio',
-  'Paolo',
-  'Nicola',
-]
-
-const DEMO_SPENDING_FACTORS = [
-  {
-    P: 0.82,
-    D: 0.32,
-    C: 0.08,
-    A: 0,
-  },
-  {
-    P: 0.96,
-    D: 0.18,
-    C: 0,
-    A: 0,
-  },
-  {
-    P: 1,
-    D: 0.5,
-    C: 0.12,
-    A: 0,
-  },
-  {
-    P: 1.1,
-    D: 0.68,
-    C: 0.2,
-    A: 0,
-  },
-  {
-    P: 0.72,
-    D: 0.82,
-    C: 0.28,
-    A: 0,
-  },
-  {
-    P: 1,
-    D: 0.95,
-    C: 0.36,
-    A: 0,
-  },
-  {
-    P: 1.18,
-    D: 1.05,
-    C: 0.4,
-    A: 0,
-  },
-  {
-    P: 0.9,
-    D: 1.2,
-    C: 0.52,
-    A: 0,
-  },
-  {
-    P: 0.75,
-    D: 0.42,
-    C: 0.12,
-    A: 0,
-  },
-  {
-    P: 1,
-    D: 0.62,
-    C: 0.22,
-    A: 0,
-  },
-  {
-    P: 1.08,
-    D: 0.74,
-    C: 0.3,
-    A: 0,
-  },
-  {
-    P: 0.88,
-    D: 0.92,
-    C: 0.44,
-    A: 0,
-  },
-]
+const ROLE_ORDER:
+  AuctionRole[] = [
+    'P',
+    'D',
+    'C',
+    'A',
+  ]
 
 let activeRole:
   AuctionRole = 'P'
@@ -173,22 +85,8 @@ let selectedTeamFilter = ''
 
 let auctionFeedback = ''
 
-let nextAssignmentId = 1
-
 let editingAssignmentId:
-  number | null = null
-
-const participantStates =
-  new Map<
-    string,
-    DemoParticipantState
-  >()
-
-const assignments:
-  DemoAssignment[] = []
-
-const discardedRecommendations =
-  new Set<string>()
+  string | null = null
 
 /* =========================
    HELPERS
@@ -198,10 +96,22 @@ function escapeHtml(
   value: string,
 ): string {
   return value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
+    .replaceAll(
+      '&',
+      '&amp;',
+    )
+    .replaceAll(
+      '<',
+      '&lt;',
+    )
+    .replaceAll(
+      '>',
+      '&gt;',
+    )
+    .replaceAll(
+      '"',
+      '&quot;',
+    )
     .replaceAll(
       "'",
       '&#039;',
@@ -239,15 +149,6 @@ function clamp(
   )
 }
 
-function roundCredits(
-  value: number,
-): number {
-  return Math.max(
-    0,
-    Math.round(value),
-  )
-}
-
 function formatNumber(
   value:
     | number
@@ -263,7 +164,10 @@ function formatNumber(
 
   return value
     .toFixed(digits)
-    .replace('.', ',')
+    .replace(
+      '.',
+      ',',
+    )
 }
 
 function formatPercent(
@@ -281,7 +185,30 @@ function formatPercent(
 
   return `${value
     .toFixed(digits)
-    .replace('.', ',')}%`
+    .replace(
+      '.',
+      ',',
+    )}%`
+}
+
+function createAssignmentId():
+  string {
+  if (
+    typeof crypto !==
+      'undefined' &&
+    typeof crypto.randomUUID ===
+      'function'
+  ) {
+    return crypto.randomUUID()
+  }
+
+  return [
+    'assignment',
+    Date.now(),
+    Math.random()
+      .toString(36)
+      .slice(2),
+  ].join('_')
 }
 
 function getPlayer(
@@ -317,37 +244,48 @@ function getRolePlayers(
 ): Player[] {
   return players.filter(
     (player) =>
-      player.role === role,
-  )
-}
-
-function getParticipant(
-  participantId: string,
-):
-  | DemoParticipantState
-  | undefined {
-  return participantStates.get(
-    participantId,
+      player.role ===
+      role,
   )
 }
 
 function getAssignmentByPlayer(
+  state: AppState,
   playerId: string,
 ):
-  | DemoAssignment
+  | AuctionAssignment
   | undefined {
-  return assignments.find(
-    (assignment) =>
-      assignment.playerId ===
-      playerId,
-  )
+  return state
+    .auctionAssignments
+    .find(
+      (assignment) =>
+        assignment.playerId ===
+        playerId,
+    )
+}
+
+function getAssignmentById(
+  state: AppState,
+  assignmentId: string,
+):
+  | AuctionAssignment
+  | undefined {
+  return state
+    .auctionAssignments
+    .find(
+      (assignment) =>
+        assignment.id ===
+        assignmentId,
+    )
 }
 
 function isPlayerAssigned(
+  state: AppState,
   playerId: string,
 ): boolean {
   return Boolean(
     getAssignmentByPlayer(
+      state,
       playerId,
     ),
   )
@@ -358,16 +296,13 @@ function managerDisplayName(
     AppState['managers'][number],
 ): string {
   const firstName =
-    manager.firstName?.trim() ??
-    ''
+    manager.firstName.trim()
 
   const lastName =
-    manager.lastName?.trim() ??
-    ''
+    manager.lastName.trim()
 
   const alias =
-    manager.alias?.trim() ??
-    ''
+    manager.alias.trim()
 
   if (alias) {
     return [
@@ -388,174 +323,124 @@ function managerDisplayName(
     'Manager'
 }
 
+function getManagerById(
+  state: AppState,
+  managerId: string,
+) {
+  return state.managers.find(
+    (manager) =>
+      manager.id ===
+      managerId,
+  )
+}
+
 /* =========================
-   PARTICIPANTS DEMO
+   REAL PARTICIPANTS
 ========================= */
 
-function getRoleTargetCredits(
-  state: AppState,
-  role: AuctionRole,
-): number {
-  return (
-    state.initialCredits *
-    state.budgetDistribution[
-      role
-    ]
-  ) / 100
-}
-
-function createParticipant(
-  id: string,
-  name: string,
-  isOwner: boolean,
-  state: AppState,
-  index: number,
-): DemoParticipantState {
-  const factors =
-    DEMO_SPENDING_FACTORS[
-      index %
-      DEMO_SPENDING_FACTORS.length
-    ]
-
-  const spent:
-    Record<
-      AuctionRole,
-      number
-    > = {
-      P: 0,
-      D: 0,
-      C: 0,
-      A: 0,
-    }
-
-  const slots:
-    Record<
-      AuctionRole,
-      number
-    > = {
-      P: 0,
-      D: 0,
-      C: 0,
-      A: 0,
-    }
-
-  ROLE_ORDER.forEach(
-    (role) => {
-      const target =
-        getRoleTargetCredits(
-          state,
-          role,
-        )
-
-      spent[role] =
-        roundCredits(
-          target *
-          factors[role],
-        )
-
-      slots[role] =
-        Math.min(
-          DEMO_SLOT_LIMITS[
-            role
-          ],
-          Math.floor(
-            DEMO_SLOT_LIMITS[
-              role
-            ] *
-            clamp(
-              factors[role],
-              0,
-              1,
-            ),
-          ),
-        )
-    },
-  )
-
-  return {
-    id,
-    name,
-    isOwner,
-    spent,
-    slots,
-  }
-}
-
-function ensureParticipants(
+function buildParticipants(
   state: AppState,
 ):
-  DemoParticipantState[] {
-  if (
-    participantStates.size ===
-    0
-  ) {
-    const managers =
-      state.managers.filter(
-        (manager) =>
-          !manager.archived &&
-          manager.active,
-      )
-
-    managers.forEach(
-      (
-        manager,
-        index,
-      ) => {
-        const id =
-          `manager-${manager.id}`
-
-        participantStates.set(
-          id,
-          createParticipant(
-            id,
-            managerDisplayName(
-              manager,
-            ),
-            manager.isOwner,
-            state,
-            index,
-          ),
-        )
-      },
+  AuctionParticipantState[] {
+  const activeManagers =
+    state.managers.filter(
+      (manager) =>
+        manager.active &&
+        !manager.archived,
     )
 
-    let demoIndex = 0
+  return activeManagers.map(
+    (manager) => {
+      const spent:
+        Record<
+          AuctionRole,
+          number
+        > = {
+          P: 0,
+          D: 0,
+          C: 0,
+          A: 0,
+        }
 
-    while (
-      participantStates.size <
-      8
-    ) {
-      const id =
-        `demo-manager-${demoIndex}`
+      const slots:
+        Record<
+          AuctionRole,
+          number
+        > = {
+          P: 0,
+          D: 0,
+          C: 0,
+          A: 0,
+        }
 
-      participantStates.set(
-        id,
-        createParticipant(
-          id,
-          DEMO_NAMES[
-            demoIndex
-          ] ??
-            `Manager ${
-              demoIndex + 1
-            }`,
-          false,
-          state,
-          participantStates.size,
-        ),
-      )
+      state
+        .auctionAssignments
+        .forEach(
+          (assignment) => {
+            if (
+              assignment.managerId !==
+              manager.id
+            ) {
+              return
+            }
 
-      demoIndex += 1
-    }
-  }
+            const player =
+              getPlayer(
+                assignment.playerId,
+              )
 
-  return Array.from(
-    participantStates.values(),
+            if (!player) {
+              return
+            }
+
+            spent[
+              player.role
+            ] +=
+              assignment.price
+
+            slots[
+              player.role
+            ] += 1
+          },
+        )
+
+      return {
+        id:
+          manager.id,
+
+        name:
+          managerDisplayName(
+            manager,
+          ),
+
+        isOwner:
+          manager.isOwner,
+
+        spent,
+
+        slots,
+      }
+    },
+  )
+}
+
+function getParticipant(
+  participants:
+    AuctionParticipantState[],
+  participantId: string,
+):
+  | AuctionParticipantState
+  | undefined {
+  return participants.find(
+    (participant) =>
+      participant.id ===
+      participantId,
   )
 }
 
 function getTotalSpent(
   participant:
-    DemoParticipantState,
+    AuctionParticipantState,
 ): number {
   return ROLE_ORDER.reduce(
     (
@@ -572,7 +457,7 @@ function getTotalSpent(
 
 function getRemainingCredits(
   participant:
-    DemoParticipantState,
+    AuctionParticipantState,
   state: AppState,
 ): number {
   return Math.max(
@@ -584,9 +469,21 @@ function getRemainingCredits(
   )
 }
 
+function getRoleTargetCredits(
+  state: AppState,
+  role: AuctionRole,
+): number {
+  return (
+    state.initialCredits *
+    state.budgetDistribution[
+      role
+    ]
+  ) / 100
+}
+
 function getBudgetBarData(
   participant:
-    DemoParticipantState,
+    AuctionParticipantState,
   state: AppState,
   role: AuctionRole,
 ): {
@@ -684,143 +581,48 @@ function getBudgetBarData(
   if (ratio > 1) {
     return {
       width,
+
       color:
-        'rgb(63, 174, 216)',
+        '#5AA8FF',
+
       description:
         'Più margine del piano nel ruolo attivo',
     }
   }
 
-  const hue =
-    Math.round(
-      clamp(
-        ratio,
-        0,
-        1,
-      ) * 120,
-    )
+  if (ratio > 0.55) {
+    return {
+      width,
+
+      color:
+        '#46E6A1',
+
+      description:
+        'Margine alto nel ruolo attivo',
+    }
+  }
+
+  if (ratio > 0.2) {
+    return {
+      width,
+
+      color:
+        '#E7C94C',
+
+      description:
+        'Margine ridotto nel ruolo attivo',
+    }
+  }
 
   return {
     width,
+
     color:
-      `hsl(${hue} 72% 52%)`,
+      '#E45E5E',
+
     description:
-      ratio > 0
-        ? 'Margine del ruolo in progressiva riduzione'
-        : 'Budget del ruolo oltre il piano',
+      'Budget del ruolo in tensione',
   }
-}
-
-/* =========================
-   ASSIGNMENTS DEMO
-========================= */
-
-function applyAssignment(
-  assignment:
-    DemoAssignment,
-): void {
-  const player =
-    getPlayer(
-      assignment.playerId,
-    )
-
-  const participant =
-    getParticipant(
-      assignment.participantId,
-    )
-
-  if (
-    !player ||
-    !participant
-  ) {
-    return
-  }
-
-  participant.spent[
-    player.role
-  ] +=
-    assignment.price
-
-  participant.slots[
-    player.role
-  ] =
-    Math.min(
-      DEMO_SLOT_LIMITS[
-        player.role
-      ],
-      participant.slots[
-        player.role
-      ] + 1,
-    )
-}
-
-function reverseAssignment(
-  assignment:
-    DemoAssignment,
-): void {
-  const player =
-    getPlayer(
-      assignment.playerId,
-    )
-
-  const participant =
-    getParticipant(
-      assignment.participantId,
-    )
-
-  if (
-    !player ||
-    !participant
-  ) {
-    return
-  }
-
-  participant.spent[
-    player.role
-  ] =
-    Math.max(
-      0,
-      participant.spent[
-        player.role
-      ] -
-        assignment.price,
-    )
-
-  participant.slots[
-    player.role
-  ] =
-    Math.max(
-      0,
-      participant.slots[
-        player.role
-      ] - 1,
-    )
-}
-
-function removeAssignment(
-  assignmentId: number,
-): boolean {
-  const index =
-    assignments.findIndex(
-      (assignment) =>
-        assignment.id ===
-        assignmentId,
-    )
-
-  if (index < 0) {
-    return false
-  }
-
-  reverseAssignment(
-    assignments[index],
-  )
-
-  assignments.splice(
-    index,
-    1,
-  )
-
-  return true
 }
 
 /* =========================
@@ -829,25 +631,27 @@ function removeAssignment(
 
 function renderRoleTabs():
   string {
-  return ROLE_ORDER.map(
-    (role) => `
-      <button
-        type="button"
-        class="
-          auction-role-tab
-          ${
-            role ===
-            activeRole
-              ? 'active'
-              : ''
-          }
-        "
-        data-auction-role="${role}"
-      >
-        ${role}
-      </button>
-    `,
-  ).join('')
+  return ROLE_ORDER
+    .map(
+      (role) => `
+        <button
+          type="button"
+          class="
+            auction-role-tab
+            ${
+              role ===
+              activeRole
+                ? 'active'
+                : ''
+            }
+          "
+          data-auction-role="${role}"
+        >
+          ${role}
+        </button>
+      `,
+    )
+    .join('')
 }
 
 /* =========================
@@ -864,22 +668,25 @@ function getTeams():
       ),
     ),
   ).sort(
-    (a, b) =>
-      a.localeCompare(
-        b,
+    (first, second) =>
+      first.localeCompare(
+        second,
         'it',
       ),
   )
 }
 
-function renderSelector():
+function renderSelector(
+  state: AppState,
+):
   string {
   if (!selectorMode) {
     return ''
   }
 
   const teamMode =
-    selectorMode === 'team'
+    selectorMode ===
+    'team'
 
   const visiblePlayers =
     teamMode &&
@@ -934,6 +741,7 @@ function renderSelector():
             id="closeAuctionSelectorButton"
             type="button"
             class="icon-button"
+            aria-label="Chiudi"
           >
             ×
           </button>
@@ -1033,72 +841,74 @@ function renderSelector():
               >
                 ${visiblePlayers
                   .map(
-                    (player) => `
-                      <button
-                        type="button"
-                        class="
-                          auction-selector-player
+                    (player) => {
+                      const assigned =
+                        isPlayerAssigned(
+                          state,
+                          player.id,
+                        )
+
+                      return `
+                        <button
+                          type="button"
+                          class="
+                            auction-selector-player
+                            ${
+                              assigned
+                                ? 'assigned'
+                                : ''
+                            }
+                          "
+                          data-auction-select-player="${escapeHtml(
+                            player.id,
+                          )}"
+                          data-search="${escapeHtml(
+                            normalizeText(
+                              `${player.name} ${player.team}`,
+                            ),
+                          )}"
                           ${
-                            isPlayerAssigned(
-                              player.id,
-                            )
-                              ? 'assigned'
+                            assigned
+                              ? 'disabled'
                               : ''
                           }
-                        "
-                        data-auction-select-player="${escapeHtml(
-                          player.id,
-                        )}"
-                        data-search="${escapeHtml(
-                          normalizeText(
-                            `${player.name} ${player.team}`,
-                          ),
-                        )}"
-                        ${
-                          isPlayerAssigned(
-                            player.id,
-                          )
-                            ? 'disabled'
-                            : ''
-                        }
-                      >
-                        <span
-                          class="
-                            auction-role-badge
-                            role-${player.role.toLowerCase()}
-                          "
                         >
-                          ${player.role}
-                        </span>
+                          <span
+                            class="
+                              auction-role-badge
+                              role-${player.role.toLowerCase()}
+                            "
+                          >
+                            ${player.role}
+                          </span>
 
-                        <span>
-                          <strong>
-                            ${escapeHtml(
-                              player.name,
-                            )}
-                          </strong>
+                          <span>
+                            <strong>
+                              ${escapeHtml(
+                                player.name,
+                              )}
+                            </strong>
 
-                          <small>
-                            ${escapeHtml(
-                              player.team,
-                            )}
-                          </small>
-                        </span>
+                            <small>
+                              ${escapeHtml(
+                                player.team,
+                              )}
+                            </small>
+                          </span>
 
-                        <em>
-                          ${
-                            isPlayerAssigned(
-                              player.id,
-                            )
-                              ? 'Assegnato'
-                              : formatNumber(
-                                  player.iCa,
-                                  2,
-                                )
-                          }
-                        </em>
-                      </button>
-                    `,
+                          <em>
+                            ${
+                              assigned
+                                ? 'Assegnato'
+                                : formatNumber(
+                                    player.iCa,
+                                    2,
+                                  )
+                            }
+                          </em>
+                        </button>
+                      `
+                    },
                   )
                   .join('')}
               </div>
@@ -1192,12 +1002,14 @@ function renderPlayerSearchStrip():
 ========================= */
 
 function renderPlayerCard(
+  state: AppState,
   player: Player,
   participants:
-    DemoParticipantState[],
+    AuctionParticipantState[],
 ): string {
   const assignment =
     getAssignmentByPlayer(
+      state,
       player.id,
     )
 
@@ -1205,6 +1017,14 @@ function renderPlayerCard(
     Boolean(
       assignment,
     )
+
+  const assignedManager =
+    assignment
+      ? getManagerById(
+          state,
+          assignment.managerId,
+        )
+      : undefined
 
   return `
     <section
@@ -1265,7 +1085,7 @@ function renderPlayerCard(
             ${
               isAssigned
                 ? 'ASSEGNATO'
-                : 'LIBERO'
+                : 'DA ASSEGNARE'
             }
           </span>
 
@@ -1587,10 +1407,11 @@ function renderPlayerCard(
 
               <strong>
                 ${escapeHtml(
-                  getParticipant(
-                    assignment.participantId,
-                  )?.name ??
-                    'Manager',
+                  assignedManager
+                    ? managerDisplayName(
+                        assignedManager,
+                      )
+                    : 'Manager non disponibile',
                 )}
               </strong>
 
@@ -1603,14 +1424,18 @@ function renderPlayerCard(
 
               <button
                 type="button"
-                data-edit-assignment="${assignment.id}"
+                data-edit-assignment="${escapeHtml(
+                  assignment.id,
+                )}"
               >
                 Modifica
               </button>
 
               <button
                 type="button"
-                data-remove-assignment="${assignment.id}"
+                data-remove-assignment="${escapeHtml(
+                  assignment.id,
+                )}"
               >
                 Annulla assegnazione
               </button>
@@ -1638,43 +1463,17 @@ function renderPlayerCard(
 }
 
 /* =========================
-   RECOMMENDATIONS
+   SIDE PANELS
 ========================= */
 
-function renderRecommendations():
+function renderSuggestedPlayersPanel():
   string {
-  const candidates =
-    getRolePlayers(
-      activeRole,
-    )
-      .filter(
-        (player) =>
-          !isPlayerAssigned(
-            player.id,
-          ) &&
-          !discardedRecommendations.has(
-            player.id,
-          ),
-      )
-      .sort(
-        (a, b) =>
-          (
-            b.iCa ??
-            -Infinity
-          ) -
-          (
-            a.iCa ??
-            -Infinity
-          ),
-      )
-      .slice(
-        0,
-        3,
-      )
-
   return `
     <aside
-      class="auction-next-panel"
+      class="
+        auction-next-panel
+        auction-suggested-panel
+      "
     >
       <div
         class="auction-panel-title"
@@ -1687,7 +1486,91 @@ function renderRecommendations():
           </span>
 
           <h3>
-            Prossime chiamate
+            Giocatori consigliati
+          </h3>
+        </div>
+
+        <span
+          class="
+            auction-demo-label
+          "
+        >
+          NON ATTIVO
+        </span>
+      </div>
+
+      <div
+        class="
+          auction-next-list
+        "
+      >
+        <div
+          class="
+            auction-recommendation-placeholder
+          "
+        >
+          La chiamata consigliata
+          verrà calcolata da un
+          algoritmo dedicato e
+          resterà distinta dall’iCà.
+        </div>
+      </div>
+    </aside>
+  `
+}
+
+function renderTopICaPanel(
+  state: AppState,
+): string {
+  const candidates =
+    getRolePlayers(
+      activeRole,
+    )
+      .filter(
+        (player) =>
+          !isPlayerAssigned(
+            state,
+            player.id,
+          ),
+      )
+      .sort(
+        (
+          first,
+          second,
+        ) =>
+          (
+            second.iCa ??
+            -Infinity
+          ) -
+          (
+            first.iCa ??
+            -Infinity
+          ),
+      )
+      .slice(
+        0,
+        3,
+      )
+
+  return `
+    <aside
+      class="
+        auction-next-panel
+        auction-top-ica-panel
+      "
+    >
+      <div
+        class="auction-panel-title"
+      >
+        <div>
+          <span
+            class="auction-kicker"
+          >
+            SOLO NON ASSEGNATI
+          </span>
+
+          <h3>
+            Top iCà · ${activeRole}
           </h3>
         </div>
 
@@ -1701,91 +1584,112 @@ function renderRecommendations():
       <div
         class="auction-next-list"
       >
-        ${candidates
-          .map(
-            (
-              player,
-              index,
-            ) => `
-              <article
+        ${
+          candidates.length
+            ? candidates
+                .map(
+                  (
+                    player,
+                    index,
+                  ) => `
+                    <article
+                      class="
+                        auction-next-card
+                        ${
+                          index === 0
+                            ? 'primary'
+                            : ''
+                        }
+                      "
+                    >
+                      <div
+                        class="
+                          auction-next-card-top
+                        "
+                      >
+                        <div>
+                          <strong>
+                            ${escapeHtml(
+                              player.name,
+                            )}
+                          </strong>
+
+                          <span>
+                            ${escapeHtml(
+                              player.team,
+                            )}
+                          </span>
+                        </div>
+
+                        <b>
+                          ${formatNumber(
+                            player.iCa,
+                            2,
+                          )}
+                        </b>
+                      </div>
+
+                      <p>
+                        Consenso
+                        ${formatNumber(
+                          player.consensus,
+                          2,
+                        )}
+                        · Titolarità
+                        ${formatPercent(
+                          player.startingProbability,
+                          0,
+                        )}
+                      </p>
+
+                      <div
+                        class="
+                          auction-next-actions
+                        "
+                      >
+                        <button
+                          type="button"
+                          data-call-top-ica="${escapeHtml(
+                            player.id,
+                          )}"
+                        >
+                          Chiama
+                        </button>
+                      </div>
+                    </article>
+                  `,
+                )
+                .join('')
+            : `
+              <div
                 class="
-                  auction-next-card
-                  ${
-                    index === 0
-                      ? 'primary'
-                      : ''
-                  }
+                  auction-recommendation-placeholder
                 "
               >
-                <div
-                  class="
-                    auction-next-card-top
-                  "
-                >
-                  <div>
-                    <strong>
-                      ${escapeHtml(
-                        player.name,
-                      )}
-                    </strong>
-
-                    <span>
-                      ${escapeHtml(
-                        player.team,
-                      )}
-                    </span>
-                  </div>
-
-                  <b>
-                    ${formatNumber(
-                      player.iCa,
-                      2,
-                    )}
-                  </b>
-                </div>
-
-                <p>
-                  Consenso
-                  ${formatNumber(
-                    player.consensus,
-                    2,
-                  )}
-                  · Titolarità
-                  ${formatPercent(
-                    player.startingProbability,
-                    0,
-                  )}
-                </p>
-
-                <div
-                  class="
-                    auction-next-actions
-                  "
-                >
-                  <button
-                    type="button"
-                    data-select-recommended="${escapeHtml(
-                      player.id,
-                    )}"
-                  >
-                    Chiama
-                  </button>
-
-                  <button
-                    type="button"
-                    data-discard-recommended="${escapeHtml(
-                      player.id,
-                    )}"
-                  >
-                    Scarta
-                  </button>
-                </div>
-              </article>
-            `,
-          )
-          .join('')}
+                Nessun giocatore
+                disponibile nel ruolo
+                ${activeRole}.
+              </div>
+            `
+        }
       </div>
     </aside>
+  `
+}
+
+function renderSidePanels(
+  state: AppState,
+): string {
+  return `
+    <div
+      class="auction-side-panels"
+    >
+      ${renderSuggestedPlayersPanel()}
+
+      ${renderTopICaPanel(
+        state,
+      )}
+    </div>
   `
 }
 
@@ -1796,7 +1700,7 @@ function renderRecommendations():
 function renderParticipants(
   state: AppState,
   participants:
-    DemoParticipantState[],
+    AuctionParticipantState[],
 ): string {
   return `
     <section
@@ -1848,111 +1752,128 @@ function renderParticipants(
         </div>
       </div>
 
-      <div
-        class="auction-participant-grid"
-      >
-        ${participants
-          .map(
-            (participant) => {
-              const remaining =
-                getRemainingCredits(
-                  participant,
-                  state,
-                )
+      ${
+        participants.length === 0
+          ? `
+            <div
+              class="
+                auction-history-empty
+              "
+            >
+              Nessun partecipante
+              attivo configurato.
+            </div>
+          `
+          : `
+            <div
+              class="auction-participant-grid"
+            >
+              ${participants
+                .map(
+                  (participant) => {
+                    const remaining =
+                      getRemainingCredits(
+                        participant,
+                        state,
+                      )
 
-              const bar =
-                getBudgetBarData(
-                  participant,
-                  state,
-                  activeRole,
-                )
+                    const bar =
+                      getBudgetBarData(
+                        participant,
+                        state,
+                        activeRole,
+                      )
 
-              return `
-                <article
-                  class="
-                    auction-participant-card
-                    ${
-                      participant.isOwner
-                        ? 'owner'
-                        : ''
-                    }
-                  "
-                >
-                  <div
-                    class="
-                      auction-participant-top
-                    "
-                  >
-                    <strong>
-                      ${escapeHtml(
-                        participant.name,
-                      )}
-                    </strong>
-
-                    <span>
-                      ${remaining}
-                    </span>
-                  </div>
-
-                  <div
-                    class="
-                      auction-budget-track
-                    "
-                    title="${escapeHtml(
-                      bar.description,
-                    )}"
-                  >
-                    <span
-                      style="
-                        width:
-                        ${bar.width.toFixed(
-                          2,
-                        )}%;
-
-                        background:
-                        ${bar.color};
-                      "
-                    ></span>
-                  </div>
-
-                  <div
-                    class="auction-slot-row"
-                  >
-                    ${ROLE_ORDER.map(
-                      (role) => `
-                        <span
+                    return `
+                      <article
+                        class="
+                          auction-participant-card
+                          ${
+                            participant.isOwner
+                              ? 'owner'
+                              : ''
+                          }
+                        "
+                      >
+                        <div
                           class="
-                            auction-slot
-                            role-${role.toLowerCase()}
-                            ${
-                              role ===
-                              activeRole
-                                ? 'active'
-                                : ''
-                            }
+                            auction-participant-top
                           "
                         >
-                          ${role}
+                          <strong>
+                            ${escapeHtml(
+                              participant.name,
+                            )}
+                          </strong>
 
-                          ${
-                            participant.slots[
-                              role
-                            ]
-                          }/${
-                            DEMO_SLOT_LIMITS[
-                              role
-                            ]
-                          }
-                        </span>
-                      `,
-                    ).join('')}
-                  </div>
-                </article>
-              `
-            },
-          )
-          .join('')}
-      </div>
+                          <span>
+                            ${remaining}
+                          </span>
+                        </div>
+
+                        <div
+                          class="
+                            auction-budget-track
+                          "
+                          title="${escapeHtml(
+                            bar.description,
+                          )}"
+                        >
+                          <span
+                            style="
+                              width:
+                              ${bar.width.toFixed(
+                                2,
+                              )}%;
+
+                              background:
+                              ${bar.color};
+                            "
+                          ></span>
+                        </div>
+
+                        <div
+                          class="auction-slot-row"
+                        >
+                          ${ROLE_ORDER
+                            .map(
+                              (role) => `
+                                <span
+                                  class="
+                                    auction-slot
+                                    role-${role.toLowerCase()}
+                                    ${
+                                      role ===
+                                      activeRole
+                                        ? 'active'
+                                        : ''
+                                    }
+                                  "
+                                >
+                                  ${role}
+
+                                  ${
+                                    participant.slots[
+                                      role
+                                    ]
+                                  }/${
+                                    SLOT_LIMITS[
+                                      role
+                                    ]
+                                  }
+                                </span>
+                              `,
+                            )
+                            .join('')}
+                        </div>
+                      </article>
+                    `
+                  },
+                )
+                .join('')}
+            </div>
+          `
+      }
     </section>
   `
 }
@@ -1961,8 +1882,12 @@ function renderParticipants(
    HISTORY
 ========================= */
 
-function renderAssignmentHistory():
-  string {
+function renderAssignmentHistory(
+  state: AppState,
+): string {
+  const assignments =
+    state.auctionAssignments
+
   return `
     <section
       class="
@@ -2004,7 +1929,8 @@ function renderAssignmentHistory():
               "
             >
               Nessuna assegnazione
-              registrata nella demo.
+              registrata in questa
+              sessione.
             </div>
           `
           : `
@@ -2022,15 +1948,13 @@ function renderAssignmentHistory():
                         assignment.playerId,
                       )
 
-                    const participant =
-                      getParticipant(
-                        assignment.participantId,
+                    const manager =
+                      getManagerById(
+                        state,
+                        assignment.managerId,
                       )
 
-                    if (
-                      !player ||
-                      !participant
-                    ) {
+                    if (!player) {
                       return ''
                     }
 
@@ -2078,7 +2002,11 @@ function renderAssignmentHistory():
 
                           <strong>
                             ${escapeHtml(
-                              participant.name,
+                              manager
+                                ? managerDisplayName(
+                                    manager,
+                                  )
+                                : 'Manager non disponibile',
                             )}
                           </strong>
                         </div>
@@ -2104,7 +2032,9 @@ function renderAssignmentHistory():
                         >
                           <button
                             type="button"
-                            data-edit-assignment="${assignment.id}"
+                            data-edit-assignment="${escapeHtml(
+                              assignment.id,
+                            )}"
                           >
                             Modifica
                           </button>
@@ -2112,7 +2042,9 @@ function renderAssignmentHistory():
                           <button
                             type="button"
                             class="danger"
-                            data-remove-assignment="${assignment.id}"
+                            data-remove-assignment="${escapeHtml(
+                              assignment.id,
+                            )}"
                           >
                             Annulla
                           </button>
@@ -2130,12 +2062,13 @@ function renderAssignmentHistory():
 }
 
 /* =========================
-   EDIT OVERLAY
+   EDIT ASSIGNMENT
 ========================= */
 
 function renderEditAssignmentOverlay(
+  state: AppState,
   participants:
-    DemoParticipantState[],
+    AuctionParticipantState[],
 ): string {
   if (
     editingAssignmentId ===
@@ -2145,10 +2078,9 @@ function renderEditAssignmentOverlay(
   }
 
   const assignment =
-    assignments.find(
-      (item) =>
-        item.id ===
-        editingAssignmentId,
+    getAssignmentById(
+      state,
+      editingAssignmentId,
     )
 
   if (!assignment) {
@@ -2202,6 +2134,7 @@ function renderEditAssignmentOverlay(
             id="closeEditAssignmentButton"
             type="button"
             class="icon-button"
+            aria-label="Chiudi"
           >
             ×
           </button>
@@ -2227,7 +2160,7 @@ function renderEditAssignmentOverlay(
                       )}"
                       ${
                         participant.id ===
-                        assignment.participantId
+                        assignment.managerId
                           ? 'selected'
                           : ''
                       }
@@ -2283,14 +2216,171 @@ function renderEditAssignmentOverlay(
 }
 
 /* =========================
-   LIVE PAGE
+   FINALIZATION OVERLAYS
+========================= */
+
+function renderFinalizationOverlay():
+  string {
+  return `
+    <div
+      id="finalizeAuctionOverlay"
+      class="overlay"
+      aria-hidden="false"
+    >
+      <div
+        class="
+          overlay-backdrop
+          auction-finalization-backdrop
+        "
+      ></div>
+
+      <div
+        class="
+          overlay-card
+          small-overlay-card
+          auction-finalization-overlay
+        "
+      >
+        <div
+          class="overlay-header"
+        >
+          <div>
+            <span
+              class="eyebrow"
+            >
+              ASTA TERMINATA
+            </span>
+
+            <h2>
+              Come vuoi chiudere
+              la sessione?
+            </h2>
+          </div>
+        </div>
+
+        <div
+          class="
+            auction-finalization-summary
+          "
+        >
+          <p>
+            Registra conserva le
+            assegnazioni nello storico.
+          </p>
+
+          <p>
+            Scarta elimina la sessione
+            corrente senza archiviarla.
+          </p>
+        </div>
+
+        <div
+          class="overlay-actions"
+        >
+          <button
+            id="discardAuctionButton"
+            type="button"
+            class="danger-button"
+          >
+            Scarta asta
+          </button>
+
+          <button
+            id="archiveAuctionButton"
+            type="button"
+            class="primary-button"
+          >
+            Registra asta
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="discardAuctionOverlay"
+      class="overlay hidden"
+      aria-hidden="true"
+    >
+      <div
+        class="overlay-backdrop"
+      ></div>
+
+      <div
+        class="
+          overlay-card
+          small-overlay-card
+        "
+      >
+        <div
+          class="overlay-header"
+        >
+          <div>
+            <span
+              class="eyebrow"
+            >
+              SCARTA ASTA
+            </span>
+
+            <h2>
+              Conferma eliminazione
+            </h2>
+          </div>
+
+          <button
+            id="closeDiscardAuctionButton"
+            type="button"
+            class="icon-button"
+            aria-label="Chiudi"
+          >
+            ×
+          </button>
+        </div>
+
+        <div
+          class="danger-panel"
+        >
+          <p>
+            Le assegnazioni della
+            sessione corrente verranno
+            eliminate e l’asta non
+            entrerà nello storico.
+          </p>
+        </div>
+
+        <div
+          class="overlay-actions"
+        >
+          <button
+            id="cancelDiscardAuctionButton"
+            type="button"
+            class="secondary-button"
+          >
+            Annulla
+          </button>
+
+          <button
+            id="confirmDiscardAuctionButton"
+            type="button"
+            class="danger-button"
+          >
+            Scarta asta
+          </button>
+        </div>
+      </div>
+    </div>
+  `
+}
+
+/* =========================
+   LIVE CONTEXT
 ========================= */
 
 function renderLiveAuction(
   state: AppState,
+  finalizing = false,
 ): string {
   const participants =
-    ensureParticipants(
+    buildParticipants(
       state,
     )
 
@@ -2324,6 +2414,11 @@ function renderLiveAuction(
       class="
         page
         auction-live-page
+        ${
+          finalizing
+            ? 'is-finalizing'
+            : ''
+        }
       "
     >
       <div
@@ -2345,9 +2440,20 @@ function renderLiveAuction(
           </div>
 
           <span
-            class="live-badge"
+            class="
+              live-badge
+              ${
+                finalizing
+                  ? 'finalizing-badge'
+                  : ''
+              }
+            "
           >
-            LIVE
+            ${
+              finalizing
+                ? 'CHIUSURA'
+                : 'LIVE'
+            }
           </span>
         </div>
 
@@ -2379,11 +2485,35 @@ function renderLiveAuction(
           class="auction-toolbar-actions"
         >
           <button
+            id="goToPlayersButton"
+            type="button"
+            class="
+              auction-toolbar-button
+              auction-quick-nav
+            "
+          >
+            Giocatori
+          </button>
+
+          <button
+            id="goToObjectivesButton"
+            type="button"
+            class="
+              auction-toolbar-button
+              auction-quick-nav
+            "
+          >
+            Obiettivi
+          </button>
+
+          <button
             id="undoLastAssignmentButton"
             type="button"
             class="auction-toolbar-button"
             ${
-              assignments.length
+              state
+                .auctionAssignments
+                .length
                 ? ''
                 : 'disabled'
             }
@@ -2414,6 +2544,7 @@ function renderLiveAuction(
           ${
             selectedPlayer
               ? renderPlayerCard(
+                  state,
                   selectedPlayer,
                   participants,
                 )
@@ -2444,7 +2575,9 @@ function renderLiveAuction(
           }
         </div>
 
-        ${renderRecommendations()}
+        ${renderSidePanels(
+          state,
+        )}
       </div>
 
       ${renderParticipants(
@@ -2452,21 +2585,42 @@ function renderLiveAuction(
         participants,
       )}
 
-      ${renderAssignmentHistory()}
+      ${renderAssignmentHistory(
+        state,
+      )}
 
       <div
         class="auction-prototype-note"
       >
-        Partecipanti, budget e
-        assegnazioni sono ancora
-        memoria demo.
+        Assegnazioni, crediti residui
+        e slot occupati derivano ora
+        dallo stato reale della
+        sessione. L’algoritmo di
+        consiglio resta non attivo.
       </div>
 
-      ${renderEditAssignmentOverlay(
-        participants,
-      )}
+      ${
+        finalizing
+          ? ''
+          : renderEditAssignmentOverlay(
+              state,
+              participants,
+            )
+      }
 
-      ${renderSelector()}
+      ${
+        finalizing
+          ? ''
+          : renderSelector(
+              state,
+            )
+      }
+
+      ${
+        finalizing
+          ? renderFinalizationOverlay()
+          : ''
+      }
     </section>
   `
 }
@@ -2484,6 +2638,7 @@ export function renderAuctionPage(
   ) {
     return renderLiveAuction(
       state,
+      false,
     )
   }
 
@@ -2491,209 +2646,20 @@ export function renderAuctionPage(
     state.auctionPhase ===
     'finalizing'
   ) {
-    return `
-      <section class="page">
-        <div class="page-heading">
-          <div>
-            <h1>Asta</h1>
-            <p>
-              Sessione terminata.
-            </p>
-          </div>
-
-          <span
-            class="finalizing-badge"
-          >
-            DA FINALIZZARE
-          </span>
-        </div>
-
-        <section
-          class="
-            panel
-            finalization-panel
-          "
-        >
-          <div
-            class="finalization-icon"
-          >
-            !
-          </div>
-
-          <div
-            class="finalization-copy"
-          >
-            <h2>
-              Asta terminata
-            </h2>
-
-            <p>
-              La sessione non è ancora
-              stata registrata.
-            </p>
-
-            <p>
-              Prima di iniziare una
-              nuova asta devi scegliere
-              se salvare definitivamente
-              i dati nello storico
-              oppure scartare questa
-              sessione.
-            </p>
-          </div>
-        </section>
-
-        <div
-          class="auction-actions"
-        >
-          <button
-            id="discardAuctionButton"
-            type="button"
-            class="danger-button"
-          >
-            Scarta asta
-          </button>
-
-          <button
-            id="archiveAuctionButton"
-            type="button"
-            class="primary-button"
-          >
-            Registra asta
-          </button>
-        </div>
-
-        <div
-          id="discardAuctionOverlay"
-          class="overlay hidden"
-          aria-hidden="true"
-        >
-          <div
-            class="overlay-backdrop"
-          ></div>
-
-          <div
-            class="
-              overlay-card
-              small-overlay-card
-            "
-          >
-            <div
-              class="overlay-header"
-            >
-              <div>
-                <span
-                  class="eyebrow"
-                >
-                  SCARTA ASTA
-                </span>
-
-                <h2>
-                  Conferma eliminazione
-                </h2>
-              </div>
-
-              <button
-                id="closeDiscardAuctionButton"
-                type="button"
-                class="icon-button"
-              >
-                ×
-              </button>
-            </div>
-
-            <div
-              class="danger-panel"
-            >
-              <p>
-                Questa sessione
-                non verrà aggiunta
-                allo storico.
-              </p>
-            </div>
-
-            <div
-              class="overlay-actions"
-            >
-              <button
-                id="cancelDiscardAuctionButton"
-                type="button"
-                class="secondary-button"
-              >
-                Annulla
-              </button>
-
-              <button
-                id="confirmDiscardAuctionButton"
-                type="button"
-                class="danger-button"
-              >
-                Scarta asta
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-    `
-  }
-
-  if (
-    state.auctionPhase ===
-      'archived' ||
-    state.auctionPhase ===
-      'discarded'
-  ) {
-    const archived =
-      state.auctionPhase ===
-      'archived'
-
-    return `
-      <section class="page">
-        <div class="page-heading">
-          <div>
-            <h1>Asta</h1>
-
-            <p>
-              ${
-                archived
-                  ? 'Sessione registrata.'
-                  : 'Sessione scartata.'
-              }
-            </p>
-          </div>
-        </div>
-
-        <section class="panel">
-          <h2>
-            ${
-              archived
-                ? 'Asta registrata'
-                : 'Asta scartata'
-            }
-          </h2>
-        </section>
-
-        <div
-          class="auction-actions"
-        >
-          <button
-            id="newAuctionButton"
-            type="button"
-            class="primary-button"
-          >
-            Nuova asta
-          </button>
-        </div>
-      </section>
-    `
+    return renderLiveAuction(
+      state,
+      true,
+    )
   }
 
   return `
     <section class="page">
-      <h1>Asta</h1>
+      <h1>
+        Asta
+      </h1>
 
       <p>
-        Asta non ancora avviata.
+        Asta non attiva.
       </p>
     </section>
   `
@@ -2707,105 +2673,114 @@ export function bindAuctionEvents(
   state: AppState,
   actions: AuctionActions,
 ): void {
+  /*
+    In finalizzazione l'asta resta
+    visibile come contesto, ma tutte
+    le operazioni live sono bloccate.
+
+    Restano attivi solo Registra e
+    Scarta.
+  */
+  if (
+    state.auctionPhase ===
+    'finalizing'
+  ) {
+    document
+      .querySelector(
+        '#archiveAuctionButton',
+      )
+      ?.addEventListener(
+        'click',
+        actions.onArchiveAuction,
+      )
+
+    const discardOverlay =
+      document.querySelector<HTMLElement>(
+        '#discardAuctionOverlay',
+      )
+
+    const openDiscardOverlay =
+      (): void => {
+        discardOverlay
+          ?.classList
+          .remove(
+            'hidden',
+          )
+
+        discardOverlay
+          ?.setAttribute(
+            'aria-hidden',
+            'false',
+          )
+      }
+
+    const closeDiscardOverlay =
+      (): void => {
+        discardOverlay
+          ?.classList
+          .add(
+            'hidden',
+          )
+
+        discardOverlay
+          ?.setAttribute(
+            'aria-hidden',
+            'true',
+          )
+      }
+
+    document
+      .querySelector(
+        '#discardAuctionButton',
+      )
+      ?.addEventListener(
+        'click',
+        openDiscardOverlay,
+      )
+
+    document
+      .querySelector(
+        '#closeDiscardAuctionButton',
+      )
+      ?.addEventListener(
+        'click',
+        closeDiscardOverlay,
+      )
+
+    document
+      .querySelector(
+        '#cancelDiscardAuctionButton',
+      )
+      ?.addEventListener(
+        'click',
+        closeDiscardOverlay,
+      )
+
+    document
+      .querySelector(
+        '#discardAuctionOverlay .overlay-backdrop',
+      )
+      ?.addEventListener(
+        'click',
+        closeDiscardOverlay,
+      )
+
+    document
+      .querySelector(
+        '#confirmDiscardAuctionButton',
+      )
+      ?.addEventListener(
+        'click',
+        actions.onDiscardAuction,
+      )
+
+    return
+  }
+
   if (
     state.auctionPhase !==
     'live'
   ) {
-    if (
-      state.auctionPhase ===
-      'finalizing'
-    ) {
-      document
-        .querySelector(
-          '#archiveAuctionButton',
-        )
-        ?.addEventListener(
-          'click',
-          actions.onArchiveAuction,
-        )
-
-      const overlay =
-        document.querySelector<HTMLElement>(
-          '#discardAuctionOverlay',
-        )
-
-      const openOverlay =
-        () => {
-          overlay?.classList.remove(
-            'hidden',
-          )
-
-          overlay?.setAttribute(
-            'aria-hidden',
-            'false',
-          )
-        }
-
-      const closeOverlay =
-        () => {
-          overlay?.classList.add(
-            'hidden',
-          )
-
-          overlay?.setAttribute(
-            'aria-hidden',
-            'true',
-          )
-        }
-
-      document
-        .querySelector(
-          '#discardAuctionButton',
-        )
-        ?.addEventListener(
-          'click',
-          openOverlay,
-        )
-
-      document
-        .querySelector(
-          '#closeDiscardAuctionButton',
-        )
-        ?.addEventListener(
-          'click',
-          closeOverlay,
-        )
-
-      document
-        .querySelector(
-          '#cancelDiscardAuctionButton',
-        )
-        ?.addEventListener(
-          'click',
-          closeOverlay,
-        )
-
-      document
-        .querySelector(
-          '#confirmDiscardAuctionButton',
-        )
-        ?.addEventListener(
-          'click',
-          actions.onDiscardAuction,
-        )
-    }
-
-    if (
-      state.auctionPhase ===
-        'archived' ||
-      state.auctionPhase ===
-        'discarded'
-    ) {
-      document
-        .querySelector(
-          '#newAuctionButton',
-        )
-        ?.addEventListener(
-          'click',
-          actions.onNewAuction,
-        )
-    }
-
     return
   }
 
@@ -2816,6 +2791,24 @@ export function bindAuctionEvents(
     ?.addEventListener(
       'click',
       actions.onEndAuction,
+    )
+
+  document
+    .querySelector(
+      '#goToPlayersButton',
+    )
+    ?.addEventListener(
+      'click',
+      actions.onGoToPlayers,
+    )
+
+  document
+    .querySelector(
+      '#goToObjectivesButton',
+    )
+    ?.addEventListener(
+      'click',
+      actions.onGoToObjectives,
     )
 
   document
@@ -2837,18 +2830,14 @@ export function bindAuctionEvents(
               return
             }
 
-            /*
-              Cambiare ruolo NON
-              avvia automaticamente
-              una chiamata.
-            */
             activeRole =
               role
 
             state.currentAuctionPlayerId =
               null
 
-            auctionFeedback = ''
+            auctionFeedback =
+              ''
 
             actions.onStateChange()
           },
@@ -2890,21 +2879,24 @@ export function bindAuctionEvents(
       },
     )
 
+  const closeSelector =
+    (): void => {
+      selectorMode =
+        null
+
+      selectedTeamFilter =
+        ''
+
+      actions.onRender()
+    }
+
   document
     .querySelector(
       '#closeAuctionSelectorButton',
     )
     ?.addEventListener(
       'click',
-      () => {
-        selectorMode =
-          null
-
-        selectedTeamFilter =
-          ''
-
-        actions.onRender()
-      },
+      closeSelector,
     )
 
   document
@@ -2913,15 +2905,7 @@ export function bindAuctionEvents(
     )
     ?.addEventListener(
       'click',
-      () => {
-        selectorMode =
-          null
-
-        selectedTeamFilter =
-          ''
-
-        actions.onRender()
-      },
+      closeSelector,
     )
 
   document
@@ -2968,34 +2952,35 @@ export function bindAuctionEvents(
       '#auctionSelectorResults',
     )
 
-  selectorSearch?.addEventListener(
-    'input',
-    () => {
-      const query =
-        normalizeText(
-          selectorSearch.value,
-        )
+  selectorSearch
+    ?.addEventListener(
+      'input',
+      () => {
+        const query =
+          normalizeText(
+            selectorSearch.value,
+          )
 
-      selectorResults
-        ?.querySelectorAll<HTMLElement>(
-          '[data-search]',
-        )
-        .forEach(
-          (result) => {
-            const searchable =
-              result.dataset
-                .search ??
-              ''
+        selectorResults
+          ?.querySelectorAll<HTMLElement>(
+            '[data-search]',
+          )
+          .forEach(
+            (result) => {
+              const searchable =
+                result.dataset
+                  .search ??
+                ''
 
-            result.hidden =
-              Boolean(query) &&
-              !searchable.includes(
-                query,
-              )
-          },
-        )
-    },
-  )
+              result.hidden =
+                Boolean(query) &&
+                !searchable.includes(
+                  query,
+                )
+            },
+          )
+      },
+    )
 
   document
     .querySelectorAll<HTMLButtonElement>(
@@ -3019,6 +3004,7 @@ export function bindAuctionEvents(
             if (
               !player ||
               isPlayerAssigned(
+                state,
                 player.id,
               )
             ) {
@@ -3048,7 +3034,7 @@ export function bindAuctionEvents(
 
   document
     .querySelectorAll<HTMLButtonElement>(
-      '[data-select-recommended]',
+      '[data-call-top-ica]',
     )
     .forEach(
       (button) => {
@@ -3058,11 +3044,17 @@ export function bindAuctionEvents(
             const player =
               getPlayer(
                 button.dataset
-                  .selectRecommended ??
+                  .callTopIca ??
                   null,
               )
 
-            if (!player) {
+            if (
+              !player ||
+              isPlayerAssigned(
+                state,
+                player.id,
+              )
+            ) {
               return
             }
 
@@ -3076,33 +3068,6 @@ export function bindAuctionEvents(
               ''
 
             actions.onStateChange()
-          },
-        )
-      },
-    )
-
-  document
-    .querySelectorAll<HTMLButtonElement>(
-      '[data-discard-recommended]',
-    )
-    .forEach(
-      (button) => {
-        button.addEventListener(
-          'click',
-          () => {
-            const playerId =
-              button.dataset
-                .discardRecommended
-
-            if (!playerId) {
-              return
-            }
-
-            discardedRecommendations.add(
-              playerId,
-            )
-
-            actions.onRender()
           },
         )
       },
@@ -3142,7 +3107,7 @@ export function bindAuctionEvents(
         }
 
         auctionFeedback =
-          `${player.name} segnato come invenduto nella demo.`
+          `${player.name} non assegnato.`
 
         state.currentAuctionPlayerId =
           null
@@ -3183,6 +3148,7 @@ export function bindAuctionEvents(
 
         if (
           isPlayerAssigned(
+            state,
             player.id,
           )
         ) {
@@ -3194,8 +3160,14 @@ export function bindAuctionEvents(
           return
         }
 
+        const participants =
+          buildParticipants(
+            state,
+          )
+
         const participant =
           getParticipant(
+            participants,
             buyerSelect.value,
           )
 
@@ -3249,7 +3221,7 @@ export function bindAuctionEvents(
           participant.slots[
             player.role
           ] >=
-          DEMO_SLOT_LIMITS[
+          SLOT_LIMITS[
             player.role
           ]
         ) {
@@ -3261,34 +3233,25 @@ export function bindAuctionEvents(
           return
         }
 
-        const assignment:
-          DemoAssignment = {
+        state
+          .auctionAssignments
+          .push({
             id:
-              nextAssignmentId,
+              createAssignmentId(),
 
             playerId:
               player.id,
 
-            participantId:
+            managerId:
               participant.id,
 
             price,
-          }
-
-        nextAssignmentId += 1
-
-        assignments.push(
-          assignment,
-        )
-
-        applyAssignment(
-          assignment,
-        )
+          })
 
         auctionFeedback =
           `${player.name} aggiudicato a ${participant.name} per ${price} crediti.`
 
-        actions.onRender()
+        actions.onStateChange()
       },
     )
 
@@ -3300,9 +3263,11 @@ export function bindAuctionEvents(
       'click',
       () => {
         const last =
-          assignments[
-            assignments.length -
-            1
+          state
+            .auctionAssignments[
+            state
+              .auctionAssignments
+              .length - 1
           ]
 
         if (!last) {
@@ -3314,16 +3279,16 @@ export function bindAuctionEvents(
             last.playerId,
           )
 
-        removeAssignment(
-          last.id,
-        )
+        state
+          .auctionAssignments
+          .pop()
 
         auctionFeedback =
           player
             ? `Annullata l'ultima assegnazione: ${player.name}.`
             : 'Ultima assegnazione annullata.'
 
-        actions.onRender()
+        actions.onStateChange()
       },
     )
 
@@ -3336,23 +3301,51 @@ export function bindAuctionEvents(
         button.addEventListener(
           'click',
           () => {
-            const id =
-              Number(
-                button.dataset
-                  .removeAssignment,
-              )
+            const assignmentId =
+              button.dataset
+                .removeAssignment
 
-            if (
-              !Number.isFinite(id)
-            ) {
+            if (!assignmentId) {
               return
             }
 
-            removeAssignment(
-              id,
-            )
+            const index =
+              state
+                .auctionAssignments
+                .findIndex(
+                  (assignment) =>
+                    assignment.id ===
+                    assignmentId,
+                )
 
-            actions.onRender()
+            if (index < 0) {
+              return
+            }
+
+            const assignment =
+              state
+                .auctionAssignments[
+                index
+              ]
+
+            const player =
+              getPlayer(
+                assignment.playerId,
+              )
+
+            state
+              .auctionAssignments
+              .splice(
+                index,
+                1,
+              )
+
+            auctionFeedback =
+              player
+                ? `Assegnazione annullata: ${player.name} torna da assegnare.`
+                : 'Assegnazione annullata.'
+
+            actions.onStateChange()
           },
         )
       },
@@ -3367,23 +3360,22 @@ export function bindAuctionEvents(
         button.addEventListener(
           'click',
           () => {
-            const id =
-              Number(
-                button.dataset
-                  .editAssignment,
-              )
+            const assignmentId =
+              button.dataset
+                .editAssignment
 
             if (
-              !assignments.some(
-                (item) =>
-                  item.id === id,
+              !assignmentId ||
+              !getAssignmentById(
+                state,
+                assignmentId,
               )
             ) {
               return
             }
 
             editingAssignmentId =
-              id
+              assignmentId
 
             actions.onRender()
           },
@@ -3419,6 +3411,15 @@ export function bindAuctionEvents(
 
   document
     .querySelector(
+      '#editAssignmentOverlay .overlay-backdrop',
+    )
+    ?.addEventListener(
+      'click',
+      closeEdit,
+    )
+
+  document
+    .querySelector(
       '#saveEditAssignmentButton',
     )
     ?.addEventListener(
@@ -3432,10 +3433,9 @@ export function bindAuctionEvents(
         }
 
         const assignment =
-          assignments.find(
-            (item) =>
-              item.id ===
-              editingAssignmentId,
+          getAssignmentById(
+            state,
+            editingAssignmentId,
           )
 
         const buyerSelect =
@@ -3461,11 +3461,6 @@ export function bindAuctionEvents(
             assignment.playerId,
           )
 
-        const newParticipant =
-          getParticipant(
-            buyerSelect.value,
-          )
-
         const newPrice =
           Number(
             priceInput.value,
@@ -3473,7 +3468,6 @@ export function bindAuctionEvents(
 
         if (
           !player ||
-          !newParticipant ||
           !Number.isInteger(
             newPrice,
           ) ||
@@ -3482,9 +3476,45 @@ export function bindAuctionEvents(
           return
         }
 
-        reverseAssignment(
-          assignment,
-        )
+        /*
+          Per verificare correttamente
+          crediti e slot togliamo
+          temporaneamente l'assegnazione
+          che stiamo modificando dal
+          calcolo.
+        */
+        const originalManagerId =
+          assignment.managerId
+
+        const originalPrice =
+          assignment.price
+
+        assignment.managerId =
+          '__editing__'
+
+        assignment.price =
+          0
+
+        const participants =
+          buildParticipants(
+            state,
+          )
+
+        assignment.managerId =
+          originalManagerId
+
+        assignment.price =
+          originalPrice
+
+        const newParticipant =
+          getParticipant(
+            participants,
+            buyerSelect.value,
+          )
+
+        if (!newParticipant) {
+          return
+        }
 
         const availableCredits =
           getRemainingCredits(
@@ -3496,7 +3526,7 @@ export function bindAuctionEvents(
           newParticipant.slots[
             player.role
           ] <
-          DEMO_SLOT_LIMITS[
+          SLOT_LIMITS[
             player.role
           ]
 
@@ -3505,10 +3535,6 @@ export function bindAuctionEvents(
             availableCredits ||
           !roleHasSpace
         ) {
-          applyAssignment(
-            assignment,
-          )
-
           auctionFeedback =
             !roleHasSpace
               ? `Il manager selezionato non ha più slot ${player.role} disponibili.`
@@ -3522,20 +3548,19 @@ export function bindAuctionEvents(
           return
         }
 
-        assignment.participantId =
+        assignment.managerId =
           newParticipant.id
 
         assignment.price =
           newPrice
 
-        applyAssignment(
-          assignment,
-        )
-
         editingAssignmentId =
           null
 
-        actions.onRender()
+        auctionFeedback =
+          `${player.name}: assegnazione aggiornata.`
+
+        actions.onStateChange()
       },
     )
 }

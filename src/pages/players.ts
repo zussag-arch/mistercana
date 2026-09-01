@@ -37,6 +37,11 @@ type SpecialistRank =
   | 3
   | 4
 
+type PlayerAuctionStatus =
+  | 'not-live'
+  | 'free'
+  | 'assigned'
+
 interface PlayersViewState {
   role: RoleFilter
 
@@ -70,6 +75,8 @@ interface PlayersActions {
 
   onCallPlayer:
     (playerId: string) => void
+
+  onGoToAuction: () => void
 }
 
 const viewState: PlayersViewState = {
@@ -514,6 +521,64 @@ function getPlayerSpecialists(
 }
 
 /* =========================
+   AUCTION STATUS
+========================= */
+
+function isPlayerAssigned(
+  state: AppState,
+  playerId: string,
+): boolean {
+  return state
+    .auctionAssignments
+    .some(
+      (assignment) =>
+        assignment.playerId ===
+        playerId,
+    )
+}
+
+function getPlayerAuctionStatus(
+  state: AppState,
+  playerId: string,
+): PlayerAuctionStatus {
+  if (
+    state.auctionPhase !==
+    'live'
+  ) {
+    return 'not-live'
+  }
+
+  return isPlayerAssigned(
+    state,
+    playerId,
+  )
+    ? 'assigned'
+    : 'free'
+}
+
+function getAuctionStatusSortValue(
+  state: AppState,
+  playerId: string,
+): number {
+  const status =
+    getPlayerAuctionStatus(
+      state,
+      playerId,
+    )
+
+  switch (status) {
+    case 'free':
+      return 2
+
+    case 'assigned':
+      return 1
+
+    default:
+      return 0
+  }
+}
+
+/* =========================
    INDICATORS
 ========================= */
 
@@ -662,7 +727,9 @@ function isPenaltyTaker(
   )
 }
 
-function getFilteredPlayers():
+function getFilteredPlayers(
+  state: AppState,
+):
   Player[] {
   const search =
     normalizeText(
@@ -689,9 +756,22 @@ function getFilteredPlayers():
           return false
         }
 
+        /*
+          "Solo liberi" ha significato
+          soltanto durante una sessione
+          live.
+
+          Fuori LIVE non usiamo mai
+          player.status come fallback.
+        */
         if (
+          state.auctionPhase ===
+            'live' &&
           viewState.freeOnly &&
-          player.status !== 'free'
+          isPlayerAssigned(
+            state,
+            player.id,
+          )
         ) {
           return false
         }
@@ -716,7 +796,15 @@ function getFilteredPlayers():
     )
 
   return filtered.sort(
-    comparePlayers,
+    (
+      first,
+      second,
+    ) =>
+      comparePlayers(
+        state,
+        first,
+        second,
+      ),
   )
 }
 
@@ -725,7 +813,10 @@ function getFilteredPlayers():
 ========================= */
 
 const ROLE_ORDER:
-  Record<PlayerRole, number> = {
+  Record<
+    PlayerRole,
+    number
+  > = {
     P: 0,
     D: 1,
     C: 2,
@@ -794,6 +885,7 @@ function compareDefaultRoleIca(
 }
 
 function getSortableValue(
+  state: AppState,
   player: Player,
   key: SortKey,
 ): string | number {
@@ -840,11 +932,15 @@ function getSortableValue(
       )
 
     case 'status':
-      return player.status
+      return getAuctionStatusSortValue(
+        state,
+        player.id,
+      )
   }
 }
 
 function comparePlayers(
+  state: AppState,
   first: Player,
   second: Player,
 ): number {
@@ -859,12 +955,14 @@ function comparePlayers(
 
   const firstValue =
     getSortableValue(
+      state,
       first,
       viewState.sortKey,
     )
 
   const secondValue =
     getSortableValue(
+      state,
       second,
       viewState.sortKey,
     )
@@ -959,10 +1057,67 @@ function renderSortHeader(
 }
 
 /* =========================
+   PLAYER STATUS
+========================= */
+
+function renderPlayerStatus(
+  state: AppState,
+  player: Player,
+): string {
+  const status =
+    getPlayerAuctionStatus(
+      state,
+      player.id,
+    )
+
+  if (
+    status === 'not-live'
+  ) {
+    return `
+      <span
+        class="
+          player-status
+          player-status-not-live
+        "
+      >
+        NO LIVE
+      </span>
+    `
+  }
+
+  if (
+    status === 'assigned'
+  ) {
+    return `
+      <span
+        class="
+          player-status
+          player-status-assigned
+        "
+      >
+        ASSEGNATO
+      </span>
+    `
+  }
+
+  return `
+    <span
+      class="
+        player-status
+        player-status-free
+      "
+    >
+      DA ASSEGNARE
+    </span>
+  `
+}
+
+/* =========================
    PLAYER ROW
 ========================= */
 
 function renderPlayerRow(
+  state: AppState,
   player: Player,
 ): string {
   return `
@@ -1115,24 +1270,10 @@ function renderPlayerRow(
           players-status-cell
         "
       >
-        <span
-          class="
-            player-status
-            ${
-              player.status ===
-              'free'
-                ? 'player-status-free'
-                : 'player-status-assigned'
-            }
-          "
-        >
-          ${
-            player.status ===
-            'free'
-              ? 'Libero'
-              : 'Assegnato'
-          }
-        </span>
+        ${renderPlayerStatus(
+          state,
+          player,
+        )}
       </div>
     </button>
   `
@@ -1170,6 +1311,13 @@ function renderPlayerPreview(
   const auctionLive =
     state.auctionPhase ===
     'live'
+
+  const assigned =
+    auctionLive &&
+    isPlayerAssigned(
+      state,
+      player.id,
+    )
 
   return `
     <div
@@ -1282,6 +1430,17 @@ function renderPlayerPreview(
           </div>
         </div>
 
+        <div
+          class="
+            players-preview-auction-status
+          "
+        >
+          ${renderPlayerStatus(
+            state,
+            player,
+          )}
+        </div>
+
         <p
           class="muted-text"
         >
@@ -1302,20 +1461,8 @@ function renderPlayerPreview(
           </button>
 
           ${
-            auctionLive
+            !auctionLive
               ? `
-                <button
-                  id="callPlayerInAuctionButton"
-                  type="button"
-                  class="primary-button"
-                  data-call-player="${escapeHtml(
-                    player.id,
-                  )}"
-                >
-                  Chiama in asta
-                </button>
-              `
-              : `
                 <button
                   type="button"
                   class="primary-button"
@@ -1325,6 +1472,29 @@ function renderPlayerPreview(
                   Asta non attiva
                 </button>
               `
+              : assigned
+                ? `
+                  <button
+                    type="button"
+                    class="primary-button"
+                    disabled
+                    title="Giocatore già assegnato"
+                  >
+                    Già assegnato
+                  </button>
+                `
+                : `
+                  <button
+                    id="callPlayerInAuctionButton"
+                    type="button"
+                    class="primary-button"
+                    data-call-player="${escapeHtml(
+                      player.id,
+                    )}"
+                  >
+                    Chiama in asta
+                  </button>
+                `
           }
         </div>
       </div>
@@ -1339,8 +1509,29 @@ function renderPlayerPreview(
 export function renderPlayersPage(
   state: AppState,
 ): string {
+  const auctionLive =
+    state.auctionPhase ===
+    'live'
+
+  /*
+    Il filtro non deve sopravvivere
+    silenziosamente alla fine
+    dell'asta.
+
+    Fuori LIVE torna realmente spento.
+  */
+  if (
+    !auctionLive &&
+    viewState.freeOnly
+  ) {
+    viewState.freeOnly =
+      false
+  }
+
   const filteredPlayers =
-    getFilteredPlayers()
+    getFilteredPlayers(
+      state,
+    )
 
   return `
     <section
@@ -1373,6 +1564,38 @@ export function renderPlayersPage(
             ${players.length}
             nel listone attivo
           </p>
+        </div>
+
+        <div
+          class="
+            players-header-actions
+          "
+        >
+          <button
+            id="playersGoToAuctionButton"
+            type="button"
+            class="
+              players-auction-nav-button
+              ${
+                auctionLive
+                  ? 'is-live'
+                  : 'is-disabled'
+              }
+            "
+            ${
+              auctionLive
+                ? ''
+                : 'disabled'
+            }
+          >
+            <span
+              class="
+                players-auction-nav-dot
+              "
+            ></span>
+
+            Asta
+          </button>
         </div>
       </div>
 
@@ -1457,19 +1680,36 @@ export function renderPlayersPage(
               class="
                 players-simple-toggle
                 ${
-                  viewState.freeOnly
+                  viewState.freeOnly &&
+                  auctionLive
                     ? 'selected'
                     : ''
                 }
+                ${
+                  auctionLive
+                    ? ''
+                    : 'disabled'
+                }
               "
+              title="${
+                auctionLive
+                  ? 'Mostra solo i giocatori da assegnare'
+                  : 'Disponibile solo durante un’asta LIVE'
+              }"
             >
               <input
                 id="freeOnly"
                 type="checkbox"
                 ${
-                  viewState.freeOnly
+                  viewState.freeOnly &&
+                  auctionLive
                     ? 'checked'
                     : ''
+                }
+                ${
+                  auctionLive
+                    ? ''
+                    : 'disabled'
                 }
               >
 
@@ -1638,6 +1878,7 @@ export function renderPlayersPage(
                         Player,
                     ) =>
                       renderPlayerRow(
+                        state,
                         player,
                       ),
                   )
@@ -1719,6 +1960,24 @@ export function bindPlayersEvents(
   actions: PlayersActions,
 ): void {
   document
+    .querySelector(
+      '#playersGoToAuctionButton',
+    )
+    ?.addEventListener(
+      'click',
+      () => {
+        if (
+          state.auctionPhase !==
+          'live'
+        ) {
+          return
+        }
+
+        actions.onGoToAuction()
+      },
+    )
+
+  document
     .querySelectorAll<HTMLButtonElement>(
       '[data-player-role]',
     )
@@ -1772,6 +2031,16 @@ export function bindPlayersEvents(
     ?.addEventListener(
       'change',
       (event) => {
+        if (
+          state.auctionPhase !==
+          'live'
+        ) {
+          viewState.freeOnly =
+            false
+
+          return
+        }
+
         const target =
           event.currentTarget as
             HTMLInputElement
@@ -1976,6 +2245,22 @@ export function bindPlayersEvents(
             .callPlayer
 
         if (!playerId) {
+          return
+        }
+
+        /*
+          Doppia protezione:
+          anche se la UI fosse
+          desincronizzata, un
+          assegnato non viene
+          richiamato.
+        */
+        if (
+          isPlayerAssigned(
+            state,
+            playerId,
+          )
+        ) {
           return
         }
 

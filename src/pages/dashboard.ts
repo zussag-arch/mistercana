@@ -127,50 +127,9 @@ function getAuctionStatusSubLabel(
   }
 }
 
-function getStartButtonLabel(
-  state: AppState,
-): string {
-  if (
-    state.auctionPhase ===
-    'live'
-  ) {
-    return 'Torna all’asta LIVE'
-  }
-
-  if (
-    state.auctionPhase ===
-    'finalizing'
-  ) {
-    return 'Asta da finalizzare'
-  }
-
-  if (
-    state.auctionPhase ===
-    'archived'
-  ) {
-    return 'Asta registrata'
-  }
-
-  if (
-    state.auctionPhase ===
-    'discarded'
-  ) {
-    return 'Asta scartata'
-  }
-
-  return 'Avvia asta'
-}
-
 function canStartAuction(
   state: AppState,
 ): boolean {
-  if (
-    state.auctionPhase ===
-    'live'
-  ) {
-    return true
-  }
-
   if (
     state.auctionPhase !==
     'setup'
@@ -745,6 +704,15 @@ function renderRecapOverlay(
       state,
     )
 
+  const startAllowed =
+    canStartAuction(
+      state,
+    )
+
+  const isSetup =
+    state.auctionPhase ===
+    'setup'
+
   return `
     <div
       id="recapOverlay"
@@ -917,6 +885,28 @@ function renderRecapOverlay(
           </div>
         </div>
 
+        ${
+          isSetup &&
+          !startAllowed
+            ? `
+              <div
+                class="
+                  warning-panel
+                  dashboard-recap-warning
+                "
+              >
+                <p>
+                  Per avviare l’asta
+                  servono una
+                  distribuzione budget
+                  pari al 100% e almeno
+                  un partecipante attivo.
+                </p>
+              </div>
+            `
+            : ''
+        }
+
         <div
           class="overlay-actions"
         >
@@ -929,6 +919,27 @@ function renderRecapOverlay(
           >
             Chiudi
           </button>
+
+          ${
+            isSetup
+              ? `
+                <button
+                  id="recapStartAuctionButton"
+                  type="button"
+                  class="
+                    dashboard-cta-button
+                  "
+                  ${
+                    startAllowed
+                      ? ''
+                      : 'disabled'
+                  }
+                >
+                  Avvia asta
+                </button>
+              `
+              : ''
+          }
         </div>
       </div>
     </div>
@@ -954,16 +965,6 @@ export function renderDashboardPage(
 
   const activeManagers =
     getActiveManagers(
-      state,
-    )
-
-  const startDisabled =
-    !canStartAuction(
-      state,
-    )
-
-  const startLabel =
-    getStartButtonLabel(
       state,
     )
 
@@ -1032,25 +1033,10 @@ export function renderDashboardPage(
             id="openRecapButton"
             type="button"
             class="
-              dashboard-secondary-footer-button
+              dashboard-cta-button
             "
           >
             Recap
-          </button>
-
-          <button
-            id="heroStartAuctionButton"
-            type="button"
-            class="
-              dashboard-cta-button
-            "
-            ${
-              startDisabled
-                ? 'disabled'
-                : ''
-            }
-          >
-            ${startLabel}
           </button>
         </div>
       </div>
@@ -1298,6 +1284,11 @@ export function renderDashboardPage(
                         ? 'checked'
                         : ''
                     }
+                    ${
+                      locked
+                        ? 'disabled'
+                        : ''
+                    }
                   >
 
                   <span
@@ -1334,6 +1325,11 @@ export function renderDashboardPage(
                     }
                   "
                   data-profile="prudente"
+                  ${
+                    locked
+                      ? 'disabled'
+                      : ''
+                  }
                 >
                   Prudente
                 </button>
@@ -1351,6 +1347,11 @@ export function renderDashboardPage(
                     }
                   "
                   data-profile="equilibrata"
+                  ${
+                    locked
+                      ? 'disabled'
+                      : ''
+                  }
                 >
                   Equilibrata
                 </button>
@@ -1368,6 +1369,11 @@ export function renderDashboardPage(
                     }
                   "
                   data-profile="aggressiva"
+                  ${
+                    locked
+                      ? 'disabled'
+                      : ''
+                  }
                 >
                   Aggressiva
                 </button>
@@ -1385,6 +1391,11 @@ export function renderDashboardPage(
                     }
                   "
                   data-profile="personalizzata"
+                  ${
+                    locked
+                      ? 'disabled'
+                      : ''
+                  }
                 >
                   Personalizzata
                 </button>
@@ -1421,6 +1432,11 @@ export function renderDashboardPage(
                 min="1"
                 step="1"
                 value="${state.initialCredits}"
+                ${
+                  locked
+                    ? 'disabled'
+                    : ''
+                }
               >
             </label>
           </div>
@@ -1476,6 +1492,11 @@ export function renderDashboardPage(
                           step="1"
                           value="${value}"
                           data-budget-role="${role}"
+                          ${
+                            locked
+                              ? 'disabled'
+                              : ''
+                          }
                         >
 
                         <span>
@@ -1788,7 +1809,7 @@ export function bindDashboardEvents(
 
   document
     .querySelector(
-      '#heroStartAuctionButton',
+      '#recapStartAuctionButton',
     )
     ?.addEventListener(
       'click',

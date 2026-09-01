@@ -1,14 +1,14 @@
 import './style.css'
+
 import './styles/dashboard.css'
+import './styles/auction.css'
 import './styles/players.css'
 import './styles/objectives.css'
 import './styles/insights.css'
 import './styles/importExport.css'
-import './styles/auction.css'
 
 import {
   renderNavigation,
-  type PageId,
 } from './components/navigation'
 
 import {
@@ -33,6 +33,7 @@ import {
 
 import {
   renderInsightsPage,
+  bindInsightsEvents,
 } from './pages/insights'
 
 import {
@@ -50,26 +51,72 @@ import {
 
 import {
   getActivePage,
-  isActivePage,
   navigateTo,
 } from './app/router'
+
+import {
+  initializeFavicon,
+  syncFavicon,
+} from './app/favicon'
+
+import type {
+  PageId,
+} from './components/navigation'
 
 const state =
   loadState()
 
-const appElement =
-  document.querySelector<HTMLDivElement>(
-    '#app',
-  )
+initializeFavicon(
+  state.auctionPhase ===
+    'live',
+)
 
-if (!appElement) {
-  throw new Error(
-    'Elemento #app non trovato',
+/* =========================
+   HELPERS
+========================= */
+
+function getBudgetTotal():
+  number {
+  return (
+    state.budgetDistribution.P +
+    state.budgetDistribution.D +
+    state.budgetDistribution.C +
+    state.budgetDistribution.A
   )
 }
 
-const app =
-  appElement
+function getActiveManagersCount():
+  number {
+  return state.managers.filter(
+    (manager) =>
+      manager.active &&
+      !manager.archived,
+  ).length
+}
+
+function createArchiveId():
+  string {
+  if (
+    typeof crypto !==
+      'undefined' &&
+    typeof crypto.randomUUID ===
+      'function'
+  ) {
+    return crypto.randomUUID()
+  }
+
+  return [
+    'auction',
+    Date.now(),
+    Math.random()
+      .toString(36)
+      .slice(2),
+  ].join('_')
+}
+
+/* =========================
+   PAGE CONTENT
+========================= */
 
 function getPageContent(
   page: PageId,
@@ -100,18 +147,16 @@ function getPageContent(
 
     case 'importExport':
       return renderImportExportPage()
-
-    default:
-      return renderDashboardPage(
-        state,
-      )
   }
 }
 
-function saveAndRender(): void {
-  saveState(
-    state,
-  )
+/* =========================
+   SAVE / NAVIGATION
+========================= */
+
+function saveAndRender():
+  void {
+  saveState(state)
 
   render()
 }
@@ -119,12 +164,14 @@ function saveAndRender(): void {
 function navigateAndRender(
   page: PageId,
 ): void {
-  navigateTo(
-    page,
-  )
+  navigateTo(page)
 
   render()
 }
+
+/* =========================
+   PLAYER -> AUCTION
+========================= */
 
 function callPlayerInAuction(
   playerId: string,
@@ -136,202 +183,295 @@ function callPlayerInAuction(
     return
   }
 
-  const playerExists =
-    players.some(
-      (player) =>
-        player.id ===
+  const player =
+    players.find(
+      (item) =>
+        item.id ===
         playerId,
     )
 
-  if (!playerExists) {
+  if (!player) {
+    return
+  }
+
+  const alreadyAssigned =
+    state.auctionAssignments.some(
+      (assignment) =>
+        assignment.playerId ===
+        playerId,
+    )
+
+  if (alreadyAssigned) {
     return
   }
 
   state.currentAuctionPlayerId =
     playerId
 
-  navigateTo(
-    'auction',
-  )
+  navigateTo('auction')
 
-  saveAndRender()
+  saveState(state)
+
+  render()
 }
 
-function startAuction(): void {
-  const total =
-    state.budgetDistribution.P +
-    state.budgetDistribution.D +
-    state.budgetDistribution.C +
-    state.budgetDistribution.A
+/* =========================
+   AUCTION LIFECYCLE
+========================= */
 
-  const activeManagers =
-    state.managers.filter(
-      (manager) =>
-        !manager.archived &&
-        manager.active,
-    )
-
+function startAuction():
+  void {
   if (
-    total !== 100
+    state.auctionPhase !==
+    'setup'
   ) {
     return
   }
 
   if (
-    activeManagers.length === 0
+    getBudgetTotal() !==
+    100
   ) {
     return
   }
+
+  if (
+    getActiveManagersCount() <
+    1
+  ) {
+    return
+  }
+
+  state.auctionAssignments = []
+
+  state.currentAuctionPlayerId =
+    null
 
   state.auctionPhase =
     'live'
 
-  state.currentAuctionPlayerId =
-    null
+  navigateTo('auction')
 
-  navigateTo(
-    'auction',
-  )
+  saveState(state)
 
-  saveAndRender()
+  render()
 }
 
-function endAuction(): void {
+function endAuction():
+  void {
+  if (
+    state.auctionPhase !==
+    'live'
+  ) {
+    return
+  }
+
   state.auctionPhase =
     'finalizing'
 
+  saveState(state)
+
+  render()
+}
+
+function archiveAuction():
+  void {
+  if (
+    state.auctionPhase !==
+    'finalizing'
+  ) {
+    return
+  }
+
+  state.archivedAuctions.push({
+    id:
+      createArchiveId(),
+
+    archivedAt:
+      new Date()
+        .toISOString(),
+
+    assignments:
+      state.auctionAssignments.map(
+        (assignment) => ({
+          ...assignment,
+        }),
+      ),
+  })
+
+  state.auctionAssignments = []
+
   state.currentAuctionPlayerId =
     null
 
-  navigateTo(
-    'auction',
-  )
-
-  saveAndRender()
-}
-
-function archiveAuction(): void {
-  state.auctionPhase =
-    'archived'
-
-  state.currentAuctionPlayerId =
-    null
-
-  navigateTo(
-    'auction',
-  )
-
-  saveAndRender()
-}
-
-function discardAuction(): void {
-  state.auctionPhase =
-    'discarded'
-
-  state.currentAuctionPlayerId =
-    null
-
-  navigateTo(
-    'auction',
-  )
-
-  saveAndRender()
-}
-
-function newAuction(): void {
   state.auctionPhase =
     'setup'
 
+  navigateTo('dashboard')
+
+  saveState(state)
+
+  render()
+}
+
+function discardAuction():
+  void {
+  if (
+    state.auctionPhase !==
+    'finalizing'
+  ) {
+    return
+  }
+
+  state.auctionAssignments = []
+
   state.currentAuctionPlayerId =
     null
 
-  navigateTo(
-    'dashboard',
-  )
+  state.auctionPhase =
+    'setup'
 
-  saveAndRender()
+  navigateTo('dashboard')
+
+  saveState(state)
+
+  render()
 }
 
-function bindPageEvents(): void {
-  if (
-    isActivePage(
-      'dashboard',
-    )
-  ) {
-    bindDashboardEvents(
-      state,
-      {
-        onStateChange:
-          saveAndRender,
+/* =========================
+   PAGE EVENTS
+========================= */
 
-        onStartAuction:
-          startAuction,
-      },
-    )
-  }
+function bindPageEvents(
+  page: PageId,
+): void {
+  switch (page) {
+    case 'dashboard':
+      bindDashboardEvents(
+        state,
+        {
+          onStateChange:
+            saveAndRender,
 
-  if (
-    isActivePage(
-      'auction',
-    )
-  ) {
-    bindAuctionEvents(
-      state,
-      {
-        onEndAuction:
-          endAuction,
+          onStartAuction:
+            startAuction,
+        },
+      )
 
-        onArchiveAuction:
-          archiveAuction,
+      break
 
-        onDiscardAuction:
-          discardAuction,
+    case 'auction':
+      bindAuctionEvents(
+        state,
+        {
+          onEndAuction:
+            endAuction,
 
-        onNewAuction:
-          newAuction,
+          onArchiveAuction:
+            archiveAuction,
 
-        onStateChange:
-          saveAndRender,
+          onDiscardAuction:
+            discardAuction,
 
-        onRender:
-          render,
-      },
-    )
-  }
+          onStateChange:
+            saveAndRender,
 
-  if (
-    isActivePage(
-      'players',
-    )
-  ) {
-    bindPlayersEvents(
-      state,
-      {
-        onRender:
-          render,
+          onRender:
+            render,
 
-        onCallPlayer:
-          callPlayerInAuction,
-      },
-    )
-  }
+          onGoToPlayers:
+            () => {
+              navigateAndRender(
+                'players',
+              )
+            },
 
-  if (
-    isActivePage(
-      'objectives',
-    )
-  ) {
-    bindObjectivesEvents(
-      state,
-      {
-        onStateChange:
-          saveAndRender,
-      },
-    )
+          onGoToObjectives:
+            () => {
+              navigateAndRender(
+                'objectives',
+              )
+            },
+        },
+      )
+
+      break
+
+    case 'players':
+      bindPlayersEvents(
+        state,
+        {
+          onRender:
+            render,
+
+          onCallPlayer:
+            callPlayerInAuction,
+
+          onGoToAuction:
+            () => {
+              if (
+                state.auctionPhase !==
+                'live'
+              ) {
+                return
+              }
+
+              navigateAndRender(
+                'auction',
+              )
+            },
+        },
+      )
+
+      break
+
+    case 'objectives':
+      bindObjectivesEvents(
+        state,
+        {
+          onStateChange:
+            saveAndRender,
+
+          onGoToAuction:
+            () => {
+              if (
+                state.auctionPhase !==
+                'live'
+              ) {
+                return
+              }
+
+              navigateAndRender(
+                'auction',
+              )
+            },
+        },
+      )
+
+      break
+
+    case 'insights':
+      bindInsightsEvents()
+
+      break
+
+    case 'importExport':
+      /*
+        La pagina Import / Export
+        attuale è puramente visiva:
+        non espone ancora eventi
+        applicativi.
+      */
+      break
   }
 }
 
-function bindNavigation(): void {
+/* =========================
+   GLOBAL NAVIGATION
+========================= */
+
+function bindNavigationEvents():
+  void {
   document
     .querySelectorAll<HTMLButtonElement>(
       '[data-page]',
@@ -363,9 +503,28 @@ function bindNavigation(): void {
     )
 }
 
-function render(): void {
+/* =========================
+   RENDER
+========================= */
+
+function render():
+  void {
   const activePage =
     getActivePage()
+
+  syncFavicon(
+    state.auctionPhase ===
+      'live',
+  )
+
+  const app =
+    document.querySelector<HTMLElement>(
+      '#app',
+    )
+
+  if (!app) {
+    return
+  }
 
   app.innerHTML = `
     ${renderNavigation(
@@ -373,15 +532,18 @@ function render(): void {
       state.auctionPhase,
     )}
 
-    <main class="app-content">
+    <main class="app-main">
       ${getPageContent(
         activePage,
       )}
     </main>
   `
 
-  bindNavigation()
-  bindPageEvents()
+  bindNavigationEvents()
+
+  bindPageEvents(
+    activePage,
+  )
 }
 
 render()

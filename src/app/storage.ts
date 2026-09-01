@@ -1,5 +1,7 @@
 import type {
   AppState,
+  ArchivedAuction,
+  AuctionAssignment,
   AuctionPhase,
   Manager,
 } from './state'
@@ -29,11 +31,17 @@ type LegacyState =
       | 'auctionPhase'
       | 'objectives'
       | 'currentAuctionPlayerId'
+      | 'auctionAssignments'
+      | 'archivedAuctions'
     >
   > & {
     auctionPhase?: unknown
 
     currentAuctionPlayerId?: unknown
+
+    auctionAssignments?: unknown
+
+    archivedAuctions?: unknown
 
     managers?: LegacyManager[]
 
@@ -49,21 +57,48 @@ export function saveState(
   )
 }
 
+/* =========================
+   AUCTION PHASE MIGRATION
+========================= */
+
 function normalizeAuctionPhase(
   phase: unknown,
 ): AuctionPhase {
+  /*
+    Vecchia fase "completed":
+    la sessione era conclusa ma
+    non ancora finalizzata.
+  */
   if (
     phase === 'completed'
   ) {
     return 'finalizing'
   }
 
+  /*
+    Il nuovo flusso non lascia più
+    l'app ferma nelle pagine
+    archived/discarded.
+
+    Dopo Registra o Scarta si torna
+    direttamente alla Dashboard
+    pronta per una nuova sessione.
+
+    Quindi eventuali salvataggi
+    legacy in questi due stati
+    vengono migrati a setup.
+  */
+  if (
+    phase === 'archived' ||
+    phase === 'discarded'
+  ) {
+    return 'setup'
+  }
+
   if (
     phase === 'setup' ||
     phase === 'live' ||
-    phase === 'finalizing' ||
-    phase === 'archived' ||
-    phase === 'discarded'
+    phase === 'finalizing'
   ) {
     return phase
   }
@@ -87,6 +122,10 @@ function normalizeCurrentAuctionPlayerId(
     ? clean
     : null
 }
+
+/* =========================
+   MANAGERS
+========================= */
 
 function splitLegacyName(
   value: string,
@@ -176,7 +215,7 @@ function migrateManager(
       typeof manager.id ===
         'string' &&
       manager.id.trim()
-        ? manager.id
+        ? manager.id.trim()
         : `manager_migrated_${index}`,
 
     firstName,
@@ -214,6 +253,10 @@ function migrateManager(
         : false,
   }
 }
+
+/* =========================
+   OBJECTIVES
+========================= */
 
 function isObjectivePriority(
   value: unknown,
@@ -275,21 +318,23 @@ function migrateObjectives(
         return
       }
 
+      const playerId =
+        candidate.playerId.trim()
+
       if (
         seenPlayerIds.has(
-          candidate.playerId,
+          playerId,
         )
       ) {
         return
       }
 
       seenPlayerIds.add(
-        candidate.playerId,
+        playerId,
       )
 
       objectives.push({
-        playerId:
-          candidate.playerId,
+        playerId,
 
         priority:
           candidate.priority,
@@ -307,7 +352,219 @@ function migrateObjectives(
   return objectives
 }
 
-export function loadState(): AppState {
+/* =========================
+   AUCTION ASSIGNMENTS
+========================= */
+
+function normalizeManagerId(
+  value: unknown,
+): string {
+  if (
+    typeof value !== 'string'
+  ) {
+    return ''
+  }
+
+  return value
+    .trim()
+    .replace(
+      /^manager-/,
+      '',
+    )
+}
+
+function migrateAuctionAssignments(
+  value: unknown,
+): AuctionAssignment[] {
+  if (
+    !Array.isArray(value)
+  ) {
+    return []
+  }
+
+  const assignments:
+    AuctionAssignment[] = []
+
+  const seenPlayerIds =
+    new Set<string>()
+
+  value.forEach(
+    (
+      item,
+      index,
+    ) => {
+      if (
+        !item ||
+        typeof item !==
+          'object'
+      ) {
+        return
+      }
+
+      const candidate =
+        item as {
+          id?: unknown
+          playerId?: unknown
+          managerId?: unknown
+          participantId?: unknown
+          price?: unknown
+        }
+
+      if (
+        typeof candidate.playerId !==
+          'string' ||
+        !candidate.playerId.trim()
+      ) {
+        return
+      }
+
+      const playerId =
+        candidate.playerId.trim()
+
+      /*
+        Supportiamo sia il nuovo
+        managerId sia l'eventuale
+        participantId di versioni
+        intermedie.
+
+        Il vecchio prefisso manager-
+        viene rimosso in entrambi
+        i casi.
+      */
+      const managerId =
+        normalizeManagerId(
+          candidate.managerId,
+        ) ||
+        normalizeManagerId(
+          candidate.participantId,
+        )
+
+      const price =
+        typeof candidate.price ===
+          'number'
+          ? candidate.price
+          : Number(
+              candidate.price,
+            )
+
+      if (
+        !managerId ||
+        !Number.isInteger(price) ||
+        price <= 0
+      ) {
+        return
+      }
+
+      /*
+        Nella stessa asta un giocatore
+        può avere una sola assegnazione
+        attiva.
+      */
+      if (
+        seenPlayerIds.has(
+          playerId,
+        )
+      ) {
+        return
+      }
+
+      seenPlayerIds.add(
+        playerId,
+      )
+
+      assignments.push({
+        id:
+          typeof candidate.id ===
+            'string' &&
+          candidate.id.trim()
+            ? candidate.id.trim()
+            : `assignment_migrated_${index}`,
+
+        playerId,
+
+        managerId,
+
+        price,
+      })
+    },
+  )
+
+  return assignments
+}
+
+/* =========================
+   ARCHIVED AUCTIONS
+========================= */
+
+function migrateArchivedAuctions(
+  value: unknown,
+): ArchivedAuction[] {
+  if (
+    !Array.isArray(value)
+  ) {
+    return []
+  }
+
+  const auctions:
+    ArchivedAuction[] = []
+
+  value.forEach(
+    (
+      item,
+      index,
+    ) => {
+      if (
+        !item ||
+        typeof item !==
+          'object'
+      ) {
+        return
+      }
+
+      const candidate =
+        item as {
+          id?: unknown
+          archivedAt?: unknown
+          assignments?: unknown
+        }
+
+      const assignments =
+        migrateAuctionAssignments(
+          candidate.assignments,
+        )
+
+      const archivedAt =
+        typeof candidate.archivedAt ===
+          'string' &&
+        candidate.archivedAt.trim()
+          ? candidate.archivedAt.trim()
+          : new Date(0)
+              .toISOString()
+
+      auctions.push({
+        id:
+          typeof candidate.id ===
+            'string' &&
+          candidate.id.trim()
+            ? candidate.id.trim()
+            : `auction_migrated_${index}`,
+
+        archivedAt,
+
+        assignments,
+      })
+    },
+  )
+
+  return auctions
+}
+
+/* =========================
+   LOAD
+========================= */
+
+export function loadState():
+  AppState {
   const raw =
     localStorage.getItem(
       STORAGE_KEY,
@@ -325,6 +582,11 @@ export function loadState(): AppState {
         raw,
       ) as LegacyState
 
+    const auctionPhase =
+      normalizeAuctionPhase(
+        parsed.auctionPhase,
+      )
+
     const managers =
       Array.isArray(
         parsed.managers,
@@ -341,16 +603,45 @@ export function loadState(): AppState {
         parsed.objectives,
       )
 
-    return {
-      auctionPhase:
-        normalizeAuctionPhase(
-          parsed.auctionPhase,
-        ),
+    /*
+      Le assegnazioni correnti hanno
+      senso soltanto se la sessione
+      era ancora LIVE o FINALIZING.
 
-      currentAuctionPlayerId:
-        normalizeCurrentAuctionPlayerId(
-          parsed.currentAuctionPlayerId,
-        ),
+      Un vecchio archived/discarded
+      viene migrato a setup e non deve
+      trascinarsi dietro assegnazioni
+      operative della sessione chiusa.
+    */
+    const auctionAssignments =
+      auctionPhase === 'live' ||
+      auctionPhase === 'finalizing'
+        ? migrateAuctionAssignments(
+            parsed.auctionAssignments,
+          )
+        : []
+
+    const archivedAuctions =
+      migrateArchivedAuctions(
+        parsed.archivedAuctions,
+      )
+
+    const currentAuctionPlayerId =
+      auctionPhase === 'live' ||
+      auctionPhase === 'finalizing'
+        ? normalizeCurrentAuctionPlayerId(
+            parsed.currentAuctionPlayerId,
+          )
+        : null
+
+    return {
+      auctionPhase,
+
+      currentAuctionPlayerId,
+
+      auctionAssignments,
+
+      archivedAuctions,
 
       initialCredits:
         typeof parsed.initialCredits ===

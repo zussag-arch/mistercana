@@ -18,6 +18,7 @@ import type {
 
 interface ObjectivesActions {
   onStateChange: () => void
+  onGoToAuction: () => void
 }
 
 const PRIORITIES:
@@ -460,6 +461,10 @@ function getRoleLabel(
 export function renderObjectivesPage(
   state: AppState,
 ): string {
+  const auctionLive =
+    state.auctionPhase ===
+    'live'
+
   return `
     <section
       class="
@@ -491,19 +496,51 @@ export function renderObjectivesPage(
           </p>
         </div>
 
-        <span
+        <div
           class="
-            objectives-total
+            objectives-header-actions
           "
         >
-          ${state.objectives.length}
+          <span
+            class="
+              objectives-total
+            "
+          >
+            ${state.objectives.length}
 
-          ${
-            state.objectives.length === 1
-              ? 'obiettivo'
-              : 'obiettivi'
-          }
-        </span>
+            ${
+              state.objectives.length === 1
+                ? 'obiettivo'
+                : 'obiettivi'
+            }
+          </span>
+
+          <button
+            id="objectivesGoToAuctionButton"
+            type="button"
+            class="
+              objectives-auction-nav-button
+              ${
+                auctionLive
+                  ? 'is-live'
+                  : 'is-disabled'
+              }
+            "
+            ${
+              auctionLive
+                ? ''
+                : 'disabled'
+            }
+          >
+            <span
+              class="
+                objectives-auction-nav-dot
+              "
+            ></span>
+
+            Asta
+          </button>
+        </div>
       </div>
 
       <section
@@ -675,6 +712,24 @@ export function bindObjectivesEvents(
   state: AppState,
   actions: ObjectivesActions,
 ): void {
+  document
+    .querySelector(
+      '#objectivesGoToAuctionButton',
+    )
+    ?.addEventListener(
+      'click',
+      () => {
+        if (
+          state.auctionPhase !==
+          'live'
+        ) {
+          return
+        }
+
+        actions.onGoToAuction()
+      },
+    )
+
   const searchInput =
     document.querySelector<HTMLInputElement>(
       '#objectivesSearch',
