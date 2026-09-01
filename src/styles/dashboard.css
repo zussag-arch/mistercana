@@ -131,6 +131,21 @@
   box-shadow:
     0 12px 26px
     rgba(25, 197, 129, 0.18);
+
+  transition:
+    transform
+      var(--motion-instant)
+      var(--ease-out),
+    border-color
+      var(--motion-fast)
+      var(--ease-standard),
+    box-shadow
+      var(--motion-fast)
+      var(--ease-standard);
+}
+
+.dashboard-cta-button:active:not(:disabled) {
+  transform: scale(0.97);
 }
 
 .dashboard-cta-button:disabled {
@@ -392,7 +407,7 @@
 
   overflow: hidden;
 
-  padding: 20px 17px 17px;
+  padding: 20px 17px 18px;
 
   border:
     1px solid
@@ -407,17 +422,15 @@
       rgba(255, 255, 255, 0.008)
     ),
     #171a1c;
+
+  transition:
+    border-color
+      var(--motion-fast)
+      var(--ease-standard),
+    background
+      var(--motion-fast)
+      var(--ease-standard);
 }
-
-/*
-  Barra superiore colorata per ruolo.
-
-  Ordine:
-  1 = P
-  2 = D
-  3 = C
-  4 = A
-*/
 
 .dashboard-page
 .budget-field::before {
@@ -435,7 +448,7 @@
     var(--radius-pill);
 }
 
-/* P = giallo */
+/* P */
 
 .dashboard-page
 .budget-field:nth-child(1)::before {
@@ -453,7 +466,7 @@
   color: #ead15b;
 }
 
-/* D = blu */
+/* D */
 
 .dashboard-page
 .budget-field:nth-child(2)::before {
@@ -471,7 +484,7 @@
   color: #67aaff;
 }
 
-/* C = verde */
+/* C */
 
 .dashboard-page
 .budget-field:nth-child(3)::before {
@@ -489,7 +502,7 @@
   color: #5bd88d;
 }
 
-/* A = rosso */
+/* A */
 
 .dashboard-page
 .budget-field:nth-child(4)::before {
@@ -509,13 +522,120 @@
 
 .dashboard-page
 .budget-field > span {
+  display: block;
+
   font-size: 14px;
   font-weight: 900;
+
+  letter-spacing: 0.04em;
 }
+
+/* =========================
+   PERCENTUALE BUDGET
+========================= */
 
 .dashboard-page
 .percentage-input {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+
   margin-top: 12px;
+}
+
+.dashboard-page
+.percentage-input input {
+  box-sizing: border-box;
+
+  width: 100%;
+  height: 64px;
+
+  padding:
+    0
+    48px;
+
+  border-radius: 18px;
+
+  text-align: center;
+
+  font-size: 30px;
+  font-weight: 900;
+  line-height: 64px;
+
+  font-variant-numeric:
+    tabular-nums;
+
+  transition:
+    border-color
+      var(--motion-fast)
+      var(--ease-standard),
+    box-shadow
+      var(--motion-fast)
+      var(--ease-standard),
+    background
+      var(--motion-fast)
+      var(--ease-standard);
+}
+
+.dashboard-page
+.percentage-input > span {
+  position: absolute;
+
+  top: 50%;
+  right: 18px;
+
+  transform:
+    translateY(-50%);
+
+  color: #7f878e;
+
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1;
+
+  pointer-events: none;
+}
+
+/* Rimuove spinner numerici */
+
+.dashboard-page
+.percentage-input input::-webkit-inner-spin-button,
+.dashboard-page
+.percentage-input input::-webkit-outer-spin-button {
+  margin: 0;
+
+  -webkit-appearance: none;
+}
+
+.dashboard-page
+.percentage-input input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+/* =========================
+   CREDITI EQUIVALENTI
+========================= */
+
+.dashboard-page
+.budget-field small {
+  display: block;
+
+  margin-top: 11px;
+
+  color: #d9dee2;
+
+  font-size: 19px;
+  font-weight: 900;
+  line-height: 1.1;
+
+  font-variant-numeric:
+    tabular-nums;
+
+  letter-spacing: -0.01em;
 }
 
 /* input P */
@@ -566,15 +686,12 @@
     rgba(231, 105, 105, 0.09);
 }
 
-.dashboard-page
-.budget-field small {
-  display: block;
-
-  margin-top: 8px;
-
-  color: #81888e;
-
-  font-size: 11px;
+@media (hover: hover) {
+  .dashboard-page
+  .budget-field:hover {
+    border-color:
+      rgba(255, 255, 255, 0.13);
+  }
 }
 
 /* =========================
@@ -774,19 +891,34 @@
   cursor: pointer;
 
   transition:
-    border-color 0.2s ease,
-    background 0.2s ease,
-    color 0.2s ease;
+    border-color
+      var(--motion-fast)
+      var(--ease-standard),
+    background
+      var(--motion-fast)
+      var(--ease-standard),
+    color
+      var(--motion-fast)
+      var(--ease-standard),
+    transform
+      var(--motion-instant)
+      var(--ease-out);
 }
 
-.dashboard-add-manager-card:hover:not(:disabled) {
-  border-color:
-    rgba(52, 211, 153, 0.28);
+.dashboard-add-manager-card:active:not(:disabled) {
+  transform: scale(0.98);
+}
 
-  background:
-    rgba(52, 211, 153, 0.04);
+@media (hover: hover) {
+  .dashboard-add-manager-card:hover:not(:disabled) {
+    border-color:
+      rgba(52, 211, 153, 0.28);
 
-  color: #ffffff;
+    background:
+      rgba(52, 211, 153, 0.04);
+
+    color: #ffffff;
+  }
 }
 
 .dashboard-add-manager-card:disabled {
@@ -829,13 +961,30 @@
   font-weight: 700;
 
   cursor: pointer;
+
+  transition:
+    border-color
+      var(--motion-fast)
+      var(--ease-standard),
+    background
+      var(--motion-fast)
+      var(--ease-standard),
+    transform
+      var(--motion-instant)
+      var(--ease-out);
 }
 
-.dashboard-secondary-footer-button:hover {
-  border-color:
-    rgba(255, 255, 255, 0.18);
+.dashboard-secondary-footer-button:active {
+  transform: scale(0.97);
+}
 
-  background: #1e2224;
+@media (hover: hover) {
+  .dashboard-secondary-footer-button:hover {
+    border-color:
+      rgba(255, 255, 255, 0.18);
+
+    background: #1e2224;
+  }
 }
 
 .dashboard-recap-kpis {
@@ -880,14 +1029,6 @@
    NESTED COMPONENTS
 ========================= */
 
-/*
-  Regola importante del nuovo
-  linguaggio visivo:
-
-  anche gli elementi interni
-  mantengono raccordi morbidi.
-*/
-
 .dashboard-page
 .manager-menu {
   border-radius: 20px;
@@ -907,7 +1048,7 @@
 
 .dashboard-page
 .percentage-input input {
-  border-radius: 16px;
+  border-radius: 18px;
 }
 
 .dashboard-page
@@ -1007,5 +1148,50 @@
 
   .dashboard-toggle-chip {
     width: 100%;
+  }
+}
+
+@media (max-width: 560px) {
+  .dashboard-page
+  .percentage-input input {
+    height: 60px;
+
+    padding:
+      0
+      44px;
+
+    font-size: 28px;
+    line-height: 60px;
+  }
+
+  .dashboard-page
+  .percentage-input > span {
+    right: 16px;
+
+    font-size: 17px;
+  }
+
+  .dashboard-page
+  .budget-field small {
+    font-size: 18px;
+  }
+}
+
+/* =========================
+   REDUCED MOTION
+========================= */
+
+@media (
+  prefers-reduced-motion:
+  reduce
+) {
+  .dashboard-cta-button,
+  .dashboard-add-manager-card,
+  .dashboard-secondary-footer-button,
+  .dashboard-page
+  .budget-field,
+  .dashboard-page
+  .percentage-input input {
+    transition: none;
   }
 }
