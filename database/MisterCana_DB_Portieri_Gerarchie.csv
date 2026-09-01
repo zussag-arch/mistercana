@@ -1,0 +1,62 @@
+id_giocatore;Giocatore;Squadra;Gerarchia
+0001;Carnesecchi;Atalanta;1
+0002;Sportiello;Atalanta;2
+0003;Vismara;Atalanta;3
+0027;Happonen;Bologna;3
+0026;Pessina Mas.;Bologna;2
+0025;Skorupski;Bologna;1
+0049;Caprile;Cagliari;1
+0050;Radunovic;Cagliari;3
+0051;Sherri;Cagliari;2
+0076;Butez;Como;1
+0077;Tornqvist;Como;2
+0078;Vigorito;Como;3
+0106;Christensen O.;Fiorentina;3
+0105;De Gea;Fiorentina;1
+0107;Lezzerini;Fiorentina;2
+0128;Desplanches;Frosinone;2
+0130;Lolic;Frosinone;3
+0129;Palmisani;Frosinone;1
+0131;Pisseri;Frosinone;4
+0158;Bijlow;Genoa;1
+0159;Sommariva;Genoa;3
+0160;Stolz;Genoa;2
+0185;Di Gennaro;Inter;3
+0183;Martinez Jo.;Inter;1
+0184;Provedel;Inter;2
+0206;Di Gregorio;Juventus;1
+0207;Perin;Juventus;2
+0208;Pinsoglio;Juventus;3
+0233;Mandas;Lazio;1
+0234;Motta;Lazio;2
+0235;Renzetti;Lazio;3
+0259;Falcone;Lecce;1
+0260;Penev;Lecce;2
+0280;Maignan;Milan;1
+0281;Terracciano;Milan;3
+0282;Torriani;Milan;2
+0308;Pizzignacco;Monza;1
+0309;Strajnar;Monza;3
+0307;Thiam;Monza;2
+0331;Contini;Napoli;3
+0329;Meret;Napoli;1
+0330;Milinkovic-Savic V.;Napoli;2
+0355;Corvi;Parma;2
+0357;Daffara;Parma;3
+0356;Suzuki;Parma;1
+0380;De Marzi;Roma;2
+0381;Gollini;Roma;3
+0379;Svilar;Roma;1
+0401;Muric;Sassuolo;1
+0403;Russo A.;Sassuolo;3
+0404;Satalino;Sassuolo;4
+0402;Turati;Sassuolo;2
+0428;Mascardi;Torino;2
+0427;Paleari;Torino;1
+0429;Siviero;Torino;3
+0451;Okoye;Udinese;1
+0452;Padelli;Udinese;2
+0453;Piana;Udinese;3
+0479;Grandi;Venezia;2
+0480;Pozzi;Venezia;3
+0478;Stankovic F.;Venezia;1

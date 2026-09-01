@@ -1,6 +1,20 @@
-import coachesCsv from '../../database/MisterCana_DB_Allenatori.csv?raw'
-import goalkeepersCsv from '../../database/MisterCana_DB_Portieri.csv?raw'
-import setPiecesCsv from '../../database/MisterCana_DB_Battitori.csv?raw'
+import coachesCsv
+  from '../../database/MisterCana_DB_Allenatori.csv?raw'
+
+import goalkeepersCsv
+  from '../../database/MisterCana_DB_Portieri.csv?raw'
+
+import setPiecesCsv
+  from '../../database/MisterCana_DB_Battitori.csv?raw'
+
+import {
+  calculateGoalkeeperPairCoverage,
+  goalkeeperCalendarTeams,
+} from '../data/goalkeeperCalendar'
+
+import type {
+  GoalkeeperCoverage,
+} from '../data/goalkeeperCalendar'
 
 /* =========================
    TYPES
@@ -59,6 +73,11 @@ interface GoalkeeperMatrix {
       number | null
     >
   >
+}
+
+interface GoalkeeperPairResult {
+  team: string
+  coverage: GoalkeeperCoverage
 }
 
 interface SetPieceTeam {
@@ -176,6 +195,18 @@ function escapeHtml(
       "'",
       '&#039;',
     )
+}
+
+/* =========================
+   FORMATTERS
+========================= */
+
+function formatPercent(
+  value: number,
+): string {
+  return `${value
+    .toFixed(0)
+    .replace('.', ',')}%`
 }
 
 /* =========================
@@ -389,7 +420,15 @@ function parseCoachesCsv(
 }
 
 /* =========================
-   GOALKEEPER DATABASE
+   LEGACY GOALKEEPER MATRIX
+
+   IMPORTANTE:
+   questo database continua
+   ad alimentare SOLO la griglia
+   nell'overlay.
+
+   Insight usa invece il nuovo
+   calendario 0/1/2.
 ========================= */
 
 function parseGoalkeeperCsv(
@@ -569,47 +608,112 @@ const SET_PIECE_TEAMS =
   )
 
 /* =========================
-   GOALKEEPER HELPERS
+   GOALKEEPER CALENDAR
 ========================= */
+
+function compareGoalkeeperPairResults(
+  first: GoalkeeperPairResult,
+  second: GoalkeeperPairResult,
+): number {
+  /*
+    Nessun peso arbitrario.
+
+    Ordine:
+    1. più giornate favorevoli
+    2. meno buchi
+    3. media matchup più alta
+    4. nome squadra
+  */
+
+  const favorableDifference =
+    second
+      .coverage
+      .favorableDays -
+    first
+      .coverage
+      .favorableDays
+
+  if (
+    favorableDifference !== 0
+  ) {
+    return favorableDifference
+  }
+
+  const holesDifference =
+    first
+      .coverage
+      .holes -
+    second
+      .coverage
+      .holes
+
+  if (
+    holesDifference !== 0
+  ) {
+    return holesDifference
+  }
+
+  const averageDifference =
+    second
+      .coverage
+      .averageMatchup -
+    first
+      .coverage
+      .averageMatchup
+
+  if (
+    averageDifference !== 0
+  ) {
+    return averageDifference
+  }
+
+  return first.team.localeCompare(
+    second.team,
+    'it',
+  )
+}
 
 function getGoalkeeperTopThree(
   team: string,
-): Array<{
-  team: string
-  score: number
-}> {
-  const row =
-    GOALKEEPER_MATRIX
-      .scores[team]
-
-  if (!row) {
+):
+  GoalkeeperPairResult[] {
+  if (!team) {
     return []
   }
 
-  return Object
-    .entries(row)
+  return goalkeeperCalendarTeams
     .filter(
-      (
-        entry,
-      ): entry is [
-        string,
-        number,
-      ] =>
-        entry[1] !== null,
+      (pairedTeam) =>
+        pairedTeam !== team,
     )
     .map(
-      ([
-        pairedTeam,
-        score,
-      ]) => ({
-        team: pairedTeam,
-        score,
-      }),
+      (pairedTeam) => {
+        const coverage =
+          calculateGoalkeeperPairCoverage(
+            team,
+            pairedTeam,
+          )
+
+        if (!coverage) {
+          return null
+        }
+
+        return {
+          team:
+            pairedTeam,
+
+          coverage,
+        }
+      },
+    )
+    .filter(
+      (
+        result,
+      ): result is GoalkeeperPairResult =>
+        result !== null,
     )
     .sort(
-      (a, b) =>
-        b.score -
-        a.score,
+      compareGoalkeeperPairResults,
     )
     .slice(
       0,
@@ -633,7 +737,7 @@ function renderGoalkeeperTopThree(
 
         <small>
           I tre migliori abbinamenti
-          compariranno qui.
+          calendario compariranno qui.
         </small>
       </div>
     `
@@ -653,7 +757,8 @@ function renderGoalkeeperTopThree(
           goalkeeper-recommendations-empty
         "
       >
-        Nessun abbinamento disponibile.
+        Nessun abbinamento calendario
+        disponibile.
       </div>
     `
   }
@@ -665,7 +770,7 @@ function renderGoalkeeperTopThree(
       "
     >
       <span>
-        Migliori abbinamenti
+        Migliori abbinamenti calendario
       </span>
 
       <strong>
@@ -711,7 +816,16 @@ function renderGoalkeeperTopThree(
                 </strong>
 
                 <small>
-                  Abbinamento
+                  Favorevoli
+                  ${result.coverage.favorableDays}/${result.coverage.days}
+                  ·
+                  Copertura
+                  ${formatPercent(
+                    result.coverage.coveredPercent,
+                  )}
+                  ·
+                  Buchi
+                  ${result.coverage.holes}
                 </small>
               </div>
 
@@ -719,13 +833,36 @@ function renderGoalkeeperTopThree(
                 class="
                   goalkeeper-score
                 "
+                title="Giornate con almeno un matchup favorevole"
               >
-                ${result.score}
+                ${formatPercent(
+                  result
+                    .coverage
+                    .favorablePercent,
+                )}
               </span>
             </div>
           `,
         )
         .join('')}
+    </div>
+
+    <div
+      class="
+        goalkeeper-recommendations-empty
+      "
+      style="
+        margin-top: 8px;
+        min-height: 0;
+        padding: 8px 10px;
+      "
+    >
+      <small>
+        Classifica:
+        più giornate favorevoli,
+        poi meno buchi,
+        poi miglior media matchup.
+      </small>
     </div>
   `
 }
@@ -742,8 +879,7 @@ function getGoalkeeperMatches(
     return []
   }
 
-  return GOALKEEPER_MATRIX
-    .teams
+  return goalkeeperCalendarTeams
     .filter(
       (team) =>
         team
@@ -806,6 +942,10 @@ function renderGoalkeeperSuggestions(
     )
     .join('')
 }
+
+/* =========================
+   LEGACY MATRIX HELPERS
+========================= */
 
 function getMatrixScoreClass(
   score: number | null,
@@ -1015,9 +1155,11 @@ function renderGoalkeeperSection():
           </h2>
 
           <p>
-            Cerca una squadra e consulta
-            immediatamente i tre migliori
-            abbinamenti della griglia.
+            Cerca una squadra.
+            I suggerimenti vengono
+            calcolati giornata per
+            giornata dal calendario
+            matchup 0 / 1 / 2.
           </p>
         </div>
 
@@ -1132,8 +1274,9 @@ function renderGoalkeeperSection():
             </h2>
 
             <p>
-              Valori di compatibilità
-              tra le squadre.
+              Matrice legacy di
+              compatibilità tra le
+              squadre.
             </p>
           </div>
 
@@ -2251,6 +2394,12 @@ function updateGoalkeeperUi():
       )
   }
 
+  /*
+    La griglia continua a essere
+    generata dal DB legacy.
+    Qui aggiorniamo soltanto
+    l'evidenziazione della squadra.
+  */
   const matrix =
     document.querySelector<HTMLElement>(
       '#goalkeeperMatrixContent',

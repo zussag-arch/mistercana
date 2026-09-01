@@ -2352,46 +2352,6 @@ function renderDiscardedPlayers(
 function renderSuggestedPlayersPanel(
   state: AppState,
 ): string {
-  if (
-    activeRole === 'P'
-  ) {
-    return `
-      <aside
-        class="
-          auction-next-panel
-          auction-suggested-panel
-        "
-      >
-        <div
-          class="auction-panel-title"
-        >
-          <div>
-            <span
-              class="auction-kicker"
-            >
-              RUOLO P
-            </span>
-
-            <h3>
-              Chiamata consigliata
-            </h3>
-          </div>
-        </div>
-
-        <div
-          class="auction-next-list"
-        >
-          <div
-            class="auction-recommendation-placeholder"
-          >
-            P1, P2 e P3 richiedono
-            una logica dedicata.
-          </div>
-        </div>
-      </aside>
-    `
-  }
-
   const recommendation =
     calculateRecommendation(
       state,
@@ -2410,8 +2370,34 @@ function renderSuggestedPlayersPanel(
 
   if (!recommended) {
     const roleCompleted =
-      recommendation.targetSlot ===
-      undefined
+      activeRole === 'P'
+        ? state
+            .auctionAssignments
+            .filter(
+              (assignment) => {
+                const player =
+                  getPlayer(
+                    assignment.playerId,
+                  )
+
+                const manager =
+                  getManagerById(
+                    state,
+                    assignment.managerId,
+                  )
+
+                return Boolean(
+                  player &&
+                  player.role ===
+                    'P' &&
+                  manager?.isOwner,
+                )
+              },
+            )
+            .length >=
+          ROSTER_SLOT_LIMITS.P
+        : recommendation.targetSlot ===
+          undefined
 
     return `
       <aside
@@ -2444,10 +2430,14 @@ function renderSuggestedPlayersPanel(
           >
             ${
               roleCompleted
-                ? `Il reparto ${activeRole} è già strategicamente completo.`
-                : discarded.length
-                  ? `Non ci sono altri candidati automatici: controlla gli scartati ${activeRole}.`
-                  : 'Nessun candidato disponibile.'
+                ? `Il reparto ${activeRole} è già completo.`
+                : activeRole === 'P'
+                  ? discarded.length
+                    ? 'Non ci sono altre terne strategiche disponibili: controlla gli scartati P.'
+                    : 'Nessuna terna portieri valida disponibile con le gerarchie e le fasce correnti.'
+                  : discarded.length
+                    ? `Non ci sono altri candidati automatici: controlla gli scartati ${activeRole}.`
+                    : 'Nessun candidato disponibile.'
             }
           </div>
         </div>
@@ -2463,9 +2453,20 @@ function renderSuggestedPlayersPanel(
     recommended.player
 
   const targetLabel =
-    recommendation.targetSlot
-      ? `${activeRole}${recommendation.targetSlot}`
-      : activeRole
+    activeRole === 'P'
+      ? 'P'
+      : recommendation.targetSlot
+        ? `${activeRole}${recommendation.targetSlot}`
+        : activeRole
+
+  const slotLabel =
+    activeRole === 'P'
+      ? recommended.playerSlot
+        ? `P${recommended.playerSlot}`
+        : 'P'
+      : recommended.playerSlot
+        ? `${player.role}${recommended.playerSlot}`
+        : player.role
 
   return `
     <aside
@@ -2481,7 +2482,11 @@ function renderSuggestedPlayersPanel(
           <span
             class="auction-kicker"
           >
-            SERVE ${targetLabel}
+            ${
+              activeRole === 'P'
+                ? 'STRATEGIA PORTIERI · AUTO'
+                : `SERVE ${targetLabel}`
+            }
           </span>
 
           <h3>
@@ -2516,11 +2521,7 @@ function renderSuggestedPlayersPanel(
                 player.team,
               )}
               ·
-              ${
-                recommended.playerSlot
-                  ? `${player.role}${recommended.playerSlot}`
-                  : player.role
-              }
+              ${slotLabel}
             </span>
           </div>
 
@@ -2559,36 +2560,74 @@ function renderSuggestedPlayersPanel(
         <div
           class="auction-call-meta"
         >
-          <span>
-            iCà
-            <strong>
-              ${formatNumber(
-                player.iCa,
-                2,
-              )}
-            </strong>
-          </span>
+          ${
+            activeRole === 'P'
+              ? `
+                <span>
+                  Gerarchia
+                  <strong>
+                    ${
+                      recommended.playerSlot
+                        ? `P${recommended.playerSlot}`
+                        : '—'
+                    }
+                  </strong>
+                </span>
 
-          <span>
-            Valore
-            <strong>
-              ${formatCredits(
-                recommended
-                  .priceAdvice
-                  .valueLimit,
-              )}
-            </strong>
-          </span>
+                <span>
+                  Consenso
+                  <strong>
+                    ${formatNumber(
+                      player.consensus,
+                      2,
+                    )}
+                  </strong>
+                </span>
 
-          <span>
-            Slot
-            <strong>
-              ${
-                recommended.playerSlot ??
-                '—'
-              }
-            </strong>
-          </span>
+                <span>
+                  Valore
+                  <strong>
+                    ${formatCredits(
+                      recommended
+                        .priceAdvice
+                        .valueLimit,
+                    )}
+                  </strong>
+                </span>
+              `
+              : `
+                <span>
+                  iCà
+                  <strong>
+                    ${formatNumber(
+                      player.iCa,
+                      2,
+                    )}
+                  </strong>
+                </span>
+
+                <span>
+                  Valore
+                  <strong>
+                    ${formatCredits(
+                      recommended
+                        .priceAdvice
+                        .valueLimit,
+                    )}
+                  </strong>
+                </span>
+
+                <span>
+                  Slot
+                  <strong>
+                    ${
+                      recommended.playerSlot ??
+                      '—'
+                    }
+                  </strong>
+                </span>
+              `
+          }
         </div>
 
         <div
@@ -2662,6 +2701,12 @@ function renderSuggestedPlayersPanel(
                               .player
                               .team,
                           )}
+                          ${
+                            activeRole === 'P' &&
+                            candidate.playerSlot
+                              ? ` · P${candidate.playerSlot}`
+                              : ''
+                          }
                         </span>
                       </div>
 

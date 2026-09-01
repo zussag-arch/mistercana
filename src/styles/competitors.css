@@ -1,0 +1,510 @@
+/* =========================
+   AUCTION COMPETITORS
+========================= */
+
+.auction-competitors-section {
+  margin-top: 12px;
+
+  padding: 12px;
+
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.08
+    );
+
+  border-radius: 21px;
+
+  background: #121416;
+}
+
+.auction-competitors-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  margin-bottom: 9px;
+}
+
+.auction-competitors-heading h3 {
+  margin: 3px 0 0;
+
+  font-size: 12px;
+}
+
+.auction-competitors-count {
+  max-width: 180px;
+
+  overflow: hidden;
+
+  padding:
+    4px
+    8px;
+
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.07
+    );
+
+  border-radius:
+    var(--radius-pill);
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.025
+    );
+
+  color: #767e82;
+
+  font-size: 7px;
+  font-weight: 800;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.auction-competitors-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(0, 1fr)
+    );
+
+  gap: 7px;
+}
+
+/* =========================
+   CARD
+========================= */
+
+.auction-competitor-card {
+  min-width: 0;
+  min-height: 135px;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 10px;
+
+  overflow: hidden;
+
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.075
+    );
+
+  border-radius: 16px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(
+        255,
+        255,
+        255,
+        0.025
+      ),
+      rgba(
+        255,
+        255,
+        255,
+        0.008
+      )
+    ),
+    #181b1d;
+}
+
+/* =========================
+   RISK BORDER
+========================= */
+
+.auction-competitor-card.risk-high {
+  border-color:
+    rgba(
+      228,
+      94,
+      94,
+      0.30
+    );
+}
+
+.auction-competitor-card.risk-medium {
+  border-color:
+    rgba(
+      231,
+      201,
+      76,
+      0.28
+    );
+}
+
+.auction-competitor-card.risk-low {
+  border-color:
+    rgba(
+      90,
+      168,
+      255,
+      0.18
+    );
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.auction-competitor-card-top {
+  min-width: 0;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 8px;
+}
+
+.auction-competitor-card-top
+> div {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+.auction-competitor-card-top
+> div
+> strong {
+  overflow: hidden;
+
+  color: #e4e8e6;
+
+  font-size: 9px;
+  font-weight: 850;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.auction-competitor-card-top
+> div
+> span {
+  overflow: hidden;
+
+  color: #6f777b;
+
+  font-size: 7px;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* =========================
+   RISK BADGE
+========================= */
+
+.auction-competitor-risk {
+  min-height: 22px;
+
+  display: inline-flex;
+  align-items: center;
+
+  flex: 0 0 auto;
+
+  padding:
+    0
+    8px;
+
+  border:
+    1px solid transparent;
+
+  border-radius:
+    var(--radius-pill);
+
+  font-size: 7px;
+  font-weight: 950;
+
+  letter-spacing: 0.05em;
+}
+
+.auction-competitor-risk.risk-high {
+  border-color:
+    rgba(
+      228,
+      94,
+      94,
+      0.28
+    );
+
+  background:
+    rgba(
+      228,
+      94,
+      94,
+      0.09
+    );
+
+  color: #f08383;
+}
+
+.auction-competitor-risk.risk-medium {
+  border-color:
+    rgba(
+      231,
+      201,
+      76,
+      0.28
+    );
+
+  background:
+    rgba(
+      231,
+      201,
+      76,
+      0.08
+    );
+
+  color: #ead565;
+}
+
+.auction-competitor-risk.risk-low {
+  border-color:
+    rgba(
+      90,
+      168,
+      255,
+      0.20
+    );
+
+  background:
+    rgba(
+      90,
+      168,
+      255,
+      0.065
+    );
+
+  color: #88bdFA;
+}
+
+/* =========================
+   ESTIMATED BID
+========================= */
+
+.auction-competitor-main {
+  display: flex;
+  flex-direction: column;
+
+  gap: 2px;
+
+  margin-top: 10px;
+}
+
+.auction-competitor-main
+> span {
+  color: #858d91;
+
+  font-size: 7px;
+}
+
+.auction-competitor-main
+> strong {
+  color: #f2f5f3;
+
+  font-size: 21px;
+  font-weight: 950;
+
+  line-height: 1;
+}
+
+.auction-competitor-card.risk-high
+.auction-competitor-main
+> strong {
+  color: #f07171;
+}
+
+.auction-competitor-card.risk-medium
+.auction-competitor-main
+> strong {
+  color: #e7c94c;
+}
+
+.auction-competitor-card.risk-low
+.auction-competitor-main
+> strong {
+  color: #9fc8f7;
+}
+
+.auction-competitor-main
+> small {
+  margin-top: 1px;
+
+  color: #626a6e;
+
+  font-size: 6px;
+}
+
+/* =========================
+   BOTTOM METRICS
+========================= */
+
+.auction-competitor-bottom {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+
+  gap: 5px;
+
+  margin-top: auto;
+  padding-top: 9px;
+
+  border-top:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.055
+    );
+}
+
+.auction-competitor-bottom
+> div {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+.auction-competitor-bottom
+span {
+  color: #666e72;
+
+  font-size: 6px;
+
+  white-space: nowrap;
+}
+
+.auction-competitor-bottom
+strong {
+  overflow: hidden;
+
+  color: #b8bec1;
+
+  font-size: 9px;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.auction-competitor-bottom
+> div:last-child {
+  text-align: right;
+}
+
+.auction-competitor-bottom
+> div:last-child
+strong {
+  color: #858d91;
+
+  font-size: 8px;
+}
+
+/* =========================
+   EMPTY
+========================= */
+
+.auction-competitors-empty {
+  padding: 13px;
+
+  border:
+    1px dashed
+    rgba(
+      255,
+      255,
+      255,
+      0.09
+    );
+
+  border-radius: 14px;
+
+  color: #737b7f;
+
+  font-size: 8px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 1150px) {
+  .auction-competitors-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+}
+
+@media (max-width: 680px) {
+  .auction-competitors-section {
+    padding: 10px;
+
+    border-radius: 18px;
+  }
+
+  .auction-competitors-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+
+  .auction-competitor-card {
+    min-height: 128px;
+  }
+}
+
+@media (max-width: 520px) {
+  .auction-competitors-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .auction-competitor-card {
+    min-height: 120px;
+  }
+
+  .auction-competitors-heading {
+    align-items: flex-start;
+  }
+
+  .auction-competitors-count {
+    max-width: 115px;
+  }
+}

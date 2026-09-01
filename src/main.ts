@@ -2,6 +2,7 @@ import './style.css'
 
 import './styles/dashboard.css'
 import './styles/auction.css'
+import './styles/competitors.css'
 import './styles/players.css'
 import './styles/objectives.css'
 import './styles/insights.css'
@@ -43,6 +44,10 @@ import {
 import {
   players,
 } from './data/players'
+
+import {
+  renderCompetitorAnalysis,
+} from './domain/competitorAnalysis'
 
 import {
   loadState,
@@ -148,6 +153,250 @@ function getPageContent(
     case 'importExport':
       return renderImportExportPage()
   }
+}
+
+/* =========================
+   COMPACT PAGE CHROME
+========================= */
+
+function isActionElement(
+  element: Element,
+): boolean {
+  return (
+    element.matches(
+      'button, input, select',
+    ) ||
+    Boolean(
+      element.querySelector(
+        'button, input, select',
+      ),
+    )
+  )
+}
+
+function moveElementToTopbar(
+  element:
+    | Element
+    | null,
+  target: HTMLElement,
+): void {
+  if (!element) {
+    return
+  }
+
+  target.appendChild(
+    element,
+  )
+}
+
+function compactGenericPageHeading(
+  target: HTMLElement,
+): void {
+  const heading =
+    document.querySelector<HTMLElement>(
+      '.page-heading',
+    )
+
+  if (!heading) {
+    return
+  }
+
+  Array.from(
+    heading.children,
+  ).forEach(
+    (child) => {
+      if (
+        isActionElement(
+          child,
+        )
+      ) {
+        moveElementToTopbar(
+          child,
+          target,
+        )
+      }
+    },
+  )
+
+  heading.remove()
+}
+
+function compactDashboardChrome(
+  target: HTMLElement,
+): void {
+  const hero =
+    document.querySelector<HTMLElement>(
+      '.dashboard-hero',
+    )
+
+  if (!hero) {
+    return
+  }
+
+  const recapButton =
+    hero.querySelector<HTMLElement>(
+      '#openRecapButton',
+    )
+
+  moveElementToTopbar(
+    recapButton,
+    target,
+  )
+
+  hero.remove()
+}
+
+function compactAuctionChrome(
+  target: HTMLElement,
+): void {
+  const toolbar =
+    document.querySelector<HTMLElement>(
+      '.auction-live-toolbar',
+    )
+
+  if (!toolbar) {
+    return
+  }
+
+  if (
+    state.auctionPhase ===
+    'live'
+  ) {
+    const roleSwitcher =
+      toolbar.querySelector<HTMLElement>(
+        '.auction-role-switcher',
+      )
+
+    const ownerCredits =
+      toolbar.querySelector<HTMLElement>(
+        '.auction-toolbar-stat',
+      )
+
+    const actions =
+      toolbar.querySelector<HTMLElement>(
+        '.auction-toolbar-actions',
+      )
+
+    moveElementToTopbar(
+      roleSwitcher,
+      target,
+    )
+
+    moveElementToTopbar(
+      ownerCredits,
+      target,
+    )
+
+    moveElementToTopbar(
+      actions,
+      target,
+    )
+  }
+
+  toolbar.remove()
+}
+
+function compactPageChrome(
+  page: PageId,
+): void {
+  const target =
+    document.querySelector<HTMLElement>(
+      '#topbarPageActions',
+    )
+
+  if (!target) {
+    return
+  }
+
+  if (
+    page === 'dashboard'
+  ) {
+    compactDashboardChrome(
+      target,
+    )
+  }
+
+  if (
+    page === 'auction'
+  ) {
+    compactAuctionChrome(
+      target,
+    )
+  }
+
+  compactGenericPageHeading(
+    target,
+  )
+}
+
+/* =========================
+   AUCTION COMPETITORS
+========================= */
+
+function mountAuctionCompetitors(
+  page: PageId,
+): void {
+  if (
+    page !== 'auction' ||
+    state.auctionPhase !==
+      'live'
+  ) {
+    return
+  }
+
+  const playerId =
+    state.currentAuctionPlayerId
+
+  if (!playerId) {
+    return
+  }
+
+  const player =
+    players.find(
+      (item) =>
+        item.id ===
+        playerId,
+    )
+
+  if (!player) {
+    return
+  }
+
+  /*
+    Inseriamo la fascia dentro
+    la colonna principale del
+    workspace.
+
+    Quindi resta esattamente
+    sotto il blocco giocatore /
+    prezzo e prima della sezione
+    Partecipanti, come nello
+    screenshot.
+  */
+  const workspaceMain =
+    document.querySelector<HTMLElement>(
+      '.auction-workspace-main',
+    )
+
+  if (!workspaceMain) {
+    return
+  }
+
+  const markup =
+    renderCompetitorAnalysis(
+      state,
+      player,
+      players,
+    )
+
+  if (!markup.trim()) {
+    return
+  }
+
+  workspaceMain.insertAdjacentHTML(
+    'beforeend',
+    markup,
+  )
 }
 
 /* =========================
@@ -538,6 +787,26 @@ function render():
       )}
     </main>
   `
+
+  /*
+    1. Spostiamo gli elementi
+       della pagina nella topbar.
+
+    2. Inseriamo le tessere
+       concorrenti nella colonna
+       principale dell'asta.
+
+    3. Solo dopo colleghiamo
+       tutti gli eventi.
+  */
+
+  compactPageChrome(
+    activePage,
+  )
+
+  mountAuctionCompetitors(
+    activePage,
+  )
 
   bindNavigationEvents()
 

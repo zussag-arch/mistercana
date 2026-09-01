@@ -66,12 +66,24 @@ button {
 .topbar {
   min-height: 58px;
 
-  display: flex;
+  display: grid;
+
+  grid-template-columns:
+    auto
+    minmax(0, 1fr)
+    auto;
+
   align-items: center;
 
-  gap: 34px;
+  gap: 28px;
 
-  padding: 0 32px;
+  padding:
+    0
+    clamp(
+      18px,
+      3vw,
+      32px
+    );
 
   border-bottom:
     1px solid #292d30;
@@ -79,23 +91,90 @@ button {
   background: #191b1d;
 }
 
+.topbar-brand-stack {
+  min-width: 92px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+
+  gap: 3px;
+
+  align-self: stretch;
+}
+
 .brand {
   font-size: 17px;
   font-weight: 850;
 
+  line-height: 1;
+
   white-space: nowrap;
 }
 
+.topbar-live-status {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 5px;
+
+  color: #61e9ad;
+
+  font-size: 7px;
+  font-weight: 900;
+
+  letter-spacing: 0.12em;
+}
+
+.topbar-live-dot {
+  width: 6px;
+  height: 6px;
+
+  display: inline-block;
+
+  border-radius:
+    var(--radius-pill);
+
+  background: #46e6a1;
+
+  box-shadow:
+    0 0 8px
+    rgba(
+      70,
+      230,
+      161,
+      0.72
+    );
+}
+
 .main-nav {
+  min-width: 0;
+
   display: flex;
   align-items: center;
 
-  gap: 23px;
+  gap:
+    clamp(
+      12px,
+      1.7vw,
+      23px
+    );
+
+  overflow-x: auto;
+
+  scrollbar-width: none;
+}
+
+.main-nav::-webkit-scrollbar {
+  display: none;
 }
 
 .nav-item {
   display: inline-flex;
   align-items: center;
+
+  flex: 0 0 auto;
 
   gap: 5px;
 
@@ -103,7 +182,10 @@ button {
   border-bottom:
     2px solid transparent;
 
-  padding: 20px 0 18px;
+  padding:
+    20px
+    0
+    18px;
 
   background: transparent;
 
@@ -111,6 +193,8 @@ button {
 
   font-size: 10px;
   font-weight: 750;
+
+  white-space: nowrap;
 
   cursor: pointer;
 }
@@ -151,15 +235,204 @@ button {
 }
 
 /* =========================
+   TOPBAR PAGE ACTIONS
+========================= */
+
+.topbar-page-actions {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 8px;
+
+  white-space: nowrap;
+}
+
+.topbar-page-actions:empty {
+  display: none;
+}
+
+/*
+  Dashboard: il Recap mantiene
+  lo stile verde, ma diventa
+  più compatto nella topbar.
+*/
+
+.topbar
+.topbar-page-actions
+.dashboard-cta-button {
+  min-height: 34px;
+
+  padding:
+    0
+    13px;
+
+  border-radius: 12px;
+
+  font-size: 9px;
+
+  box-shadow: none;
+}
+
+/*
+  Asta: ruolo, crediti e azioni
+  sono gli stessi elementi della
+  vecchia toolbar, semplicemente
+  trasferiti qui.
+*/
+
+.topbar
+.topbar-page-actions
+.auction-role-switcher {
+  gap: 6px;
+}
+
+.topbar
+.topbar-page-actions
+.auction-role-switcher
+> span {
+  display: none;
+}
+
+.topbar
+.topbar-page-actions
+.auction-role-switcher
+> div {
+  padding: 3px;
+
+  border-radius: 13px;
+}
+
+.topbar
+.topbar-page-actions
+.auction-role-tab {
+  width: 30px;
+  height: 28px;
+
+  border-radius: 9px;
+}
+
+.topbar
+.topbar-page-actions
+.auction-toolbar-stat {
+  gap: 5px;
+
+  padding:
+    0
+    3px;
+}
+
+.topbar
+.topbar-page-actions
+.auction-toolbar-stat span {
+  font-size: 7px;
+}
+
+.topbar
+.topbar-page-actions
+.auction-toolbar-stat strong {
+  font-size: 15px;
+}
+
+.topbar
+.topbar-page-actions
+.auction-toolbar-actions {
+  display: flex;
+  align-items: center;
+
+  gap: 5px;
+
+  margin: 0;
+}
+
+.topbar
+.topbar-page-actions
+.auction-toolbar-button {
+  min-height: 32px;
+
+  padding:
+    0
+    9px;
+
+  border-radius: 11px;
+
+  font-size: 8px;
+}
+
+.topbar
+.topbar-page-actions
+.danger-button {
+  min-height: 32px;
+
+  padding:
+    0
+    10px;
+
+  border-radius: 11px;
+
+  font-size: 8px;
+}
+
+/*
+  Quando una pagina possiede
+  un blocco azioni proveniente
+  da .page-heading, azzeriamo
+  gli spazi propri dell'header.
+*/
+
+.topbar-page-actions
+.page-actions,
+.topbar-page-actions
+.page-heading-actions,
+.topbar-page-actions
+.players-actions,
+.topbar-page-actions
+.objectives-actions,
+.topbar-page-actions
+.insights-actions {
+  margin: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+}
+
+/* =========================
    GLOBAL PAGE LAYOUT
 ========================= */
+
+.app-main {
+  width: 100%;
+
+  padding:
+    16px
+    clamp(
+      24px,
+      4vw,
+      68px
+    )
+    70px;
+}
+
+/*
+  Conservata per eventuali
+  componenti legacy che usano
+  ancora .app-content.
+*/
 
 .app-content {
   width: 100%;
 
   padding:
-    38px
-    clamp(24px, 4vw, 68px)
+    16px
+    clamp(
+      24px,
+      4vw,
+      68px
+    )
     70px;
 }
 
@@ -1114,10 +1387,101 @@ input:disabled
    SMALLER SCREENS
 ========================= */
 
+@media (max-width: 1100px) {
+  .topbar {
+    gap: 16px;
+
+    padding:
+      0
+      18px;
+  }
+
+  .main-nav {
+    gap: 14px;
+  }
+
+  .topbar-page-actions {
+    gap: 5px;
+  }
+
+  .topbar
+  .topbar-page-actions
+  .auction-toolbar-button {
+    padding:
+      0
+      7px;
+
+    font-size: 7px;
+  }
+
+  .topbar
+  .topbar-page-actions
+  .auction-toolbar-stat span {
+    display: none;
+  }
+}
+
 @media (max-width: 900px) {
+  .topbar {
+    grid-template-columns:
+      auto
+      minmax(0, 1fr);
+
+    gap:
+      7px
+      14px;
+
+    min-height: 0;
+
+    padding:
+      8px
+      16px
+      0;
+  }
+
+  .topbar-brand-stack {
+    grid-column: 1;
+    grid-row: 1;
+
+    min-height: 38px;
+  }
+
+  .topbar-page-actions {
+    grid-column: 2;
+    grid-row: 1;
+
+    max-width: 100%;
+
+    overflow-x: auto;
+
+    scrollbar-width: none;
+  }
+
+  .topbar-page-actions::-webkit-scrollbar {
+    display: none;
+  }
+
+  .main-nav {
+    grid-column:
+      1 / -1;
+    grid-row: 2;
+
+    width: 100%;
+
+    gap: 18px;
+  }
+
+  .nav-item {
+    padding:
+      12px
+      0
+      10px;
+  }
+
+  .app-main,
   .app-content {
     padding:
-      28px
+      14px
       24px
       60px;
   }
@@ -1136,5 +1500,130 @@ input:disabled
         2,
         minmax(190px, 1fr)
       );
+  }
+}
+
+@media (max-width: 680px) {
+  .topbar {
+    padding:
+      8px
+      12px
+      0;
+  }
+
+  .brand {
+    font-size: 15px;
+  }
+
+  .topbar
+  .topbar-page-actions
+  .auction-toolbar-actions {
+    gap: 4px;
+  }
+
+  /*
+    Su telefono togliamo i due
+    collegamenti rapidi duplicati:
+    Giocatori e Obiettivi sono
+    comunque sempre raggiungibili
+    dal menu immediatamente sotto.
+
+    Restano invece ruolo, crediti,
+    Annulla ultima e Termina asta.
+  */
+
+  .topbar
+  .topbar-page-actions
+  #goToPlayersButton,
+  .topbar
+  .topbar-page-actions
+  #goToObjectivesButton {
+    display: none;
+  }
+
+  .topbar
+  .topbar-page-actions
+  .auction-toolbar-button {
+    min-height: 29px;
+  }
+
+  .topbar
+  .topbar-page-actions
+  .danger-button {
+    min-height: 29px;
+  }
+
+  .topbar
+  .topbar-page-actions
+  .dashboard-cta-button {
+    min-height: 31px;
+  }
+
+  .app-main,
+  .app-content {
+    padding:
+      12px
+      14px
+      50px;
+  }
+}
+
+@media (max-width: 520px) {
+  .topbar {
+    grid-template-columns:
+      auto
+      minmax(0, 1fr);
+  }
+
+  .topbar-page-actions {
+    gap: 4px;
+  }
+
+  .topbar
+  .topbar-page-actions
+  .auction-toolbar-stat {
+    display: none;
+  }
+
+  .topbar
+  .topbar-page-actions
+  .auction-role-tab {
+    width: 27px;
+    height: 27px;
+  }
+
+  .topbar
+  .topbar-page-actions
+  #undoLastAssignmentButton {
+    font-size: 0;
+
+    width: 30px;
+    padding: 0;
+  }
+
+  .topbar
+  .topbar-page-actions
+  #undoLastAssignmentButton::after {
+    content: "↶";
+
+    font-size: 14px;
+  }
+
+  .topbar
+  .topbar-page-actions
+  #endAuctionButton {
+    padding:
+      0
+      8px;
+
+    font-size: 7px;
+  }
+
+  .main-nav {
+    gap: 15px;
+  }
+
+  .nav-item {
+    font-size: 9px;
   }
 }

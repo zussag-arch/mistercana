@@ -15,6 +15,10 @@ import {
   calculatePriceAdvice,
 } from './priceAdvice'
 
+import {
+  calculateGoalkeeperRecommendation,
+} from './goalkeeperStrategy'
+
 import type {
   PriceAdvice,
 } from './priceAdvice'
@@ -1011,6 +1015,28 @@ export function calculateRecommendation(
   }
 
   /*
+    PORTIERI
+
+    P non usa gli slot strategici
+    generici derivati dal PMA.
+
+    La raccomandazione viene delegata
+    al motore dedicato che valuta
+    le terne e le strategie P.
+  */
+  if (
+    role === 'P'
+  ) {
+    return calculateGoalkeeperRecommendation(
+      state,
+      allPlayers,
+      parameters,
+    )
+  }
+
+  /*
+    D / C / A
+
     La Chiamata consigliata considera
     sempre e soltanto il ruolo attivo.
   */
