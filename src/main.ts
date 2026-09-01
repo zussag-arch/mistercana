@@ -189,6 +189,10 @@ function moveElementToTopbar(
   )
 }
 
+/* =========================
+   GENERIC PAGE HEADING
+========================= */
+
 function compactGenericPageHeading(
   target: HTMLElement,
 ): void {
@@ -221,6 +225,10 @@ function compactGenericPageHeading(
   heading.remove()
 }
 
+/* =========================
+   DASHBOARD
+========================= */
+
 function compactDashboardChrome(
   target: HTMLElement,
 ): void {
@@ -245,6 +253,10 @@ function compactDashboardChrome(
 
   hero.remove()
 }
+
+/* =========================
+   AUCTION
+========================= */
 
 function compactAuctionChrome(
   target: HTMLElement,
@@ -296,6 +308,144 @@ function compactAuctionChrome(
   toolbar.remove()
 }
 
+/* =========================
+   PLAYERS
+========================= */
+
+function compactPlayersChrome(
+  target: HTMLElement,
+): void {
+  const header =
+    document.querySelector<HTMLElement>(
+      '.players-page-header',
+    )
+
+  if (!header) {
+    return
+  }
+
+  /*
+    Conserviamo soltanto il
+    collegamento rapido all'Asta.
+
+    DATABASE 2026/27,
+    titolo, descrizione e conteggio
+    superiore sono ridondanti.
+
+    Il conteggio rimane comunque
+    disponibile nel footer della
+    pagina Giocatori.
+  */
+  const auctionButton =
+    header.querySelector<HTMLElement>(
+      '#playersGoToAuctionButton',
+    )
+
+  moveElementToTopbar(
+    auctionButton,
+    target,
+  )
+
+  header.remove()
+}
+
+/* =========================
+   OBJECTIVES
+========================= */
+
+function compactObjectivesChrome(
+  target: HTMLElement,
+): void {
+  const header =
+    document.querySelector<HTMLElement>(
+      '.objectives-page-header',
+    )
+
+  if (!header) {
+    return
+  }
+
+  /*
+    Il totale obiettivi è una
+    informazione operativa breve:
+    lo conserviamo in topbar.
+
+    Conserviamo anche il pulsante
+    Asta.
+
+    Titolo, eyebrow e descrizione
+    vengono invece eliminati.
+  */
+  const total =
+    header.querySelector<HTMLElement>(
+      '.objectives-total',
+    )
+
+  const auctionButton =
+    header.querySelector<HTMLElement>(
+      '#objectivesGoToAuctionButton',
+    )
+
+  moveElementToTopbar(
+    total,
+    target,
+  )
+
+  moveElementToTopbar(
+    auctionButton,
+    target,
+  )
+
+  header.remove()
+}
+
+/* =========================
+   INSIGHTS
+========================= */
+
+function compactInsightsChrome():
+  void {
+  const header =
+    document.querySelector<HTMLElement>(
+      '.insights-page-header',
+    )
+
+  /*
+    Insights non contiene azioni
+    operative nella testata.
+
+    La pagina può quindi partire
+    direttamente dal primo blocco:
+    Abbinamenti portieri.
+  */
+  header?.remove()
+}
+
+/* =========================
+   IMPORT / EXPORT
+========================= */
+
+function compactImportExportChrome():
+  void {
+  const header =
+    document.querySelector<HTMLElement>(
+      '.import-export-page-header',
+    )
+
+  /*
+    Anche qui la testata contiene
+    soltanto titolo e descrizione.
+
+    Il primo contenuto utile diventa
+    direttamente IMPORT / Carica dati.
+  */
+  header?.remove()
+}
+
+/* =========================
+   PAGE CHROME CONTROLLER
+========================= */
+
 function compactPageChrome(
   page: PageId,
 ): void {
@@ -308,22 +458,45 @@ function compactPageChrome(
     return
   }
 
-  if (
-    page === 'dashboard'
-  ) {
-    compactDashboardChrome(
-      target,
-    )
+  switch (page) {
+    case 'dashboard':
+      compactDashboardChrome(
+        target,
+      )
+      break
+
+    case 'auction':
+      compactAuctionChrome(
+        target,
+      )
+      break
+
+    case 'players':
+      compactPlayersChrome(
+        target,
+      )
+      break
+
+    case 'objectives':
+      compactObjectivesChrome(
+        target,
+      )
+      break
+
+    case 'insights':
+      compactInsightsChrome()
+      break
+
+    case 'importExport':
+      compactImportExportChrome()
+      break
   }
 
-  if (
-    page === 'auction'
-  ) {
-    compactAuctionChrome(
-      target,
-    )
-  }
-
+  /*
+    Compatibilità con eventuali
+    pagine/componenti che utilizzano
+    ancora la vecchia classe generica.
+  */
   compactGenericPageHeading(
     target,
   )
@@ -363,15 +536,10 @@ function mountAuctionCompetitors(
   }
 
   /*
-    Inseriamo la fascia dentro
-    la colonna principale del
-    workspace.
-
-    Quindi resta esattamente
-    sotto il blocco giocatore /
-    prezzo e prima della sezione
-    Partecipanti, come nello
-    screenshot.
+    Le tessere concorrenti vengono
+    inserite nella colonna principale
+    dell'Asta sotto il blocco
+    giocatore/prezzo.
   */
   const workspaceMain =
     document.querySelector<HTMLElement>(
@@ -789,15 +957,23 @@ function render():
   `
 
   /*
-    1. Spostiamo gli elementi
-       della pagina nella topbar.
+    ORDINE IMPORTANTE
 
-    2. Inseriamo le tessere
-       concorrenti nella colonna
-       principale dell'asta.
+    1. Render della pagina.
 
-    3. Solo dopo colleghiamo
-       tutti gli eventi.
+    2. Spostamento delle azioni
+       utili nella topbar e rimozione
+       delle testate ridondanti.
+
+    3. Inserimento delle tessere
+       concorrenti nell'Asta.
+
+    4. Binding degli eventi.
+
+    In questo modo gli elementi
+    conservano gli ID originali
+    e i binder delle pagine li
+    trovano nella nuova posizione.
   */
 
   compactPageChrome(

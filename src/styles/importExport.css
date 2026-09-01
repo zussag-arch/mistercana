@@ -192,6 +192,10 @@
     rgba(77, 145, 231, 0.08);
 }
 
+/* =========================
+   STATUS
+========================= */
+
 .data-transfer-status {
   min-height: 26px;
 
@@ -205,6 +209,8 @@
 
   font-size: 8px;
   font-weight: 750;
+
+  white-space: nowrap;
 }
 
 .status-pending {
@@ -216,6 +222,28 @@
     rgba(232, 146, 109, 0.1);
 
   color: #d99374;
+}
+
+.status-ready {
+  border:
+    1px solid
+    rgba(70, 230, 161, 0.18);
+
+  background:
+    rgba(70, 230, 161, 0.09);
+
+  color: #72dfac;
+}
+
+.status-neutral {
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.08);
+
+  background:
+    rgba(255, 255, 255, 0.035);
+
+  color: #7f878b;
 }
 
 /* =========================
@@ -290,12 +318,16 @@
   text-overflow: ellipsis;
 }
 
+/* =========================
+   BUTTONS
+========================= */
+
 .data-transfer-button {
-  min-height: 32px;
+  min-height: 34px;
 
   flex: 0 0 auto;
 
-  padding: 0 11px;
+  padding: 0 12px;
 
   border:
     1px solid
@@ -308,9 +340,257 @@
   color: #62686c;
 
   font-size: 8px;
-  font-weight: 700;
+  font-weight: 750;
 
   cursor: default;
+}
+
+.data-transfer-button-primary {
+  border-color:
+    rgba(90, 168, 255, 0.22);
+
+  background:
+    rgba(90, 168, 255, 0.10);
+
+  color: #82b9f5;
+
+  cursor: pointer;
+}
+
+.data-transfer-button-primary:hover {
+  border-color:
+    rgba(90, 168, 255, 0.38);
+
+  background:
+    rgba(90, 168, 255, 0.15);
+}
+
+.data-transfer-button-secondary {
+  color: #a3a8ab;
+
+  cursor: pointer;
+}
+
+.data-transfer-button-danger {
+  border-color:
+    rgba(228, 94, 94, 0.25);
+
+  background:
+    rgba(228, 94, 94, 0.11);
+
+  color: #eb7c7c;
+
+  cursor: pointer;
+}
+
+.data-transfer-button-danger:hover {
+  border-color:
+    rgba(228, 94, 94, 0.42);
+
+  background:
+    rgba(228, 94, 94, 0.16);
+}
+
+.data-transfer-button:disabled {
+  opacity: 0.62;
+
+  cursor: default;
+}
+
+.data-transfer-file-input {
+  display: none;
+}
+
+/* =========================
+   FEEDBACK
+========================= */
+
+.data-transfer-feedback {
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+
+  margin-top: 12px;
+
+  padding: 10px 12px;
+
+  border-radius: 16px;
+
+  font-size: 9px;
+}
+
+.data-transfer-feedback strong {
+  flex: 0 0 auto;
+
+  font-size: 9px;
+}
+
+.data-transfer-feedback span {
+  color: #989fa2;
+
+  line-height: 1.45;
+}
+
+.data-transfer-feedback-success {
+  border:
+    1px solid
+    rgba(70, 230, 161, 0.16);
+
+  background:
+    rgba(70, 230, 161, 0.055);
+}
+
+.data-transfer-feedback-success strong {
+  color: #72dfac;
+}
+
+.data-transfer-feedback-error {
+  border:
+    1px solid
+    rgba(228, 94, 94, 0.18);
+
+  background:
+    rgba(228, 94, 94, 0.06);
+}
+
+.data-transfer-feedback-error strong {
+  color: #e97777;
+}
+
+.data-transfer-feedback-info {
+  border:
+    1px solid
+    rgba(90, 168, 255, 0.15);
+
+  background:
+    rgba(90, 168, 255, 0.05);
+}
+
+.data-transfer-feedback-info strong {
+  color: #7fb6f1;
+}
+
+/* =========================
+   RESTORE PREVIEW
+========================= */
+
+.restore-preview {
+  margin-top: 12px;
+
+  padding: 14px;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.08);
+
+  border-radius: 20px;
+
+  background: #15181a;
+}
+
+.restore-preview-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 16px;
+}
+
+.restore-preview-header > div {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.restore-preview-header strong {
+  overflow: hidden;
+
+  font-size: 11px;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.restore-preview-header small {
+  color: #747b7f;
+
+  font-size: 8px;
+}
+
+.restore-preview-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0, 1fr)
+    );
+
+  gap: 8px;
+
+  margin-top: 13px;
+}
+
+.restore-preview-grid > div {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 5px;
+
+  padding: 9px 10px;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.055);
+
+  border-radius: 14px;
+
+  background: #191c1e;
+}
+
+.restore-preview-grid span {
+  color: #686f73;
+
+  font-size: 8px;
+}
+
+.restore-preview-grid strong {
+  font-size: 10px;
+}
+
+.restore-preview-warning {
+  margin-top: 12px;
+
+  padding: 9px 10px;
+
+  border:
+    1px solid
+    rgba(242, 154, 90, 0.15);
+
+  border-radius: 14px;
+
+  background:
+    rgba(242, 154, 90, 0.055);
+
+  color: #c99470;
+
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.restore-preview-actions {
+  display: flex;
+  justify-content: flex-end;
+
+  gap: 8px;
+
+  margin-top: 12px;
 }
 
 /* =========================
@@ -399,6 +679,18 @@
 @media (max-width: 620px) {
   .data-transfer-section {
     padding: 15px;
+
+    border-radius: 22px;
+  }
+
+  .data-transfer-section-header {
+    flex-direction: column;
+
+    gap: 10px;
+  }
+
+  .data-transfer-card {
+    min-height: 0;
   }
 
   .data-transfer-card-footer {
@@ -409,9 +701,39 @@
 
   .data-transfer-button {
     width: 100%;
+
+    min-height: 40px;
+  }
+
+  .data-transfer-feedback {
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+
+  .restore-preview-header {
+    flex-direction: column;
+  }
+
+  .restore-preview-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+
+  .restore-preview-actions {
+    flex-direction: column;
   }
 
   .data-integrity-panel {
     flex-direction: column;
+  }
+}
+
+@media (max-width: 420px) {
+  .restore-preview-grid {
+    grid-template-columns: 1fr;
   }
 }

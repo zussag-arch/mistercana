@@ -18,6 +18,11 @@ import type {
 const STORAGE_KEY =
   'mistercana_app_state_v1'
 
+const BACKUP_TYPE =
+  'mistercana-state-backup'
+
+const BACKUP_VERSION = 1
+
 type LegacyManager =
   Partial<Manager> & {
     name?: unknown
@@ -50,6 +55,36 @@ type LegacyState =
 
     objectives?: unknown
   }
+
+interface BackupEnvelope {
+  type: string
+
+  version: number
+
+  exportedAt: string
+
+  state: unknown
+}
+
+export type StateBackupParseResult =
+  | {
+      ok: true
+
+      state: AppState
+
+      exportedAt: string
+
+      version: number
+    }
+  | {
+      ok: false
+
+      error: string
+    }
+
+/* =========================
+   SAVE
+========================= */
 
 export function saveState(
   state: AppState,
@@ -622,6 +657,111 @@ function migrateArchivedAuctions(
 }
 
 /* =========================
+   NORMALIZE STATE
+========================= */
+
+function normalizeState(
+  parsed: LegacyState,
+): AppState {
+  const auctionPhase =
+    normalizeAuctionPhase(
+      parsed.auctionPhase,
+    )
+
+  const managers =
+    Array.isArray(
+      parsed.managers,
+    )
+      ? parsed.managers.map(
+          migrateManager,
+        )
+      : structuredClone(
+          defaultState.managers,
+        )
+
+  const objectives =
+    migrateObjectives(
+      parsed.objectives,
+    )
+
+  const auctionAssignments =
+    auctionPhase === 'live' ||
+    auctionPhase === 'finalizing'
+      ? migrateAuctionAssignments(
+          parsed.auctionAssignments,
+        )
+      : []
+
+  const recommendedDiscards =
+    auctionPhase === 'live' ||
+    auctionPhase === 'finalizing'
+      ? migrateRecommendedDiscards(
+          parsed.recommendedDiscards,
+        )
+      : []
+
+  const archivedAuctions =
+    migrateArchivedAuctions(
+      parsed.archivedAuctions,
+    )
+
+  const currentAuctionPlayerId =
+    auctionPhase === 'live' ||
+    auctionPhase === 'finalizing'
+      ? normalizeCurrentAuctionPlayerId(
+          parsed.currentAuctionPlayerId,
+        )
+      : null
+
+  return {
+    auctionPhase,
+
+    currentAuctionPlayerId,
+
+    auctionAssignments,
+
+    archivedAuctions,
+
+    recommendedDiscards,
+
+    initialCredits:
+      typeof parsed.initialCredits ===
+        'number' &&
+      Number.isFinite(
+        parsed.initialCredits,
+      ) &&
+      parsed.initialCredits > 0
+        ? parsed.initialCredits
+        : defaultState.initialCredits,
+
+    defenseModifierEnabled:
+      typeof parsed
+        .defenseModifierEnabled ===
+        'boolean'
+        ? parsed
+            .defenseModifierEnabled
+        : defaultState
+            .defenseModifierEnabled,
+
+    budgetProfile:
+      parsed.budgetProfile ??
+      defaultState.budgetProfile,
+
+    budgetDistribution: {
+      ...defaultState
+        .budgetDistribution,
+
+      ...parsed
+        .budgetDistribution,
+    },
+
+    managers,
+
+    objectives,
+  }
+}
+
+/* =========================
    LOAD
 ========================= */
 
@@ -644,105 +784,212 @@ export function loadState():
         raw,
       ) as LegacyState
 
-    const auctionPhase =
-      normalizeAuctionPhase(
-        parsed.auctionPhase,
-      )
-
-    const managers =
-      Array.isArray(
-        parsed.managers,
-      )
-        ? parsed.managers.map(
-            migrateManager,
-          )
-        : structuredClone(
-            defaultState.managers,
-          )
-
-    const objectives =
-      migrateObjectives(
-        parsed.objectives,
-      )
-
-    const auctionAssignments =
-      auctionPhase === 'live' ||
-      auctionPhase === 'finalizing'
-        ? migrateAuctionAssignments(
-            parsed.auctionAssignments,
-          )
-        : []
-
-    const recommendedDiscards =
-      auctionPhase === 'live' ||
-      auctionPhase === 'finalizing'
-        ? migrateRecommendedDiscards(
-            parsed.recommendedDiscards,
-          )
-        : []
-
-    const archivedAuctions =
-      migrateArchivedAuctions(
-        parsed.archivedAuctions,
-      )
-
-    const currentAuctionPlayerId =
-      auctionPhase === 'live' ||
-      auctionPhase === 'finalizing'
-        ? normalizeCurrentAuctionPlayerId(
-            parsed.currentAuctionPlayerId,
-          )
-        : null
-
-    return {
-      auctionPhase,
-
-      currentAuctionPlayerId,
-
-      auctionAssignments,
-
-      archivedAuctions,
-
-      recommendedDiscards,
-
-      initialCredits:
-        typeof parsed.initialCredits ===
-          'number' &&
-        Number.isFinite(
-          parsed.initialCredits,
-        ) &&
-        parsed.initialCredits > 0
-          ? parsed.initialCredits
-          : defaultState.initialCredits,
-
-      defenseModifierEnabled:
-        typeof parsed
-          .defenseModifierEnabled ===
-          'boolean'
-          ? parsed
-              .defenseModifierEnabled
-          : defaultState
-              .defenseModifierEnabled,
-
-      budgetProfile:
-        parsed.budgetProfile ??
-        defaultState.budgetProfile,
-
-      budgetDistribution: {
-        ...defaultState
-          .budgetDistribution,
-
-        ...parsed
-          .budgetDistribution,
-      },
-
-      managers,
-
-      objectives,
-    }
+    return normalizeState(
+      parsed,
+    )
   } catch {
     return structuredClone(
       defaultState,
     )
+  }
+}
+
+/* =========================
+   BACKUP EXPORT
+========================= */
+
+export function createStateBackup(
+  state: AppState,
+): string {
+  const backup = {
+    type:
+      BACKUP_TYPE,
+
+    version:
+      BACKUP_VERSION,
+
+    exportedAt:
+      new Date()
+        .toISOString(),
+
+    state,
+  }
+
+  return JSON.stringify(
+    backup,
+    null,
+    2,
+  )
+}
+
+/* =========================
+   BACKUP VALIDATION
+========================= */
+
+function isObject(
+  value: unknown,
+): value is Record<
+  string,
+  unknown
+> {
+  return (
+    typeof value ===
+      'object' &&
+    value !== null &&
+    !Array.isArray(value)
+  )
+}
+
+function hasValidBackupCore(
+  value: unknown,
+): boolean {
+  if (!isObject(value)) {
+    return false
+  }
+
+  if (
+    typeof value.initialCredits !==
+      'number' ||
+    !Number.isFinite(
+      value.initialCredits,
+    ) ||
+    value.initialCredits <= 0
+  ) {
+    return false
+  }
+
+  if (
+    !Array.isArray(
+      value.managers,
+    )
+  ) {
+    return false
+  }
+
+  if (
+    !isObject(
+      value.budgetDistribution,
+    )
+  ) {
+    return false
+  }
+
+  return true
+}
+
+/* =========================
+   BACKUP IMPORT
+========================= */
+
+export function parseStateBackup(
+  raw: string,
+): StateBackupParseResult {
+  let parsed:
+    unknown
+
+  try {
+    parsed =
+      JSON.parse(raw)
+  } catch {
+    return {
+      ok: false,
+
+      error:
+        'Il file non contiene JSON valido.',
+    }
+  }
+
+  if (!isObject(parsed)) {
+    return {
+      ok: false,
+
+      error:
+        'Il file non è un backup MisterCanà valido.',
+    }
+  }
+
+  const envelope =
+    parsed as Partial<
+      BackupEnvelope
+    >
+
+  if (
+    envelope.type !==
+      BACKUP_TYPE
+  ) {
+    return {
+      ok: false,
+
+      error:
+        'Il file non è riconosciuto come backup MisterCanà.',
+    }
+  }
+
+  if (
+    envelope.version !==
+      BACKUP_VERSION
+  ) {
+    return {
+      ok: false,
+
+      error:
+        `Versione backup non supportata: ${String(
+          envelope.version ??
+            'sconosciuta',
+        )}.`,
+    }
+  }
+
+  if (
+    typeof envelope.exportedAt !==
+      'string' ||
+    !envelope.exportedAt.trim()
+  ) {
+    return {
+      ok: false,
+
+      error:
+        'Il backup non contiene una data di esportazione valida.',
+    }
+  }
+
+  if (
+    !hasValidBackupCore(
+      envelope.state,
+    )
+  ) {
+    return {
+      ok: false,
+
+      error:
+        'Il contenuto del backup è incompleto o non valido.',
+    }
+  }
+
+  try {
+    const state =
+      normalizeState(
+        envelope.state as
+          LegacyState,
+      )
+
+    return {
+      ok: true,
+
+      state,
+
+      exportedAt:
+        envelope.exportedAt,
+
+      version:
+        envelope.version,
+    }
+  } catch {
+    return {
+      ok: false,
+
+      error:
+        'Il backup non può essere normalizzato in modo sicuro.',
+    }
   }
 }

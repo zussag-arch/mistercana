@@ -11,6 +11,13 @@
   place-items: center;
 
   padding: 24px;
+
+  isolation: isolate;
+
+  animation:
+    playerDetailOverlayEnter
+    var(--motion-base)
+    var(--ease-out);
 }
 
 .player-detail-backdrop {
@@ -34,6 +41,11 @@
     blur(7px);
 
   cursor: default;
+
+  animation:
+    playerDetailBackdropEnter
+    var(--motion-base)
+    var(--ease-standard);
 }
 
 .player-detail-card {
@@ -85,6 +97,109 @@
       0,
       0.55
     );
+
+  transform-origin:
+    center;
+
+  animation:
+    playerDetailCardEnter
+    var(--motion-base)
+    var(--ease-out);
+
+  will-change:
+    transform,
+    opacity;
+
+  -webkit-overflow-scrolling:
+    touch;
+}
+
+.player-detail-overlay.is-closing {
+  pointer-events: none;
+}
+
+.player-detail-overlay.is-closing
+.player-detail-backdrop {
+  animation:
+    playerDetailBackdropExit
+    var(--motion-exit)
+    var(--ease-standard)
+    forwards;
+}
+
+.player-detail-overlay.is-closing
+.player-detail-card {
+  animation:
+    playerDetailCardExit
+    var(--motion-exit)
+    var(--ease-standard)
+    forwards;
+}
+
+@keyframes playerDetailOverlayEnter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes playerDetailBackdropEnter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes playerDetailBackdropExit {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes playerDetailCardEnter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(9px)
+      scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+@keyframes playerDetailCardExit {
+  from {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+
+  to {
+    opacity: 0;
+
+    transform:
+      translateY(5px)
+      scale(0.99);
+  }
 }
 
 /* =========================
@@ -253,6 +368,17 @@
     0.07em;
 
   cursor: pointer;
+
+  transition:
+    filter
+    var(--motion-fast)
+    var(--ease-standard),
+    box-shadow
+    var(--motion-fast)
+    var(--ease-standard),
+    transform
+    var(--motion-instant)
+    var(--ease-standard);
 }
 
 .player-detail-call-button:disabled {
@@ -290,6 +416,50 @@
   font-size: 24px;
 
   cursor: pointer;
+
+  transition:
+    color
+    var(--motion-fast)
+    var(--ease-standard),
+    background
+    var(--motion-fast)
+    var(--ease-standard),
+    border-color
+    var(--motion-fast)
+    var(--ease-standard),
+    transform
+    var(--motion-instant)
+    var(--ease-standard);
+}
+
+@media (hover: hover) {
+  .player-detail-call-button:hover:not(:disabled) {
+    filter:
+      brightness(1.06);
+
+    box-shadow:
+      0 8px 22px
+      rgba(
+        70,
+        230,
+        161,
+        0.12
+      );
+  }
+
+  .player-detail-close-button:hover {
+    border-color: #51575a;
+
+    background: #292d2f;
+
+    color: #ffffff;
+  }
+}
+
+.player-detail-call-button:active:not(:disabled),
+.player-detail-close-button:active {
+  transform:
+    scale(0.97);
 }
 
 /* =========================
@@ -338,6 +508,14 @@
   border-radius: 17px;
 
   background: #191c1e;
+
+  transition:
+    border-color
+    var(--motion-fast)
+    var(--ease-standard),
+    background
+    var(--motion-fast)
+    var(--ease-standard);
 }
 
 .player-detail-kpi > span {
@@ -508,6 +686,26 @@ strong {
       #2fbf83,
       #46e6a1
     );
+
+  transform-origin:
+    left center;
+
+  animation:
+    playerDetailProgressEnter
+    var(--motion-slow)
+    var(--ease-out);
+}
+
+@keyframes playerDetailProgressEnter {
+  from {
+    transform:
+      scaleX(0);
+  }
+
+  to {
+    transform:
+      scaleX(1);
+  }
 }
 
 /* =========================
@@ -671,7 +869,7 @@ span::before {
 
   border-radius: 50%;
 
-  content: '';
+  content: "";
 }
 
 .player-detail-chart-legend
@@ -1034,10 +1232,14 @@ span {
   font-weight: 800;
 
   cursor: pointer;
-}
 
-.auction-player-detail-trigger:hover {
-  color: #a4ceff;
+  transition:
+    color
+    var(--motion-fast)
+    var(--ease-standard),
+    transform
+    var(--motion-instant)
+    var(--ease-standard);
 }
 
 .auction-recommendation-name-button,
@@ -1057,26 +1259,46 @@ span {
   text-align: left;
 
   cursor: pointer;
+
+  transition:
+    color
+    var(--motion-fast)
+    var(--ease-standard),
+    transform
+    var(--motion-instant)
+    var(--ease-standard);
 }
 
-.auction-recommendation-name-button:hover,
-.auction-top-ica-name-button:hover {
-  color: #8dc4ff;
-  text-decoration:
-    underline;
+@media (hover: hover) {
+  .auction-player-detail-trigger:hover {
+    color: #a4ceff;
+  }
+
+  .auction-recommendation-name-button:hover,
+  .auction-top-ica-name-button:hover {
+    color: #8dc4ff;
+
+    text-decoration:
+      underline;
+  }
 }
 
-/*
-  La rifinitura mobile viene fatta
-  nella fase dedicata.
+.auction-player-detail-trigger:active,
+.auction-recommendation-name-button:active,
+.auction-top-ica-name-button:active {
+  transform:
+    scale(0.985);
+}
 
-  Manteniamo comunque il componente
-  tecnicamente restringibile, senza
-  fissare ora la UX definitiva.
-*/
-@media (
-  max-width: 900px
-) {
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 900px) {
+  .player-detail-overlay {
+    padding: 12px;
+  }
+
   .player-detail-card {
     width:
       calc(
@@ -1089,6 +1311,33 @@ span {
         100vh -
         24px
       );
+
+    padding: 18px;
+  }
+
+  .player-detail-header {
+    gap: 16px;
+  }
+
+  .player-detail-kpis {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+
+  .player-detail-performance-strip {
+    grid-template-columns:
+      1fr;
+
+    gap: 10px;
+
+    padding:
+      14px 2px;
   }
 
   .player-detail-chart-grid {
@@ -1105,5 +1354,156 @@ span {
           1fr
         )
       );
+  }
+}
+
+@media (max-width: 680px) {
+  .player-detail-card {
+    padding: 15px;
+
+    border-radius: 22px;
+  }
+
+  .player-detail-header {
+    flex-direction: column;
+
+    align-items: stretch;
+  }
+
+  .player-detail-header-actions {
+    width: 100%;
+  }
+
+  .player-detail-call-button {
+    flex: 1;
+  }
+
+  .player-detail-identity {
+    align-items:
+      flex-start;
+  }
+
+  .player-detail-identity h2 {
+    font-size: 26px;
+  }
+
+  .player-detail-role {
+    width: 46px;
+    height: 46px;
+
+    border-radius: 15px;
+
+    font-size: 15px;
+  }
+
+  .player-detail-starting {
+    grid-template-columns:
+      auto
+      minmax(
+        120px,
+        1fr
+      )
+      auto;
+  }
+
+  .player-detail-stats-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+}
+
+@media (max-width: 520px) {
+  .player-detail-overlay {
+    padding: 8px;
+  }
+
+  .player-detail-card {
+    width:
+      calc(
+        100vw -
+        16px
+      );
+
+    max-height:
+      calc(
+        100vh -
+        16px
+      );
+
+    padding: 13px;
+
+    border-radius: 20px;
+  }
+
+  .player-detail-kpis {
+    grid-template-columns:
+      1fr;
+  }
+
+  .player-detail-kpi {
+    min-height: 66px;
+  }
+
+  .player-detail-kpi > strong {
+    font-size: 20px;
+  }
+
+  .player-detail-starting {
+    grid-template-columns:
+      1fr;
+
+    gap: 7px;
+  }
+
+  .player-detail-starting
+  strong {
+    text-align: left;
+  }
+
+  .player-detail-chart {
+    min-width: 580px;
+  }
+
+  .player-detail-chart-shell {
+    overflow-x: auto;
+
+    -webkit-overflow-scrolling:
+      touch;
+  }
+
+  .player-detail-notes {
+    grid-template-columns:
+      1fr;
+  }
+}
+
+/* =========================
+   REDUCED MOTION
+========================= */
+
+@media (
+  prefers-reduced-motion:
+  reduce
+) {
+  .player-detail-overlay,
+  .player-detail-backdrop,
+  .player-detail-card,
+  .player-detail-starting-track
+  > span {
+    animation: none;
+  }
+
+  .player-detail-call-button,
+  .player-detail-close-button,
+  .auction-player-detail-trigger,
+  .auction-recommendation-name-button,
+  .auction-top-ica-name-button {
+    transition: none;
   }
 }

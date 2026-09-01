@@ -33,6 +33,42 @@
   --radius-lg: 20px;
   --radius-xl: 24px;
   --radius-pill: 999px;
+
+  /* =========================
+     MOTION SYSTEM
+  ========================= */
+
+  --motion-instant: 90ms;
+  --motion-fast: 140ms;
+  --motion-base: 190ms;
+  --motion-slow: 280ms;
+
+  --motion-exit: 140ms;
+
+  --ease-standard:
+    cubic-bezier(
+      0.2,
+      0,
+      0,
+      1
+    );
+
+  --ease-out:
+    cubic-bezier(
+      0.16,
+      1,
+      0.3,
+      1
+    );
+
+  --focus-ring:
+    0 0 0 3px
+    rgba(
+      90,
+      168,
+      255,
+      0.16
+    );
 }
 
 * {
@@ -53,10 +89,28 @@ button,
 input,
 select {
   font: inherit;
+
+  -webkit-tap-highlight-color:
+    transparent;
 }
 
 button {
   color: inherit;
+
+  touch-action: manipulation;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: none;
+
+  box-shadow:
+    var(--focus-ring);
+}
+
+button:disabled {
+  cursor: default;
 }
 
 /* =========================
@@ -146,6 +200,41 @@ button {
       161,
       0.72
     );
+
+  animation:
+    liveDotBreath
+    2.8s
+    ease-in-out
+    infinite;
+}
+
+@keyframes liveDotBreath {
+  0%,
+  100% {
+    opacity: 0.82;
+
+    box-shadow:
+      0 0 6px
+      rgba(
+        70,
+        230,
+        161,
+        0.48
+      );
+  }
+
+  50% {
+    opacity: 1;
+
+    box-shadow:
+      0 0 11px
+      rgba(
+        70,
+        230,
+        161,
+        0.78
+      );
+  }
 }
 
 .main-nav {
@@ -197,10 +286,27 @@ button {
   white-space: nowrap;
 
   cursor: pointer;
+
+  transition:
+    color
+    var(--motion-fast)
+    var(--ease-standard),
+    border-color
+    var(--motion-fast)
+    var(--ease-standard),
+    background
+    var(--motion-fast)
+    var(--ease-standard);
 }
 
-.nav-item:hover:not(:disabled) {
-  color: #d7dadd;
+@media (hover: hover) {
+  .nav-item:hover:not(:disabled) {
+    color: #d7dadd;
+  }
+}
+
+.nav-item:active:not(:disabled) {
+  color: #ffffff;
 }
 
 .nav-item.active {
@@ -548,11 +654,33 @@ button {
 
   background: #181a1c;
   color: var(--text);
+
+  transition:
+    border-color
+    var(--motion-fast)
+    var(--ease-standard),
+    background
+    var(--motion-fast)
+    var(--ease-standard),
+    box-shadow
+    var(--motion-fast)
+    var(--ease-standard);
 }
 
 .field input:focus,
 .field select:focus {
-  border-color: #70767a;
+  border-color:
+    rgba(
+      90,
+      168,
+      255,
+      0.52
+    );
+
+  background: #1b1e20;
+
+  box-shadow:
+    var(--focus-ring);
 }
 
 .field input:disabled,
@@ -593,6 +721,23 @@ button {
   font-weight: 700;
 
   cursor: pointer;
+
+  transition:
+    color
+    var(--motion-fast)
+    var(--ease-standard),
+    background
+    var(--motion-fast)
+    var(--ease-standard),
+    border-color
+    var(--motion-fast)
+    var(--ease-standard),
+    box-shadow
+    var(--motion-fast)
+    var(--ease-standard),
+    transform
+    var(--motion-instant)
+    var(--ease-standard);
 }
 
 .profile-button {
@@ -612,6 +757,60 @@ button {
 
 .profile-button:disabled {
   cursor: default;
+}
+
+@media (hover: hover) {
+  .secondary-button:hover:not(:disabled) {
+    border-color:
+      #4a5053;
+
+    background:
+      #222527;
+  }
+
+  .primary-button:hover:not(:disabled) {
+    border-color:
+      #ffffff;
+
+    background:
+      #ffffff;
+  }
+
+  .danger-button:hover:not(:disabled) {
+    border-color:
+      #a95353;
+
+    background:
+      #603030;
+  }
+
+  .archive-button:hover:not(:disabled) {
+    border-color:
+      #aa7547;
+
+    background:
+      #63452e;
+  }
+
+  .profile-button:hover:not(:disabled) {
+    border-color:
+      #4a5053;
+
+    background:
+      #202325;
+
+    color: #d9dcde;
+  }
+}
+
+.secondary-button:active:not(:disabled),
+.primary-button:active:not(:disabled),
+.danger-button:active:not(:disabled),
+.archive-button:active:not(:disabled),
+.profile-button:active:not(:disabled),
+.icon-button:active:not(:disabled) {
+  transform:
+    scale(0.975);
 }
 
 .budget-grid {
@@ -816,6 +1015,20 @@ button {
   line-height: 1;
 
   cursor: pointer;
+
+  transition:
+    color
+    var(--motion-fast)
+    var(--ease-standard),
+    background
+    var(--motion-fast)
+    var(--ease-standard),
+    border-color
+    var(--motion-fast)
+    var(--ease-standard),
+    transform
+    var(--motion-instant)
+    var(--ease-standard);
 }
 
 .manager-menu-button:hover {
@@ -824,6 +1037,11 @@ button {
 
   background: #222527;
   color: white;
+}
+
+.manager-menu-button:active {
+  transform:
+    scale(0.96);
 }
 
 .manager-menu {
@@ -849,6 +1067,32 @@ button {
   box-shadow:
     0 10px 30px
     rgba(0, 0, 0, 0.35);
+
+  transform-origin:
+    top right;
+
+  animation:
+    menuEnter
+    var(--motion-base)
+    var(--ease-out);
+}
+
+@keyframes menuEnter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(-4px)
+      scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
 }
 
 .manager-menu.hidden {
@@ -873,6 +1117,14 @@ button {
   font-size: 10px;
 
   cursor: pointer;
+
+  transition:
+    color
+    var(--motion-fast)
+    var(--ease-standard),
+    background
+    var(--motion-fast)
+    var(--ease-standard);
 }
 
 .manager-menu button:hover {
@@ -897,12 +1149,31 @@ button {
   color: var(--muted);
 
   cursor: pointer;
+
+  transition:
+    color
+    var(--motion-fast)
+    var(--ease-standard),
+    background
+    var(--motion-fast)
+    var(--ease-standard),
+    border-color
+    var(--motion-fast)
+    var(--ease-standard),
+    transform
+    var(--motion-instant)
+    var(--ease-standard);
 }
 
 .add-manager-card:hover {
   color: white;
 
   border-color: #62676a;
+}
+
+.add-manager-card:active {
+  transform:
+    scale(0.985);
 }
 
 .add-manager-icon {
@@ -941,7 +1212,16 @@ button {
 
   cursor: pointer;
 
-  transition: 0.18s;
+  transition:
+    background
+    var(--motion-base)
+    var(--ease-standard),
+    transform
+    var(--motion-base)
+    var(--ease-standard),
+    box-shadow
+    var(--motion-base)
+    var(--ease-standard);
 }
 
 .switch-slider::before {
@@ -960,7 +1240,16 @@ button {
 
   background: white;
 
-  transition: 0.18s;
+  transition:
+    background
+    var(--motion-base)
+    var(--ease-standard),
+    transform
+    var(--motion-base)
+    var(--ease-standard),
+    box-shadow
+    var(--motion-base)
+    var(--ease-standard);
 }
 
 .switch-control
@@ -974,6 +1263,13 @@ input:checked
 + .switch-slider::before {
   transform:
     translateX(18px);
+}
+
+.switch-control
+input:focus-visible
++ .switch-slider {
+  box-shadow:
+    var(--focus-ring);
 }
 
 .switch-control
@@ -1150,6 +1446,13 @@ input:disabled
   place-items: center;
 
   padding: 28px;
+
+  isolation: isolate;
+
+  animation:
+    overlayEnter
+    var(--motion-base)
+    var(--ease-out);
 }
 
 .overlay.hidden {
@@ -1171,6 +1474,11 @@ input:disabled
 
   backdrop-filter:
     blur(4px);
+
+  animation:
+    backdropEnter
+    var(--motion-base)
+    var(--ease-standard);
 }
 
 .overlay-card {
@@ -1199,6 +1507,106 @@ input:disabled
       0,
       0.5
     );
+
+  transform-origin:
+    center;
+
+  animation:
+    dialogEnter
+    var(--motion-base)
+    var(--ease-out);
+
+  will-change:
+    transform,
+    opacity;
+}
+
+.overlay.is-closing {
+  pointer-events: none;
+}
+
+.overlay.is-closing
+.overlay-backdrop {
+  animation:
+    backdropExit
+    var(--motion-exit)
+    var(--ease-standard)
+    forwards;
+}
+
+.overlay.is-closing
+.overlay-card {
+  animation:
+    dialogExit
+    var(--motion-exit)
+    var(--ease-standard)
+    forwards;
+}
+
+@keyframes overlayEnter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes backdropEnter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes backdropExit {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes dialogEnter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(8px)
+      scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+@keyframes dialogExit {
+  from {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+
+  to {
+    opacity: 0;
+
+    transform:
+      translateY(5px)
+      scale(0.99);
+  }
 }
 
 .small-overlay-card {
@@ -1244,6 +1652,30 @@ input:disabled
   color: white;
 
   cursor: pointer;
+
+  transition:
+    color
+    var(--motion-fast)
+    var(--ease-standard),
+    background
+    var(--motion-fast)
+    var(--ease-standard),
+    border-color
+    var(--motion-fast)
+    var(--ease-standard),
+    transform
+    var(--motion-instant)
+    var(--ease-standard);
+}
+
+@media (hover: hover) {
+  .icon-button:hover:not(:disabled) {
+    border-color:
+      #50565a;
+
+    background:
+      #242729;
+  }
 }
 
 .recap-grid {
@@ -1625,5 +2057,37 @@ input:disabled
 
   .nav-item {
     font-size: 9px;
+  }
+}
+
+/* =========================
+   ACCESSIBILITY / MOTION
+========================= */
+
+@media (
+  prefers-reduced-motion:
+  reduce
+) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior:
+      auto !important;
+
+    animation-duration:
+      0.001ms !important;
+
+    animation-iteration-count:
+      1 !important;
+
+    transition-duration:
+      0.001ms !important;
+
+    transition-delay:
+      0ms !important;
+  }
+
+  .topbar-live-dot {
+    animation: none;
   }
 }

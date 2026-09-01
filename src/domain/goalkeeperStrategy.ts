@@ -3,38 +3,33 @@ import type {
 } from '../app/state'
 
 import {
-  calculateGoalkeeperCoverage,
-} from '../data/goalkeeperCalendar'
-
-import type {
-  GoalkeeperCoverage,
-} from '../data/goalkeeperCalendar'
-
-import {
-  getGoalkeeperHierarchy,
-} from '../data/goalkeeperHierarchy'
-
-import type {
-  GoalkeeperHierarchy,
-} from '../data/goalkeeperHierarchy'
-
-import {
-  getSaggiForPlayer,
-} from '../data/saggi'
-
-import {
   getOwnerManagerId,
   getOwnerRolePlayers,
-  isPlayerAssigned,
 } from './auctionContext'
 
 import {
-  calculatePriceAdvice,
+  calculateBaseAuctionValue,
+  calculateGoalkeeperPriceAdviceFromPlans,
 } from './priceAdvice'
 
 import type {
   PriceAdvice,
 } from './priceAdvice'
+
+import {
+  DEFAULT_GOALKEEPER_STRATEGY_PARAMETERS,
+  getAvailableGoalkeepers,
+  getGoalkeeperPlayerHierarchy,
+  getGoalkeeperSaggiProfile,
+  getValidGoalkeeperPlans,
+} from './goalkeeperPlanning'
+
+import type {
+  GoalkeeperPlanningPlan,
+  GoalkeeperSaggiProfile,
+  GoalkeeperStrategyParameters,
+  GoalkeeperStrategyType,
+} from './goalkeeperPlanning'
 
 import type {
   ObjectivePriority,
@@ -50,73 +45,25 @@ import type {
   RecommendationResult,
 } from './recommendation'
 
+export {
+  DEFAULT_GOALKEEPER_STRATEGY_PARAMETERS,
+  getGoalkeeperSaggiProfile,
+} from './goalkeeperPlanning'
+
+export type {
+  GoalkeeperSaggiProfile,
+  GoalkeeperStrategyParameters,
+  GoalkeeperStrategyType,
+  GoalkeeperTier,
+} from './goalkeeperPlanning'
+
 /* =========================
    TYPES
 ========================= */
 
-export type GoalkeeperTier =
-  | 'top'
-  | 'semitop'
-  | 'second'
-  | 'other'
-  | 'unknown'
-
-export type GoalkeeperStrategyType =
-  | 'monoclub'
-  | 'top-pair'
-  | 'rotation'
-
-export interface GoalkeeperStrategyParameters {
-  /*
-    PARAMETRI CORRENTI,
-    NON DEFINITIVI.
-
-    Fascia_Valore dei Saggi:
-    5 = livello massimo,
-    1 = livello minimo.
-
-    Le soglie potranno essere
-    cambiate dopo i test beta.
-  */
-  topMinFascia: number
-  semitopMinFascia: number
-  secondTierMinFascia: number
-}
-
-export const DEFAULT_GOALKEEPER_STRATEGY_PARAMETERS:
-  GoalkeeperStrategyParameters = {
-    topMinFascia:
-      5,
-
-    semitopMinFascia:
-      4,
-
-    secondTierMinFascia:
-      3,
-  }
-
-export interface GoalkeeperSaggiProfile {
-  medianFascia?: number
-  tier: GoalkeeperTier
-  samples: number
-}
-
-export interface GoalkeeperStrategyPlan {
-  strategy:
-    GoalkeeperStrategyType
-
-  players:
-    Player[]
-
-  teams:
-    string[]
-
-  coverage:
-    GoalkeeperCoverage | null
-
+export interface GoalkeeperStrategyPlan
+  extends GoalkeeperPlanningPlan {
   projectedCost?: number
-
-  saggiStrength?: number
 }
 
 interface GoalkeeperCandidateData {
@@ -137,7 +84,7 @@ interface GoalkeeperCandidateData {
 }
 
 /* =========================
-   GENERIC HELPERS
+   HELPERS
 ========================= */
 
 function clamp(
@@ -152,177 +99,6 @@ function clamp(
     ),
     max,
   )
-}
-
-function median(
-  values: number[],
-): number | undefined {
-  const valid =
-    values
-      .filter(
-        (value) =>
-          Number.isFinite(
-            value,
-          ),
-      )
-      .sort(
-        (
-          first,
-          second,
-        ) =>
-          first -
-          second,
-      )
-
-  if (!valid.length) {
-    return undefined
-  }
-
-  const middle =
-    Math.floor(
-      valid.length /
-      2,
-    )
-
-  if (
-    valid.length %
-      2 ===
-    1
-  ) {
-    return valid[
-      middle
-    ]
-  }
-
-  return (
-    valid[
-      middle - 1
-    ] +
-    valid[
-      middle
-    ]
-  ) / 2
-}
-
-function getUniqueTeams(
-  players: Player[],
-): string[] {
-  return Array.from(
-    new Set(
-      players.map(
-        (player) =>
-          player.team,
-      ),
-    ),
-  )
-}
-
-function hasPlayer(
-  players: Player[],
-  playerId: string,
-): boolean {
-  return players.some(
-    (player) =>
-      player.id ===
-      playerId,
-  )
-}
-
-/* =========================
-   SAGGI
-========================= */
-
-export function getGoalkeeperSaggiProfile(
-  playerId: string,
-  parameters:
-    GoalkeeperStrategyParameters =
-      DEFAULT_GOALKEEPER_STRATEGY_PARAMETERS,
-): GoalkeeperSaggiProfile {
-  const values =
-    getSaggiForPlayer(
-      playerId,
-    )
-      .map(
-        (record) =>
-          record.fasciaValore,
-      )
-      .filter(
-        (
-          value,
-        ): value is number =>
-          value !== undefined &&
-          Number.isFinite(
-            value,
-          ) &&
-          value >= 1 &&
-          value <= 5,
-      )
-
-  const medianFascia =
-    median(
-      values,
-    )
-
-  if (
-    medianFascia === undefined
-  ) {
-    return {
-      tier:
-        'unknown',
-
-      samples:
-        values.length,
-    }
-  }
-
-  if (
-    medianFascia >=
-    parameters.topMinFascia
-  ) {
-    return {
-      medianFascia,
-      tier:
-        'top',
-      samples:
-        values.length,
-    }
-  }
-
-  if (
-    medianFascia >=
-    parameters
-      .semitopMinFascia
-  ) {
-    return {
-      medianFascia,
-      tier:
-        'semitop',
-      samples:
-        values.length,
-    }
-  }
-
-  if (
-    medianFascia >=
-    parameters
-      .secondTierMinFascia
-  ) {
-    return {
-      medianFascia,
-      tier:
-        'second',
-      samples:
-        values.length,
-    }
-  }
-
-  return {
-    medianFascia,
-    tier:
-      'other',
-    samples:
-      values.length,
-  }
 }
 
 /* =========================
@@ -395,16 +171,15 @@ function calculateSustainability(
     [
       advice.roleLimit,
       advice.financialLimit,
-    ]
-      .filter(
-        (
+    ].filter(
+      (
+        value,
+      ): value is number =>
+        value !== undefined &&
+        Number.isFinite(
           value,
-        ): value is number =>
-          value !== undefined &&
-          Number.isFinite(
-            value,
-          ),
-      )
+        ),
+    )
 
   if (
     cost === undefined ||
@@ -431,11 +206,11 @@ function calculateSustainability(
   return clamp(
     parameters
       .sustainabilityIntercept -
-    (
-      parameters
-        .sustainabilitySlope *
-      ratio
-    ),
+      (
+        parameters
+          .sustainabilitySlope *
+        ratio
+      ),
     0,
     1,
   )
@@ -464,6 +239,15 @@ function isFinanciallyEligible(
     return true
   }
 
+  /*
+    Anche per P l'unica
+    esclusione economica hard
+    è il limite finanziario
+    globale.
+
+    Il limite strategico P
+    rimane soft.
+  */
   return (
     cost <=
     financialLimit
@@ -471,49 +255,7 @@ function isFinanciallyEligible(
 }
 
 /* =========================
-   HIERARCHY HELPERS
-========================= */
-
-function getHierarchy(
-  player: Player,
-):
-  | GoalkeeperHierarchy
-  | undefined {
-  const record =
-    getGoalkeeperHierarchy(
-      player.id,
-    )
-
-  if (
-    !record ||
-    record.team !==
-      player.team
-  ) {
-    return undefined
-  }
-
-  return record.hierarchy
-}
-
-function findTeamGoalkeeper(
-  players: Player[],
-  team: string,
-  hierarchy:
-    GoalkeeperHierarchy,
-): Player | undefined {
-  return players.find(
-    (player) =>
-      player.team ===
-        team &&
-      getHierarchy(
-        player,
-      ) ===
-        hierarchy,
-  )
-}
-
-/* =========================
-   COST
+   PROJECTED PLAN COST
 ========================= */
 
 function getProjectedPlayerCost(
@@ -543,7 +285,15 @@ function getProjectedPlayerCost(
     }
   }
 
-  return calculatePriceAdvice(
+  /*
+    Usiamo soltanto il valore-base
+    di mercato.
+
+    NON richiamiamo calculatePriceAdvice()
+    qui, evitando ricorsioni e la
+    ricostruzione ripetuta dei piani P.
+  */
+  return calculateBaseAuctionValue(
     state,
     player,
     allPlayers,
@@ -579,506 +329,31 @@ function calculateProjectedTrioCost(
 
   return (
     values as number[]
-  ).reduce<number>(
+  ).reduce(
     (
       total,
       value,
     ) =>
-      total +
-      value,
+      total + value,
     0,
   )
 }
 
-/* =========================
-   PLAN QUALITY
-========================= */
-
-function calculatePlanSaggiStrength(
-  players: Player[],
-  parameters:
-    GoalkeeperStrategyParameters,
-): number | undefined {
-  const p1Profiles =
-    players
-      .filter(
-        (player) =>
-          getHierarchy(
-            player,
-          ) === 1,
-      )
-      .map(
-        (player) =>
-          getGoalkeeperSaggiProfile(
-            player.id,
-            parameters,
-          )
-            .medianFascia,
-      )
-      .filter(
-        (
-          value,
-        ): value is number =>
-          value !== undefined,
-      )
-
-  return median(
-    p1Profiles,
-  )
-}
-
-/* =========================
-   STRATEGY 1
-   MONOCLUB
-========================= */
-
-function buildMonoclubPlan(
+function enrichPlan(
   state: AppState,
-  trio: Player[],
+  plan: GoalkeeperPlanningPlan,
   allPlayers: Player[],
-  parameters:
-    GoalkeeperStrategyParameters,
-):
-  | GoalkeeperStrategyPlan
-  | null {
-  const teams =
-    getUniqueTeams(
-      trio,
-    )
-
-  if (
-    teams.length !== 1
-  ) {
-    return null
-  }
-
-  const team =
-    teams[0]
-
-  const p1 =
-    findTeamGoalkeeper(
-      trio,
-      team,
-      1,
-    )
-
-  const p2 =
-    findTeamGoalkeeper(
-      trio,
-      team,
-      2,
-    )
-
-  const p3 =
-    findTeamGoalkeeper(
-      trio,
-      team,
-      3,
-    )
-
-  if (
-    !p1 ||
-    !p2 ||
-    !p3
-  ) {
-    return null
-  }
-
-  const profile =
-    getGoalkeeperSaggiProfile(
-      p1.id,
-      parameters,
-    )
-
-  /*
-    Strategia 1:
-    il P1 deve essere Top.
-
-    P2 e P3 non ricevono
-    penalità qualitative.
-  */
-  if (
-    profile.tier !==
-      'top'
-  ) {
-    return null
-  }
-
+): GoalkeeperStrategyPlan {
   return {
-    strategy:
-      'monoclub',
-
-    players:
-      trio,
-
-    teams,
-
-    coverage:
-      calculateGoalkeeperCoverage(
-        [
-          team,
-        ],
-      ),
+    ...plan,
 
     projectedCost:
       calculateProjectedTrioCost(
         state,
-        trio,
+        plan.players,
         allPlayers,
       ),
-
-    saggiStrength:
-      profile.medianFascia,
   }
-}
-
-/* =========================
-   STRATEGY 2
-   TOP / SEMITOP + P2
-   + P1 ABBINATO
-========================= */
-
-function buildTopPairPlan(
-  state: AppState,
-  trio: Player[],
-  allPlayers: Player[],
-  parameters:
-    GoalkeeperStrategyParameters,
-):
-  | GoalkeeperStrategyPlan
-  | null {
-  const teams =
-    getUniqueTeams(
-      trio,
-    )
-
-  if (
-    teams.length !== 2
-  ) {
-    return null
-  }
-
-  const counts =
-    new Map<
-      string,
-      number
-    >()
-
-  trio.forEach(
-    (player) => {
-      counts.set(
-        player.team,
-        (
-          counts.get(
-            player.team,
-          ) ??
-          0
-        ) + 1,
-      )
-    },
-  )
-
-  const anchorTeam =
-    Array.from(
-      counts.entries(),
-    )
-      .find(
-        (
-          entry,
-        ) =>
-          entry[1] === 2,
-      )
-      ?.[0]
-
-  const pairedTeam =
-    Array.from(
-      counts.entries(),
-    )
-      .find(
-        (
-          entry,
-        ) =>
-          entry[1] === 1,
-      )
-      ?.[0]
-
-  if (
-    !anchorTeam ||
-    !pairedTeam
-  ) {
-    return null
-  }
-
-  const anchorP1 =
-    findTeamGoalkeeper(
-      trio,
-      anchorTeam,
-      1,
-    )
-
-  const anchorP2 =
-    findTeamGoalkeeper(
-      trio,
-      anchorTeam,
-      2,
-    )
-
-  const pairedP1 =
-    findTeamGoalkeeper(
-      trio,
-      pairedTeam,
-      1,
-    )
-
-  if (
-    !anchorP1 ||
-    !anchorP2 ||
-    !pairedP1
-  ) {
-    return null
-  }
-
-  const anchorProfile =
-    getGoalkeeperSaggiProfile(
-      anchorP1.id,
-      parameters,
-    )
-
-  if (
-    anchorProfile.tier !==
-      'top' &&
-    anchorProfile.tier !==
-      'semitop'
-  ) {
-    return null
-  }
-
-  return {
-    strategy:
-      'top-pair',
-
-    players:
-      trio,
-
-    teams:
-      [
-        anchorTeam,
-        pairedTeam,
-      ],
-
-    coverage:
-      calculateGoalkeeperCoverage(
-        [
-          anchorTeam,
-          pairedTeam,
-        ],
-      ),
-
-    projectedCost:
-      calculateProjectedTrioCost(
-        state,
-        trio,
-        allPlayers,
-      ),
-
-    saggiStrength:
-      calculatePlanSaggiStrength(
-        trio,
-        parameters,
-      ),
-  }
-}
-
-/* =========================
-   STRATEGY 3
-   TRE P1 SECONDA FASCIA
-========================= */
-
-function buildRotationPlan(
-  state: AppState,
-  trio: Player[],
-  allPlayers: Player[],
-  parameters:
-    GoalkeeperStrategyParameters,
-):
-  | GoalkeeperStrategyPlan
-  | null {
-  const teams =
-    getUniqueTeams(
-      trio,
-    )
-
-  if (
-    teams.length !== 3
-  ) {
-    return null
-  }
-
-  const allP1 =
-    trio.every(
-      (player) =>
-        getHierarchy(
-          player,
-        ) === 1,
-    )
-
-  if (!allP1) {
-    return null
-  }
-
-  const allSecondTier =
-    trio.every(
-      (player) =>
-        getGoalkeeperSaggiProfile(
-          player.id,
-          parameters,
-        ).tier ===
-          'second',
-    )
-
-  if (
-    !allSecondTier
-  ) {
-    return null
-  }
-
-  return {
-    strategy:
-      'rotation',
-
-    players:
-      trio,
-
-    teams,
-
-    coverage:
-      calculateGoalkeeperCoverage(
-        teams,
-      ),
-
-    projectedCost:
-      calculateProjectedTrioCost(
-        state,
-        trio,
-        allPlayers,
-      ),
-
-    saggiStrength:
-      calculatePlanSaggiStrength(
-        trio,
-        parameters,
-      ),
-  }
-}
-
-/* =========================
-   TRIO EVALUATION
-========================= */
-
-function evaluateTrio(
-  state: AppState,
-  trio: Player[],
-  allPlayers: Player[],
-  parameters:
-    GoalkeeperStrategyParameters,
-): GoalkeeperStrategyPlan[] {
-  if (
-    trio.length !== 3
-  ) {
-    return []
-  }
-
-  const plans:
-    GoalkeeperStrategyPlan[] =
-    []
-
-  const monoclub =
-    buildMonoclubPlan(
-      state,
-      trio,
-      allPlayers,
-      parameters,
-    )
-
-  if (monoclub) {
-    plans.push(
-      monoclub,
-    )
-  }
-
-  const topPair =
-    buildTopPairPlan(
-      state,
-      trio,
-      allPlayers,
-      parameters,
-    )
-
-  if (topPair) {
-    plans.push(
-      topPair,
-    )
-  }
-
-  const rotation =
-    buildRotationPlan(
-      state,
-      trio,
-      allPlayers,
-      parameters,
-    )
-
-  if (rotation) {
-    plans.push(
-      rotation,
-    )
-  }
-
-  return plans
-}
-
-/* =========================
-   COMBINATIONS
-========================= */
-
-function buildTrios(
-  players: Player[],
-): Player[][] {
-  const result:
-    Player[][] = []
-
-  for (
-    let first = 0;
-    first <
-      players.length - 2;
-    first += 1
-  ) {
-    for (
-      let second =
-        first + 1;
-      second <
-        players.length - 1;
-      second += 1
-    ) {
-      for (
-        let third =
-          second + 1;
-        third <
-          players.length;
-        third += 1
-      ) {
-        result.push(
-          [
-            players[first],
-            players[second],
-            players[third],
-          ],
-        )
-      }
-    }
-  }
-
-  return result
 }
 
 /* =========================
@@ -1094,14 +369,12 @@ function comparePlans(
   /*
     Nessun punteggio pesato.
 
-    Ordine corrente:
+    Ordine ALPHA corrente:
+
     1. qualità Saggi dei P1
     2. meno buchi calendario
     3. più giornate favorevoli
     4. minor costo stimato
-
-    È una scelta ALPHA e resta
-    configurabile/rivedibile.
   */
 
   const saggiDifference =
@@ -1251,7 +524,7 @@ function buildGoalkeeperReasons(
 }
 
 /* =========================
-   GENERIC CANDIDATE
+   CANDIDATE
 ========================= */
 
 function buildRecommendationCandidate(
@@ -1262,22 +535,29 @@ function buildRecommendationCandidate(
     RecommendationParameters,
   strategyParameters:
     GoalkeeperStrategyParameters,
-  plans:
-    GoalkeeperStrategyPlan[],
+  planningPlans:
+    GoalkeeperPlanningPlan[],
 ): GoalkeeperCandidateData {
-  const sortedPlans =
-    [
-      ...plans,
-    ].sort(
-      comparePlans,
-    )
+  const enrichedPlans =
+    planningPlans
+      .map(
+        (plan) =>
+          enrichPlan(
+            state,
+            plan,
+            allPlayers,
+          ),
+      )
+      .sort(
+        comparePlans,
+      )
 
   const bestPlan =
-    sortedPlans[0]
+    enrichedPlans[0]
 
   const strategies =
     new Set(
-      plans.map(
+      planningPlans.map(
         (plan) =>
           plan.strategy,
       ),
@@ -1292,11 +572,20 @@ function buildRecommendationCandidate(
       strategyParameters,
     )
 
+  /*
+    Il prezzo P usa gli stessi
+    piani che sono già stati
+    calcolati dal ranking.
+
+    Evitiamo quindi di enumerare
+    di nuovo tutte le terne.
+  */
   const advice =
-    calculatePriceAdvice(
+    calculateGoalkeeperPriceAdviceFromPlans(
       state,
       player,
       allPlayers,
+      planningPlans,
     )
 
   const objectivePriority =
@@ -1312,7 +601,7 @@ function buildRecommendationCandidate(
     )
 
   const hierarchy =
-    getHierarchy(
+    getGoalkeeperPlayerHierarchy(
       player,
     )
 
@@ -1332,92 +621,91 @@ function buildRecommendationCandidate(
 
   /*
     Nei portieri non applichiamo
-    la penalità di concentrazione
-    della rosa.
+    penalità di concentrazione.
 
-    Le strategie 1 e 2 richiedono
+    Monoclub e Top-pair richiedono
     esplicitamente portieri della
     stessa squadra reale.
   */
   const candidate:
     RecommendationCandidate = {
-    player,
+      player,
 
-    /*
-      Per P lo score esprime soltanto
-      il valore di opzione strategica:
-      1 strategia = 0.33
-      2 strategie = 0.67
-      3 strategie = 1.00
+      /*
+        Score P = valore di opzione
+        strategica.
 
-      L'ordinamento finale utilizza
-      anche obiettivi e qualità del
-      miglior piano.
-    */
-    score:
-      openStrategies /
-      3,
+        1 strategia = 1/3
+        2 strategie = 2/3
+        3 strategie = 1
 
-    quality:
-      saggiProfile
-        .medianFascia ===
-      undefined
-        ? undefined
-        : clamp(
-            saggiProfile
-              .medianFascia /
-            5,
-            0,
-            1,
-          ),
+        L'ordinamento AUTO non usa
+        una somma pesata D/C/A.
+      */
+      score:
+        openStrategies / 3,
 
-    needFit:
-      openStrategies /
-      3,
+      quality:
+        saggiProfile
+          .medianFascia ===
+          undefined
+          ? undefined
+          : clamp(
+              saggiProfile
+                .medianFascia /
+                5,
+              0,
+              1,
+            ),
 
-    sustainability:
-      calculateSustainability(
-        advice,
-        recommendationParameters,
-      ),
+      needFit:
+        openStrategies / 3,
 
-    opportunity:
-      undefined,
+      sustainability:
+        calculateSustainability(
+          advice,
+          recommendationParameters,
+        ),
 
-    objectiveFit,
+      opportunity:
+        undefined,
 
-    objectivePriority,
+      objectiveFit,
 
-    teamFactor:
-      1,
+      objectivePriority,
 
-    targetSlot:
-      undefined,
+      teamFactor: 1,
 
-    playerSlot:
-      hierarchy,
+      targetSlot:
+        undefined,
 
-    sameTeamCount,
+      playerSlot:
+        hierarchy,
 
-    sameTeamRoleCount:
       sameTeamCount,
 
-    priceAdvice:
-      advice,
+      sameTeamRoleCount:
+        sameTeamCount,
 
-    reasons:
-      [],
-  }
+      priceAdvice:
+        advice,
+
+      reasons: [],
+    }
 
   const data:
     GoalkeeperCandidateData = {
-    candidate,
-    plans:
-      sortedPlans,
-    bestPlan,
-    openStrategies,
-    saggiProfile,
-  }
+      candidate,
+
+      plans:
+        enrichedPlans,
+
+      bestPlan,
+
+      openStrategies,
+
+      saggiProfile,
+    }
 
   candidate.reasons =
     buildGoalkeeperReasons(
@@ -1440,14 +728,14 @@ function compareCandidates(
   /*
     Ordine AUTO corrente:
 
-    1. mantiene aperte più strategie
+    1. più strategie ancora aperte
     2. priorità Obiettivi
-    3. qualità del miglior piano
-    4. qualità Saggi del candidato
-    5. iCà come ultimo tie-break
+    3. qualità miglior piano
+    4. qualità Saggi candidato
+    5. iCà tie-break
 
-    Non usiamo una somma di pesi
-    arbitrari.
+    Nessuna somma di pesi
+    arbitrari per P.
   */
 
   if (
@@ -1554,14 +842,11 @@ export function calculateGoalkeeperRecommendation(
 
   if (!ownerId) {
     return {
-      role:
-        'P',
+      role: 'P',
 
-      alternatives:
-        [],
+      alternatives: [],
 
-      ranked:
-        [],
+      ranked: [],
     }
   }
 
@@ -1572,24 +857,35 @@ export function calculateGoalkeeperRecommendation(
       'P',
     )
 
-  /*
-    Rosa P completa.
-  */
   if (
-    ownerGoalkeepers.length >=
-    3
+    ownerGoalkeepers.length >= 3
   ) {
     return {
-      role:
-        'P',
+      role: 'P',
 
-      alternatives:
-        [],
+      alternatives: [],
 
-      ranked:
-        [],
+      ranked: [],
     }
   }
+
+  /*
+    Una sola costruzione delle
+    terne valide per tutto il
+    ranking AUTO.
+  */
+  const allPlans =
+    getValidGoalkeeperPlans(
+      state,
+      allPlayers,
+      undefined,
+      strategyParameters,
+    )
+
+  const discardedIds =
+    new Set(
+      state.recommendedDiscards,
+    )
 
   const ownerIds =
     new Set(
@@ -1599,90 +895,10 @@ export function calculateGoalkeeperRecommendation(
       ),
     )
 
-  /*
-    Pool utilizzabile:
-    - portieri già nostri
-    - portieri ancora liberi
-
-    Escludiamo chi è stato
-    acquistato dagli avversari.
-  */
   const availableGoalkeepers =
-    allPlayers.filter(
-      (player) => {
-        if (
-          player.role !==
-          'P'
-        ) {
-          return false
-        }
-
-        if (
-          ownerIds.has(
-            player.id,
-          )
-        ) {
-          return true
-        }
-
-        return !isPlayerAssigned(
-          state,
-          player.id,
-        )
-      },
-    )
-
-  if (
-    availableGoalkeepers.length <
-    3
-  ) {
-    return {
-      role:
-        'P',
-
-      alternatives:
-        [],
-
-      ranked:
-        [],
-    }
-  }
-
-  /*
-    Una terna futura è accettabile
-    solo se contiene TUTTI i
-    portieri già acquistati.
-  */
-  const validTrios =
-    buildTrios(
-      availableGoalkeepers,
-    )
-      .filter(
-        (trio) =>
-          ownerGoalkeepers.every(
-            (owned) =>
-              hasPlayer(
-                trio,
-                owned.id,
-              ),
-          ),
-      )
-
-  const plans:
-    GoalkeeperStrategyPlan[] =
-    validTrios.flatMap(
-      (trio) =>
-        evaluateTrio(
-          state,
-          trio,
-          allPlayers,
-          strategyParameters,
-        ),
-    )
-
-  const discardedIds =
-    new Set(
-      state.recommendedDiscards,
+    getAvailableGoalkeepers(
+      state,
+      allPlayers,
     )
 
   const candidateData =
@@ -1699,11 +915,12 @@ export function calculateGoalkeeperRecommendation(
       .map(
         (player) => {
           const playerPlans =
-            plans.filter(
+            allPlans.filter(
               (plan) =>
-                hasPlayer(
-                  plan.players,
-                  player.id,
+                plan.players.some(
+                  (goalkeeper) =>
+                    goalkeeper.id ===
+                    player.id,
                 ),
             )
 
@@ -1718,18 +935,21 @@ export function calculateGoalkeeperRecommendation(
         },
       )
       /*
-        Se un portiere non conduce
-        ad alcuna terna valida,
-        non entra nel ranking AUTO.
+        Nessun piano valido:
+        escluso soltanto dal ranking
+        automatico.
 
-        Resta comunque libero e
+        Il giocatore resta libero e
         selezionabile manualmente.
       */
       .filter(
         (data) =>
-          data.openStrategies >
-          0,
+          data.openStrategies > 0,
       )
+      /*
+        L'unico hard cap economico
+        resta quello finanziario.
+      */
       .filter(
         (data) =>
           isFinanciallyEligible(
@@ -1759,8 +979,7 @@ export function calculateGoalkeeperRecommendation(
     )
 
   return {
-    role:
-      'P',
+    role: 'P',
 
     recommended,
 

@@ -9,6 +9,10 @@ import type {
   AppState,
 } from '../app/state'
 
+import {
+  runOverlayExit,
+} from '../app/motion'
+
 import type {
   Player,
   PlayerRole,
@@ -2000,10 +2004,15 @@ export function bindPlayersEvents(
 
   const closePreview =
     (): void => {
-      previewPlayerId =
-        null
+      runOverlayExit(
+        '#playerDetailOverlay',
+        () => {
+          previewPlayerId =
+            null
 
-      actions.onRender()
+          actions.onRender()
+        },
+      )
     }
 
   document

@@ -18,6 +18,19 @@ import {
   ROSTER_SLOT_LIMITS,
 } from './auctionContext'
 
+import {
+  calculateGoalkeeperCompletionReserve,
+  calculateGoalkeeperEconomics,
+} from './goalkeeperEconomics'
+
+import {
+  getValidGoalkeeperPlans,
+} from './goalkeeperPlanning'
+
+import type {
+  GoalkeeperPlanningPlan,
+} from './goalkeeperPlanning'
+
 import type {
   Player,
   PlayerRole,
@@ -134,6 +147,27 @@ export interface PriceAdvice {
   globalReserve?: number
 }
 
+export interface BaseAuctionValueData {
+  pmaCredits?: number
+
+  auctionMarketFactor:
+    number
+
+  auctionMarketSource:
+    AuctionMarketSource
+
+  auctionMarketSampleSize:
+    number
+
+  roleMarketSampleSize:
+    number
+
+  overallMarketSampleSize:
+    number
+
+  baseAuctionValue?: number
+}
+
 function clamp(
   value: number,
   min: number,
@@ -242,8 +276,7 @@ function calculateAuctionMarket(
 
   if (
     roleRatios.length >=
-      parameters
-        .sameRoleMinSample &&
+      parameters.sameRoleMinSample &&
     roleMedian !== undefined
   ) {
     return {
@@ -266,10 +299,8 @@ function calculateAuctionMarket(
 
   if (
     overallRatios.length >=
-      parameters
-        .sameRoleMinSample &&
-    overallMedian !==
-      undefined
+      parameters.sameRoleMinSample &&
+    overallMedian !== undefined
   ) {
     return {
       factor:
@@ -311,8 +342,7 @@ function calculateAuctionMarket(
   }
 
   if (
-    overallMedian !==
-    undefined
+    overallMedian !== undefined
   ) {
     return {
       factor:
@@ -347,6 +377,62 @@ function calculateAuctionMarket(
 }
 
 /* =========================
+   BASE AUCTION VALUE
+========================= */
+
+export function calculateBaseAuctionValue(
+  state: AppState,
+  player: Player,
+  allPlayers: Player[],
+  parameters:
+    PriceAdviceParameters =
+      DEFAULT_PRICE_ADVICE_PARAMETERS,
+): BaseAuctionValueData {
+  const pmaCredits =
+    getPmaCredits(
+      player,
+      state.initialCredits,
+    )
+
+  const market =
+    calculateAuctionMarket(
+      state,
+      player,
+      allPlayers,
+      parameters,
+    )
+
+  const baseAuctionValue =
+    pmaCredits === undefined
+      ? undefined
+      : (
+          pmaCredits *
+          market.factor
+        )
+
+  return {
+    pmaCredits,
+
+    auctionMarketFactor:
+      market.factor,
+
+    auctionMarketSource:
+      market.source,
+
+    auctionMarketSampleSize:
+      market.sampleSize,
+
+    roleMarketSampleSize:
+      market.roleSampleSize,
+
+    overallMarketSampleSize:
+      market.overallSampleSize,
+
+    baseAuctionValue,
+  }
+}
+
+/* =========================
    DYNAMIC ROLE TARGETS
 ========================= */
 
@@ -359,30 +445,22 @@ function getBaseRoleTargets(
   return {
     P:
       state.initialCredits *
-      state
-        .budgetDistribution
-        .P /
+      state.budgetDistribution.P /
       100,
 
     D:
       state.initialCredits *
-      state
-        .budgetDistribution
-        .D /
+      state.budgetDistribution.D /
       100,
 
     C:
       state.initialCredits *
-      state
-        .budgetDistribution
-        .C /
+      state.budgetDistribution.C /
       100,
 
     A:
       state.initialCredits *
-      state
-        .budgetDistribution
-        .A /
+      state.budgetDistribution.A /
       100,
   }
 }
@@ -558,6 +636,7 @@ function getAdjustedRoleTargets(
 
 /* =========================
    STRATEGIC SLOT QUOTAS
+   D / C / A
 ========================= */
 
 function getRoleStrategicQuotas(
@@ -649,6 +728,7 @@ function getRoleStrategicQuotas(
 
 /* =========================
    ROLE RESERVE
+   D / C / A
 ========================= */
 
 function getRoleReserve(
@@ -705,10 +785,10 @@ function getRoleReserve(
 }
 
 /* =========================
-   GLOBAL RESERVE
+   NON-GOALKEEPER RESERVE
 ========================= */
 
-function calculateGlobalReserve(
+function calculateNonGoalkeeperGlobalReserve(
   state: AppState,
   player: Player,
   allPlayers: Player[],
@@ -724,7 +804,14 @@ function calculateGlobalReserve(
 
   let remainingSlotCount = 0
 
-  ROLE_ORDER.forEach(
+  const roles:
+    PlayerRole[] = [
+      'D',
+      'C',
+      'A',
+    ]
+
+  roles.forEach(
     (role) => {
       const roleReserve =
         getRoleReserve(
@@ -758,8 +845,63 @@ function calculateGlobalReserve(
   return Math.max(
     minimumReserve,
     rawReserve *
+      parameters.reserveFactor,
+  )
+}
+
+/* =========================
+   GLOBAL RESERVE D/C/A
+
+   P viene calcolato con il
+   planning dedicato.
+========================= */
+
+function calculateGlobalReserveForOutfieldPlayer(
+  state: AppState,
+  player: Player,
+  allPlayers: Player[],
+  adjustedTargets:
+    Record<
+      PlayerRole,
+      number
+    >,
+  parameters:
+    PriceAdviceParameters,
+): number {
+  const nonGoalkeeperReserve =
+    calculateNonGoalkeeperGlobalReserve(
+      state,
+      player,
+      allPlayers,
+      adjustedTargets,
+      parameters,
+    )
+
+  const goalkeeperPlans =
+    getValidGoalkeeperPlans(
+      state,
+      allPlayers,
+    )
+
+  const goalkeeperReserve =
+    calculateGoalkeeperCompletionReserve(
+      state,
+      allPlayers,
+      goalkeeperPlans,
       parameters
-        .reserveFactor,
+        .minimumFutureSlotCost,
+      (goalkeeper) =>
+        calculateBaseAuctionValue(
+          state,
+          goalkeeper,
+          allPlayers,
+          parameters,
+        ).baseAuctionValue,
+    )
+
+  return (
+    nonGoalkeeperReserve +
+    goalkeeperReserve
   )
 }
 
@@ -795,8 +937,7 @@ function calculateScarcity(
   const rawFactor =
     1 +
     (
-      parameters
-        .scarcityK *
+      parameters.scarcityK *
       Math.max(
         0,
         pressure - 1,
@@ -871,6 +1012,321 @@ function calculateSoftCeiling(
 }
 
 /* =========================
+   BINDING CONSTRAINT
+========================= */
+
+function getBindingConstraints(
+  recommendedCeiling:
+    number | undefined,
+  financialLimit:
+    number | undefined,
+  softRecommendedCeiling:
+    number | undefined,
+  valueLimit:
+    number | undefined,
+  roleLimit:
+    number | undefined,
+): PriceConstraint[] {
+  const result:
+    PriceConstraint[] = []
+
+  if (
+    recommendedCeiling ===
+      undefined
+  ) {
+    return result
+  }
+
+  if (
+    financialLimit !==
+      undefined &&
+    recommendedCeiling ===
+      financialLimit &&
+    (
+      softRecommendedCeiling ===
+        undefined ||
+      financialLimit <=
+        softRecommendedCeiling
+    )
+  ) {
+    result.push(
+      'financial',
+    )
+
+    return result
+  }
+
+  if (
+    valueLimit !== undefined &&
+    roleLimit !== undefined
+  ) {
+    result.push(
+      valueLimit <= roleLimit
+        ? 'value'
+        : 'role',
+    )
+
+    return result
+  }
+
+  if (
+    valueLimit !== undefined
+  ) {
+    result.push(
+      'value',
+    )
+
+    return result
+  }
+
+  if (
+    roleLimit !== undefined
+  ) {
+    result.push(
+      'role',
+    )
+  }
+
+  return result
+}
+
+/* =========================
+   GOALKEEPER PRICE ADVICE
+========================= */
+
+function calculateGoalkeeperPriceAdviceInternal(
+  state: AppState,
+  player: Player,
+  allPlayers: Player[],
+  parameters:
+    PriceAdviceParameters,
+  precomputedPlans?:
+    GoalkeeperPlanningPlan[],
+): PriceAdvice {
+  const base =
+    calculateBaseAuctionValue(
+      state,
+      player,
+      allPlayers,
+      parameters,
+    )
+
+  /*
+    P NON usa:
+    - playerSlot PMA
+    - domanda per slot
+    - offerta per slot
+    - scarsità per slot
+
+    Il valore d'asta resta invece
+    osservabile tramite PMA +
+    andamento reale del mercato.
+  */
+  const expectedAuctionValue =
+    base.baseAuctionValue
+
+  const valueLimit =
+    expectedAuctionValue ===
+      undefined
+      ? undefined
+      : Math.max(
+          1,
+          Math.round(
+            expectedAuctionValue,
+          ),
+        )
+
+  const adjustedTargets =
+    getAdjustedRoleTargets(
+      state,
+      allPlayers,
+      parameters,
+    )
+
+  const dynamicRoleTarget =
+    adjustedTargets.P
+
+  const nonGoalkeeperGlobalReserve =
+    calculateNonGoalkeeperGlobalReserve(
+      state,
+      player,
+      allPlayers,
+      adjustedTargets,
+      parameters,
+    )
+
+  const plans =
+    precomputedPlans ??
+    getValidGoalkeeperPlans(
+      state,
+      allPlayers,
+      player,
+    )
+
+  const economics =
+    calculateGoalkeeperEconomics({
+      state,
+
+      player,
+
+      allPlayers,
+
+      plans,
+
+      dynamicRoleTarget,
+
+      nonGoalkeeperGlobalReserve,
+
+      minimumFutureSlotCost:
+        parameters
+          .minimumFutureSlotCost,
+
+      estimatePlayerCost:
+        (goalkeeper) =>
+          calculateBaseAuctionValue(
+            state,
+            goalkeeper,
+            allPlayers,
+            parameters,
+          ).baseAuctionValue,
+    })
+
+  const roleLimit =
+    economics.roleLimit
+
+  const financialLimit =
+    economics.financialLimit
+
+  const softRecommendedCeiling =
+    calculateSoftCeiling(
+      valueLimit,
+      roleLimit,
+      parameters,
+    )
+
+  const recommendedCeiling =
+    softRecommendedCeiling ===
+      undefined
+      ? financialLimit
+      : financialLimit ===
+          undefined
+        ? softRecommendedCeiling
+        : Math.min(
+            softRecommendedCeiling,
+            financialLimit,
+          )
+
+  const bindingConstraints =
+    getBindingConstraints(
+      recommendedCeiling,
+      financialLimit,
+      softRecommendedCeiling,
+      valueLimit,
+      roleLimit,
+    )
+
+  return {
+    pmaCredits:
+      base.pmaCredits,
+
+    auctionMarketFactor:
+      base.auctionMarketFactor,
+
+    auctionMarketSource:
+      base.auctionMarketSource,
+
+    auctionMarketSampleSize:
+      base.auctionMarketSampleSize,
+
+    roleMarketSampleSize:
+      base.roleMarketSampleSize,
+
+    overallMarketSampleSize:
+      base.overallMarketSampleSize,
+
+    baseAuctionValue:
+      base.baseAuctionValue,
+
+    /*
+      Non vengono calcolati per P
+      perché sarebbero basati sulla
+      classificazione PMA degli slot.
+    */
+    supply:
+      undefined,
+
+    demand:
+      undefined,
+
+    pressure:
+      undefined,
+
+    scarcityFactor:
+      1,
+
+    expectedAuctionValue,
+
+    financialLimit,
+
+    roleLimit,
+
+    valueLimit,
+
+    softRecommendedCeiling,
+
+    recommendedCeiling,
+
+    bindingConstraints,
+
+    playerSlot:
+      undefined,
+
+    ownerRemainingCredits:
+      economics
+        .ownerRemainingCredits,
+
+    dynamicRoleTarget,
+
+    roleReserve:
+      economics
+        .strategicReserve,
+
+    globalReserve:
+      economics
+        .globalReserve,
+  }
+}
+
+/* =========================
+   PUBLIC GOALKEEPER API
+
+   Usata dal motore P quando
+   dispone già dei piani validi,
+   così non ricostruiamo tutte
+   le combinazioni per ogni
+   candidato del ranking.
+========================= */
+
+export function calculateGoalkeeperPriceAdviceFromPlans(
+  state: AppState,
+  player: Player,
+  allPlayers: Player[],
+  plans:
+    GoalkeeperPlanningPlan[],
+  parameters:
+    PriceAdviceParameters =
+      DEFAULT_PRICE_ADVICE_PARAMETERS,
+): PriceAdvice {
+  return calculateGoalkeeperPriceAdviceInternal(
+    state,
+    player,
+    allPlayers,
+    parameters,
+    plans,
+  )
+}
+
+/* =========================
    MAIN
 ========================= */
 
@@ -882,27 +1338,38 @@ export function calculatePriceAdvice(
     PriceAdviceParameters =
       DEFAULT_PRICE_ADVICE_PARAMETERS,
 ): PriceAdvice {
-  const pmaCredits =
-    getPmaCredits(
-      player,
-      state.initialCredits,
-    )
+  /*
+    PORTIERI
 
-  const market =
-    calculateAuctionMarket(
+    Branch economico dedicato.
+
+    Nessun budget P / numero slot,
+    nessuna classificazione P1/P2/P3
+    derivata dal PMA.
+  */
+  if (
+    player.role === 'P'
+  ) {
+    return calculateGoalkeeperPriceAdviceInternal(
       state,
       player,
       allPlayers,
       parameters,
     )
+  }
 
-  const baseAuctionValue =
-    pmaCredits === undefined
-      ? undefined
-      : (
-          pmaCredits *
-          market.factor
-        )
+  /*
+    D / C / A
+
+    Manteniamo la logica esistente.
+  */
+  const base =
+    calculateBaseAuctionValue(
+      state,
+      player,
+      allPlayers,
+      parameters,
+    )
 
   const playerSlot =
     getPlayerSlot(
@@ -935,15 +1402,17 @@ export function calculatePriceAdvice(
     )
 
   const expectedAuctionValue =
-    baseAuctionValue === undefined
+    base.baseAuctionValue ===
+      undefined
       ? undefined
       : (
-          baseAuctionValue *
+          base.baseAuctionValue *
           scarcity.factor
         )
 
   const valueLimit =
-    expectedAuctionValue === undefined
+    expectedAuctionValue ===
+      undefined
       ? undefined
       : Math.max(
           1,
@@ -975,11 +1444,17 @@ export function calculatePriceAdvice(
       player.role
     ]
 
+  /*
+    Anche per D/C/A il vincolo
+    finanziario globale usa ora
+    una riserva P costruita dalle
+    strategie reali dei portieri.
+  */
   const globalReserve =
     ownerRemainingCredits ===
       undefined
       ? undefined
-      : calculateGlobalReserve(
+      : calculateGlobalReserveForOutfieldPlayer(
           state,
           player,
           allPlayers,
@@ -1015,13 +1490,11 @@ export function calculatePriceAdvice(
     roleReserveData.reserve
 
   const roleElasticity =
-    player.role === 'P'
-      ? 1
-      : playerSlot === 1
-        ? parameters
-            .topSlotElasticity
-        : parameters
-            .baseRoleElasticity
+    playerSlot === 1
+      ? parameters
+          .topSlotElasticity
+      : parameters
+          .baseRoleElasticity
 
   const roleLimit =
     Math.max(
@@ -1057,73 +1530,36 @@ export function calculatePriceAdvice(
             financialLimit,
           )
 
-  const bindingConstraints:
-    PriceConstraint[] = []
-
-  if (
-    recommendedCeiling !==
-      undefined
-  ) {
-    if (
-      financialLimit !==
-        undefined &&
-      recommendedCeiling ===
-        financialLimit &&
-      (
-        softRecommendedCeiling ===
-          undefined ||
-        financialLimit <=
-          softRecommendedCeiling
-      )
-    ) {
-      bindingConstraints.push(
-        'financial',
-      )
-    } else if (
-      valueLimit !==
-        undefined &&
-      roleLimit !==
-        undefined
-    ) {
-      bindingConstraints.push(
-        valueLimit <= roleLimit
-          ? 'value'
-          : 'role',
-      )
-    } else if (
-      valueLimit !== undefined
-    ) {
-      bindingConstraints.push(
-        'value',
-      )
-    } else if (
-      roleLimit !== undefined
-    ) {
-      bindingConstraints.push(
-        'role',
-      )
-    }
-  }
+  const bindingConstraints =
+    getBindingConstraints(
+      recommendedCeiling,
+      financialLimit,
+      softRecommendedCeiling,
+      valueLimit,
+      roleLimit,
+    )
 
   return {
-    pmaCredits,
+    pmaCredits:
+      base.pmaCredits,
 
     auctionMarketFactor:
-      market.factor,
+      base.auctionMarketFactor,
 
     auctionMarketSource:
-      market.source,
+      base.auctionMarketSource,
 
     auctionMarketSampleSize:
-      market.sampleSize,
+      base.auctionMarketSampleSize,
 
     roleMarketSampleSize:
-      market.roleSampleSize,
+      base.roleMarketSampleSize,
 
     overallMarketSampleSize:
-      market.overallSampleSize,
+      base.overallMarketSampleSize,
 
-    baseAuctionValue,
+    baseAuctionValue:
+      base.baseAuctionValue,
 
     supply,
 

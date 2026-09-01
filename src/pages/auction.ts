@@ -4,6 +4,10 @@ import type {
 } from '../app/state'
 
 import {
+  runOverlayExit,
+} from '../app/motion'
+
+import {
   players,
 } from '../data/players'
 
@@ -660,8 +664,28 @@ function updateBidSignalElement(
     return
   }
 
+  const previousState =
+    container.dataset
+      .signalState
+
   container.dataset.signalState =
     signal.state
+
+  if (
+    previousState &&
+    previousState !==
+      signal.state
+  ) {
+    container.classList.remove(
+      'is-changing',
+    )
+
+    void container.offsetWidth
+
+    container.classList.add(
+      'is-changing',
+    )
+  }
 
   container.style.borderColor =
     signal.borderColor
@@ -3861,6 +3885,12 @@ export function bindAuctionEvents(
         discardOverlay
           ?.classList
           .remove(
+            'is-closing',
+          )
+
+        discardOverlay
+          ?.classList
+          .remove(
             'hidden',
           )
 
@@ -3873,17 +3903,28 @@ export function bindAuctionEvents(
 
     const closeDiscardOverlay =
       (): void => {
-        discardOverlay
-          ?.classList
-          .add(
-            'hidden',
-          )
+        runOverlayExit(
+          '#discardAuctionOverlay',
+          () => {
+            discardOverlay
+              ?.classList
+              .add(
+                'hidden',
+              )
 
-        discardOverlay
-          ?.setAttribute(
-            'aria-hidden',
-            'true',
-          )
+            discardOverlay
+              ?.classList
+              .remove(
+                'is-closing',
+              )
+
+            discardOverlay
+              ?.setAttribute(
+                'aria-hidden',
+                'true',
+              )
+          },
+        )
       }
 
     document
@@ -3981,10 +4022,15 @@ export function bindAuctionEvents(
         button.addEventListener(
           'click',
           () => {
-            detailPlayerId =
-              null
+            runOverlayExit(
+              '#playerDetailOverlay',
+              () => {
+                detailPlayerId =
+                  null
 
-            actions.onRender()
+                actions.onRender()
+              },
+            )
           },
         )
       },
@@ -4132,13 +4178,18 @@ export function bindAuctionEvents(
 
   const closeSelector =
     (): void => {
-      selectorMode =
-        null
+      runOverlayExit(
+        '#auctionPlayerSelectorOverlay',
+        () => {
+          selectorMode =
+            null
 
-      selectedTeamFilter =
-        ''
+          selectedTeamFilter =
+            ''
 
-      actions.onRender()
+          actions.onRender()
+        },
+      )
     }
 
   document
@@ -4541,10 +4592,15 @@ export function bindAuctionEvents(
 
   const closeAwardOverlay =
     (): void => {
-      awardOverlayOpen =
-        false
+      runOverlayExit(
+        '#auctionAwardOverlay',
+        () => {
+          awardOverlayOpen =
+            false
 
-      actions.onRender()
+          actions.onRender()
+        },
+      )
     }
 
   document
@@ -5045,10 +5101,15 @@ export function bindAuctionEvents(
 
   const closeEdit =
     (): void => {
-      editingAssignmentId =
-        null
+      runOverlayExit(
+        '#editAssignmentOverlay',
+        () => {
+          editingAssignmentId =
+            null
 
-      actions.onRender()
+          actions.onRender()
+        },
+      )
     }
 
   document

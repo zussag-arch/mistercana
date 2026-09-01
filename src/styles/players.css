@@ -91,11 +91,21 @@
   letter-spacing: 0.025em;
 
   transition:
-    color 0.16s ease,
-    border-color 0.16s ease,
-    background 0.16s ease,
-    box-shadow 0.16s ease,
-    transform 0.16s ease;
+    color
+    var(--motion-fast)
+    var(--ease-standard),
+    border-color
+    var(--motion-fast)
+    var(--ease-standard),
+    background
+    var(--motion-fast)
+    var(--ease-standard),
+    box-shadow
+    var(--motion-fast)
+    var(--ease-standard),
+    transform
+    var(--motion-instant)
+    var(--ease-standard);
 }
 
 .players-auction-nav-button.is-live {
@@ -120,21 +130,28 @@
   cursor: pointer;
 }
 
-.players-auction-nav-button.is-live:hover {
-  border-color:
-    rgba(70, 230, 161, 0.54);
+@media (hover: hover) {
+  .players-auction-nav-button.is-live:hover {
+    border-color:
+      rgba(70, 230, 161, 0.54);
 
-  background:
-    linear-gradient(
-      180deg,
-      rgba(70, 230, 161, 0.24),
-      rgba(47, 191, 131, 0.13)
-    );
+    background:
+      linear-gradient(
+        180deg,
+        rgba(70, 230, 161, 0.24),
+        rgba(47, 191, 131, 0.13)
+      );
 
-  color: #a2f7d3;
+    color: #a2f7d3;
 
+    transform:
+      translateY(-1px);
+  }
+}
+
+.players-auction-nav-button.is-live:active {
   transform:
-    translateY(-1px);
+    scale(0.97);
 }
 
 .players-auction-nav-button.is-disabled,
@@ -154,6 +171,14 @@
     var(--radius-pill);
 
   background: #555b5f;
+
+  transition:
+    background
+    var(--motion-fast)
+    var(--ease-standard),
+    box-shadow
+    var(--motion-fast)
+    var(--ease-standard);
 }
 
 .players-auction-nav-button.is-live
@@ -237,14 +262,30 @@
   cursor: pointer;
 
   transition:
-    color 0.14s ease,
-    background 0.14s ease,
-    box-shadow 0.14s ease;
+    color
+    var(--motion-fast)
+    var(--ease-standard),
+    background
+    var(--motion-fast)
+    var(--ease-standard),
+    box-shadow
+    var(--motion-fast)
+    var(--ease-standard),
+    transform
+    var(--motion-instant)
+    var(--ease-standard);
 }
 
-.players-filter-button:hover {
-  background: #24272a;
-  color: #e0e3e5;
+@media (hover: hover) {
+  .players-filter-button:hover {
+    background: #24272a;
+    color: #e0e3e5;
+  }
+}
+
+.players-filter-button:active {
+  transform:
+    scale(0.96);
 }
 
 .players-filter-button.selected {
@@ -317,9 +358,21 @@
   user-select: none;
 
   transition:
-    border-color 0.14s ease,
-    color 0.14s ease,
-    background 0.14s ease;
+    border-color
+    var(--motion-fast)
+    var(--ease-standard),
+    color
+    var(--motion-fast)
+    var(--ease-standard),
+    background
+    var(--motion-fast)
+    var(--ease-standard),
+    box-shadow
+    var(--motion-fast)
+    var(--ease-standard),
+    transform
+    var(--motion-instant)
+    var(--ease-standard);
 }
 
 .players-simple-toggle input {
@@ -330,11 +383,23 @@
   pointer-events: none;
 }
 
-.players-simple-toggle:hover {
-  border-color:
-    rgba(255, 255, 255, 0.14);
+@media (hover: hover) {
+  .players-simple-toggle:hover {
+    border-color:
+      rgba(255, 255, 255, 0.14);
 
-  color: #d9dddf;
+    color: #d9dddf;
+  }
+}
+
+.players-simple-toggle:active:not(.disabled) {
+  transform:
+    scale(0.975);
+}
+
+.players-simple-toggle:focus-within {
+  box-shadow:
+    var(--focus-ring);
 }
 
 .players-simple-toggle.selected {
@@ -353,13 +418,6 @@
   cursor: not-allowed;
 }
 
-.players-simple-toggle.disabled:hover {
-  border-color:
-    rgba(255, 255, 255, 0.08);
-
-  color: #777e83;
-}
-
 .players-toggle-dot {
   width: 9px;
   height: 9px;
@@ -370,6 +428,20 @@
   border-radius: 4px;
 
   background: #24272a;
+
+  transition:
+    border-color
+    var(--motion-fast)
+    var(--ease-standard),
+    background
+    var(--motion-fast)
+    var(--ease-standard),
+    box-shadow
+    var(--motion-fast)
+    var(--ease-standard),
+    transform
+    var(--motion-fast)
+    var(--ease-standard);
 }
 
 .players-simple-toggle.selected
@@ -418,16 +490,24 @@
   background: #17191b;
 
   transition:
-    border-color 0.16s ease,
-    background 0.16s ease,
-    box-shadow 0.16s ease;
+    border-color
+    var(--motion-fast)
+    var(--ease-standard),
+    background
+    var(--motion-fast)
+    var(--ease-standard),
+    box-shadow
+    var(--motion-fast)
+    var(--ease-standard);
 }
 
-.players-search:hover {
-  border-color:
-    rgba(255, 255, 255, 0.15);
+@media (hover: hover) {
+  .players-search:hover {
+    border-color:
+      rgba(255, 255, 255, 0.15);
 
-  background: #1a1d1f;
+    background: #1a1d1f;
+  }
 }
 
 .players-search:focus-within {
@@ -437,8 +517,7 @@
   background: #1b1e20;
 
   box-shadow:
-    0 0 0 3px
-    rgba(90, 168, 255, 0.06);
+    var(--focus-ring);
 }
 
 .players-search-icon {
@@ -497,16 +576,37 @@ input[type="search"]::-webkit-search-cancel-button {
   line-height: 1;
 
   cursor: pointer;
+
+  transition:
+    color
+    var(--motion-fast)
+    var(--ease-standard),
+    background
+    var(--motion-fast)
+    var(--ease-standard),
+    border-color
+    var(--motion-fast)
+    var(--ease-standard),
+    transform
+    var(--motion-instant)
+    var(--ease-standard);
 }
 
-.players-search-clear:hover {
-  border-color:
-    rgba(255, 255, 255, 0.08);
+@media (hover: hover) {
+  .players-search-clear:hover {
+    border-color:
+      rgba(255, 255, 255, 0.08);
 
-  background:
-    rgba(255, 255, 255, 0.05);
+    background:
+      rgba(255, 255, 255, 0.05);
 
-  color: #e3e6e7;
+    color: #e3e6e7;
+  }
+}
+
+.players-search-clear:active {
+  transform:
+    scale(0.94);
 }
 
 .players-search-clear.hidden {
@@ -539,6 +639,9 @@ input[type="search"]::-webkit-search-cancel-button {
   box-shadow:
     inset 0 1px 0
     rgba(255, 255, 255, 0.025);
+
+  -webkit-overflow-scrolling:
+    touch;
 }
 
 /* =========================
@@ -601,19 +704,44 @@ input[type="search"]::-webkit-search-cancel-button {
   letter-spacing: 0.035em;
 
   cursor: pointer;
+
+  transition:
+    color
+    var(--motion-fast)
+    var(--ease-standard),
+    opacity
+    var(--motion-fast)
+    var(--ease-standard),
+    transform
+    var(--motion-instant)
+    var(--ease-standard);
 }
 
-.players-table-sort:hover {
-  color: #e3e6e7;
+@media (hover: hover) {
+  .players-table-sort:hover {
+    color: #e3e6e7;
+  }
+}
+
+.players-table-sort:active {
+  transform:
+    scale(0.96);
 }
 
 .players-sort-neutral {
   opacity: 0.25;
+
+  transition:
+    opacity
+    var(--motion-fast)
+    var(--ease-standard);
 }
 
-.players-table-sort:hover
-.players-sort-neutral {
-  opacity: 0.65;
+@media (hover: hover) {
+  .players-table-sort:hover
+  .players-sort-neutral {
+    opacity: 0.65;
+  }
 }
 
 .players-sort-active {
@@ -644,16 +772,43 @@ input[type="search"]::-webkit-search-cancel-button {
   cursor: pointer;
 
   transition:
-    background 0.12s ease;
+    background
+    var(--motion-fast)
+    var(--ease-standard),
+    box-shadow
+    var(--motion-fast)
+    var(--ease-standard),
+    transform
+    var(--motion-instant)
+    var(--ease-standard);
 }
 
 .players-table-row:last-child {
   border-bottom: 0;
 }
 
-.players-table-row:hover {
+@media (hover: hover) {
+  .players-table-row:hover {
+    background:
+      rgba(255, 255, 255, 0.035);
+  }
+}
+
+.players-table-row:active {
   background:
-    rgba(255, 255, 255, 0.035);
+    rgba(255, 255, 255, 0.055);
+
+  transform:
+    scale(0.998);
+}
+
+.players-table-row:focus-visible {
+  position: relative;
+  z-index: 1;
+
+  box-shadow:
+    inset 0 0 0 2px
+    rgba(90, 168, 255, 0.42);
 }
 
 /* =========================
@@ -703,11 +858,18 @@ input[type="search"]::-webkit-search-cancel-button {
 
   white-space: nowrap;
   text-overflow: ellipsis;
+
+  transition:
+    color
+    var(--motion-fast)
+    var(--ease-standard);
 }
 
-.players-table-row:hover
-.players-player-name-row > strong {
-  color: #ffffff;
+@media (hover: hover) {
+  .players-table-row:hover
+  .players-player-name-row > strong {
+    color: #ffffff;
+  }
 }
 
 .players-player-info small {
@@ -763,6 +925,20 @@ input[type="search"]::-webkit-search-cancel-button {
   box-shadow:
     inset 0 1px 0
     rgba(255, 255, 255, 0.08);
+
+  transition:
+    color
+    var(--motion-fast)
+    var(--ease-standard),
+    background
+    var(--motion-fast)
+    var(--ease-standard),
+    border-color
+    var(--motion-fast)
+    var(--ease-standard),
+    box-shadow
+    var(--motion-fast)
+    var(--ease-standard);
 }
 
 .player-indicator-xi {
@@ -867,6 +1043,17 @@ input[type="search"]::-webkit-search-cancel-button {
 
   font-size: 9px;
   font-weight: 900;
+
+  transition:
+    color
+    var(--motion-fast)
+    var(--ease-standard),
+    background
+    var(--motion-fast)
+    var(--ease-standard),
+    border-color
+    var(--motion-fast)
+    var(--ease-standard);
 }
 
 .role-badge.role-p {
@@ -924,11 +1111,18 @@ input[type="search"]::-webkit-search-cancel-button {
 
   font-variant-numeric:
     tabular-nums;
+
+  transition:
+    color
+    var(--motion-fast)
+    var(--ease-standard);
 }
 
-.players-table-row:hover
-.players-number-cell {
-  color: #e0e3e4;
+@media (hover: hover) {
+  .players-table-row:hover
+  .players-number-cell {
+    color: #e0e3e4;
+  }
 }
 
 .players-ica-cell {
@@ -1001,6 +1195,20 @@ input[type="search"]::-webkit-search-cancel-button {
   letter-spacing: 0.025em;
 
   white-space: nowrap;
+
+  transition:
+    color
+    var(--motion-fast)
+    var(--ease-standard),
+    background
+    var(--motion-fast)
+    var(--ease-standard),
+    border-color
+    var(--motion-fast)
+    var(--ease-standard),
+    box-shadow
+    var(--motion-fast)
+    var(--ease-standard);
 }
 
 /*
@@ -1011,6 +1219,7 @@ input[type="search"]::-webkit-search-cancel-button {
   è libero o assegnato fuori da una
   sessione attiva.
 */
+
 .player-status-not-live {
   border:
     1px solid
@@ -1025,6 +1234,7 @@ input[type="search"]::-webkit-search-cancel-button {
 /*
   LIVE + giocatore ancora disponibile.
 */
+
 .player-status-free {
   border:
     1px solid
@@ -1042,10 +1252,8 @@ input[type="search"]::-webkit-search-cancel-button {
 
 /*
   LIVE + giocatore già aggiudicato.
-  Manteniamo l'identità arancio
-  dell'interfaccia precedente, ma
-  aumentiamo la leggibilità.
 */
+
 .player-status-assigned {
   border:
     1px solid
@@ -1234,6 +1442,8 @@ input[type="search"]::-webkit-search-cancel-button {
 
   .players-filter-button {
     flex: 1 1 0;
+
+    min-height: 40px;
   }
 
   .players-toggle-group {
@@ -1241,7 +1451,18 @@ input[type="search"]::-webkit-search-cancel-button {
   }
 
   .players-simple-toggle {
+    min-height: 42px;
+
     flex: 1 1 0;
+  }
+
+  .players-search {
+    min-height: 44px;
+  }
+
+  .players-search-clear {
+    width: 32px;
+    height: 32px;
   }
 
   .players-footer-info {
@@ -1273,9 +1494,28 @@ input[type="search"]::-webkit-search-cancel-button {
 ) {
   .players-filter-button,
   .players-simple-toggle,
+  .players-toggle-dot,
   .players-search,
+  .players-search-clear,
+  .players-table-sort,
+  .players-sort-neutral,
   .players-table-row,
-  .players-auction-nav-button {
+  .players-player-name-row > strong,
+  .players-number-cell,
+  .player-indicator,
+  .role-badge,
+  .player-status,
+  .players-auction-nav-button,
+  .players-auction-nav-dot {
     transition: none;
+  }
+
+  .players-filter-button:active,
+  .players-simple-toggle:active,
+  .players-search-clear:active,
+  .players-table-sort:active,
+  .players-table-row:active,
+  .players-auction-nav-button:active {
+    transform: none;
   }
 }
