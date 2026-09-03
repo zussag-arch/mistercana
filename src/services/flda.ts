@@ -59,6 +59,20 @@ export interface FldaPlayersPage {
   players: FldaPlayer[]
 }
 
+export type FldaRecord = Record<string, unknown>
+
+export interface FldaPlayerDetail {
+  current: FldaPlayer
+  history: FldaRecord[]
+  guide: FldaRecord | null
+  hierarchies: FldaRecord[]
+  saggi: FldaRecord[]
+}
+
+export type FldaFixtureContext =
+  | 'goalkeeper'
+  | 'attacker'
+
 export type FldaErrorKind =
   | 'unreachable'
   | 'timeout'
@@ -237,6 +251,32 @@ export function getFldaPlayers(
 
   return fldaFetch<FldaPlayersPage>(
     `/api/players?${query.toString()}`,
+  )
+}
+
+export function getFldaPlayerDetail(
+  playerId: string,
+): Promise<FldaPlayerDetail> {
+  return fldaFetch<FldaPlayerDetail>(
+    `/api/players/${encodeURIComponent(playerId)}`,
+  )
+}
+
+export function getFldaTeamGuide(
+  team: string,
+): Promise<FldaRecord> {
+  return fldaFetch<FldaRecord>(
+    `/api/teams/${encodeURIComponent(team)}/guide`,
+  )
+}
+
+export function getFldaTeamFixtures(
+  team: string,
+  context: FldaFixtureContext,
+): Promise<FldaRecord[]> {
+  const query = new URLSearchParams({ context })
+  return fldaFetch<FldaRecord[]>(
+    `/api/teams/${encodeURIComponent(team)}/fixtures?${query.toString()}`,
   )
 }
 

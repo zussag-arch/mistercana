@@ -1,2074 +1,234 @@
-import battitoriCsv
-  from '../../database/MisterCana_DB_Battitori.csv?raw'
-
+import type { AppState } from '../app/state'
+import { runOverlayExit } from '../app/motion'
+import type { Player, PlayerRole } from '../domain/player'
+import type { FldaFixtureContext, FldaPlayer } from '../services/flda'
 import {
-  players,
-} from '../data/players'
+  findLegacyPlayerByIdentity, getCachedPlayerDetail, getCachedPlayersDataset, getCachedTeamFixtures,
+  getFldaIdForLegacyId, getLegacyPlayer, getLegacyPlayerForFldaId,
+  loadPlayerDetail, loadPlayersDataset, loadTeamFixtures,
+} from '../services/playerRepository'
+import { getLegacyIdFromFldaId } from '../services/playerIdentity'
+import { renderPlayerDetailOverlay } from '../components/playerDetailOverlay'
+import type { PlayerViewModel } from '../components/playerDataView'
+import { display, escapePlayerHtml } from '../components/playerDataView'
 
-import type {
-  AppState,
-} from '../app/state'
-
-import {
-  runOverlayExit,
-} from '../app/motion'
-
-import type {
-  Player,
-  PlayerRole,
-} from '../domain/player'
-
-import {
-  renderPlayerDetailOverlay,
-} from '../components/playerDetailOverlay'
-
-type RoleFilter =
-  | 'ALL'
-  | PlayerRole
-
-type SortKey =
-  | 'name'
-  | 'iCa'
-  | 'pmaPercent'
-  | 'consensus'
-  | 'startingProbability'
-  | 'mv'
-  | 'fmv'
-  | 'status'
-
-type SortDirection =
-  | 'asc'
-  | 'desc'
-
-type SpecialistRank =
-  | 1
-  | 2
-  | 3
-  | 4
-
-type PlayerAuctionStatus =
-  | 'not-live'
-  | 'free'
-  | 'assigned'
-
-interface PlayersViewState {
-  role: RoleFilter
-
-  penaltiesOnly: boolean
-  freeOnly: boolean
-
-  search: string
-
-  sortKey: SortKey
-  sortDirection: SortDirection
-
-  defaultRoleIcaOrder: boolean
-}
-
-interface SpecialistEntry {
-  team: string
-  name: string
-  rank: SpecialistRank
-}
-
-interface PlayerSpecialists {
-  penaltyRank:
-    SpecialistRank | null
-
-  setPieceRank:
-    SpecialistRank | null
-}
+type RoleFilter = 'ALL' | PlayerRole
+type SortKey = 'name' | 'team' | 'fm_exp' | 'integrita' | 'titolarita_display' | 'ica' | 'status'
 
 interface PlayersActions {
   onRender: () => void
-
-  onCallPlayer:
-    (playerId: string) => void
-
+  onCallPlayer: (legacyId: string) => void
   onGoToAuction: () => void
+  onOpenFullPlayer: (reference: string) => void
 }
 
-const viewState: PlayersViewState = {
-  role: 'ALL',
-
-  penaltiesOnly: false,
+const viewState = {
+  role: 'ALL' as RoleFilter,
+  team: 'ALL',
   freeOnly: false,
-
   search: '',
-
-  sortKey: 'iCa',
-  sortDirection: 'desc',
-
-  defaultRoleIcaOrder: true,
+  sortKey: 'name' as SortKey,
+  sortDirection: 'asc' as 'asc' | 'desc',
 }
 
-let previewPlayerId:
-  string | null = null
+let loadingBulk = false
+let previewReference: string | null = null
+let previewLoading = false
+let previewError: string | undefined
 
-/* =========================
-   HTML
-========================= */
-
-function escapeHtml(
-  value: string,
-): string {
-  return value
-    .replaceAll(
-      '&',
-      '&amp;',
-    )
-    .replaceAll(
-      '<',
-      '&lt;',
-    )
-    .replaceAll(
-      '>',
-      '&gt;',
-    )
-    .replaceAll(
-      '"',
-      '&quot;',
-    )
-    .replaceAll(
-      "'",
-      '&#039;',
-    )
+function legacyReference(id: string): string { return `legacy:${id}` }
+function fldaReference(player: FldaPlayer): string {
+  return player.player_id || legacyReference(findLegacy(player)?.id ?? '')
 }
-
-/* =========================
-   FORMATTERS
-========================= */
-
-function formatNumber(
-  value:
-    | number
-    | undefined,
-  digits = 0,
-): string {
-  if (
-    value === undefined ||
-    !Number.isFinite(value)
-  ) {
-    return '—'
-  }
-
-  return value
-    .toFixed(digits)
-    .replace('.', ',')
+function findLegacy(player: FldaPlayer): Player | undefined {
+  return player.player_id
+    ? getLegacyPlayerForFldaId(player.player_id)
+    : findLegacyPlayerByIdentity(player)
 }
-
-function formatItalianNumber(
-  value:
-    | number
-    | undefined,
-  digits = 2,
-): string {
-  if (
-    value === undefined ||
-    !Number.isFinite(value)
-  ) {
-    return '—'
-  }
-
-  return value
-    .toFixed(digits)
-    .replace('.', ',')
+function legacyIdFor(player: FldaPlayer): string | undefined {
+  return player.player_id ? getLegacyIdFromFldaId(player.player_id) : findLegacy(player)?.id
 }
-
-function formatPercent(
-  value:
-    | number
-    | undefined,
-  digits = 1,
-): string {
-  if (
-    value === undefined ||
-    !Number.isFinite(value)
-  ) {
-    return '—'
-  }
-
-  return `${value
-    .toFixed(digits)
-    .replace('.', ',')}%`
+function isAssigned(state: AppState, legacyId?: string): boolean {
+  return Boolean(legacyId && state.auctionAssignments.some((item) => item.playerId === legacyId))
 }
+function statusValue(state: AppState, player: FldaPlayer): number {
+  const legacyId = legacyIdFor(player)
+  if (!legacyId) return -1
+  if (state.auctionPhase !== 'live') return 0
+  return isAssigned(state, legacyId) ? 1 : 2
+}
+function statusLabel(state: AppState, player: FldaPlayer): string {
+  const legacyId = legacyIdFor(player)
+  if (!legacyId) return 'NON ASSOCIATO'
+  if (state.auctionPhase !== 'live') return 'NO LIVE'
+  return isAssigned(state, legacyId) ? 'ASSEGNATO' : 'DA ASSEGNARE'
+}
+function numeric(value: unknown): number { return typeof value === 'number' ? value : -Infinity }
 
-/* =========================
-   CSV
-========================= */
-
-function parseCsvRow(
-  line: string,
-): string[] {
-  const values: string[] = []
-
-  let current = ''
-  let quoted = false
-
-  for (
-    let index = 0;
-    index < line.length;
-    index += 1
-  ) {
-    const character =
-      line[index]
-
-    if (
-      character === '"'
-    ) {
-      if (
-        quoted &&
-        line[index + 1] === '"'
-      ) {
-        current += '"'
-        index += 1
-      } else {
-        quoted = !quoted
-      }
-
-      continue
+function filteredPlayers(state: AppState, source: FldaPlayer[]): FldaPlayer[] {
+  const query = viewState.search.trim().toLocaleLowerCase('it')
+  return source.filter((player) => {
+    if (viewState.role !== 'ALL' && player.role !== viewState.role) return false
+    if (viewState.team !== 'ALL' && player.team !== viewState.team) return false
+    if (viewState.freeOnly && state.auctionPhase === 'live' && statusValue(state, player) !== 2) return false
+    return !query || `${player.name} ${player.team}`.toLocaleLowerCase('it').includes(query)
+  }).sort((a, b) => {
+    let first: string | number
+    let second: string | number
+    if (viewState.sortKey === 'status') {
+      first = statusValue(state, a); second = statusValue(state, b)
+    } else if (viewState.sortKey === 'ica') {
+      first = numeric(findLegacy(a)?.iCa); second = numeric(findLegacy(b)?.iCa)
+    } else if (viewState.sortKey === 'name' || viewState.sortKey === 'team') {
+      first = a[viewState.sortKey]; second = b[viewState.sortKey]
+    } else {
+      first = numeric(a[viewState.sortKey])
+      second = numeric(b[viewState.sortKey])
     }
+    const result = typeof first === 'number' && typeof second === 'number'
+      ? first - second
+      : String(first).localeCompare(String(second), 'it')
+    return viewState.sortDirection === 'asc' ? result : -result
+  })
+}
 
-    if (
-      character === ';' &&
-      !quoted
-    ) {
-      values.push(
-        current.trim(),
-      )
-
-      current = ''
-
-      continue
+function playerForOverlay(reference: string, bulk: FldaPlayer[]): { flda: FldaPlayer; legacy?: Player } | undefined {
+  if (reference.startsWith('legacy:')) {
+    const legacy = getLegacyPlayer(reference.slice(7))
+    if (!legacy) return undefined
+    const fldaId = getFldaIdForLegacyId(legacy.id)
+    const flda = bulk.find((item) => item.player_id === fldaId) ?? {
+      player_id: null, name: legacy.name, team: legacy.team, role: legacy.role,
+      fm_exp: legacy.fmv ?? null, integrita: null,
+      titolarita_display: legacy.startingProbability ?? null,
     }
-
-    current += character
+    return { flda, legacy }
   }
-
-  values.push(
-    current.trim(),
-  )
-
-  return values
+  const flda = bulk.find((item) => item.player_id === reference)
+  return flda ? { flda, legacy: findLegacy(flda) } : undefined
 }
 
-function parseCsv(
-  csv: string,
-): string[][] {
-  return csv
-    .replace(/\r/g, '')
-    .split('\n')
-    .map(
-      (line) =>
-        line.trim(),
-    )
-    .filter(Boolean)
-    .map(parseCsvRow)
+function renderOverlay(state: AppState, bulk: FldaPlayer[]): string {
+  if (!previewReference) return ''
+  const selected = playerForOverlay(previewReference, bulk)
+  if (!selected) return ''
+  const legacyId = selected.legacy?.id
+  const fldaId = selected.flda.player_id ?? undefined
+  const role = selected.flda.role.toUpperCase()
+  const context: FldaFixtureContext | undefined = role === 'P' ? 'goalkeeper' : role === 'A' ? 'attacker' : undefined
+  const view: PlayerViewModel = {
+    flda: selected.flda, legacy: selected.legacy, legacyId,
+    assigned: isAssigned(state, legacyId), auctionLive: state.auctionPhase === 'live',
+    identityAvailable: Boolean(fldaId && legacyId),
+    detail: fldaId ? getCachedPlayerDetail(fldaId) : undefined,
+    fixtures: context ? getCachedTeamFixtures(selected.flda.team, context) : undefined,
+  }
+  const shell: Player = selected.legacy ?? {
+    id: '', name: selected.flda.name, team: selected.flda.team,
+    role: role as PlayerRole, penaltyTaker: false, status: 'free',
+  }
+  return renderPlayerDetailOverlay(shell, view.assigned, state.auctionPhase === 'live', {
+    view, loading: previewLoading, error: previewError,
+  })
 }
 
-/* =========================
-   SPECIALISTS
-========================= */
+function renderRow(state: AppState, player: FldaPlayer): string {
+  const legacy = findLegacy(player)
+  const status = statusLabel(state, player)
+  return `<button type="button" class="players-table-row" data-player-ref="${escapePlayerHtml(fldaReference(player))}">
+    <div class="players-player-cell"><span class="role-badge role-${player.role.toLowerCase()}">${escapePlayerHtml(player.role)}</span><span><strong>${escapePlayerHtml(player.name)}</strong><small>${escapePlayerHtml(player.team)}</small></span></div>
+    <div data-label="FM Exp.">${display(player.fm_exp, 2)}</div>
+    <div data-label="Integrità">${display(player.integrita, 0)}</div>
+    <div data-label="Titolarità">${display(player.titolarita_display, 0)}${typeof player.titolarita_display === 'number' ? '%' : ''}</div>
+    <div data-label="PMA">—</div>
+    <div data-label="iCà"><span class="players-ica">${display(legacy?.iCa, 2)}</span></div>
+    <div data-label="Stato"><span class="player-status">${status}</span></div>
+  </button>`
+}
 
-function parseSpecialistsCsv(
-  csv: string,
-): {
-  penalties: SpecialistEntry[]
-  setPieces: SpecialistEntry[]
-} {
-  const rows =
-    parseCsv(csv)
+function sortButton(label: string, key: SortKey): string {
+  const active = viewState.sortKey === key
+  return `<button type="button" data-player-sort="${key}">${label}${active ? (viewState.sortDirection === 'asc' ? ' ↑' : ' ↓') : ''}</button>`
+}
 
-  const penalties:
-    SpecialistEntry[] = []
+export function renderPlayersPage(state: AppState): string {
+  const dataset = getCachedPlayersDataset()
+  if (!dataset && !loadingBulk) {
+    loadingBulk = true
+    window.setTimeout(() => void loadPlayersDataset().then(() => {
+      loadingBulk = false
+      document.dispatchEvent(new CustomEvent('mistercana:players-loaded'))
+    }), 0)
+  }
+  const source = dataset?.players ?? []
+  const rows = filteredPlayers(state, source)
+  const teams = [...new Set(source.map((item) => item.team))].sort((a, b) => a.localeCompare(b, 'it'))
+  if (state.auctionPhase !== 'live') viewState.freeOnly = false
 
-  const setPieces:
-    SpecialistEntry[] = []
+  return `<section class="page players-page">
+    <div class="players-page-header"><div><span class="players-eyebrow">DATABASE FLDA</span><h1>Giocatori</h1><p>${rows.length} di ${source.length}</p></div><button id="playersGoToAuctionButton" class="players-auction-nav-button" ${state.auctionPhase === 'live' ? '' : 'disabled'}>Asta</button></div>
+    <div class="players-toolbar">
+      <div class="players-role-filter">${(['ALL','P','D','C','A'] as RoleFilter[]).map((role) => `<button type="button" data-player-role="${role}" class="players-filter-button ${viewState.role === role ? 'selected' : ''}">${role === 'ALL' ? 'Tutti' : role}</button>`).join('')}</div>
+      <select id="playersTeamFilter" aria-label="Filtra squadra"><option value="ALL">Tutte le squadre</option>${teams.map((team) => `<option value="${escapePlayerHtml(team)}" ${viewState.team === team ? 'selected' : ''}>${escapePlayerHtml(team)}</option>`).join('')}</select>
+      <label class="players-simple-toggle"><input id="freeOnly" type="checkbox" ${viewState.freeOnly ? 'checked' : ''} ${state.auctionPhase === 'live' ? '' : 'disabled'}> Solo liberi</label>
+      <input id="playersSearch" type="search" value="${escapePlayerHtml(viewState.search)}" placeholder="Cerca nome o squadra…">
+      <button id="retryPlayers" type="button">Riprova FLDA</button>
+    </div>
+    ${dataset?.source === 'legacy' ? `<div class="players-source-warning">FLDA non raggiungibile. Fallback legacy attivo. ${escapePlayerHtml(dataset.error)}</div>` : ''}
+    ${!dataset ? '<div class="players-loading">Caricamento giocatori FLDA…</div>' : `<div class="players-table-card"><div class="players-table-header"><span>Giocatore</span>${sortButton('FM Exp.','fm_exp')}${sortButton('Integrità','integrita')}${sortButton('Titolarità','titolarita_display')}<span>PMA</span>${sortButton('iCà','ica')}${sortButton('Stato','status')}</div><div class="players-table-body">${rows.map((player) => renderRow(state, player)).join('') || '<div class="players-empty">Nessun giocatore corrisponde ai filtri.</div>'}</div></div>`}
+    <div class="players-footer-info"><span>${rows.length} giocatori</span><span>${dataset?.source === 'flda' ? 'Fonte FLDA' : 'Fonte legacy'}</span></div>
+    ${renderOverlay(state, source)}
+  </section>`
+}
 
-  if (
-    rows.length < 2
-  ) {
-    return {
-      penalties,
-      setPieces,
+async function loadPreview(reference: string, actions: PlayersActions): Promise<void> {
+  const dataset = getCachedPlayersDataset()
+  const selected = dataset ? playerForOverlay(reference, dataset.players) : undefined
+  const fldaId = selected?.flda.player_id
+  if (!selected || !fldaId) return
+  previewLoading = true; previewError = undefined; actions.onRender()
+  try {
+    const tasks: Promise<unknown>[] = [loadPlayerDetail(fldaId)]
+    const role = selected.flda.role.toUpperCase()
+    if (role === 'P' || role === 'A') tasks.push(loadTeamFixtures(selected.flda.team, role === 'P' ? 'goalkeeper' : 'attacker'))
+    await Promise.all(tasks)
+  } catch (error) {
+    previewError = error instanceof Error ? error.message : 'Dati FLDA non disponibili.'
+  } finally {
+    if (previewReference === reference) { previewLoading = false; actions.onRender() }
+  }
+}
+
+export function bindPlayersEvents(_state: AppState, actions: PlayersActions): void {
+  document.addEventListener('mistercana:players-loaded', actions.onRender, { once: true })
+  document.querySelector('#playersGoToAuctionButton')?.addEventListener('click', actions.onGoToAuction)
+  document.querySelectorAll<HTMLElement>('[data-player-role]').forEach((button) => button.addEventListener('click', () => { viewState.role = button.dataset.playerRole as RoleFilter; actions.onRender() }))
+  document.querySelector<HTMLSelectElement>('#playersTeamFilter')?.addEventListener('change', (event) => { viewState.team = (event.currentTarget as HTMLSelectElement).value; actions.onRender() })
+  document.querySelector<HTMLInputElement>('#freeOnly')?.addEventListener('change', (event) => { viewState.freeOnly = (event.currentTarget as HTMLInputElement).checked; actions.onRender() })
+  document.querySelector<HTMLInputElement>('#playersSearch')?.addEventListener('input', (event) => { viewState.search = (event.currentTarget as HTMLInputElement).value; actions.onRender(); document.querySelector<HTMLInputElement>('#playersSearch')?.focus() })
+  document.querySelector('#retryPlayers')?.addEventListener('click', () => { loadingBulk = true; void loadPlayersDataset(true).then(() => { loadingBulk = false; actions.onRender() }) })
+  document.querySelectorAll<HTMLElement>('[data-player-sort]').forEach((button) => button.addEventListener('click', () => { const key = button.dataset.playerSort as SortKey; if (viewState.sortKey === key) viewState.sortDirection = viewState.sortDirection === 'asc' ? 'desc' : 'asc'; else { viewState.sortKey = key; viewState.sortDirection = key === 'name' || key === 'team' ? 'asc' : 'desc' } actions.onRender() }))
+  document.querySelectorAll<HTMLElement>('[data-player-ref]').forEach((row) => row.addEventListener('click', () => {
+    const ref = row.dataset.playerRef
+    if (!ref) return
+    previewReference = ref
+    actions.onRender()
+    void loadPreview(ref, actions)
+  }))
+  const close = () => runOverlayExit('#playerDetailOverlay', () => { previewReference = null; previewError = undefined; actions.onRender() })
+  document.querySelectorAll('[data-close-player-detail]').forEach((item) => item.addEventListener('click', close))
+  document.querySelector<HTMLElement>('[data-player-detail-call]')?.addEventListener('click', (event) => { const id = (event.currentTarget as HTMLElement).dataset.playerDetailCall; if (id) actions.onCallPlayer(id) })
+  document.querySelector<HTMLElement>('[data-open-full-player]')?.addEventListener('click', (event) => { const ref = (event.currentTarget as HTMLElement).dataset.openFullPlayer; if (ref) { previewReference = null; actions.onOpenFullPlayer(ref) } })
+  const dialog = document.querySelector<HTMLElement>('.player-quick-card')
+  dialog?.focus()
+  dialog?.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') close()
+    if (event.key === 'Tab') {
+      const focusable = [...dialog.querySelectorAll<HTMLElement>('button:not([disabled]), input:not([disabled]), select:not([disabled])')]
+      if (!focusable.length) return
+      const first = focusable[0], last = focusable[focusable.length - 1]
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus() }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus() }
     }
-  }
-
-  rows
-    .slice(1)
-    .forEach(
-      (columns) => {
-        const [
-          team,
-          penalty1,
-          penalty2,
-          penalty3,
-          penalty4,
-          setPiece1,
-          setPiece2,
-          setPiece3,
-        ] = columns
-
-        if (!team) {
-          return
-        }
-
-        ;[
-          penalty1,
-          penalty2,
-          penalty3,
-          penalty4,
-        ].forEach(
-          (
-            name,
-            index,
-          ) => {
-            if (!name) {
-              return
-            }
-
-            penalties.push({
-              team,
-              name,
-
-              rank:
-                (
-                  index + 1
-                ) as SpecialistRank,
-            })
-          },
-        )
-
-        ;[
-          setPiece1,
-          setPiece2,
-          setPiece3,
-        ].forEach(
-          (
-            name,
-            index,
-          ) => {
-            if (!name) {
-              return
-            }
-
-            setPieces.push({
-              team,
-              name,
-
-              rank:
-                (
-                  index + 1
-                ) as SpecialistRank,
-            })
-          },
-        )
-      },
-    )
-
-  return {
-    penalties,
-    setPieces,
-  }
-}
-
-const SPECIALISTS =
-  parseSpecialistsCsv(
-    battitoriCsv,
-  )
-
-/* =========================
-   MATCHING
-========================= */
-
-function normalizeText(
-  value: string,
-): string {
-  return value
-    .normalize('NFD')
-    .replace(
-      /[\u0300-\u036f]/g,
-      '',
-    )
-    .toLowerCase()
-    .replace(
-      /[^a-z0-9]+/g,
-      ' ',
-    )
-    .trim()
-}
-
-function getNameTokens(
-  value: string,
-): string[] {
-  return normalizeText(
-    value,
-  )
-    .split(' ')
-    .filter(Boolean)
-}
-
-function namesLikelyMatch(
-  playerName: string,
-  specialistName: string,
-): boolean {
-  const playerNormalized =
-    normalizeText(
-      playerName,
-    )
-
-  const specialistNormalized =
-    normalizeText(
-      specialistName,
-    )
-
-  if (
-    !playerNormalized ||
-    !specialistNormalized
-  ) {
-    return false
-  }
-
-  if (
-    playerNormalized ===
-    specialistNormalized
-  ) {
-    return true
-  }
-
-  const playerTokens =
-    getNameTokens(
-      playerName,
-    )
-
-  const specialistTokens =
-    getNameTokens(
-      specialistName,
-    )
-
-  if (
-    specialistTokens.length === 0
-  ) {
-    return false
-  }
-
-  return specialistTokens.every(
-    (specialistToken) => {
-      if (
-        specialistToken.length <= 2
-      ) {
-        return playerTokens.some(
-          (playerToken) =>
-            playerToken.startsWith(
-              specialistToken,
-            ),
-        )
-      }
-
-      return playerTokens.some(
-        (playerToken) =>
-          playerToken ===
-          specialistToken,
-      )
-    },
-  )
-}
-
-function teamsLikelyMatch(
-  playerTeam: string,
-  specialistTeam: string,
-): boolean {
-  return (
-    normalizeText(
-      playerTeam,
-    ) ===
-    normalizeText(
-      specialistTeam,
-    )
-  )
-}
-
-function findSpecialistRank(
-  player: Player,
-  entries: SpecialistEntry[],
-): SpecialistRank | null {
-  const match =
-    entries.find(
-      (entry) =>
-        teamsLikelyMatch(
-          player.team,
-          entry.team,
-        ) &&
-        namesLikelyMatch(
-          player.name,
-          entry.name,
-        ),
-    )
-
-  return (
-    match?.rank ??
-    null
-  )
-}
-
-function getPlayerSpecialists(
-  player: Player,
-): PlayerSpecialists {
-  return {
-    penaltyRank:
-      findSpecialistRank(
-        player,
-        SPECIALISTS.penalties,
-      ),
-
-    setPieceRank:
-      findSpecialistRank(
-        player,
-        SPECIALISTS.setPieces,
-      ),
-  }
-}
-
-/* =========================
-   AUCTION STATUS
-========================= */
-
-function isPlayerAssigned(
-  state: AppState,
-  playerId: string,
-): boolean {
-  return state
-    .auctionAssignments
-    .some(
-      (assignment) =>
-        assignment.playerId ===
-        playerId,
-    )
-}
-
-function getPlayerAuctionStatus(
-  state: AppState,
-  playerId: string,
-): PlayerAuctionStatus {
-  if (
-    state.auctionPhase !==
-    'live'
-  ) {
-    return 'not-live'
-  }
-
-  return isPlayerAssigned(
-    state,
-    playerId,
-  )
-    ? 'assigned'
-    : 'free'
-}
-
-function getAuctionStatusSortValue(
-  state: AppState,
-  playerId: string,
-): number {
-  const status =
-    getPlayerAuctionStatus(
-      state,
-      playerId,
-    )
-
-  switch (status) {
-    case 'free':
-      return 2
-
-    case 'assigned':
-      return 1
-
-    default:
-      return 0
-  }
-}
-
-/* =========================
-   INDICATORS
-========================= */
-
-function getRankClass(
-  rank:
-    SpecialistRank | null,
-): string {
-  switch (rank) {
-    case 1:
-      return 'rank-gold'
-
-    case 2:
-      return 'rank-silver'
-
-    case 3:
-      return 'rank-bronze'
-
-    case 4:
-      return 'rank-neutral'
-
-    default:
-      return ''
-  }
-}
-
-function getRankLabel(
-  rank:
-    SpecialistRank | null,
-): string {
-  if (!rank) {
-    return ''
-  }
-
-  return `${rank}°`
-}
-
-function renderPlayerIndicators(
-  player: Player,
-): string {
-  const specialists =
-    getPlayerSpecialists(
-      player,
-    )
-
-  const indicators:
-    string[] = []
-
-  if (
-    player.startingProbability !==
-      undefined &&
-    player.startingProbability >= 90
-  ) {
-    indicators.push(`
-      <span
-        class="
-          player-indicator
-          player-indicator-xi
-        "
-        title="Titolarità almeno 90%"
-        aria-label="
-          Titolarità almeno 90 per cento
-        "
-      >
-        XI
-      </span>
-    `)
-  }
-
-  if (
-    specialists.penaltyRank
-  ) {
-    indicators.push(`
-      <span
-        class="
-          player-indicator
-          player-indicator-specialist
-          ${getRankClass(
-            specialists.penaltyRank,
-          )}
-        "
-        title="${getRankLabel(
-          specialists.penaltyRank,
-        )} rigorista"
-        aria-label="${getRankLabel(
-          specialists.penaltyRank,
-        )} rigorista"
-      >
-        🥅
-      </span>
-    `)
-  }
-
-  if (
-    specialists.setPieceRank
-  ) {
-    indicators.push(`
-      <span
-        class="
-          player-indicator
-          player-indicator-specialist
-          ${getRankClass(
-            specialists.setPieceRank,
-          )}
-        "
-        title="${getRankLabel(
-          specialists.setPieceRank,
-        )} battitore piazzati"
-        aria-label="${getRankLabel(
-          specialists.setPieceRank,
-        )} battitore piazzati"
-      >
-        ⚽
-      </span>
-    `)
-  }
-
-  if (
-    indicators.length === 0
-  ) {
-    return ''
-  }
-
-  return `
-    <span
-      class="
-        players-player-indicators
-      "
-    >
-      ${indicators.join('')}
-    </span>
-  `
-}
-
-/* =========================
-   FILTERS
-========================= */
-
-function isPenaltyTaker(
-  player: Player,
-): boolean {
-  return (
-    getPlayerSpecialists(
-      player,
-    ).penaltyRank !==
-    null
-  )
-}
-
-function getFilteredPlayers(
-  state: AppState,
-):
-  Player[] {
-  const search =
-    normalizeText(
-      viewState.search,
-    )
-
-  const filtered =
-    players.filter(
-      (player) => {
-        if (
-          viewState.role !== 'ALL' &&
-          player.role !==
-            viewState.role
-        ) {
-          return false
-        }
-
-        if (
-          viewState.penaltiesOnly &&
-          !isPenaltyTaker(
-            player,
-          )
-        ) {
-          return false
-        }
-
-        if (
-          state.auctionPhase ===
-            'live' &&
-          viewState.freeOnly &&
-          isPlayerAssigned(
-            state,
-            player.id,
-          )
-        ) {
-          return false
-        }
-
-        if (search) {
-          const searchable =
-            normalizeText(
-              `${player.name} ${player.team}`,
-            )
-
-          if (
-            !searchable.includes(
-              search,
-            )
-          ) {
-            return false
-          }
-        }
-
-        return true
-      },
-    )
-
-  return filtered.sort(
-    (
-      first,
-      second,
-    ) =>
-      comparePlayers(
-        state,
-        first,
-        second,
-      ),
-  )
-}
-
-/* =========================
-   SORT
-========================= */
-
-const ROLE_ORDER:
-  Record<
-    PlayerRole,
-    number
-  > = {
-    P: 0,
-    D: 1,
-    C: 2,
-    A: 3,
-  }
-
-function compareDefaultRoleIca(
-  first: Player,
-  second: Player,
-): number {
-  const roleDifference =
-    ROLE_ORDER[first.role] -
-    ROLE_ORDER[second.role]
-
-  if (
-    roleDifference !== 0
-  ) {
-    return roleDifference
-  }
-
-  const firstIca =
-    first.iCa
-
-  const secondIca =
-    second.iCa
-
-  const firstHasIca =
-    typeof firstIca ===
-      'number' &&
-    Number.isFinite(firstIca)
-
-  const secondHasIca =
-    typeof secondIca ===
-      'number' &&
-    Number.isFinite(secondIca)
-
-  if (
-    firstHasIca &&
-    !secondHasIca
-  ) {
-    return -1
-  }
-
-  if (
-    !firstHasIca &&
-    secondHasIca
-  ) {
-    return 1
-  }
-
-  if (
-    firstHasIca &&
-    secondHasIca &&
-    firstIca !== secondIca
-  ) {
-    return (
-      (secondIca ?? 0) -
-      (firstIca ?? 0)
-    )
-  }
-
-  return first.name.localeCompare(
-    second.name,
-    'it',
-  )
-}
-
-function getSortableValue(
-  state: AppState,
-  player: Player,
-  key: SortKey,
-): string | number {
-  switch (key) {
-    case 'name':
-      return player.name
-        .toLowerCase()
-
-    case 'iCa':
-      return (
-        player.iCa ??
-        -Infinity
-      )
-
-    case 'pmaPercent':
-      return (
-        player.pmaPercent ??
-        -Infinity
-      )
-
-    case 'consensus':
-      return (
-        player.consensus ??
-        -Infinity
-      )
-
-    case 'startingProbability':
-      return (
-        player
-          .startingProbability ??
-        -Infinity
-      )
-
-    case 'mv':
-      return (
-        player.mv ??
-        -Infinity
-      )
-
-    case 'fmv':
-      return (
-        player.fmv ??
-        -Infinity
-      )
-
-    case 'status':
-      return getAuctionStatusSortValue(
-        state,
-        player.id,
-      )
-  }
-}
-
-function comparePlayers(
-  state: AppState,
-  first: Player,
-  second: Player,
-): number {
-  if (
-    viewState.defaultRoleIcaOrder
-  ) {
-    return compareDefaultRoleIca(
-      first,
-      second,
-    )
-  }
-
-  const firstValue =
-    getSortableValue(
-      state,
-      first,
-      viewState.sortKey,
-    )
-
-  const secondValue =
-    getSortableValue(
-      state,
-      second,
-      viewState.sortKey,
-    )
-
-  let result: number
-
-  if (
-    typeof firstValue ===
-      'number' &&
-    typeof secondValue ===
-      'number'
-  ) {
-    result =
-      firstValue -
-      secondValue
-  } else {
-    result =
-      String(
-        firstValue,
-      ).localeCompare(
-        String(
-          secondValue,
-        ),
-        'it',
-      )
-  }
-
-  return (
-    viewState.sortDirection ===
-    'asc'
-      ? result
-      : -result
-  )
-}
-
-function sortIndicator(
-  key: SortKey,
-): string {
-  if (
-    viewState.defaultRoleIcaOrder ||
-    viewState.sortKey !== key
-  ) {
-    return `
-      <span
-        class="
-          players-sort-neutral
-        "
-      >
-        ↕
-      </span>
-    `
-  }
-
-  return `
-    <span
-      class="
-        players-sort-active
-      "
-    >
-      ${
-        viewState
-          .sortDirection ===
-        'asc'
-          ? '↑'
-          : '↓'
-      }
-    </span>
-  `
-}
-
-function renderSortHeader(
-  label: string,
-  key: SortKey,
-): string {
-  return `
-    <button
-      type="button"
-      class="
-        players-table-sort
-      "
-      data-player-sort="${key}"
-    >
-      <span>
-        ${label}
-      </span>
-
-      ${sortIndicator(
-        key,
-      )}
-    </button>
-  `
-}
-
-/* =========================
-   PLAYER STATUS
-========================= */
-
-function renderPlayerStatus(
-  state: AppState,
-  player: Player,
-): string {
-  const status =
-    getPlayerAuctionStatus(
-      state,
-      player.id,
-    )
-
-  if (
-    status === 'not-live'
-  ) {
-    return `
-      <span
-        class="
-          player-status
-          player-status-not-live
-        "
-      >
-        NO LIVE
-      </span>
-    `
-  }
-
-  if (
-    status === 'assigned'
-  ) {
-    return `
-      <span
-        class="
-          player-status
-          player-status-assigned
-        "
-      >
-        ASSEGNATO
-      </span>
-    `
-  }
-
-  return `
-    <span
-      class="
-        player-status
-        player-status-free
-      "
-    >
-      DA ASSEGNARE
-    </span>
-  `
-}
-
-/* =========================
-   PLAYER ROW
-========================= */
-
-function renderPlayerRow(
-  state: AppState,
-  player: Player,
-): string {
-  return `
-    <button
-      type="button"
-      class="
-        players-table-row
-      "
-      data-player-id="${escapeHtml(
-        player.id,
-      )}"
-      aria-label="Apri scheda di ${escapeHtml(
-        player.name,
-      )}"
-    >
-      <div
-        class="
-          players-cell
-          players-player-cell
-        "
-      >
-        <span
-          class="
-            role-badge
-            role-${player.role.toLowerCase()}
-          "
-        >
-          ${player.role}
-        </span>
-
-        <div
-          class="
-            players-player-info
-          "
-        >
-          <div
-            class="
-              players-player-name-row
-            "
-          >
-            <strong>
-              ${escapeHtml(
-                player.name,
-              )}
-            </strong>
-
-            ${renderPlayerIndicators(
-              player,
-            )}
-          </div>
-
-          <small>
-            ${escapeHtml(
-              player.team,
-            )}
-          </small>
-        </div>
-      </div>
-
-      <div
-        class="
-          players-cell
-          players-number-cell
-          players-ica-cell
-        "
-      >
-        ${formatNumber(
-          player.iCa,
-          2,
-        )}
-      </div>
-
-      <div
-        class="
-          players-cell
-          players-number-cell
-          players-pma-cell
-        "
-      >
-        ${formatPercent(
-          player.pmaPercent,
-          1,
-        )}
-      </div>
-
-      <div
-        class="
-          players-cell
-          players-number-cell
-          players-consensus-cell
-        "
-      >
-        ${formatNumber(
-          player.consensus,
-          2,
-        )}
-      </div>
-
-      <div
-        class="
-          players-cell
-          players-number-cell
-          players-starting-cell
-        "
-      >
-        ${formatPercent(
-          player.startingProbability,
-          0,
-        )}
-      </div>
-
-      <div
-        class="
-          players-cell
-          players-number-cell
-          players-mv-cell
-        "
-      >
-        <span
-          class="
-            players-mv-primary
-          "
-        >
-          ${formatItalianNumber(
-            player.mv,
-            2,
-          )}
-        </span>
-
-        <span
-          class="
-            players-mv-separator
-          "
-        >
-          /
-        </span>
-
-        <span
-          class="
-            players-mv-secondary
-          "
-        >
-          ${formatItalianNumber(
-            player.fmv,
-            2,
-          )}
-        </span>
-      </div>
-
-      <div
-        class="
-          players-cell
-          players-status-cell
-        "
-      >
-        ${renderPlayerStatus(
-          state,
-          player,
-        )}
-      </div>
-    </button>
-  `
-}
-
-/* =========================
-   PLAYER DETAIL
-========================= */
-
-function renderPlayersDetail(
-  state: AppState,
-): string {
-  if (!previewPlayerId) {
-    return ''
-  }
-
-  const player =
-    players.find(
-      (item) =>
-        item.id ===
-        previewPlayerId,
-    )
-
-  if (!player) {
-    return ''
-  }
-
-  const auctionLive =
-    state.auctionPhase ===
-    'live'
-
-  const assigned =
-    auctionLive &&
-    isPlayerAssigned(
-      state,
-      player.id,
-    )
-
-  return renderPlayerDetailOverlay(
-    player,
-    assigned,
-    auctionLive &&
-      !assigned,
-  )
-}
-
-/* =========================
-   PAGE
-========================= */
-
-export function renderPlayersPage(
-  state: AppState,
-): string {
-  const auctionLive =
-    state.auctionPhase ===
-    'live'
-
-  if (
-    !auctionLive &&
-    viewState.freeOnly
-  ) {
-    viewState.freeOnly =
-      false
-  }
-
-  const filteredPlayers =
-    getFilteredPlayers(
-      state,
-    )
-
-  return `
-    <section
-      class="
-        page
-        players-page
-      "
-    >
-      <div
-        class="
-          players-page-header
-        "
-      >
-        <div>
-          <span
-            class="
-              players-eyebrow
-            "
-          >
-            DATABASE 2026/27
-          </span>
-
-          <h1>
-            Giocatori
-          </h1>
-
-          <p>
-            ${filteredPlayers.length}
-            di
-            ${players.length}
-            nel listone attivo
-          </p>
-        </div>
-
-        <div
-          class="
-            players-header-actions
-          "
-        >
-          <button
-            id="playersGoToAuctionButton"
-            type="button"
-            class="
-              players-auction-nav-button
-              ${
-                auctionLive
-                  ? 'is-live'
-                  : 'is-disabled'
-              }
-            "
-            ${
-              auctionLive
-                ? ''
-                : 'disabled'
-            }
-          >
-            <span
-              class="
-                players-auction-nav-dot
-              "
-            ></span>
-
-            Asta
-          </button>
-        </div>
-      </div>
-
-      <div
-        class="
-          players-toolbar
-        "
-      >
-        <div
-          class="
-            players-toolbar-left
-          "
-        >
-          <div
-            class="
-              players-role-filter
-            "
-          >
-            ${(
-              [
-                [
-                  'ALL',
-                  'Tutti',
-                ],
-                [
-                  'P',
-                  'P',
-                ],
-                [
-                  'D',
-                  'D',
-                ],
-                [
-                  'C',
-                  'C',
-                ],
-                [
-                  'A',
-                  'A',
-                ],
-              ] as Array<
-                [
-                  RoleFilter,
-                  string,
-                ]
-              >
-            )
-              .map(
-                (
-                  [
-                    value,
-                    label,
-                  ],
-                ) => `
-                  <button
-                    type="button"
-                    class="
-                      players-filter-button
-                      players-role-${value.toLowerCase()}
-                      ${
-                        viewState.role ===
-                        value
-                          ? 'selected'
-                          : ''
-                      }
-                    "
-                    data-player-role="${value}"
-                  >
-                    ${label}
-                  </button>
-                `,
-              )
-              .join('')}
-          </div>
-
-          <div
-            class="
-              players-toggle-group
-            "
-          >
-            <label
-              class="
-                players-simple-toggle
-                ${
-                  viewState.freeOnly &&
-                  auctionLive
-                    ? 'selected'
-                    : ''
-                }
-                ${
-                  auctionLive
-                    ? ''
-                    : 'disabled'
-                }
-              "
-              title="${
-                auctionLive
-                  ? 'Mostra solo i giocatori da assegnare'
-                  : 'Disponibile solo durante un’asta LIVE'
-              }"
-            >
-              <input
-                id="freeOnly"
-                type="checkbox"
-                ${
-                  viewState.freeOnly &&
-                  auctionLive
-                    ? 'checked'
-                    : ''
-                }
-                ${
-                  auctionLive
-                    ? ''
-                    : 'disabled'
-                }
-              >
-
-              <span
-                class="
-                  players-toggle-dot
-                "
-              ></span>
-
-              <span>
-                Solo liberi
-              </span>
-            </label>
-
-            <label
-              class="
-                players-simple-toggle
-                players-penalty-toggle
-                ${
-                  viewState
-                    .penaltiesOnly
-                    ? 'selected'
-                    : ''
-                }
-              "
-            >
-              <input
-                id="penaltiesOnly"
-                type="checkbox"
-                ${
-                  viewState
-                    .penaltiesOnly
-                    ? 'checked'
-                    : ''
-                }
-              >
-
-              <span
-                class="
-                  players-penalty-symbol
-                "
-              >
-                🥅
-              </span>
-
-              <span>
-                Rigoristi
-              </span>
-            </label>
-          </div>
-        </div>
-
-        <div
-          class="
-            players-search
-          "
-        >
-          <span
-            class="
-              players-search-icon
-            "
-          >
-            ⌕
-          </span>
-
-          <input
-            id="playersSearch"
-            type="search"
-            placeholder="Cerca nome o squadra..."
-            value="${escapeHtml(
-              viewState.search,
-            )}"
-            autocomplete="off"
-          >
-
-          <button
-            id="clearPlayersSearch"
-            type="button"
-            class="
-              players-search-clear
-              ${
-                viewState.search
-                  ? ''
-                  : 'hidden'
-              }
-            "
-            aria-label="Cancella ricerca"
-            title="Cancella ricerca"
-          >
-            ×
-          </button>
-        </div>
-      </div>
-
-      <div
-        class="
-          players-table-card
-        "
-      >
-        <div
-          class="
-            players-table-header
-          "
-        >
-          <div>
-            ${renderSortHeader(
-              'Giocatore',
-              'name',
-            )}
-          </div>
-
-          <div>
-            ${renderSortHeader(
-              'iCà',
-              'iCa',
-            )}
-          </div>
-
-          <div>
-            ${renderSortHeader(
-              'PMA',
-              'pmaPercent',
-            )}
-          </div>
-
-          <div>
-            ${renderSortHeader(
-              'Consenso',
-              'consensus',
-            )}
-          </div>
-
-          <div>
-            ${renderSortHeader(
-              'Titolarità',
-              'startingProbability',
-            )}
-          </div>
-
-          <div>
-            ${renderSortHeader(
-              'MV / FMV',
-              'fmv',
-            )}
-          </div>
-
-          <div>
-            ${renderSortHeader(
-              'Stato',
-              'status',
-            )}
-          </div>
-        </div>
-
-        <div
-          class="
-            players-table-body
-          "
-        >
-          ${
-            filteredPlayers.length
-              ? filteredPlayers
-                  .map(
-                    (
-                      player:
-                        Player,
-                    ) =>
-                      renderPlayerRow(
-                        state,
-                        player,
-                      ),
-                  )
-                  .join('')
-              : `
-                <div
-                  class="
-                    players-empty
-                  "
-                >
-                  Nessun giocatore
-                  corrisponde ai filtri
-                  selezionati.
-                </div>
-              `
-          }
-        </div>
-      </div>
-
-      <div
-        class="
-          players-footer-info
-        "
-      >
-        <span>
-          ${filteredPlayers.length}
-
-          ${
-            filteredPlayers.length ===
-            1
-              ? 'giocatore'
-              : 'giocatori'
-          }
-        </span>
-
-        <span>
-          Listone MisterCanà 2026/27
-        </span>
-      </div>
-
-      ${renderPlayersDetail(
-        state,
-      )}
-    </section>
-  `
-}
-
-/* =========================
-   EVENTS
-========================= */
-
-function focusSearchAtEnd():
-  void {
-  const newSearchInput =
-    document.querySelector<HTMLInputElement>(
-      '#playersSearch',
-    )
-
-  if (!newSearchInput) {
-    return
-  }
-
-  newSearchInput.focus()
-
-  const end =
-    newSearchInput
-      .value
-      .length
-
-  newSearchInput
-    .setSelectionRange(
-      end,
-      end,
-    )
-}
-
-export function bindPlayersEvents(
-  state: AppState,
-  actions: PlayersActions,
-): void {
-  document
-    .querySelector(
-      '#playersGoToAuctionButton',
-    )
-    ?.addEventListener(
-      'click',
-      () => {
-        if (
-          state.auctionPhase !==
-          'live'
-        ) {
-          return
-        }
-
-        actions.onGoToAuction()
-      },
-    )
-
-  document
-    .querySelectorAll<HTMLButtonElement>(
-      '[data-player-role]',
-    )
-    .forEach(
-      (button) => {
-        button.addEventListener(
-          'click',
-          () => {
-            const role =
-              button.dataset
-                .playerRole as
-                | RoleFilter
-                | undefined
-
-            if (!role) {
-              return
-            }
-
-            viewState.role =
-              role
-
-            actions.onRender()
-          },
-        )
-      },
-    )
-
-  document
-    .querySelector<HTMLInputElement>(
-      '#penaltiesOnly',
-    )
-    ?.addEventListener(
-      'change',
-      (event) => {
-        const target =
-          event.currentTarget as
-            HTMLInputElement
-
-        viewState
-          .penaltiesOnly =
-          target.checked
-
-        actions.onRender()
-      },
-    )
-
-  document
-    .querySelector<HTMLInputElement>(
-      '#freeOnly',
-    )
-    ?.addEventListener(
-      'change',
-      (event) => {
-        if (
-          state.auctionPhase !==
-          'live'
-        ) {
-          viewState.freeOnly =
-            false
-
-          return
-        }
-
-        const target =
-          event.currentTarget as
-            HTMLInputElement
-
-        viewState.freeOnly =
-          target.checked
-
-        actions.onRender()
-      },
-    )
-
-  const searchInput =
-    document.querySelector<HTMLInputElement>(
-      '#playersSearch',
-    )
-
-  searchInput?.addEventListener(
-    'input',
-    () => {
-      viewState.search =
-        searchInput.value
-
-      actions.onRender()
-
-      focusSearchAtEnd()
-    },
-  )
-
-  searchInput?.addEventListener(
-    'search',
-    () => {
-      if (
-        viewState.search ===
-        searchInput.value
-      ) {
-        return
-      }
-
-      viewState.search =
-        searchInput.value
-
-      actions.onRender()
-
-      focusSearchAtEnd()
-    },
-  )
-
-  document
-    .querySelector<HTMLButtonElement>(
-      '#clearPlayersSearch',
-    )
-    ?.addEventListener(
-      'click',
-      () => {
-        viewState.search = ''
-
-        actions.onRender()
-
-        const newSearchInput =
-          document.querySelector<HTMLInputElement>(
-            '#playersSearch',
-          )
-
-        newSearchInput?.focus()
-      },
-    )
-
-  document
-    .querySelectorAll<HTMLButtonElement>(
-      '[data-player-sort]',
-    )
-    .forEach(
-      (button) => {
-        button.addEventListener(
-          'click',
-          () => {
-            const key =
-              button.dataset
-                .playerSort as
-                | SortKey
-                | undefined
-
-            if (!key) {
-              return
-            }
-
-            if (
-              !viewState
-                .defaultRoleIcaOrder &&
-              viewState.sortKey ===
-              key
-            ) {
-              viewState
-                .sortDirection =
-                viewState
-                  .sortDirection ===
-                'asc'
-                  ? 'desc'
-                  : 'asc'
-            } else {
-              viewState.sortKey =
-                key
-
-              viewState
-                .sortDirection =
-                key === 'name'
-                  ? 'asc'
-                  : 'desc'
-            }
-
-            viewState
-              .defaultRoleIcaOrder =
-              false
-
-            actions.onRender()
-          },
-        )
-      },
-    )
-
-  document
-    .querySelectorAll<HTMLButtonElement>(
-      '[data-player-id]',
-    )
-    .forEach(
-      (row) => {
-        row.addEventListener(
-          'click',
-          () => {
-            const playerId =
-              row.dataset
-                .playerId
-
-            if (!playerId) {
-              return
-            }
-
-            previewPlayerId =
-              playerId
-
-            actions.onRender()
-          },
-        )
-      },
-    )
-
-  const closePreview =
-    (): void => {
-      runOverlayExit(
-        '#playerDetailOverlay',
-        () => {
-          previewPlayerId =
-            null
-
-          actions.onRender()
-        },
-      )
-    }
-
-  document
-    .querySelectorAll<HTMLButtonElement>(
-      '[data-close-player-detail]',
-    )
-    .forEach(
-      (button) => {
-        button.addEventListener(
-          'click',
-          closePreview,
-        )
-      },
-    )
-
-  document
-    .querySelector<HTMLButtonElement>(
-      '[data-player-detail-call]',
-    )
-    ?.addEventListener(
-      'click',
-      (event) => {
-        if (
-          state.auctionPhase !==
-          'live'
-        ) {
-          return
-        }
-
-        const button =
-          event.currentTarget as
-            HTMLButtonElement | null
-
-        const playerId =
-          button?.dataset
-            .playerDetailCall
-
-        if (!playerId) {
-          return
-        }
-
-        if (
-          isPlayerAssigned(
-            state,
-            playerId,
-          )
-        ) {
-          return
-        }
-
-        previewPlayerId =
-          null
-
-        actions.onCallPlayer(
-          playerId,
-        )
-      },
-    )
+  })
 }

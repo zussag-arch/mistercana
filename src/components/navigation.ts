@@ -6,6 +6,7 @@ export type PageId =
   | 'dashboard'
   | 'auction'
   | 'players'
+  | 'playerDetail'
   | 'objectives'
   | 'insights'
   | 'importExport'

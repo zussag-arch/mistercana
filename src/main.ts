@@ -4,6 +4,7 @@ import './styles/dashboard.css'
 import './styles/auction.css'
 import './styles/competitors.css'
 import './styles/players.css'
+import './styles/playerDetail.css'
 import './styles/objectives.css'
 import './styles/insights.css'
 import './styles/importExport.css'
@@ -26,6 +27,11 @@ import {
   renderPlayersPage,
   bindPlayersEvents,
 } from './pages/players'
+
+import {
+  renderFullPlayerPage,
+  bindFullPlayerPage,
+} from './pages/playerDetail'
 
 import {
   renderObjectivesPage,
@@ -70,6 +76,8 @@ import type {
 
 const state =
   loadState()
+
+let selectedPlayerReference: string | null = null
 
 initializeFavicon(
   state.auctionPhase ===
@@ -139,6 +147,12 @@ function getPageContent(
 
     case 'players':
       return renderPlayersPage(
+        state,
+      )
+
+    case 'playerDetail':
+      return renderFullPlayerPage(
+        selectedPlayerReference,
         state,
       )
 
@@ -475,6 +489,9 @@ function compactPageChrome(
       compactPlayersChrome(
         target,
       )
+      break
+
+    case 'playerDetail':
       break
 
     case 'objectives':
@@ -824,6 +841,16 @@ function bindPageEvents(
           onCallPlayer:
             callPlayerInAuction,
 
+          onOpenFullPlayer:
+            (reference) => {
+              selectedPlayerReference =
+                reference
+
+              navigateAndRender(
+                'playerDetail',
+              )
+            },
+
           onGoToAuction:
             () => {
               if (
@@ -837,6 +864,25 @@ function bindPageEvents(
                 'auction',
               )
             },
+        },
+      )
+
+      break
+
+    case 'playerDetail':
+      bindFullPlayerPage(
+        selectedPlayerReference,
+        {
+          onBack: () =>
+            navigateAndRender(
+              'players',
+            ),
+
+          onRender:
+            render,
+
+          onCallPlayer:
+            callPlayerInAuction,
         },
       )
 
