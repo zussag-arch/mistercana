@@ -9,6 +9,20 @@ import {
   saveState,
 } from '../app/storage'
 
+import {
+  FLDA_API_URL,
+  FldaApiError,
+  getFldaHealth,
+  getFldaStatus,
+  updateFlda,
+} from '../services/flda'
+
+import type {
+  FldaDatasetState,
+  FldaHealth,
+  FldaUpdateTarget,
+} from '../services/flda'
+
 import type {
   AppState,
   Manager,
@@ -39,6 +53,20 @@ interface PendingRestore {
   exportedAt: string
 }
 
+type FldaConnectionState =
+  | 'loading'
+  | 'connected'
+  | 'unreachable'
+  | 'api-error'
+
+interface FldaDatasetDefinition {
+  key: string
+  label: string
+  updateTarget?: FldaUpdateTarget
+  updateLabel?: string
+  note?: string
+}
+
 /* =========================
    LOCAL UI STATE
 ========================= */
@@ -51,6 +79,64 @@ let pendingRestore:
 
 let importExportEventsBound =
   false
+
+let fldaConnection:
+  FldaConnectionState = 'loading'
+
+let fldaHealth:
+  FldaHealth | null = null
+
+let fldaDatasets:
+  FldaDatasetState[] = []
+
+let fldaError:
+  string | null = null
+
+let fldaFeedback:
+  FeedbackState | null = null
+
+let fldaUpdating:
+  FldaUpdateTarget | 'all' | null = null
+
+let fldaLoading = false
+
+const FLDA_DATASETS:
+  FldaDatasetDefinition[] = [
+    {
+      key: 'players_current',
+      label: 'Listone',
+      updateTarget: 'players',
+      updateLabel: 'Aggiorna Listone',
+    },
+    {
+      key: 'guide',
+      label: 'Guida Asta',
+      updateTarget: 'guide',
+      updateLabel: 'Aggiorna Guida',
+    },
+    {
+      key: 'hierarchies',
+      label: 'Gerarchie',
+      note: 'Aggiornate insieme alla Guida',
+    },
+    {
+      key: 'calendar_grid',
+      label: 'Calendario / Griglie',
+      updateTarget: 'grid',
+      updateLabel: 'Aggiorna Calendario',
+    },
+    {
+      key: 'history',
+      label: 'Storico',
+      updateTarget: 'history',
+      updateLabel: 'Aggiorna Storico',
+    },
+    {
+      key: 'saggi',
+      label: 'Saggi',
+      note: 'Gestito da FLDA, non aggiornabile da questa pagina',
+    },
+  ]
 
 /* =========================
    HTML
@@ -110,6 +196,302 @@ function formatDateTime(
         'short',
     },
   ).format(date)
+}
+
+function normalizeFldaStatus(
+  value: string | undefined,
+): FldaDatasetState['status'] {
+  switch (value) {
+    case 'success':
+    case 'warning':
+    case 'failed':
+    case 'never':
+      return value
+
+    default:
+      return 'never'
+  }
+}
+
+function getFldaStatusLabel(
+  status: FldaDatasetState['status'],
+): string {
+  switch (status) {
+    case 'success':
+      return 'Aggiornato'
+
+    case 'warning':
+      return 'Con avvisi'
+
+    case 'failed':
+      return 'Errore'
+
+    case 'never':
+      return 'Mai aggiornato'
+  }
+}
+
+function getFldaDataset(
+  key: string,
+): FldaDatasetState {
+  const dataset =
+    fldaDatasets.find(
+      (candidate) =>
+        candidate.dataset_name === key,
+    )
+
+  if (!dataset) {
+    return {
+      dataset_name: key,
+      status: 'never',
+      record_count: 0,
+      warning_count: 0,
+      blocking_count: 0,
+      last_success_at: null,
+    }
+  }
+
+  return {
+    ...dataset,
+    status: normalizeFldaStatus(
+      dataset.status,
+    ),
+  }
+}
+
+function renderFldaFeedback(): string {
+  if (!fldaFeedback) {
+    return ''
+  }
+
+  return `
+    <div
+      class="
+        data-transfer-feedback
+        data-transfer-feedback-${fldaFeedback.type}
+      "
+      role="status"
+    >
+      <strong>
+        ${escapeHtml(fldaFeedback.title)}
+      </strong>
+
+      <span>
+        ${escapeHtml(fldaFeedback.message)}
+      </span>
+    </div>
+  `
+}
+
+function renderFldaDatasetCard(
+  definition: FldaDatasetDefinition,
+): string {
+  const dataset =
+    getFldaDataset(definition.key)
+
+  const updating =
+    fldaUpdating === 'all' ||
+    fldaUpdating === definition.updateTarget
+
+  const lastSuccess =
+    dataset.last_success_at
+      ? formatDateTime(
+          dataset.last_success_at,
+        )
+      : 'Non disponibile'
+
+  return `
+    <article class="flda-dataset-card">
+      <div class="flda-dataset-heading">
+        <div>
+          <h3>
+            ${escapeHtml(definition.label)}
+          </h3>
+
+          ${
+            definition.note
+              ? `<p>${escapeHtml(definition.note)}</p>`
+              : ''
+          }
+        </div>
+
+        <span
+          class="
+            data-transfer-status
+            flda-status-${dataset.status}
+          "
+        >
+          ${getFldaStatusLabel(dataset.status)}
+        </span>
+      </div>
+
+      <dl class="flda-dataset-metrics">
+        <div>
+          <dt>Record</dt>
+          <dd>${dataset.record_count}</dd>
+        </div>
+
+        <div>
+          <dt>Warning</dt>
+          <dd>${dataset.warning_count}</dd>
+        </div>
+
+        <div>
+          <dt>Bloccanti</dt>
+          <dd>${dataset.blocking_count}</dd>
+        </div>
+      </dl>
+
+      <div class="flda-dataset-footer">
+        <span>
+          Ultimo aggiornamento riuscito
+        </span>
+
+        <strong>
+          ${escapeHtml(lastSuccess)}
+        </strong>
+
+        ${
+          definition.updateTarget
+            ? `
+              <button
+                type="button"
+                class="
+                  data-transfer-button
+                  data-transfer-button-secondary
+                "
+                data-flda-update="${definition.updateTarget}"
+                ${
+                  fldaConnection !== 'connected' ||
+                  fldaUpdating
+                    ? 'disabled'
+                    : ''
+                }
+              >
+                ${
+                  updating
+                    ? 'Aggiornamento...'
+                    : definition.updateLabel
+                }
+              </button>
+            `
+            : ''
+        }
+      </div>
+    </article>
+  `
+}
+
+function renderFldaPanel(): string {
+  const connected =
+    fldaConnection === 'connected'
+
+  const connectionLabel =
+    fldaConnection === 'loading'
+      ? 'Verifica in corso'
+      : connected
+        ? 'FLDA connesso'
+        : fldaConnection === 'unreachable'
+          ? 'FLDA non raggiungibile'
+          : 'Errore API FLDA'
+
+  const connectionClass =
+    fldaConnection === 'loading'
+      ? 'status-neutral'
+      : connected
+        ? 'status-ready'
+        : 'flda-status-failed'
+
+  return `
+    <section
+      id="fldaPanel"
+      class="data-transfer-section"
+    >
+      <div class="data-transfer-section-header">
+        <div>
+          <span class="data-transfer-eyebrow">
+            DATI FLDA
+          </span>
+
+          <h2>
+            Fonti dati locali
+          </h2>
+
+          <p>
+            Stato e aggiornamento dei dataset gestiti da FLDA.
+            Questi dati sono separati dal backup dell'app.
+          </p>
+
+          <code class="flda-api-url">
+            ${escapeHtml(FLDA_API_URL)}
+          </code>
+        </div>
+
+        <div class="flda-panel-actions">
+          <span
+            class="
+              data-transfer-status
+              ${connectionClass}
+            "
+          >
+            ${connectionLabel}
+          </span>
+
+          <button
+            type="button"
+            class="
+              data-transfer-button
+              data-transfer-button-primary
+            "
+            data-flda-update="all"
+            ${
+              !connected || fldaUpdating
+                ? 'disabled'
+                : ''
+            }
+          >
+            ${
+              fldaUpdating === 'all'
+                ? 'Aggiornamento...'
+                : 'Aggiorna tutto'
+            }
+          </button>
+        </div>
+      </div>
+
+      ${
+        fldaHealth?.version
+          ? `
+            <p class="flda-service-meta">
+              API FLDA ${escapeHtml(fldaHealth.version)}
+            </p>
+          `
+          : ''
+      }
+
+      ${
+        fldaError
+          ? `
+            <div class="flda-connection-error" role="alert">
+              ${escapeHtml(fldaError)}
+            </div>
+          `
+          : ''
+      }
+
+      <div class="flda-dataset-grid">
+        ${
+          FLDA_DATASETS
+            .map(renderFldaDatasetCard)
+            .join('')
+        }
+      </div>
+
+      <div id="fldaFeedback">
+        ${renderFldaFeedback()}
+      </div>
+    </section>
+  `
 }
 
 function getManagerName(
@@ -567,6 +949,19 @@ export function renderImportExportPage():
     state.auctionAssignments
       .length > 0
 
+  window.setTimeout(
+    () => {
+      if (
+        document.querySelector(
+          '#fldaPanel',
+        )
+      ) {
+        void refreshFldaData()
+      }
+    },
+    0,
+  )
+
   return `
     <section
       class="
@@ -591,6 +986,8 @@ export function renderImportExportPage():
         </div>
       </div>
 
+      ${renderFldaPanel()}
+
       <section
         class="data-transfer-section"
       >
@@ -605,7 +1002,7 @@ export function renderImportExportPage():
                 data-transfer-eyebrow
               "
             >
-              SICUREZZA DATI
+              BACKUP APP
             </span>
 
             <h2>
@@ -939,177 +1336,6 @@ export function renderImportExportPage():
       </section>
 
       <section
-        class="data-transfer-section"
-      >
-        <div
-          class="
-            data-transfer-section-header
-          "
-        >
-          <div>
-            <span
-              class="
-                data-transfer-eyebrow
-              "
-            >
-              PROSSIMI COLLEGAMENTI
-            </span>
-
-            <h2>
-              Database esterni
-            </h2>
-
-            <p>
-              Restano separati dal backup
-              dell'app e verranno collegati
-              quando avremo i file reali.
-            </p>
-          </div>
-        </div>
-
-        <div
-          class="data-transfer-grid"
-        >
-          <article
-            class="data-transfer-card"
-          >
-            <div
-              class="
-                data-transfer-card-header
-              "
-            >
-              <div
-                class="
-                  data-transfer-icon
-                  data-transfer-icon-import
-                "
-              >
-                ↓
-              </div>
-
-              <span
-                class="
-                  data-transfer-status
-                  status-pending
-                "
-              >
-                Da collegare
-              </span>
-            </div>
-
-            <div
-              class="
-                data-transfer-card-body
-              "
-            >
-              <h3>
-                Database giocatori
-              </h3>
-
-              <p>
-                Importazione futura
-                dell'anagrafica e dei dati
-                correnti dei giocatori.
-              </p>
-            </div>
-
-            <div
-              class="
-                data-transfer-card-footer
-              "
-            >
-              <div>
-                <span>
-                  Formati previsti
-                </span>
-
-                <strong>
-                  CSV / formato normalizzato
-                </strong>
-              </div>
-
-              <button
-                type="button"
-                class="data-transfer-button"
-                disabled
-              >
-                Non collegato
-              </button>
-            </div>
-          </article>
-
-          <article
-            class="data-transfer-card"
-          >
-            <div
-              class="
-                data-transfer-card-header
-              "
-            >
-              <div
-                class="
-                  data-transfer-icon
-                  data-transfer-icon-import
-                "
-              >
-                ↓
-              </div>
-
-              <span
-                class="
-                  data-transfer-status
-                  status-pending
-                "
-              >
-                In attesa DB
-              </span>
-            </div>
-
-            <div
-              class="
-                data-transfer-card-body
-              "
-            >
-              <h3>
-                Dati storici
-              </h3>
-
-              <p>
-                Qui verranno collegati
-                prezzo della stagione
-                precedente e serie
-                storiche MV/FMV.
-              </p>
-            </div>
-
-            <div
-              class="
-                data-transfer-card-footer
-              "
-            >
-              <div>
-                <span>
-                  Formati previsti
-                </span>
-
-                <strong>
-                  CSV
-                </strong>
-              </div>
-
-              <button
-                type="button"
-                class="data-transfer-button"
-                disabled
-              >
-                In attesa file
-              </button>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <section
         class="data-integrity-panel"
       >
         <div
@@ -1170,6 +1396,118 @@ function updateDynamicUi():
   if (previewContainer) {
     previewContainer.innerHTML =
       renderRestorePreview()
+  }
+}
+
+function updateFldaUi(): void {
+  const panel =
+    document.querySelector<HTMLElement>(
+      '#fldaPanel',
+    )
+
+  if (panel) {
+    panel.outerHTML =
+      renderFldaPanel()
+  }
+}
+
+async function refreshFldaData():
+  Promise<void> {
+  if (fldaLoading) {
+    return
+  }
+
+  fldaLoading = true
+  fldaConnection = 'loading'
+  fldaError = null
+  updateFldaUi()
+
+  try {
+    const [health, datasets] =
+      await Promise.all([
+        getFldaHealth(),
+        getFldaStatus(),
+      ])
+
+    fldaHealth = health
+    fldaDatasets = datasets
+
+    if (health.status === 'ok') {
+      fldaConnection = 'connected'
+    } else {
+      fldaConnection = 'api-error'
+      fldaError =
+        `FLDA segnala lo stato “${health.status}”.`
+    }
+  } catch (error) {
+    fldaHealth = null
+
+    if (
+      error instanceof FldaApiError &&
+      (
+        error.kind === 'unreachable' ||
+        error.kind === 'timeout'
+      )
+    ) {
+      fldaConnection = 'unreachable'
+    } else {
+      fldaConnection = 'api-error'
+    }
+
+    fldaError =
+      error instanceof Error
+        ? error.message
+        : 'Errore imprevisto durante il collegamento a FLDA.'
+  } finally {
+    fldaLoading = false
+    updateFldaUi()
+  }
+}
+
+async function runFldaUpdate(
+  target: FldaUpdateTarget | 'all',
+): Promise<void> {
+  if (
+    fldaUpdating ||
+    fldaConnection !== 'connected'
+  ) {
+    return
+  }
+
+  fldaUpdating = target
+  fldaFeedback = {
+    type: 'info',
+    title: 'Aggiornamento in corso',
+    message:
+      'FLDA sta aggiornando i dataset richiesti.',
+  }
+  updateFldaUi()
+
+  try {
+    await updateFlda(
+      target === 'all'
+        ? undefined
+        : target,
+    )
+
+    fldaFeedback = {
+      type: 'success',
+      title: 'Aggiornamento completato',
+      message:
+        'Lo stato dei dataset è stato ricaricato da FLDA.',
+    }
+  } catch (error) {
+    fldaFeedback = {
+      type: 'error',
+      title: 'Aggiornamento fallito',
+      message:
+        error instanceof Error
+          ? error.message
+          : 'FLDA non ha completato l’aggiornamento.',
+    }
+  } finally {
+    fldaUpdating = null
+    await refreshFldaData()
   }
 }
 
@@ -1425,6 +1763,31 @@ export function bindImportExportEvents():
         )
       ) {
         exportBackup()
+
+        return
+      }
+
+      const fldaUpdateButton =
+        target.closest<HTMLElement>(
+          '[data-flda-update]',
+        )
+
+      if (fldaUpdateButton) {
+        const updateTarget =
+          fldaUpdateButton.dataset
+            .fldaUpdate
+
+        if (
+          updateTarget === 'all' ||
+          updateTarget === 'players' ||
+          updateTarget === 'guide' ||
+          updateTarget === 'grid' ||
+          updateTarget === 'history'
+        ) {
+          void runFldaUpdate(
+            updateTarget,
+          )
+        }
 
         return
       }
