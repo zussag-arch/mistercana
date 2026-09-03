@@ -28,6 +28,12 @@ export interface BudgetDistribution {
   A: number
 }
 
+export interface PmaConfiguration {
+  mode: 'classic' | 'mantra'
+  participants: 8 | 10 | 12
+  defenseModifier: boolean
+}
+
 export interface Manager {
   id: string
   firstName: string
@@ -90,6 +96,9 @@ export interface AppState {
   defenseModifierEnabled:
     boolean
 
+  pmaConfiguration:
+    PmaConfiguration
+
   budgetProfile:
     BudgetProfile
 
@@ -123,7 +132,13 @@ export const defaultState:
       500,
 
     defenseModifierEnabled:
-      false,
+      true,
+
+    pmaConfiguration: {
+      mode: 'classic',
+      participants: 8,
+      defenseModifier: true,
+    },
 
     budgetProfile:
       'equilibrata',

@@ -11,6 +11,7 @@ import { getLegacyIdFromFldaId } from '../services/playerIdentity'
 import { renderPlayerDetailOverlay } from '../components/playerDetailOverlay'
 import type { PlayerViewModel } from '../components/playerDataView'
 import { auctionStatusClass, display, escapePlayerHtml, icaHue, renderPlayerBadges } from '../components/playerDataView'
+import { getFldaPma } from '../domain/pma'
 
 type RoleFilter = 'ALL' | PlayerRole
 type SortKey = 'default' | 'name' | 'team' | 'fm_exp' | 'titolarita_display' | 'mv_fmv' | 'ica' | 'status'
@@ -137,6 +138,7 @@ function renderOverlay(state: AppState, bulk: FldaPlayer[]): string {
     flda: selected.flda, legacy: selected.legacy, legacyId,
     assigned: isAssigned(state, legacyId), auctionLive: state.auctionPhase === 'live',
     identityAvailable: Boolean(fldaId && legacyId),
+    pmaConfiguration: state.pmaConfiguration,
     detail: fldaId ? getCachedPlayerDetail(fldaId) : undefined,
   }
   const shell: Player = selected.legacy ?? {
@@ -157,11 +159,13 @@ function renderRow(state: AppState, player: FldaPlayer): string {
     detail: player.player_id ? getCachedPlayerDetail(player.player_id) : undefined,
     assigned: isAssigned(state, legacyId), auctionLive: state.auctionPhase === 'live',
     identityAvailable: Boolean(player.player_id && legacyId),
+    pmaConfiguration: state.pmaConfiguration,
   }
+  const pma = getFldaPma(player, state.pmaConfiguration)
   return `<button type="button" class="players-table-row" data-player-ref="${escapePlayerHtml(fldaReference(player))}">
     <div class="players-player-cell"><span class="role-badge role-${player.role.toLowerCase()}">${escapePlayerHtml(player.role)}</span><span><span class="players-name-line"><strong>${escapePlayerHtml(player.name)}</strong>${renderPlayerBadges(view)}</span><small>${escapePlayerHtml(player.team)}</small></span></div>
     <div data-label="iCà"><span class="players-ica" style="--ica-hue:${icaHue(legacy?.iCa)}">${display(legacy?.iCa, 1)}</span></div>
-    <div data-label="PMA">—</div>
+    <div data-label="PMA">${typeof pma === 'number' ? `${display(pma, 1)}%` : '—'}</div>
     <div data-label="xFM">${display(player.fm_exp, 2)}</div>
     <div data-label="Titolarità">${display(player.titolarita_display, 0)}${typeof player.titolarita_display === 'number' ? '%' : ''}</div>
     <div data-label="MV/FMV"><span class="players-dual-value">${display(legacy?.mv, 2)} <small>/</small> ${display(legacy?.fmv, 2)}</span></div>
@@ -193,7 +197,7 @@ export function renderPlayersPage(state: AppState): string {
     <div class="players-page-header"><div><span class="players-eyebrow">DATABASE FLDA</span><h1>Giocatori</h1><p><span data-players-count>${rows.length}</span> di ${source.length}</p></div><button id="playersGoToAuctionButton" class="players-auction-nav-button" ${state.auctionPhase === 'live' ? '' : 'disabled'}>Asta</button></div>
     <div class="players-toolbar">
       <div class="players-role-filter">${(['ALL','P','D','C','A'] as RoleFilter[]).map((role) => `<button type="button" data-player-role="${role}" class="players-filter-button ${viewState.role === role ? 'selected' : ''}">${role === 'ALL' ? 'Tutti' : role}</button>`).join('')}</div>
-      <select id="playersTeamFilter" aria-label="Filtra squadra"><option value="ALL">Tutte le squadre</option>${teams.map((team) => `<option value="${escapePlayerHtml(team)}" ${viewState.team === team ? 'selected' : ''}>${escapePlayerHtml(team)}</option>`).join('')}</select>
+      <details class="players-team-filter"><summary aria-label="Seleziona squadra">${viewState.team === 'ALL' ? 'Tutte' : escapePlayerHtml(viewState.team)}</summary><div class="auction-team-selector" role="group" aria-label="Filtra per squadra"><button type="button" class="auction-team-choice ${viewState.team === 'ALL' ? 'selected' : ''}" data-player-team="ALL">Tutte</button>${teams.map((team) => `<button type="button" class="auction-team-choice ${viewState.team === team ? 'selected' : ''}" data-player-team="${escapePlayerHtml(team)}">${escapePlayerHtml(team)}</button>`).join('')}</div></details>
       <details class="players-filters"><summary aria-label="Apri filtri giocatori">Filtri${activeFilters ? ` (${activeFilters})` : ''}</summary><div class="players-filter-menu">
         <label><input data-player-filter="freeOnly" type="checkbox" ${viewState.freeOnly ? 'checked' : ''} ${state.auctionPhase === 'live' ? '' : 'disabled'}> Solo liberi</label>
         <label><input data-player-filter="startingXi" type="checkbox" ${viewState.startingXi ? 'checked' : ''}> Titolare XI</label>
@@ -259,7 +263,14 @@ export function bindPlayersEvents(state: AppState, actions: PlayersActions): voi
   document.addEventListener('mistercana:players-loaded', actions.onRender, { once: true })
   document.querySelector('#playersGoToAuctionButton')?.addEventListener('click', actions.onGoToAuction)
   document.querySelectorAll<HTMLElement>('[data-player-role]').forEach((button) => button.addEventListener('click', () => { viewState.role = button.dataset.playerRole as RoleFilter; actions.onRender() }))
-  document.querySelector<HTMLSelectElement>('#playersTeamFilter')?.addEventListener('change', (event) => { viewState.team = (event.currentTarget as HTMLSelectElement).value; actions.onRender() })
+  document.querySelectorAll<HTMLButtonElement>('[data-player-team]').forEach((button) => button.addEventListener('click', () => {
+    viewState.team = button.dataset.playerTeam ?? 'ALL'
+    document.querySelectorAll<HTMLElement>('[data-player-team]').forEach((item) => item.classList.toggle('selected', item.dataset.playerTeam === viewState.team))
+    const summary = document.querySelector<HTMLElement>('.players-team-filter > summary')
+    if (summary) summary.textContent = viewState.team === 'ALL' ? 'Tutte' : viewState.team
+    document.querySelector<HTMLDetailsElement>('.players-team-filter')?.removeAttribute('open')
+    refreshPlayerResults(state, actions)
+  }))
   document.querySelectorAll<HTMLInputElement>('[data-player-filter]').forEach((input) => input.addEventListener('change', () => { const key = input.dataset.playerFilter as 'freeOnly' | 'startingXi' | 'goalkeeperOne' | 'penalty' | 'freeKick' | 'corner'; viewState[key] = input.checked; refreshFilterControls(); refreshPlayerResults(state, actions) }))
   document.querySelector('#clearPlayerFilters')?.addEventListener('click', () => { viewState.freeOnly = false; viewState.startingXi = false; viewState.goalkeeperOne = false; viewState.penalty = false; viewState.freeKick = false; viewState.corner = false; document.querySelectorAll<HTMLInputElement>('[data-player-filter]').forEach((input) => { input.checked = false }); refreshFilterControls(); refreshPlayerResults(state, actions) })
   document.querySelector<HTMLInputElement>('#playersSearch')?.addEventListener('input', (event) => { viewState.search = (event.currentTarget as HTMLInputElement).value; refreshPlayerResults(state, actions) })

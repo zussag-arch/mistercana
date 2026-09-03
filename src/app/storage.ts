@@ -4,6 +4,7 @@ import type {
   AuctionAssignment,
   AuctionPhase,
   Manager,
+  PmaConfiguration,
 } from './state'
 
 import {
@@ -713,6 +714,12 @@ function normalizeState(
         )
       : null
 
+  const pmaConfiguration =
+    normalizePmaConfiguration(
+      parsed.pmaConfiguration,
+      parsed.defenseModifierEnabled,
+    )
+
   return {
     auctionPhase,
 
@@ -742,6 +749,8 @@ function normalizeState(
             .defenseModifierEnabled
         : defaultState
             .defenseModifierEnabled,
+
+    pmaConfiguration,
 
     budgetProfile:
       parsed.budgetProfile ??
@@ -991,5 +1000,33 @@ export function parseStateBackup(
       error:
         'Il backup non può essere normalizzato in modo sicuro.',
     }
+  }
+}
+
+function normalizePmaConfiguration(
+  value: unknown,
+  legacyDefenseModifier: unknown,
+): PmaConfiguration {
+  if (
+    typeof value === 'object' &&
+    value !== null
+  ) {
+    const candidate = value as Partial<PmaConfiguration>
+    const mode = candidate.mode
+    const participants = candidate.participants
+    if (
+      (mode === 'classic' || mode === 'mantra') &&
+      (participants === 8 || participants === 10 || participants === 12) &&
+      typeof candidate.defenseModifier === 'boolean'
+    ) {
+      return { mode, participants, defenseModifier: candidate.defenseModifier }
+    }
+  }
+  return {
+    ...structuredClone(defaultState.pmaConfiguration),
+    defenseModifier:
+      typeof legacyDefenseModifier === 'boolean'
+        ? legacyDefenseModifier
+        : defaultState.pmaConfiguration.defenseModifier,
   }
 }

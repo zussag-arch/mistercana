@@ -43,9 +43,30 @@ test('renders the requested descriptive charts and avoids viewport-wide mobile c
   assert.match(view, /Valore descrittivo; non modifica i calcoli/)
   assert.match(view, />Voto</)
   assert.match(view, /chart-tick/)
+  assert.ok(view.indexOf('player-chart-summary') < view.indexOf('<svg viewBox="0 0 620 245"'))
   assert.match(view, /Andamento multi-stagione MV e FMV/)
   assert.equal(/min-width:\s*[4-9]\d{2}px/i.test(playersCss + detailCss), false)
   assert.match(detailCss, /overflow-x:hidden/)
+})
+
+test('uses the auction team-grid pattern and filters teams locally', () => {
+  const page = source('src/pages/players.ts')
+  assert.match(page, /players-team-filter/)
+  assert.match(page, /auction-team-selector/)
+  assert.match(page, /auction-team-choice/)
+  assert.match(page, /data-player-team="ALL">Tutte/)
+  assert.equal(page.includes('playersTeamFilter'), false)
+  assert.match(page, /refreshPlayerResults\(state, actions\)/)
+})
+
+test('shows the centrally selected FLDA PMA in list and shared detail metrics', () => {
+  const page = source('src/pages/players.ts')
+  const view = source('src/components/playerDataView.ts')
+  const detail = source('src/pages/playerDetail.ts')
+  assert.match(page, /getFldaPma\(player, state\.pmaConfiguration\)/)
+  assert.match(page, /pmaConfiguration: state\.pmaConfiguration/)
+  assert.match(detail, /pmaConfiguration: state\.pmaConfiguration/)
+  assert.match(view, /getFldaPma\(view\.flda, view\.pmaConfiguration\)/)
 })
 
 test('uses compact requested columns, role/iCa default order and offline-only retry', () => {

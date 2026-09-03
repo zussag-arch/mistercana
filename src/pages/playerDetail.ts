@@ -146,7 +146,7 @@ export function renderFullPlayerPage(reference: string | null, state: AppState):
   const guide = getCachedTeamGuide(flda.team)
   const role = flda.role.toUpperCase()
   const assigned = Boolean(legacyId && state.auctionAssignments.some((item) => item.playerId === legacyId))
-  const view: PlayerViewModel = { flda, legacy, legacyId, detail, guide, assigned, auctionLive: state.auctionPhase === 'live', identityAvailable: Boolean(flda.player_id && legacyId) }
+  const view: PlayerViewModel = { flda, legacy, legacyId, detail, guide, assigned, auctionLive: state.auctionPhase === 'live', identityAvailable: Boolean(flda.player_id && legacyId), pmaConfiguration: state.pmaConfiguration }
   const latest = latestHistory(detail)
   return `<section class="page player-full-page">
     <header class="player-full-header"><button type="button" data-player-detail-back>← Giocatori</button><div class="player-full-identity"><span class="player-detail-role player-detail-role-${role.toLowerCase()}">${escapePlayerHtml(role)}</span><div><small>SCHEDA GIOCATORE</small><h1>${escapePlayerHtml(flda.name)}</h1><p>${escapePlayerHtml(flda.team)}</p>${renderPlayerBadges(view)}</div></div><div class="player-full-actions"><span class="player-status player-status-${auctionStatusClass(view)}">${auctionStatusLabel(view)}</span>${legacyId ? `<button type="button" data-full-player-call="${escapePlayerHtml(legacyId)}" ${state.auctionPhase === 'live' && !assigned ? '' : 'disabled'}>${assigned ? 'ASSEGNATO' : 'CHIAMA'}</button>` : ''}</div></header>

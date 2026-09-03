@@ -1789,6 +1789,12 @@ export function bindDashboardEvents(
             defenseModifierInput
               .checked
 
+          state
+            .pmaConfiguration
+            .defenseModifier =
+            defenseModifierInput
+              .checked
+
           actions.onStateChange()
         },
       )
