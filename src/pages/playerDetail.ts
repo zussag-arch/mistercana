@@ -58,11 +58,23 @@ function textList(value: unknown): string {
   return `<ul>${(value as FldaRecord[]).map((item) => `<li>${display(field(item,'text') ?? field(item,'role') ?? field(item,'name'))}</li>`).join('')}</ul>`
 }
 
+function competitionList(value: unknown): string {
+  if (!Array.isArray(value) || !value.length) return '<p class="player-data-empty">Nessun dato.</p>'
+  return `<ul>${(value as FldaRecord[]).map((competition) => {
+    const members = field(competition, 'members')
+    if (!Array.isArray(members) || !members.length) return '<li>—</li>'
+    return `<li>${(members as FldaRecord[]).map((member) => {
+      const percentage = field(member, 'percentage')
+      return `${display(field(member, 'name'))}${typeof percentage === 'number' ? ` ${display(percentage, 0)}%` : ''}`
+    }).join(' · ')}</li>`
+  }).join('')}</ul>`
+}
+
 function guideSection(guide?: FldaRecord): string {
   if (!guide) return '<p class="player-data-empty">Guida squadra non disponibile.</p>'
   return `<div class="player-guide-summary"><div><span>Allenatore</span><strong>${display(field(guide,'coach'))}</strong></div><div><span>Modulo</span><strong>${display(field(guide,'module'))}</strong></div><div><span>Attacco</span><strong>${display(field(guide,'attack'),0)}</strong></div><div><span>Difesa</span><strong>${display(field(guide,'defense'),0)}</strong></div></div>
     <p>${display(field(guide,'comment'))}</p><p>${display(field(guide,'sos_fanta_comment'))}</p>
-    <div class="player-guide-columns"><div><h4>Up</h4>${textList(field(guide,'up'))}</div><div><h4>Down</h4>${textList(field(guide,'down'))}</div><div><h4>Hidden</h4>${textList(field(guide,'hidden'))}</div><div><h4>Punti chiave</h4>${textList(field(guide,'key_points'))}</div><div><h4>Ruoli chiave</h4>${textList(field(guide,'key_roles'))}</div><div><h4>Ballottaggi</h4>${textList(field(guide,'competitions'))}</div></div>`
+    <div class="player-guide-columns"><div><h4>Up</h4>${textList(field(guide,'up'))}</div><div><h4>Down</h4>${textList(field(guide,'down'))}</div><div><h4>Hidden</h4>${textList(field(guide,'hidden'))}</div><div><h4>Punti chiave</h4>${textList(field(guide,'key_points'))}</div><div><h4>Ruoli chiave</h4>${textList(field(guide,'key_roles'))}</div><div><h4>Ballottaggi</h4>${competitionList(field(guide,'competitions'))}</div></div>`
 }
 
 function advancedStats(row?: FldaRecord): string {

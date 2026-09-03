@@ -39,3 +39,10 @@ test('does not calculate Saggi averages and avoids viewport-wide mobile content'
   assert.equal(/min-width:\s*[4-9]\d{2}px/i.test(playersCss + detailCss), false)
   assert.match(detailCss, /overflow-x:hidden/)
 })
+
+test('renders FLDA competition members instead of empty ballottaggi', () => {
+  const detail = source('src/pages/playerDetail.ts')
+  assert.match(detail, /field\(competition, 'members'\)/)
+  assert.match(detail, /field\(member, 'name'\)/)
+  assert.match(detail, /competitionList\(field\(guide,'competitions'\)\)/)
+})
