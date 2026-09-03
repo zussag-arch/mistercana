@@ -14,11 +14,12 @@ test('loads the players bulk only through the shared in-memory repository', () =
   assert.equal(page.includes('.map((player) => loadPlayerDetail'), false)
 })
 
-test('loads detail on overlay open and fixtures only for goalkeepers and attackers', () => {
+test('loads detail only on demand and does not request removed fixture views', () => {
   const page = source('src/pages/players.ts')
+  const detail = source('src/pages/playerDetail.ts')
   assert.match(page, /loadPlayerDetail\(fldaId\)/)
-  assert.match(page, /role === 'P' \|\| role === 'A'/)
-  assert.match(page, /role === 'P' \? 'goalkeeper' : 'attacker'/)
+  assert.equal(page.includes('loadTeamFixtures'), false)
+  assert.equal(detail.includes('loadTeamFixtures'), false)
 })
 
 test('keeps unmatched players usable and exposes the full-page destination', () => {
@@ -31,18 +32,35 @@ test('keeps unmatched players usable and exposes the full-page destination', () 
   assert.match(main, /renderFullPlayerPage/)
 })
 
-test('does not calculate Saggi averages and avoids viewport-wide mobile content', () => {
+test('renders the requested descriptive charts and avoids viewport-wide mobile content', () => {
   const view = source('src/components/playerDataView.ts')
   const playersCss = source('src/styles/players.css')
   const detailCss = source('src/styles/playerDetail.css')
-  assert.equal(/media prezzo|reduce\(|average|media\(/i.test(view), false)
+  assert.match(view, /La media è descrittiva e non modifica i calcoli/)
+  assert.match(view, /Andamento multi-stagione MV e FMV/)
   assert.equal(/min-width:\s*[4-9]\d{2}px/i.test(playersCss + detailCss), false)
   assert.match(detailCss, /overflow-x:hidden/)
+})
+
+test('uses compact requested columns, role/iCa default order and offline-only retry', () => {
+  const page = source('src/pages/players.ts')
+  assert.match(page, /sortKey: 'default'/)
+  assert.match(page, /roleOrder = \['P', 'D', 'C', 'A'\]/)
+  assert.match(page, /Giocatore[\s\S]*iCà[\s\S]*PMA[\s\S]*xFM[\s\S]*Titolarità[\s\S]*MV\/FMV[\s\S]*Stato/)
+  assert.match(page, /dataset\?\.source === 'legacy' \? '<button id="retryPlayers"/)
+})
+
+test('full player page removes dedicated Saggi and Calendar sections', () => {
+  const detail = source('src/pages/playerDetail.ts')
+  assert.equal(/<h2>Saggi<\/h2>/.test(detail), false)
+  assert.equal(/<h2>Calendario<\/h2>/.test(detail), false)
+  assert.match(detail, /Statistiche avanzate/)
+  assert.match(detail, />Espandi</)
 })
 
 test('renders FLDA competition members instead of empty ballottaggi', () => {
   const detail = source('src/pages/playerDetail.ts')
   assert.match(detail, /field\(competition, 'members'\)/)
   assert.match(detail, /field\(member, 'name'\)/)
-  assert.match(detail, /competitionList\(field\(guide,'competitions'\)\)/)
+  assert.match(detail, /playerCompetitions\(field\(guide, 'competitions'\), view\.flda\.name\)/)
 })

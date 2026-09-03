@@ -1,16 +1,15 @@
 import type { AppState } from '../app/state'
-import type { FldaFixtureContext, FldaPlayer, FldaRecord } from '../services/flda'
+import type { FldaPlayer, FldaRecord } from '../services/flda'
 import {
-  getCachedPlayerDetail, getCachedPlayersDataset, getCachedTeamFixtures,
-  getCachedTeamGuide, getFldaIdForLegacyId, getLegacyPlayer,
-  getLegacyPlayerForFldaId, loadPlayerDetail, loadPlayersDataset,
-  loadTeamFixtures, loadTeamGuide,
+  getCachedPlayerDetail, getCachedPlayersDataset, getCachedTeamGuide,
+  getFldaIdForLegacyId, getLegacyPlayer, getLegacyPlayerForFldaId,
+  loadPlayerDetail, loadPlayersDataset, loadTeamGuide,
 } from '../services/playerRepository'
 import { getLegacyIdFromFldaId } from '../services/playerIdentity'
 import {
-  auctionStatusLabel, display, escapePlayerHtml, field,
-  renderCurrentMetrics, renderFixtures, renderHierarchies,
-  renderHistory, renderSaggi,
+  auctionStatusClass, auctionStatusLabel, display, displayCount, escapePlayerHtml,
+  field, latestHistory, renderCurrentMetrics, renderHierarchies,
+  renderPerformanceChart, renderPlayerBadges, renderSageChart,
 } from '../components/playerDataView'
 import type { PlayerViewModel } from '../components/playerDataView'
 
@@ -41,46 +40,97 @@ function resolve(reference: string): { flda: FldaPlayer; legacyId?: string } | u
   return flda ? { flda, legacyId: getLegacyIdFromFldaId(reference) } : undefined
 }
 
+function statGrid(fields: Array<[string, unknown, 'count' | 'decimal']>): string {
+  return `<div class="player-role-stats">${fields.map(([label, value, format]) => `<div><span>${label}</span><strong>${format === 'count' ? displayCount(value) : display(value, 2)}</strong></div>`).join('')}</div>`
+}
+
+function latestKpis(role: string, row?: FldaRecord): string {
+  const goals = role === 'P' ? field(row, 'gol_subiti') : field(row, 'gol_fatti')
+  const goalDisplay = role === 'P' && typeof goals === 'number' ? -Math.abs(Math.round(goals)) : goals
+  return statGrid([
+    ['Presenze', field(row, 'presenze'), 'count'],
+    ['Minuti', field(row, 'min_playing_time'), 'count'],
+    ['Media minuti', field(row, 'min_playing_time_per_match'), 'count'],
+    [role === 'P' ? 'Gol subiti' : 'Gol', goalDisplay, 'count'],
+    ['Assist', field(row, 'assist'), 'count'],
+    ['Ammonizioni', field(row, 'amm'), 'count'],
+    ['Espulsioni', field(row, 'esp'), 'count'],
+    ['Titolare', field(row, 'starts_eleven') ?? field(row, 'starts_eleven_5'), 'count'],
+  ])
+}
+
 function roleStats(role: string, row?: FldaRecord): string {
   if (!row) return '<p class="player-data-empty">Statistiche non disponibili.</p>'
-  const fields: Array<[string, string]> = role === 'P'
-    ? [['Gol subiti','gol_subiti'],['Clean sheet','clean_sheet'],['Parate','saves'],['Rigori parati','rigori_parati']]
+  const fields: Array<[string, string, 'count' | 'decimal']> = role === 'P'
+    ? [['Rigori parati', 'rigori_parati', 'count'], ['Parate', 'saves', 'count'], ['Parate/partita', 'saves_per_match', 'decimal'], ['Rating', 'rating', 'decimal']]
     : role === 'D'
-      ? [['Gol','gol_fatti'],['Assist','assist'],['Ammonizioni','amm'],['Espulsioni','esp'],['Minuti/presenza','min_playing_time_per_match']]
+      ? [['Recuperi/partita', 'recuperi_per_match', 'decimal'], ['Tackle', 'tackles', 'count'], ['Duelli vinti', 'duels_won', 'count'], ['Falli', 'fouls', 'count']]
       : role === 'C'
-        ? [['Gol','gol_fatti'],['Assist','assist'],['Key passes','key_passes'],['Bonus/malus','bonus_malus'],['Minuti/presenza','min_playing_time_per_match']]
-        : [['Gol','gol_fatti'],['Assist','assist'],['Tiri','total_shots'],['Tiri in porta','shots_on_target'],['xG','xg'],['Minuti/presenza','min_playing_time_per_match']]
-  return `<div class="player-role-stats">${fields.map(([label,key]) => `<div><span>${label}</span><strong>${display(field(row,key), 2)}</strong></div>`).join('')}</div>`
+        ? [['Passaggi chiave', 'key_passes', 'count'], ['Passaggi precisi', 'accurate_passes', 'count'], ['Tiri', 'total_shots', 'count'], ['xA', 'xa', 'decimal']]
+        : [['Tiri', 'total_shots', 'count'], ['Tiri in porta', 'shots_on_target', 'count'], ['xG', 'xg', 'decimal'], ['xA', 'xa', 'decimal']]
+  return statGrid(fields.map(([label, key, format]) => [label, field(row, key), format]))
 }
 
-function textList(value: unknown): string {
-  if (!Array.isArray(value) || !value.length) return '<p class="player-data-empty">Nessun dato.</p>'
-  return `<ul>${(value as FldaRecord[]).map((item) => `<li>${display(field(item,'text') ?? field(item,'role') ?? field(item,'name'))}</li>`).join('')}</ul>`
+function asTextList(value: unknown): string[] {
+  if (!Array.isArray(value)) return []
+  return (value as FldaRecord[]).map((item) => String(field(item, 'text') ?? field(item, 'role') ?? field(item, 'name') ?? '').trim()).filter(Boolean)
 }
 
-function competitionList(value: unknown): string {
-  if (!Array.isArray(value) || !value.length) return '<p class="player-data-empty">Nessun dato.</p>'
-  return `<ul>${(value as FldaRecord[]).map((competition) => {
+function competitionItems(value: unknown): string[] {
+  if (!Array.isArray(value)) return []
+  return (value as FldaRecord[]).map((competition) => {
     const members = field(competition, 'members')
-    if (!Array.isArray(members) || !members.length) return '<li>—</li>'
-    return `<li>${(members as FldaRecord[]).map((member) => {
+    if (!Array.isArray(members)) return ''
+    return (members as FldaRecord[]).map((member) => {
       const percentage = field(member, 'percentage')
-      return `${display(field(member, 'name'))}${typeof percentage === 'number' ? ` ${display(percentage, 0)}%` : ''}`
-    }).join(' · ')}</li>`
-  }).join('')}</ul>`
+      return `${String(field(member, 'name') ?? '').trim()}${typeof percentage === 'number' ? ` ${display(percentage, 0)}%` : ''}`
+    }).filter(Boolean).join(' · ')
+  }).filter(Boolean)
 }
 
-function guideSection(guide?: FldaRecord): string {
-  if (!guide) return '<p class="player-data-empty">Guida squadra non disponibile.</p>'
-  return `<div class="player-guide-summary"><div><span>Allenatore</span><strong>${display(field(guide,'coach'))}</strong></div><div><span>Modulo</span><strong>${display(field(guide,'module'))}</strong></div><div><span>Attacco</span><strong>${display(field(guide,'attack'),0)}</strong></div><div><span>Difesa</span><strong>${display(field(guide,'defense'),0)}</strong></div></div>
-    <p>${display(field(guide,'comment'))}</p><p>${display(field(guide,'sos_fanta_comment'))}</p>
-    <div class="player-guide-columns"><div><h4>Up</h4>${textList(field(guide,'up'))}</div><div><h4>Down</h4>${textList(field(guide,'down'))}</div><div><h4>Hidden</h4>${textList(field(guide,'hidden'))}</div><div><h4>Punti chiave</h4>${textList(field(guide,'key_points'))}</div><div><h4>Ruoli chiave</h4>${textList(field(guide,'key_roles'))}</div><div><h4>Ballottaggi</h4>${competitionList(field(guide,'competitions'))}</div></div>`
+function normalizedName(value: unknown): string {
+  return String(value ?? '').trim().toLocaleLowerCase('it')
+}
+
+function playerCompetitions(value: unknown, playerName: string): string[] {
+  if (!Array.isArray(value)) return []
+  return (value as FldaRecord[]).filter((competition) => {
+    const members = field(competition, 'members')
+    return Array.isArray(members) && (members as FldaRecord[]).some((member) => normalizedName(field(member, 'name')) === normalizedName(playerName))
+  }).flatMap((competition) => competitionItems([competition]))
+}
+
+function qualitativeGuide(view: PlayerViewModel, guide?: FldaRecord): string {
+  const groups: Array<[string, string, string[]]> = [
+    ['Valorizzato', 'positive', view.legacy?.valorizzato ? ['Segnale presente nel listone'] : []],
+    ['Penalizzato / Sfavorito', 'negative', view.legacy?.penalizzato ? ['Segnale presente nel listone'] : []],
+    ['Nome nascosto', 'hidden', view.legacy?.nomeNascosto ? ['Segnale presente nel listone'] : []],
+    ['Ballottaggio', 'competition', playerCompetitions(field(guide, 'competitions'), view.flda.name)],
+  ]
+  const present = groups.filter(([, , items]) => items.length)
+  if (!present.length) return ''
+  return `<section class="player-full-section player-qualitative"><div class="player-section-heading"><span>LETTURA EDITORIALE</span><h2>Indicazioni qualitative</h2></div><div class="player-qualitative-grid">${present.map(([label, tone, items]) => `<article class="qualitative-${tone}"><h3>${label}</h3><ul>${items.map((item) => `<li>${escapePlayerHtml(item)}</li>`).join('')}</ul></article>`).join('')}</div></section>`
+}
+
+function guideSummary(guide?: FldaRecord): string {
+  if (!guide) return ''
+  const keyPoints = asTextList(field(guide, 'key_points'))
+  return `<section class="player-full-section"><div class="player-section-heading"><span>CONTESTO SQUADRA</span><h2>Guida</h2></div><div class="player-guide-summary"><div><span>Allenatore</span><strong>${display(field(guide, 'coach'))}</strong></div><div><span>Modulo</span><strong>${display(field(guide, 'module'))}</strong></div><div><span>Attacco</span><strong>${display(field(guide, 'attack'), 0)}</strong></div><div><span>Difesa</span><strong>${display(field(guide, 'defense'), 0)}</strong></div></div>${field(guide, 'comment') ? `<p>${display(field(guide, 'comment'))}</p>` : ''}${field(guide, 'sos_fanta_comment') ? `<p>${display(field(guide, 'sos_fanta_comment'))}</p>` : ''}${keyPoints.length ? `<ul>${keyPoints.map((item) => `<li>${escapePlayerHtml(item)}</li>`).join('')}</ul>` : ''}</section>`
+}
+
+const advancedLabels: Record<string, string> = {
+  mv_5: 'MV ultime 5', fmv_5: 'FMV ultime 5', presenze_5: 'Presenze ultime 5', starts_eleven_5: 'Titolare ultime 5',
+  perc_match_with_bonus: 'Partite con bonus', perc_match_over_6: 'Partite sopra 6', perc_match_over_6_half: 'Partite sopra 6,5', perc_match_with_vote: 'Partite con voto',
+  total_shots: 'Tiri', shots_on_target: 'Tiri in porta', key_passes: 'Passaggi chiave', accurate_passes: 'Passaggi precisi', accurate_passes_percentage: 'Precisione passaggi',
+  tackles: 'Tackle', duels_won: 'Duelli vinti', fouls: 'Falli', recuperi_per_match: 'Recuperi/partita', rating: 'Rating', xg: 'xG', xa: 'xA', shots_per_match: 'Tiri/partita', key_passes_per_match: 'Passaggi chiave/partita', saves_per_match: 'Parate/partita',
 }
 
 function advancedStats(row?: FldaRecord): string {
   if (!row) return '<p class="player-data-empty">Statistiche avanzate non disponibili.</p>'
-  const keys = ['mv_5','fmv_5','presenze_5','starts_eleven_5','perc_match_with_bonus','perc_match_over_6','perc_match_over_6_half','perc_match_with_vote','total_shots','shots_on_target','key_passes','accurate_passes','accurate_passes_percentage','tackles','duels_won','fouls','recuperi_per_match','rating','xg','xa','shots_per_match','key_passes_per_match','saves_per_match']
-  return `<div class="player-advanced-grid">${keys.filter((key) => field(row,key) !== null && field(row,key) !== undefined).map((key) => `<div><span>${escapePlayerHtml(key.replaceAll('_',' '))}</span><strong>${display(field(row,key),2)}</strong></div>`).join('')}</div>`
+  const discrete = new Set(['presenze_5', 'starts_eleven_5', 'total_shots', 'shots_on_target', 'key_passes', 'accurate_passes', 'tackles', 'duels_won', 'fouls'])
+  const keys = Object.keys(advancedLabels).filter((key) => field(row, key) !== null && field(row, key) !== undefined)
+  if (!keys.length) return '<p class="player-data-empty">Statistiche avanzate non disponibili.</p>'
+  return `<div class="player-advanced-grid">${keys.map((key) => `<div><span>${advancedLabels[key]}</span><strong>${discrete.has(key) ? displayCount(field(row, key)) : display(field(row, key), 2)}</strong></div>`).join('')}</div>`
 }
 
 export function renderFullPlayerPage(reference: string | null, state: AppState): string {
@@ -95,22 +145,20 @@ export function renderFullPlayerPage(reference: string | null, state: AppState):
   const detail = flda.player_id ? getCachedPlayerDetail(flda.player_id) : undefined
   const guide = getCachedTeamGuide(flda.team)
   const role = flda.role.toUpperCase()
-  const context: FldaFixtureContext | undefined = role === 'P' ? 'goalkeeper' : role === 'A' ? 'attacker' : undefined
-  const fixtures = context ? getCachedTeamFixtures(flda.team, context) : undefined
   const assigned = Boolean(legacyId && state.auctionAssignments.some((item) => item.playerId === legacyId))
-  const view: PlayerViewModel = { flda, legacy, legacyId, detail, guide, fixtures, assigned, auctionLive: state.auctionPhase === 'live', identityAvailable: Boolean(flda.player_id && legacyId) }
-  const latest = detail?.history?.[0]
+  const view: PlayerViewModel = { flda, legacy, legacyId, detail, guide, assigned, auctionLive: state.auctionPhase === 'live', identityAvailable: Boolean(flda.player_id && legacyId) }
+  const latest = latestHistory(detail)
   return `<section class="page player-full-page">
-    <header class="player-full-header"><button type="button" data-player-detail-back>← Giocatori</button><div><span class="player-detail-role player-detail-role-${role.toLowerCase()}">${escapePlayerHtml(role)}</span><div><small>SCHEDA GIOCATORE</small><h1>${escapePlayerHtml(flda.name)}</h1><p>${escapePlayerHtml(flda.team)} · ${auctionStatusLabel(view)}</p></div></div>${legacyId ? `<button type="button" data-full-player-call="${escapePlayerHtml(legacyId)}" ${state.auctionPhase === 'live' && !assigned ? '' : 'disabled'}>${assigned ? 'ASSEGNATO' : 'CHIAMA'}</button>` : ''}</header>
-    ${renderCurrentMetrics(view)}
+    <header class="player-full-header"><button type="button" data-player-detail-back>← Giocatori</button><div class="player-full-identity"><span class="player-detail-role player-detail-role-${role.toLowerCase()}">${escapePlayerHtml(role)}</span><div><small>SCHEDA GIOCATORE</small><h1>${escapePlayerHtml(flda.name)}</h1><p>${escapePlayerHtml(flda.team)}</p>${renderPlayerBadges(view)}</div></div><div class="player-full-actions"><span class="player-status player-status-${auctionStatusClass(view)}">${auctionStatusLabel(view)}</span>${legacyId ? `<button type="button" data-full-player-call="${escapePlayerHtml(legacyId)}" ${state.auctionPhase === 'live' && !assigned ? '' : 'disabled'}>${assigned ? 'ASSEGNATO' : 'CHIAMA'}</button>` : ''}</div></header>
     ${!view.identityAvailable ? '<p class="player-data-alert">Dati FLDA non disponibili per questa identità.</p>' : ''}${detailError ? `<p class="player-data-alert">${escapePlayerHtml(detailError)}</p>` : ''}
-    <section class="player-full-section"><h2>Panoramica</h2>${roleStats(role, latest)}</section>
-    <section class="player-full-section"><h2>Storico</h2>${renderHistory(detail,true)}</section>
-    <section class="player-full-section"><h2>Squadra / Guida</h2>${guideSection(guide)}</section>
-    <section class="player-full-section"><h2>Gerarchie</h2>${renderHierarchies(detail)}</section>
-    <section class="player-full-section"><h2>Saggi</h2>${renderSaggi(detail,true)}</section>
-    <section class="player-full-section"><h2>Calendario</h2>${context ? renderFixtures(fixtures,38) : '<p class="player-data-empty">Calendario specifico non disponibile per questo ruolo.</p>'}</section>
-    <details class="player-full-section"><summary>Statistiche avanzate</summary>${advancedStats(latest)}</details>
+    <section class="player-full-section"><div class="player-section-heading"><span>ULTIMA STAGIONE</span><h2>Panoramica</h2></div>${latestKpis(role, latest)}</section>
+    <div class="player-chart-grid"><section class="player-full-section"><h2>Prezzi dei Saggi</h2>${renderSageChart(detail)}</section><section class="player-full-section"><h2>Storico MV / FMV</h2>${renderPerformanceChart(detail)}</section></div>
+    <section class="player-full-section"><div class="player-section-heading"><span>ASTA</span><h2>Dati correnti</h2></div>${renderCurrentMetrics(view, true)}<div class="player-previous-price"><span>Prezzo precedente</span><strong>${display(field(latest, 'previous_price') ?? field(latest, 'prezzo_precedente'), 0)}</strong></div></section>
+    ${qualitativeGuide(view, guide)}
+    <section class="player-full-section"><div class="player-section-heading"><span>${escapePlayerHtml(role)}</span><h2>Statistiche ruolo</h2></div>${roleStats(role, latest)}</section>
+    ${guideSummary(guide)}
+    <section class="player-full-section"><div class="player-section-heading"><span>ORDINI EDITORIALI</span><h2>Gerarchie</h2></div>${renderHierarchies(detail)}</section>
+    <details class="player-full-section player-advanced"><summary><span>Statistiche avanzate</span><em>Espandi</em></summary>${advancedStats(latest)}</details>
   </section>`
 }
 
@@ -121,10 +169,7 @@ async function load(reference: string, actions: PlayerDetailActions): Promise<vo
     await loadPlayersDataset()
     const selected = resolve(reference)
     if (!selected?.flda.player_id) return
-    const tasks: Promise<unknown>[] = [loadPlayerDetail(selected.flda.player_id), loadTeamGuide(selected.flda.team)]
-    const role = selected.flda.role.toUpperCase()
-    if (role === 'P' || role === 'A') tasks.push(loadTeamFixtures(selected.flda.team, role === 'P' ? 'goalkeeper' : 'attacker'))
-    await Promise.all(tasks)
+    await Promise.all([loadPlayerDetail(selected.flda.player_id), loadTeamGuide(selected.flda.team)])
   } catch (error) { detailError = error instanceof Error ? error.message : 'Dati FLDA non disponibili.' }
   finally { loadingReference = null; actions.onRender() }
 }

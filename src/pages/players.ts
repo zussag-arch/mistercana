@@ -1,19 +1,19 @@
 import type { AppState } from '../app/state'
 import { runOverlayExit } from '../app/motion'
 import type { Player, PlayerRole } from '../domain/player'
-import type { FldaFixtureContext, FldaPlayer } from '../services/flda'
+import type { FldaPlayer } from '../services/flda'
 import {
-  findLegacyPlayerByIdentity, getCachedPlayerDetail, getCachedPlayersDataset, getCachedTeamFixtures,
+  findLegacyPlayerByIdentity, getCachedPlayerDetail, getCachedPlayersDataset,
   getFldaIdForLegacyId, getLegacyPlayer, getLegacyPlayerForFldaId,
-  loadPlayerDetail, loadPlayersDataset, loadTeamFixtures,
+  loadPlayerDetail, loadPlayersDataset,
 } from '../services/playerRepository'
 import { getLegacyIdFromFldaId } from '../services/playerIdentity'
 import { renderPlayerDetailOverlay } from '../components/playerDetailOverlay'
 import type { PlayerViewModel } from '../components/playerDataView'
-import { display, escapePlayerHtml } from '../components/playerDataView'
+import { auctionStatusClass, display, escapePlayerHtml, icaHue, renderPlayerBadges } from '../components/playerDataView'
 
 type RoleFilter = 'ALL' | PlayerRole
-type SortKey = 'name' | 'team' | 'fm_exp' | 'integrita' | 'titolarita_display' | 'ica' | 'status'
+type SortKey = 'default' | 'name' | 'team' | 'fm_exp' | 'titolarita_display' | 'mv_fmv' | 'ica' | 'status'
 
 interface PlayersActions {
   onRender: () => void
@@ -27,8 +27,8 @@ const viewState = {
   team: 'ALL',
   freeOnly: false,
   search: '',
-  sortKey: 'name' as SortKey,
-  sortDirection: 'asc' as 'asc' | 'desc',
+  sortKey: 'default' as SortKey,
+  sortDirection: 'desc' as 'asc' | 'desc',
 }
 
 let loadingBulk = false
@@ -73,12 +73,21 @@ function filteredPlayers(state: AppState, source: FldaPlayer[]): FldaPlayer[] {
     if (viewState.freeOnly && state.auctionPhase === 'live' && statusValue(state, player) !== 2) return false
     return !query || `${player.name} ${player.team}`.toLocaleLowerCase('it').includes(query)
   }).sort((a, b) => {
+    if (viewState.sortKey === 'default') {
+      const roleOrder = ['P', 'D', 'C', 'A']
+      const roleResult = roleOrder.indexOf(a.role.toUpperCase()) - roleOrder.indexOf(b.role.toUpperCase())
+      if (roleResult) return roleResult
+      return numeric(findLegacy(b)?.iCa) - numeric(findLegacy(a)?.iCa)
+    }
     let first: string | number
     let second: string | number
     if (viewState.sortKey === 'status') {
       first = statusValue(state, a); second = statusValue(state, b)
     } else if (viewState.sortKey === 'ica') {
       first = numeric(findLegacy(a)?.iCa); second = numeric(findLegacy(b)?.iCa)
+    } else if (viewState.sortKey === 'mv_fmv') {
+      first = numeric(findLegacy(a)?.fmv ?? findLegacy(a)?.mv)
+      second = numeric(findLegacy(b)?.fmv ?? findLegacy(b)?.mv)
     } else if (viewState.sortKey === 'name' || viewState.sortKey === 'team') {
       first = a[viewState.sortKey]; second = b[viewState.sortKey]
     } else {
@@ -114,18 +123,15 @@ function renderOverlay(state: AppState, bulk: FldaPlayer[]): string {
   if (!selected) return ''
   const legacyId = selected.legacy?.id
   const fldaId = selected.flda.player_id ?? undefined
-  const role = selected.flda.role.toUpperCase()
-  const context: FldaFixtureContext | undefined = role === 'P' ? 'goalkeeper' : role === 'A' ? 'attacker' : undefined
   const view: PlayerViewModel = {
     flda: selected.flda, legacy: selected.legacy, legacyId,
     assigned: isAssigned(state, legacyId), auctionLive: state.auctionPhase === 'live',
     identityAvailable: Boolean(fldaId && legacyId),
     detail: fldaId ? getCachedPlayerDetail(fldaId) : undefined,
-    fixtures: context ? getCachedTeamFixtures(selected.flda.team, context) : undefined,
   }
   const shell: Player = selected.legacy ?? {
     id: '', name: selected.flda.name, team: selected.flda.team,
-    role: role as PlayerRole, penaltyTaker: false, status: 'free',
+    role: selected.flda.role.toUpperCase() as PlayerRole, penaltyTaker: false, status: 'free',
   }
   return renderPlayerDetailOverlay(shell, view.assigned, state.auctionPhase === 'live', {
     view, loading: previewLoading, error: previewError,
@@ -135,14 +141,21 @@ function renderOverlay(state: AppState, bulk: FldaPlayer[]): string {
 function renderRow(state: AppState, player: FldaPlayer): string {
   const legacy = findLegacy(player)
   const status = statusLabel(state, player)
+  const legacyId = legacyIdFor(player)
+  const view: PlayerViewModel = {
+    flda: player, legacy, legacyId,
+    detail: player.player_id ? getCachedPlayerDetail(player.player_id) : undefined,
+    assigned: isAssigned(state, legacyId), auctionLive: state.auctionPhase === 'live',
+    identityAvailable: Boolean(player.player_id && legacyId),
+  }
   return `<button type="button" class="players-table-row" data-player-ref="${escapePlayerHtml(fldaReference(player))}">
-    <div class="players-player-cell"><span class="role-badge role-${player.role.toLowerCase()}">${escapePlayerHtml(player.role)}</span><span><strong>${escapePlayerHtml(player.name)}</strong><small>${escapePlayerHtml(player.team)}</small></span></div>
-    <div data-label="FM Exp.">${display(player.fm_exp, 2)}</div>
-    <div data-label="Integrità">${display(player.integrita, 0)}</div>
-    <div data-label="Titolarità">${display(player.titolarita_display, 0)}${typeof player.titolarita_display === 'number' ? '%' : ''}</div>
+    <div class="players-player-cell"><span class="role-badge role-${player.role.toLowerCase()}">${escapePlayerHtml(player.role)}</span><span><strong>${escapePlayerHtml(player.name)}</strong><small>${escapePlayerHtml(player.team)}</small>${renderPlayerBadges(view)}</span></div>
+    <div data-label="iCà"><span class="players-ica" style="--ica-hue:${icaHue(legacy?.iCa)}">${display(legacy?.iCa, 1)}</span></div>
     <div data-label="PMA">—</div>
-    <div data-label="iCà"><span class="players-ica">${display(legacy?.iCa, 2)}</span></div>
-    <div data-label="Stato"><span class="player-status">${status}</span></div>
+    <div data-label="xFM">${display(player.fm_exp, 2)}</div>
+    <div data-label="Titolarità">${display(player.titolarita_display, 0)}${typeof player.titolarita_display === 'number' ? '%' : ''}</div>
+    <div data-label="MV/FMV"><span class="players-dual-value">${display(legacy?.mv, 2)} <small>/</small> ${display(legacy?.fmv, 2)}</span></div>
+    <div data-label="Stato"><span class="player-status player-status-${auctionStatusClass(view)}">${status}</span></div>
   </button>`
 }
 
@@ -172,10 +185,10 @@ export function renderPlayersPage(state: AppState): string {
       <select id="playersTeamFilter" aria-label="Filtra squadra"><option value="ALL">Tutte le squadre</option>${teams.map((team) => `<option value="${escapePlayerHtml(team)}" ${viewState.team === team ? 'selected' : ''}>${escapePlayerHtml(team)}</option>`).join('')}</select>
       <label class="players-simple-toggle"><input id="freeOnly" type="checkbox" ${viewState.freeOnly ? 'checked' : ''} ${state.auctionPhase === 'live' ? '' : 'disabled'}> Solo liberi</label>
       <input id="playersSearch" type="search" value="${escapePlayerHtml(viewState.search)}" placeholder="Cerca nome o squadra…">
-      <button id="retryPlayers" type="button">Riprova FLDA</button>
+      ${dataset?.source === 'legacy' ? '<button id="retryPlayers" type="button">Riprova</button>' : ''}
     </div>
     ${dataset?.source === 'legacy' ? `<div class="players-source-warning">FLDA non raggiungibile. Fallback legacy attivo. ${escapePlayerHtml(dataset.error)}</div>` : ''}
-    ${!dataset ? '<div class="players-loading">Caricamento giocatori FLDA…</div>' : `<div class="players-table-card"><div class="players-table-header"><span>Giocatore</span>${sortButton('FM Exp.','fm_exp')}${sortButton('Integrità','integrita')}${sortButton('Titolarità','titolarita_display')}<span>PMA</span>${sortButton('iCà','ica')}${sortButton('Stato','status')}</div><div class="players-table-body">${rows.map((player) => renderRow(state, player)).join('') || '<div class="players-empty">Nessun giocatore corrisponde ai filtri.</div>'}</div></div>`}
+    ${!dataset ? '<div class="players-loading">Caricamento giocatori FLDA…</div>' : `<div class="players-table-card"><div class="players-table-header"><span>Giocatore</span>${sortButton('iCà','ica')}<span>PMA</span>${sortButton('xFM','fm_exp')}${sortButton('Titolarità','titolarita_display')}${sortButton('MV/FMV','mv_fmv')}${sortButton('Stato','status')}</div><div class="players-table-body">${rows.map((player) => renderRow(state, player)).join('') || '<div class="players-empty">Nessun giocatore corrisponde ai filtri.</div>'}</div></div>`}
     <div class="players-footer-info"><span>${rows.length} giocatori</span><span>${dataset?.source === 'flda' ? 'Fonte FLDA' : 'Fonte legacy'}</span></div>
     ${renderOverlay(state, source)}
   </section>`
@@ -188,10 +201,7 @@ async function loadPreview(reference: string, actions: PlayersActions): Promise<
   if (!selected || !fldaId) return
   previewLoading = true; previewError = undefined; actions.onRender()
   try {
-    const tasks: Promise<unknown>[] = [loadPlayerDetail(fldaId)]
-    const role = selected.flda.role.toUpperCase()
-    if (role === 'P' || role === 'A') tasks.push(loadTeamFixtures(selected.flda.team, role === 'P' ? 'goalkeeper' : 'attacker'))
-    await Promise.all(tasks)
+    await loadPlayerDetail(fldaId)
   } catch (error) {
     previewError = error instanceof Error ? error.message : 'Dati FLDA non disponibili.'
   } finally {
