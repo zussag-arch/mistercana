@@ -49,6 +49,11 @@ export interface FldaPlayer {
   integrita?: number | null
   tit_index_raw?: number | null
   titolarita_display?: number | null
+  is_starting_xi?: boolean
+  goalkeeper_rank?: number | null
+  penalty_rank?: number | null
+  free_kick_rank?: number | null
+  corner_rank?: number | null
   [key: string]: unknown
 }
 
@@ -267,6 +272,14 @@ export function getFldaTeamGuide(
 ): Promise<FldaRecord> {
   return fldaFetch<FldaRecord>(
     `/api/teams/${encodeURIComponent(team)}/guide`,
+  )
+}
+
+export function getFldaTeamHierarchies(
+  team: string,
+): Promise<FldaRecord[]> {
+  return fldaFetch<FldaRecord[]>(
+    `/api/teams/${encodeURIComponent(team)}/hierarchies`,
   )
 }
 

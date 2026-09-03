@@ -5,6 +5,7 @@ import {
   getFldaPlayers,
   getFldaTeamFixtures,
   getFldaTeamGuide,
+  getFldaTeamHierarchies,
 } from './flda'
 import type {
   FldaFixtureContext,
@@ -51,6 +52,48 @@ function readableError(error: unknown): string {
     : 'Dati FLDA non disponibili.'
 }
 
+function numericRank(value: unknown): number | null {
+  return typeof value === 'number' && Number.isFinite(value) ? value : null
+}
+
+async function enrichPlayerSignals(players: FldaPlayer[]): Promise<FldaPlayer[]> {
+  const teams = [...new Set(players.map((player) => player.team))]
+  const bundles = await Promise.all(teams.map(async (team) => {
+    const [guide, hierarchies] = await Promise.all([
+      getFldaTeamGuide(team),
+      getFldaTeamHierarchies(team),
+    ])
+    return { team, guide, hierarchies }
+  }))
+  const signals = new Map<string, Partial<FldaPlayer>>()
+  const ensure = (id: unknown): Partial<FldaPlayer> | undefined => {
+    if (typeof id !== 'string' || !id) return undefined
+    const current = signals.get(id) ?? {}
+    signals.set(id, current)
+    return current
+  }
+  for (const { guide, hierarchies } of bundles) {
+    const starting = guide.starting_xi
+    if (Array.isArray(starting)) {
+      for (const row of starting as FldaRecord[]) {
+        const signal = ensure(row.player_id)
+        if (signal) signal.is_starting_xi = true
+      }
+    }
+    for (const row of hierarchies) {
+      const signal = ensure(row.player_id)
+      if (!signal) continue
+      const rank = numericRank(row.source_rank)
+      const type = String(row.hierarchy_type ?? '')
+      if (type === 'GOALKEEPER') signal.goalkeeper_rank = rank
+      else if (type === 'PENALTY') signal.penalty_rank = rank
+      else if (type === 'FREE_KICK') signal.free_kick_rank = rank
+      else if (type === 'CORNER') signal.corner_rank = rank
+    }
+  }
+  return players.map((player) => ({ ...player, ...signals.get(player.player_id ?? '') }))
+}
+
 export async function loadPlayersDataset(
   force = false,
 ): Promise<PlayersDataset> {
@@ -58,9 +101,10 @@ export async function loadPlayersDataset(
   if (datasetRequest && !force) return datasetRequest
 
   datasetRequest = getFldaPlayers()
-    .then((page) => {
-      initializePlayerIdentity(legacyPlayers, page.players)
-      dataset = { source: 'flda', players: page.players }
+    .then(async (page) => {
+      const players = await enrichPlayerSignals(page.players)
+      initializePlayerIdentity(legacyPlayers, players)
+      dataset = { source: 'flda', players }
       return dataset
     })
     .catch((error: unknown) => {

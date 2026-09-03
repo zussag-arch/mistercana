@@ -12,6 +12,8 @@ test('loads the players bulk only through the shared in-memory repository', () =
   assert.equal((repository.match(/getFldaPlayers\(/g) ?? []).length, 1)
   assert.equal(page.includes('getFldaPlayers('), false)
   assert.equal(page.includes('.map((player) => loadPlayerDetail'), false)
+  assert.equal(repository.includes('teams.map(async (team)'), true)
+  assert.equal(repository.includes('players.map(async (player)'), false)
 })
 
 test('loads detail only on demand and does not request removed fixture views', () => {
@@ -36,7 +38,11 @@ test('renders the requested descriptive charts and avoids viewport-wide mobile c
   const view = source('src/components/playerDataView.ts')
   const playersCss = source('src/styles/players.css')
   const detailCss = source('src/styles/playerDetail.css')
-  assert.match(view, /La media è descrittiva e non modifica i calcoli/)
+  assert.match(view, /Prezzo \(crediti\)/)
+  assert.match(view, /Media Saggi/)
+  assert.match(view, /Valore descrittivo; non modifica i calcoli/)
+  assert.match(view, />Voto</)
+  assert.match(view, /chart-tick/)
   assert.match(view, /Andamento multi-stagione MV e FMV/)
   assert.equal(/min-width:\s*[4-9]\d{2}px/i.test(playersCss + detailCss), false)
   assert.match(detailCss, /overflow-x:hidden/)
@@ -54,8 +60,33 @@ test('full player page removes dedicated Saggi and Calendar sections', () => {
   const detail = source('src/pages/playerDetail.ts')
   assert.equal(/<h2>Saggi<\/h2>/.test(detail), false)
   assert.equal(/<h2>Calendario<\/h2>/.test(detail), false)
+  assert.equal(/Ordini editoriali/i.test(detail), false)
+  assert.equal(/<details/.test(detail), false)
+  assert.equal(/Espandi|Riduci/.test(detail), false)
   assert.match(detail, /Statistiche avanzate/)
-  assert.match(detail, />Espandi</)
+})
+
+test('keeps badges beside the player name and provides combinable filters', () => {
+  const page = source('src/pages/players.ts')
+  const view = source('src/components/playerDataView.ts')
+  assert.match(page, /players-name-line[\s\S]*renderPlayerBadges\(view\)/)
+  for (const filter of ['freeOnly', 'startingXi', 'goalkeeperOne', 'penalty', 'freeKick', 'corner']) {
+    assert.match(page, new RegExp(`data-player-filter="${filter}"`))
+  }
+  assert.match(page, /Filtri\$\{activeFilters/)
+  assert.match(page, /Azzera filtri/)
+  assert.match(view, /🧤 P\$\{view\.flda\.goalkeeper_rank\}/)
+  assert.match(view, /🥅/)
+  assert.match(view, /👟/)
+  assert.match(view, /🚩/)
+})
+
+test('filters search locally without rerendering the search input or requesting data', () => {
+  const page = source('src/pages/players.ts')
+  const inputHandler = page.match(/#playersSearch[^\n]+/)?.[0] ?? ''
+  assert.match(inputHandler, /refreshPlayerResults\(state, actions\)/)
+  assert.equal(inputHandler.includes('actions.onRender()'), false)
+  assert.equal(inputHandler.includes('loadPlayersDataset'), false)
 })
 
 test('renders FLDA competition members instead of empty ballottaggi', () => {

@@ -8,7 +8,7 @@ import {
 import { getLegacyIdFromFldaId } from '../services/playerIdentity'
 import {
   auctionStatusClass, auctionStatusLabel, display, displayCount, escapePlayerHtml,
-  field, latestHistory, renderCurrentMetrics, renderHierarchies,
+  field, latestHistory, renderCurrentMetrics,
   renderPerformanceChart, renderPlayerBadges, renderSageChart,
 } from '../components/playerDataView'
 import type { PlayerViewModel } from '../components/playerDataView'
@@ -157,8 +157,7 @@ export function renderFullPlayerPage(reference: string | null, state: AppState):
     ${qualitativeGuide(view, guide)}
     <section class="player-full-section"><div class="player-section-heading"><span>${escapePlayerHtml(role)}</span><h2>Statistiche ruolo</h2></div>${roleStats(role, latest)}</section>
     ${guideSummary(guide)}
-    <section class="player-full-section"><div class="player-section-heading"><span>ORDINI EDITORIALI</span><h2>Gerarchie</h2></div>${renderHierarchies(detail)}</section>
-    <details class="player-full-section player-advanced"><summary><span>Statistiche avanzate</span><em>Espandi</em></summary>${advancedStats(latest)}</details>
+    <section class="player-full-section player-advanced"><div class="player-section-heading"><span>DETTAGLIO</span><h2>Statistiche avanzate</h2></div>${advancedStats(latest)}</section>
   </section>`
 }
 

@@ -65,17 +65,21 @@ function hierarchyRank(row: FldaRecord): number | undefined {
 
 export function renderPlayerBadges(view: PlayerViewModel): string {
   const badges: string[] = []
-  if (typeof view.flda.titolarita_display === 'number' && view.flda.titolarita_display >= 90) {
+  if (view.flda.is_starting_xi || (!view.flda.player_id && typeof view.flda.titolarita_display === 'number' && view.flda.titolarita_display >= 90)) {
     badges.push('<span class="player-signal player-signal-xi">XI</span>')
   }
+  if (view.flda.goalkeeper_rank && view.flda.goalkeeper_rank <= 3) badges.push(`<span class="player-signal player-signal-goalkeeper">🧤 P${view.flda.goalkeeper_rank}</span>`)
+  if (view.flda.penalty_rank) badges.push(`<span class="player-signal player-signal-penalty">🥅${view.flda.penalty_rank > 1 ? ` ${view.flda.penalty_rank}` : ''}</span>`)
+  if (view.flda.free_kick_rank) badges.push(`<span class="player-signal player-signal-free-kick">👟${view.flda.free_kick_rank > 1 ? ` ${view.flda.free_kick_rank}` : ''}</span>`)
+  if (view.flda.corner_rank) badges.push(`<span class="player-signal player-signal-corner">🚩${view.flda.corner_rank > 1 ? ` ${view.flda.corner_rank}` : ''}</span>`)
   for (const row of hierarchyRows(view.detail)) {
     const type = hierarchyType(row)
     const rank = hierarchyRank(row)
     const suffix = rank ? ` ${rank}°` : ''
-    if (type.includes('GOALKEEPER')) badges.push(`<span class="player-signal player-signal-goalkeeper">🧤 P${rank ?? ''}</span>`)
-    else if (type.includes('PENALTY')) badges.push(`<span class="player-signal player-signal-penalty">Rig.${suffix}</span>`)
-    else if (type.includes('FREE_KICK')) badges.push(`<span class="player-signal player-signal-free-kick">👟 Pun.${suffix}</span>`)
-    else if (type.includes('CORNER')) badges.push(`<span class="player-signal player-signal-corner">🚩 Corner${suffix}</span>`)
+    if (type.includes('GOALKEEPER') && !view.flda.goalkeeper_rank && rank && rank <= 3) badges.push(`<span class="player-signal player-signal-goalkeeper">🧤 P${rank}</span>`)
+    else if (type.includes('PENALTY') && !view.flda.penalty_rank) badges.push(`<span class="player-signal player-signal-penalty">🥅${suffix}</span>`)
+    else if (type.includes('FREE_KICK') && !view.flda.free_kick_rank) badges.push(`<span class="player-signal player-signal-free-kick">👟${suffix}</span>`)
+    else if (type.includes('CORNER') && !view.flda.corner_rank) badges.push(`<span class="player-signal player-signal-corner">🚩${suffix}</span>`)
   }
   return badges.length ? `<div class="player-signals">${badges.join('')}</div>` : ''
 }
@@ -122,11 +126,14 @@ export function renderSageChart(detail?: FldaPlayerDetail): string {
   const gap = 40
   const startX = 62
   const averageY = baseY - (average / max) * height
+  const ticks = [0, max / 2, max]
   return `<div class="player-chart"><svg viewBox="0 0 620 245" role="img" aria-label="Prezzi dei cinque Saggi e media descrittiva">
-    <line x1="45" y1="${averageY}" x2="590" y2="${averageY}" class="chart-average-line"/><text x="588" y="${averageY - 7}" text-anchor="end" class="chart-average-label">media ${display(average, 1)}</text>
+    <text x="13" y="120" text-anchor="middle" transform="rotate(-90 13 120)" class="chart-axis-title">Prezzo (crediti)</text>
+    ${ticks.map((tick) => { const tickY = baseY - (tick / max) * height; return `<line x1="40" y1="${tickY}" x2="590" y2="${tickY}" class="chart-grid-line"/><text x="35" y="${tickY + 4}" text-anchor="end" class="chart-tick">${display(tick, 0)}</text>` }).join('')}
+    <line x1="40" y1="${averageY}" x2="590" y2="${averageY}" class="chart-average-line"/><rect x="491" y="${averageY - 20}" width="99" height="18" rx="7" class="chart-average-bg"/><text x="582" y="${averageY - 7}" text-anchor="end" class="chart-average-label">Media ${display(average, 1)}</text>
     ${rows.map((row, index) => { const h = (row.price / max) * height; const x = startX + index * (barWidth + gap); return `<rect x="${x}" y="${baseY - h}" width="${barWidth}" height="${h}" rx="10" class="chart-bar"/><text x="${x + barWidth / 2}" y="${baseY - h - 8}" text-anchor="middle" class="chart-value">${display(row.price, 0)}</text><text x="${x + barWidth / 2}" y="214" text-anchor="middle" class="chart-label">${escapePlayerHtml(row.name)}</text>` }).join('')}
-    <line x1="45" y1="${baseY}" x2="590" y2="${baseY}" class="chart-axis"/>
-  </svg><p>La media è descrittiva e non modifica i calcoli.</p></div>`
+    <line x1="40" y1="${baseY}" x2="590" y2="${baseY}" class="chart-axis"/>
+  </svg><div class="player-chart-summary"><span>Media Saggi</span><strong>${display(average, 1)} cr</strong><small>Valore descrittivo; non modifica i calcoli.</small></div></div>`
 }
 
 export function renderPerformanceChart(detail?: FldaPlayerDetail): string {
@@ -139,9 +146,12 @@ export function renderPerformanceChart(detail?: FldaPlayerDetail): string {
   const x = (index: number) => rows.length === 1 ? 310 : 55 + index * (520 / (rows.length - 1))
   const y = (value: number) => 185 - ((value - min) / Math.max(max - min, 1)) * 125
   const points = (key: 'mv' | 'fmv') => rows.map((row, index) => typeof row[key] === 'number' ? `${x(index)},${y(row[key])}` : '').filter(Boolean).join(' ')
+  const ticks = [min, (min + max) / 2, max]
   return `<div class="player-chart"><svg viewBox="0 0 620 245" role="img" aria-label="Andamento multi-stagione MV e FMV">
-    <line x1="45" y1="185" x2="590" y2="185" class="chart-axis"/><polyline points="${points('mv')}" class="chart-line chart-line-mv"/><polyline points="${points('fmv')}" class="chart-line chart-line-fmv"/>
-    ${rows.map((row, index) => `<text x="${x(index)}" y="214" text-anchor="middle" class="chart-label">${escapePlayerHtml(row.season)}</text>${typeof row.mv === 'number' ? `<circle cx="${x(index)}" cy="${y(row.mv)}" r="5" class="chart-dot chart-dot-mv"><title>MV ${display(row.mv, 2)}</title></circle>` : ''}${typeof row.fmv === 'number' ? `<circle cx="${x(index)}" cy="${y(row.fmv)}" r="5" class="chart-dot chart-dot-fmv"><title>FMV ${display(row.fmv, 2)}</title></circle>` : ''}`).join('')}
+    <text x="13" y="120" text-anchor="middle" transform="rotate(-90 13 120)" class="chart-axis-title">Voto</text>
+    ${ticks.map((tick) => { const tickY = y(tick); return `<line x1="40" y1="${tickY}" x2="590" y2="${tickY}" class="chart-grid-line"/><text x="35" y="${tickY + 4}" text-anchor="end" class="chart-tick">${display(tick, 1)}</text>` }).join('')}
+    <line x1="40" y1="185" x2="590" y2="185" class="chart-axis"/><polyline points="${points('mv')}" class="chart-line chart-line-mv"/><polyline points="${points('fmv')}" class="chart-line chart-line-fmv"/>
+    ${rows.map((row, index) => { const title = `${row.season} · MV ${display(row.mv, 2)} · FMV ${display(row.fmv, 2)}`; return `<text x="${x(index)}" y="214" text-anchor="middle" class="chart-label">${escapePlayerHtml(row.season)}</text>${typeof row.mv === 'number' ? `<circle cx="${x(index)}" cy="${y(row.mv)}" r="5" class="chart-dot chart-dot-mv"><title>${title}</title></circle>` : ''}${typeof row.fmv === 'number' ? `<circle cx="${x(index)}" cy="${y(row.fmv)}" r="5" class="chart-dot chart-dot-fmv"><title>${title}</title></circle>` : ''}` }).join('')}
     <g class="chart-legend"><circle cx="440" cy="25" r="5" class="chart-dot-mv"/><text x="452" y="29">MV</text><circle cx="510" cy="25" r="5" class="chart-dot-fmv"/><text x="522" y="29">FMV</text></g>
   </svg></div>`
 }
