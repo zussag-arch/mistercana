@@ -123,18 +123,18 @@ export function renderSageChart(detail?: FldaPlayerDetail): string {
   if (!rows.length) return chartEmpty('Prezzi Saggi non disponibili.')
   const average = rows.reduce((sum, row) => sum + row.price, 0) / rows.length
   const max = Math.max(...rows.map((row) => row.price), average, 1)
-  const baseY = 190
-  const height = 130
+  const baseY = 250
+  const height = 185
   const barWidth = 70
   const gap = 40
   const startX = 62
   const averageY = baseY - (average / max) * height
   const ticks = [0, max / 2, max]
-  return `<div class="player-chart"><svg viewBox="0 0 620 245" role="img" aria-label="Prezzi dei cinque Saggi e media descrittiva">
-    <text x="13" y="120" text-anchor="middle" transform="rotate(-90 13 120)" class="chart-axis-title">Prezzo (crediti)</text>
+  return `<div class="player-chart"><svg viewBox="0 0 620 315" role="img" aria-label="Prezzi dei cinque Saggi e media descrittiva">
+    <text x="13" y="155" text-anchor="middle" transform="rotate(-90 13 155)" class="chart-axis-title">Prezzo (crediti)</text>
     ${ticks.map((tick) => { const tickY = baseY - (tick / max) * height; return `<line x1="40" y1="${tickY}" x2="590" y2="${tickY}" class="chart-grid-line"/><text x="35" y="${tickY + 4}" text-anchor="end" class="chart-tick">${display(tick, 0)}</text>` }).join('')}
     <line x1="40" y1="${averageY}" x2="590" y2="${averageY}" class="chart-average-line"/><text x="56" y="${averageY - 6}" text-anchor="end" class="chart-average-value">${display(average, 1)} cr</text>
-    ${rows.map((row, index) => { const h = (row.price / max) * height; const x = startX + index * (barWidth + gap); return `<rect x="${x}" y="${baseY - h}" width="${barWidth}" height="${h}" rx="10" class="chart-bar"/><text x="${x + barWidth / 2}" y="${baseY - h - 8}" text-anchor="middle" class="chart-value">${display(row.price, 0)}</text><text x="${x + barWidth / 2}" y="214" text-anchor="middle" class="chart-label">${escapePlayerHtml(row.name)}</text>` }).join('')}
+    ${rows.map((row, index) => { const h = (row.price / max) * height; const x = startX + index * (barWidth + gap); return `<rect x="${x}" y="${baseY - h}" width="${barWidth}" height="${h}" rx="10" class="chart-bar"/><text x="${x + barWidth / 2}" y="${baseY - h - 9}" text-anchor="middle" class="chart-value">${display(row.price, 0)}</text><text x="${x + barWidth / 2}" y="280" text-anchor="middle" class="chart-label">${escapePlayerHtml(row.name)}</text>` }).join('')}
     <line x1="40" y1="${baseY}" x2="590" y2="${baseY}" class="chart-axis"/>
   </svg></div>`
 }
@@ -147,14 +147,14 @@ export function renderPerformanceChart(detail?: FldaPlayerDetail): string {
   const min = Math.min(...values, 4)
   const max = Math.max(...values, 8)
   const x = (index: number) => rows.length === 1 ? 310 : 55 + index * (520 / (rows.length - 1))
-  const y = (value: number) => 185 - ((value - min) / Math.max(max - min, 1)) * 125
+  const y = (value: number) => 245 - ((value - min) / Math.max(max - min, 1)) * 180
   const points = (key: 'mv' | 'fmv') => rows.map((row, index) => typeof row[key] === 'number' ? `${x(index)},${y(row[key])}` : '').filter(Boolean).join(' ')
   const ticks = [min, (min + max) / 2, max]
-  return `<div class="player-chart"><svg viewBox="0 0 620 245" role="img" aria-label="Andamento multi-stagione MV e FMV">
-    <text x="13" y="120" text-anchor="middle" transform="rotate(-90 13 120)" class="chart-axis-title">Voto</text>
+  return `<div class="player-chart"><svg viewBox="0 0 620 315" role="img" aria-label="Andamento multi-stagione MV e FMV">
+    <text x="13" y="155" text-anchor="middle" transform="rotate(-90 13 155)" class="chart-axis-title">Voto</text>
     ${ticks.map((tick) => { const tickY = y(tick); return `<line x1="40" y1="${tickY}" x2="590" y2="${tickY}" class="chart-grid-line"/><text x="35" y="${tickY + 4}" text-anchor="end" class="chart-tick">${display(tick, 1)}</text>` }).join('')}
-    <line x1="40" y1="185" x2="590" y2="185" class="chart-axis"/><polyline points="${points('mv')}" class="chart-line chart-line-mv"/><polyline points="${points('fmv')}" class="chart-line chart-line-fmv"/>
-    ${rows.map((row, index) => { const title = `${row.season} · MV ${display(row.mv, 2)} · FMV ${display(row.fmv, 2)}`; return `<text x="${x(index)}" y="214" text-anchor="middle" class="chart-label">${escapePlayerHtml(row.season)}</text>${typeof row.mv === 'number' ? `<circle cx="${x(index)}" cy="${y(row.mv)}" r="5" class="chart-dot chart-dot-mv"><title>${title}</title></circle>` : ''}${typeof row.fmv === 'number' ? `<circle cx="${x(index)}" cy="${y(row.fmv)}" r="5" class="chart-dot chart-dot-fmv"><title>${title}</title></circle>` : ''}` }).join('')}
+    <line x1="40" y1="245" x2="590" y2="245" class="chart-axis"/><polyline points="${points('mv')}" class="chart-line chart-line-mv"/><polyline points="${points('fmv')}" class="chart-line chart-line-fmv"/>
+    ${rows.map((row, index) => { const title = `${row.season} · MV ${display(row.mv, 2)} · FMV ${display(row.fmv, 2)}`; return `<text x="${x(index)}" y="278" text-anchor="middle" class="chart-label">${escapePlayerHtml(row.season)}</text>${typeof row.mv === 'number' ? `<circle cx="${x(index)}" cy="${y(row.mv)}" r="6" class="chart-dot chart-dot-mv"><title>${title}</title></circle>` : ''}${typeof row.fmv === 'number' ? `<circle cx="${x(index)}" cy="${y(row.fmv)}" r="6" class="chart-dot chart-dot-fmv"><title>${title}</title></circle>` : ''}` }).join('')}
     <g class="chart-legend"><circle cx="440" cy="25" r="5" class="chart-dot-mv"/><text x="452" y="29">MV</text><circle cx="510" cy="25" r="5" class="chart-dot-fmv"/><text x="522" y="29">FMV</text></g>
   </svg></div>`
 }
