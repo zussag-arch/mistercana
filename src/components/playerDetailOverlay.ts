@@ -29,7 +29,8 @@ export function renderPlayerDetailOverlay(
     auctionLive: callEnabled || assigned, identityAvailable: false,
   }
   const role = view.flda.role.toUpperCase()
-  const canCall = Boolean(view.legacyId) && callEnabled && !assigned
+  const callId = view.flda.player_id ?? view.legacyId
+  const canCall = Boolean(callId) && callEnabled && !assigned
   const latest = latestHistory(view.detail)
   const roleFields: Array<[string, string]> = role === 'P'
     ? [['Presenze', 'presenze'], ['Minuti', 'min_playing_time'], ['Gol subiti', 'gol_subiti'], ['Rigori parati', 'rigori_parati']]
@@ -42,7 +43,7 @@ export function renderPlayerDetailOverlay(
     <section class="player-detail-card player-quick-card" role="dialog" aria-modal="true" aria-labelledby="playerDetailTitle" tabindex="-1">
       <header class="player-detail-header">
         <div class="player-detail-identity"><span class="player-detail-role player-detail-role-${role.toLowerCase()}">${escapePlayerHtml(role)}</span><div><span class="player-detail-eyebrow">SNAPSHOT GIOCATORE</span><h2 id="playerDetailTitle">${escapePlayerHtml(view.flda.name)}</h2><p>${escapePlayerHtml(view.flda.team)}</p>${renderPlayerBadges(view)}</div></div>
-        <div class="player-detail-header-actions"><span class="player-status player-status-${auctionStatusClass(view)}">${auctionStatusLabel(view)}</span><button type="button" class="player-detail-call-button" data-player-detail-call="${escapePlayerHtml(view.legacyId ?? '')}" ${canCall ? '' : 'disabled'}>${assigned ? 'ASSEGNATO' : callEnabled ? 'CHIAMA' : 'ASTA NON ATTIVA'}</button><button type="button" class="player-detail-close-button" data-close-player-detail aria-label="Chiudi">×</button></div>
+        <div class="player-detail-header-actions"><span class="player-status player-status-${auctionStatusClass(view)}">${auctionStatusLabel(view)}</span><button type="button" class="player-detail-call-button" data-player-detail-call="${escapePlayerHtml(callId ?? '')}" ${canCall ? '' : 'disabled'}>${assigned ? 'ASSEGNATO' : callEnabled ? 'CHIAMA' : 'ASTA NON ATTIVA'}</button><button type="button" class="player-detail-close-button" data-close-player-detail aria-label="Chiudi">×</button></div>
       </header>
       ${renderCurrentMetrics(view)}
       ${!view.identityAvailable ? '<p class="player-data-alert">Dati FLDA non disponibili per questa identità. Sono mostrati i dati legacy disponibili.</p>' : ''}

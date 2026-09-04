@@ -198,7 +198,7 @@ function getMarketRatios(
         const player =
           getPlayerById(
             allPlayers,
-            assignment.playerId,
+            assignment.playerId ?? '',
           )
 
         if (!player) {

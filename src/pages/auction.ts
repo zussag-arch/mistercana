@@ -34,10 +34,14 @@ import {
   renderPlayerDetailOverlay,
 } from '../components/playerDetailOverlay'
 import { displayHistoricalAuctionPrices } from '../domain/historicalAuctionPrice'
-import { getCachedPlayerDetail, getFldaIdForLegacyId, loadPlayerDetail, loadPlayersDataset } from '../services/playerRepository'
+import type { FldaPlayer } from '../services/flda'
+import { getCachedPlayerDetail, getCachedPlayersDataset, getFldaIdForLegacyId, loadPlayerDetail, loadPlayersDataset } from '../services/playerRepository'
+import { getAssignmentFldaId, isFldaPlayerAssigned, resolveAssignmentPlayer, resolveCurrentAuctionPlayer, resolveFldaPlayer, summarizeManagerAssignments } from '../services/auctionPlayerResolver'
+import type { CanonicalAuctionPlayer } from '../services/auctionPlayerResolver'
 
 const loadingHistoricalPrices = new Set<string>()
 const attemptedHistoricalPrices = new Set<string>()
+let auctionCatalogLoading = false
 
 type AuctionRole =
   PlayerRole
@@ -288,14 +292,10 @@ function getPlayer(
   )
 }
 
-function getSelectedPlayer(
+function getSelectedCanonicalPlayer(
   state: AppState,
-):
-  | Player
-  | undefined {
-  return getPlayer(
-    state.currentAuctionPlayerId,
-  )
+): CanonicalAuctionPlayer | undefined {
+  return resolveCurrentAuctionPlayer(state, getCachedPlayersDataset())
 }
 
 function getRolePlayers(
@@ -313,12 +313,13 @@ function getAssignmentByPlayer(
 ):
   | AuctionAssignment
   | undefined {
+  const fldaId = getFldaIdForLegacyId(playerId)
   return state
     .auctionAssignments
     .find(
       (assignment) =>
-        assignment.playerId ===
-        playerId,
+        assignment.playerId === playerId ||
+        Boolean(fldaId && getAssignmentFldaId(assignment) === fldaId),
     )
 }
 
@@ -430,23 +431,29 @@ function callPlayer(
     | undefined,
   actions: AuctionActions,
 ): void {
-  const player =
-    getPlayer(
-      playerId ?? null,
-    )
+  const fldaId = playerId && (
+    resolveFldaPlayer(playerId, getCachedPlayersDataset())
+      ? playerId
+      : getFldaIdForLegacyId(playerId)
+  )
+  const player = resolveFldaPlayer(
+    fldaId,
+    getCachedPlayersDataset(),
+  )
 
   if (
     !player ||
-    isPlayerAssigned(
-      state,
-      player.id,
+    isFldaPlayerAssigned(
+      state.auctionAssignments,
+      player.canonicalId,
     )
   ) {
     return
   }
 
-  state.currentAuctionPlayerId =
-    player.id
+  state.currentAuctionFldaPlayerId =
+    player.canonicalId
+  state.currentAuctionPlayerId = null
 
   activeRole =
     player.role
@@ -720,10 +727,7 @@ function updateLiveBidPrice(
       '#auctionPriceInput',
     )
 
-  const player =
-    getSelectedPlayer(
-      state,
-    )
+  const player = getSelectedCanonicalPlayer(state)
 
   if (
     !input ||
@@ -757,17 +761,10 @@ function updateLiveBidPrice(
   input.value =
     String(next)
 
-  const advice =
-    calculatePriceAdvice(
-      state,
-      player,
-      players,
-    )
-
-  updateBidSignalElement(
-    advice,
-    next,
-  )
+  if (player.legacy) {
+    const advice = calculatePriceAdvice(state, player.legacy, players)
+    updateBidSignalElement(advice, next)
+  }
 }
 
 /* =========================
@@ -787,58 +784,11 @@ function buildParticipants(
 
   return activeManagers.map(
     (manager) => {
-      const spent:
-        Record<
-          AuctionRole,
-          number
-        > = {
-          P: 0,
-          D: 0,
-          C: 0,
-          A: 0,
-        }
-
-      const slots:
-        Record<
-          AuctionRole,
-          number
-        > = {
-          P: 0,
-          D: 0,
-          C: 0,
-          A: 0,
-        }
-
-      state
-        .auctionAssignments
-        .forEach(
-          (assignment) => {
-            if (
-              assignment.managerId !==
-              manager.id
-            ) {
-              return
-            }
-
-            const player =
-              getPlayer(
-                assignment.playerId,
-              )
-
-            if (!player) {
-              return
-            }
-
-            spent[
-              player.role
-            ] +=
-              assignment.price
-
-            slots[
-              player.role
-            ] += 1
-          },
-        )
+      const { spent, slots } = summarizeManagerAssignments(
+        state.auctionAssignments,
+        manager.id,
+        getCachedPlayersDataset(),
+      )
 
       return {
         id:
@@ -1082,11 +1032,11 @@ function renderRoleTabs():
    SELECTOR
 ========================= */
 
-function getTeams():
+function getTeams(catalog: FldaPlayer[]):
   string[] {
   return Array.from(
     new Set(
-      players.map(
+      catalog.map(
         (player) =>
           player.team,
       ),
@@ -1112,10 +1062,21 @@ function renderSelector(
     selectorMode ===
     'team'
 
+  const dataset = getCachedPlayersDataset()
+  if (!dataset || auctionCatalogLoading) {
+    return `<div id="auctionPlayerSelectorOverlay" class="overlay" aria-hidden="false"><div class="overlay-backdrop"></div><div class="overlay-card auction-selector-card"><div class="overlay-header"><h2>Catalogo FLDA</h2><button id="closeAuctionSelectorButton" type="button" class="icon-button" aria-label="Chiudi">×</button></div><p>Caricamento giocatori FLDA…</p></div></div>`
+  }
+  if (dataset.source !== 'flda') {
+    return `<div id="auctionPlayerSelectorOverlay" class="overlay" aria-hidden="false"><div class="overlay-backdrop"></div><div class="overlay-card auction-selector-card"><div class="overlay-header"><h2>FLDA non disponibile</h2><button id="closeAuctionSelectorButton" type="button" class="icon-button" aria-label="Chiudi">×</button></div><p>${escapeHtml(dataset.error ?? 'Impossibile caricare il catalogo FLDA.')}</p><button id="retryAuctionCatalogButton" type="button">Riprova</button></div></div>`
+  }
+  const catalog = dataset.players.filter(
+    (player): player is FldaPlayer & { player_id: string } =>
+      Boolean(player.player_id) && ROLE_ORDER.includes(player.role as AuctionRole),
+  )
   const visiblePlayers =
     teamMode &&
     selectedTeamFilter
-      ? players.filter(
+      ? catalog.filter(
           (player) =>
             normalizeText(
               player.team,
@@ -1124,7 +1085,7 @@ function renderSelector(
               selectedTeamFilter,
             ),
         )
-      : players
+      : catalog
 
   return `
     <div
@@ -1173,7 +1134,7 @@ function renderSelector(
               <div
                 class="auction-team-selector"
               >
-                ${getTeams()
+                ${getTeams(catalog)
                   .map(
                     (team) => `
                       <button
@@ -1257,9 +1218,9 @@ function renderSelector(
                   .map(
                     (player) => {
                       const assigned =
-                        isPlayerAssigned(
-                          state,
-                          player.id,
+                        isFldaPlayerAssigned(
+                          state.auctionAssignments,
+                          player.player_id,
                         )
 
                       return `
@@ -1274,7 +1235,7 @@ function renderSelector(
                             }
                           "
                           data-auction-select-player="${escapeHtml(
-                            player.id,
+                            player.player_id,
                           )}"
                           data-search="${escapeHtml(
                             normalizeText(
@@ -1315,7 +1276,7 @@ function renderSelector(
                               assigned
                                 ? 'Assegnato'
                                 : formatNumber(
-                                    player.iCa,
+                                    player.fm_exp ?? undefined,
                                     2,
                                   )
                             }
@@ -1983,10 +1944,7 @@ function renderAwardOverlay(
     return ''
   }
 
-  const player =
-    getSelectedPlayer(
-      state,
-    )
+  const player = getSelectedCanonicalPlayer(state)
 
   if (!player) {
     return ''
@@ -2408,7 +2366,7 @@ function renderSuggestedPlayersPanel(
               (assignment) => {
                 const player =
                   getPlayer(
-                    assignment.playerId,
+                    assignment.playerId ?? null,
                   )
 
                 const manager =
@@ -3081,10 +3039,10 @@ function renderAssignmentHistory(
                 .reverse()
                 .map(
                   (assignment) => {
-                    const player =
-                      getPlayer(
-                        assignment.playerId,
-                      )
+                    const player = resolveAssignmentPlayer(
+                      assignment,
+                      getCachedPlayersDataset(),
+                    )
 
                     const manager =
                       getManagerById(
@@ -3245,10 +3203,10 @@ function renderEditAssignmentOverlay(
     return ''
   }
 
-  const player =
-    getPlayer(
-      assignment.playerId,
-    )
+  const player = resolveAssignmentPlayer(
+    assignment,
+    getCachedPlayersDataset(),
+  )
 
   if (!player) {
     return ''
@@ -3575,10 +3533,7 @@ function renderLiveAuction(
       state,
     )
 
-  const selectedPlayer =
-    getSelectedPlayer(
-      state,
-    )
+  const selectedPlayer = getSelectedCanonicalPlayer(state)
 
   if (selectedPlayer) {
     activeRole =
@@ -3727,10 +3682,9 @@ function renderLiveAuction(
         >
           ${
             selectedPlayer
-              ? renderPlayerCard(
-                  state,
-                  selectedPlayer,
-                )
+              ? selectedPlayer.legacy
+                ? renderPlayerCard(state, selectedPlayer.legacy)
+                : renderFldaPlayerCard(state, selectedPlayer)
               : `
                 <section
                   class="
@@ -3864,6 +3818,13 @@ export function bindAuctionEvents(
   state: AppState,
   actions: AuctionActions,
 ): void {
+  if (!getCachedPlayersDataset() && !auctionCatalogLoading) {
+    auctionCatalogLoading = true
+    void loadPlayersDataset().finally(() => {
+      auctionCatalogLoading = false
+      actions.onRender()
+    })
+  }
   const selectedLegacyId = state.currentAuctionPlayerId
   const selectedFldaId = selectedLegacyId ? getFldaIdForLegacyId(selectedLegacyId) : undefined
   if (selectedLegacyId && (!selectedFldaId || !getCachedPlayerDetail(selectedFldaId))
@@ -4148,6 +4109,7 @@ export function bindAuctionEvents(
 
             state.currentAuctionPlayerId =
               null
+            state.currentAuctionFldaPlayerId = null
 
             auctionFeedback =
               ''
@@ -4222,6 +4184,14 @@ export function bindAuctionEvents(
       'click',
       closeSelector,
     )
+
+  document.querySelector('#retryAuctionCatalogButton')?.addEventListener('click', () => {
+    auctionCatalogLoading = true
+    void loadPlayersDataset(true).finally(() => {
+      auctionCatalogLoading = false
+      actions.onRender()
+    })
+  })
 
   document
     .querySelector(
@@ -4496,21 +4466,14 @@ export function bindAuctionEvents(
     ?.addEventListener(
       'input',
       () => {
-        const player =
-          getSelectedPlayer(
-            state,
-          )
+        const player = getSelectedCanonicalPlayer(state)
 
         if (!player) {
           return
         }
 
-        const advice =
-          calculatePriceAdvice(
-            state,
-            player,
-            players,
-          )
+        if (!player.legacy) return
+        const advice = calculatePriceAdvice(state, player.legacy, players)
 
         const currentPrice =
           Number(
@@ -4563,10 +4526,7 @@ export function bindAuctionEvents(
     ?.addEventListener(
       'click',
       () => {
-        const player =
-          getSelectedPlayer(
-            state,
-          )
+        const player = getSelectedCanonicalPlayer(state)
 
         const priceInput =
           document.querySelector<HTMLInputElement>(
@@ -4719,10 +4679,7 @@ export function bindAuctionEvents(
     ?.addEventListener(
       'click',
       () => {
-        const player =
-          getSelectedPlayer(
-            state,
-          )
+        const player = getSelectedCanonicalPlayer(state)
 
         const winnerSelect =
           document.querySelector<HTMLSelectElement>(
@@ -4927,14 +4884,21 @@ export function bindAuctionEvents(
           return
         }
 
+        if (isFldaPlayerAssigned(state.auctionAssignments, player.canonicalId)) {
+          auctionFeedback = `${player.name} risulta già assegnato.`
+          awardOverlayOpen = false
+          actions.onRender()
+          return
+        }
+
         state
           .auctionAssignments
           .push({
             id:
               createAssignmentId(),
 
-            playerId:
-              player.id,
+            fldaPlayerId:
+              player.canonicalId,
 
             managerId:
               winner.id,
@@ -4962,7 +4926,7 @@ export function bindAuctionEvents(
             .filter(
               (playerId) =>
                 playerId !==
-                player.id,
+                player.legacy?.id,
             )
 
         awardOverlayOpen =
@@ -4987,6 +4951,7 @@ export function bindAuctionEvents(
       () => {
         state.currentAuctionPlayerId =
           null
+        state.currentAuctionFldaPlayerId = null
 
         awardOverlayOpen =
           false
@@ -5011,10 +4976,7 @@ export function bindAuctionEvents(
     ?.addEventListener(
       'click',
       () => {
-        const player =
-          getSelectedPlayer(
-            state,
-          )
+        const player = getSelectedCanonicalPlayer(state)
 
         if (!player) {
           return
@@ -5025,6 +4987,7 @@ export function bindAuctionEvents(
 
         state.currentAuctionPlayerId =
           null
+        state.currentAuctionFldaPlayerId = null
 
         awardOverlayOpen =
           false
@@ -5275,4 +5238,39 @@ export function bindAuctionEvents(
         actions.onStateChange()
       },
     )
+}
+
+function renderFldaPlayerCard(
+  state: AppState,
+  player: CanonicalAuctionPlayer,
+): string {
+  const assigned = isFldaPlayerAssigned(
+    state.auctionAssignments,
+    player.canonicalId,
+  )
+  const flda = player.flda
+  return `
+    <section class="auction-player-card">
+      <div class="auction-player-header">
+        <div class="auction-player-identity">
+          <span class="auction-role-badge large role-${player.role.toLowerCase()}">${player.role}</span>
+          <div><span class="auction-kicker">GIOCATORE IN ASTA · FLDA</span><h2>${escapeHtml(player.name)}</h2><p>${escapeHtml(player.team)} · ${player.role}</p></div>
+        </div>
+        <span class="auction-availability ${assigned ? 'assigned' : ''}">${assigned ? 'ASSEGNATO' : 'DA ASSEGNARE'}</span>
+      </div>
+      <div class="auction-main-values">
+        <div class="auction-main-value"><span>xFM</span><strong>${formatNumber(flda?.fm_exp ?? undefined, 2)}</strong></div>
+        <div class="auction-main-value"><span>Titolarità</span><strong>${formatPercent(flda?.titolarita_display ?? undefined, 0)}</strong></div>
+        <div class="auction-main-value"><span>iCà</span><strong>—</strong></div>
+        <div class="auction-main-value"><span>Consiglio prezzo</span><strong>—</strong></div>
+      </div>
+      <p class="muted-text">Le metriche strategiche legacy non sono disponibili per questo giocatore FLDA e non bloccano la chiamata.</p>
+      <div class="auction-live-price-row">
+        <label class="auction-live-price-field"><span>Prezzo corrente</span><input id="auctionPriceInput" type="number" inputmode="numeric" min="0" step="1" placeholder="0" ${assigned ? 'disabled' : ''}></label>
+        <div class="auction-price-stepper"><button id="auctionPricePlusOneButton" type="button" ${assigned ? 'disabled' : ''}>+1</button><button id="auctionPricePlusTenButton" type="button" ${assigned ? 'disabled' : ''}>+10</button></div>
+        <button id="auctionOpenAwardButton" type="button" class="auction-primary-action" ${assigned ? 'disabled' : ''}>Aggiudicato</button>
+        <button id="auctionUnsoldButton" type="button" class="auction-secondary-action" ${assigned ? 'disabled' : ''}>Invenduto</button>
+        <button id="auctionCancelCallButton" type="button" class="auction-secondary-action">Annulla</button>
+      </div>
+    </section>`
 }

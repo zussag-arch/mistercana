@@ -152,7 +152,7 @@ function getAssignmentRatio(
 } | undefined {
   const assignedPlayer =
     playerMap.get(
-      assignment.playerId,
+      assignment.playerId ?? '',
     )
 
   if (!assignedPlayer) {
@@ -596,7 +596,7 @@ export function calculateCompetitors(
               const assignedPlayer =
                 playerMap.get(
                   assignment
-                    .playerId,
+                    .playerId ?? '',
                 )
 
               if (

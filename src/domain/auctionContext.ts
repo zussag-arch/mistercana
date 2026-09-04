@@ -179,7 +179,7 @@ export function getSpentByRole(
       const player =
         getPlayerById(
           allPlayers,
-          assignment.playerId,
+          assignment.playerId ?? '',
         )
 
       if (!player) {
@@ -382,7 +382,7 @@ export function getManagerRolePlayers(
       (assignment) =>
         getPlayerById(
           allPlayers,
-          assignment.playerId,
+          assignment.playerId ?? '',
         ),
     )
     .filter(

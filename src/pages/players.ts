@@ -8,6 +8,7 @@ import {
   loadPlayerDetail, loadPlayersDataset,
 } from '../services/playerRepository'
 import { getLegacyIdFromFldaId } from '../services/playerIdentity'
+import { getAssignmentFldaId } from '../services/auctionPlayerResolver'
 import { renderPlayerDetailOverlay } from '../components/playerDetailOverlay'
 import type { PlayerViewModel } from '../components/playerDataView'
 import { auctionStatusClass, display, escapePlayerHtml, icaHue, renderPlayerBadges } from '../components/playerDataView'
@@ -54,20 +55,20 @@ function findLegacy(player: FldaPlayer): Player | undefined {
 function legacyIdFor(player: FldaPlayer): string | undefined {
   return player.player_id ? getLegacyIdFromFldaId(player.player_id) : findLegacy(player)?.id
 }
-function isAssigned(state: AppState, legacyId?: string): boolean {
-  return Boolean(legacyId && state.auctionAssignments.some((item) => item.playerId === legacyId))
+function isAssigned(state: AppState, player: FldaPlayer): boolean {
+  return Boolean(player.player_id && state.auctionAssignments.some(
+    (item) => getAssignmentFldaId(item) === player.player_id,
+  ))
 }
 function statusValue(state: AppState, player: FldaPlayer): number {
-  const legacyId = legacyIdFor(player)
-  if (!legacyId) return -1
+  if (!player.player_id) return -1
   if (state.auctionPhase !== 'live') return 0
-  return isAssigned(state, legacyId) ? 1 : 2
+  return isAssigned(state, player) ? 1 : 2
 }
 function statusLabel(state: AppState, player: FldaPlayer): string {
-  const legacyId = legacyIdFor(player)
-  if (!legacyId) return 'NON ASSOCIATO'
+  if (!player.player_id) return 'IDENTITÀ FLDA ASSENTE'
   if (state.auctionPhase !== 'live') return 'NO LIVE'
-  return isAssigned(state, legacyId) ? 'ASSEGNATO' : 'DA ASSEGNARE'
+  return isAssigned(state, player) ? 'ASSEGNATO' : 'DA ASSEGNARE'
 }
 function numeric(value: unknown): number { return typeof value === 'number' ? value : -Infinity }
 
@@ -136,8 +137,8 @@ function renderOverlay(state: AppState, bulk: FldaPlayer[]): string {
   const fldaId = selected.flda.player_id ?? undefined
   const view: PlayerViewModel = {
     flda: selected.flda, legacy: selected.legacy, legacyId,
-    assigned: isAssigned(state, legacyId), auctionLive: state.auctionPhase === 'live',
-    identityAvailable: Boolean(fldaId && legacyId),
+    assigned: isAssigned(state, selected.flda), auctionLive: state.auctionPhase === 'live',
+    identityAvailable: Boolean(fldaId),
     pmaConfiguration: state.pmaConfiguration,
     detail: fldaId ? getCachedPlayerDetail(fldaId) : undefined,
   }
@@ -157,14 +158,14 @@ function renderRow(state: AppState, player: FldaPlayer): string {
   const view: PlayerViewModel = {
     flda: player, legacy, legacyId,
     detail: player.player_id ? getCachedPlayerDetail(player.player_id) : undefined,
-    assigned: isAssigned(state, legacyId), auctionLive: state.auctionPhase === 'live',
-    identityAvailable: Boolean(player.player_id && legacyId),
+    assigned: isAssigned(state, player), auctionLive: state.auctionPhase === 'live',
+    identityAvailable: Boolean(player.player_id),
     pmaConfiguration: state.pmaConfiguration,
   }
   const pma = getFldaPma(player, state.pmaConfiguration)
   return `<button type="button" class="players-table-row" data-player-ref="${escapePlayerHtml(fldaReference(player))}">
     <div class="players-player-cell"><span class="role-badge role-${player.role.toLowerCase()}">${escapePlayerHtml(player.role)}</span><span><span class="players-name-line"><strong>${escapePlayerHtml(player.name)}</strong>${renderPlayerBadges(view)}</span><small>${escapePlayerHtml(player.team)}</small></span></div>
-    <div data-label="iCà"><span class="players-ica" style="--ica-hue:${icaHue(legacy?.iCa)}">${display(legacy?.iCa, 1)}</span></div>
+    <div data-label="iCà"><span class="players-ica" style="--ica-hue:${icaHue(legacy?.iCa)}">${display(legacy?.iCa, 2)}</span></div>
     <div data-label="PMA">${typeof pma === 'number' ? `${display(pma, 1)}%` : '—'}</div>
     <div data-label="xFM">${display(player.fm_exp, 2)}</div>
     <div data-label="Titolarità">${display(player.titolarita_display, 0)}${typeof player.titolarita_display === 'number' ? '%' : ''}</div>
@@ -198,6 +199,7 @@ export function renderPlayersPage(state: AppState): string {
     <div class="players-toolbar">
       <div class="players-role-filter">${(['ALL','P','D','C','A'] as RoleFilter[]).map((role) => `<button type="button" data-player-role="${role}" class="players-filter-button ${viewState.role === role ? 'selected' : ''}">${role === 'ALL' ? 'Tutti' : role}</button>`).join('')}</div>
       <details class="players-team-filter"><summary aria-label="Seleziona squadra">${viewState.team === 'ALL' ? 'Tutte' : escapePlayerHtml(viewState.team)}</summary><div class="auction-team-selector" role="group" aria-label="Filtra per squadra"><button type="button" class="auction-team-choice ${viewState.team === 'ALL' ? 'selected' : ''}" data-player-team="ALL">Tutte</button>${teams.map((team) => `<button type="button" class="auction-team-choice ${viewState.team === team ? 'selected' : ''}" data-player-team="${escapePlayerHtml(team)}">${escapePlayerHtml(team)}</button>`).join('')}</div></details>
+      <input id="playersSearch" type="search" value="${escapePlayerHtml(viewState.search)}" placeholder="Cerca nome o squadra…" aria-label="Cerca giocatore per nome o squadra">
       <details class="players-filters"><summary aria-label="Apri filtri giocatori">Filtri${activeFilters ? ` (${activeFilters})` : ''}</summary><div class="players-filter-menu">
         <label><input data-player-filter="freeOnly" type="checkbox" ${viewState.freeOnly ? 'checked' : ''} ${state.auctionPhase === 'live' ? '' : 'disabled'}> Solo liberi</label>
         <label><input data-player-filter="startingXi" type="checkbox" ${viewState.startingXi ? 'checked' : ''}> Titolare XI</label>
@@ -207,7 +209,6 @@ export function renderPlayersPage(state: AppState): string {
         <label><input data-player-filter="corner" type="checkbox" ${viewState.corner ? 'checked' : ''}> Corner</label>
         <button type="button" id="clearPlayerFilters" ${activeFilters ? '' : 'disabled'}>Azzera filtri</button>
       </div></details>
-      <input id="playersSearch" type="search" value="${escapePlayerHtml(viewState.search)}" placeholder="Cerca nome o squadra…" aria-label="Cerca giocatore per nome o squadra">
       ${dataset?.source === 'legacy' ? '<button id="retryPlayers" type="button">Riprova</button>' : ''}
     </div>
     ${dataset?.source === 'legacy' ? `<div class="players-source-warning">FLDA non raggiungibile. Fallback legacy attivo. ${escapePlayerHtml(dataset.error)}</div>` : ''}

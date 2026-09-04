@@ -10,7 +10,7 @@
 .auction-kicker {
   display: block;
   color: #777e82;
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 850;
   letter-spacing: 0.12em;
 }
@@ -18,7 +18,7 @@
 .auction-demo-label,
 .auction-real-label {
   color: #6e7579;
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.07em;
 }
@@ -74,7 +74,7 @@
 .auction-role-switcher > span,
 .auction-toolbar-stat span {
   color: #7d8488;
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .auction-role-switcher > div {
@@ -126,7 +126,7 @@
   border-radius: 14px;
   background: #202325;
   color: #d2d5d7;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 750;
   cursor: pointer;
 }
@@ -156,7 +156,7 @@
   background:
     rgba(70, 230, 161, 0.12);
   color: #82f2c0;
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 900;
 }
 
@@ -245,11 +245,11 @@
 
 .auction-call-selector small {
   color: #737a7e;
-  font-size: 7px;
+  font-size: 9px;
 }
 
 .auction-call-selector strong {
-  font-size: 9px;
+  font-size: 11px;
 }
 
 /* =========================
@@ -284,7 +284,7 @@
   border-radius: 12px;
   background: #191c1e;
   color: #bfc4c7;
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 750;
   cursor: pointer;
 }
@@ -319,7 +319,7 @@
   border: 1px solid #34393c;
   border-radius: 13px;
   background: #1b1e20;
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .auction-selected-team button {
@@ -327,7 +327,7 @@
   border: 0;
   background: transparent;
   color: #82f2c0;
-  font-size: 8px;
+  font-size: 10px;
   cursor: pointer;
 }
 
@@ -379,12 +379,12 @@
 
 .auction-selector-player small {
   color: #747b7f;
-  font-size: 7px;
+  font-size: 9px;
 }
 
 .auction-selector-player em {
   color: #75f0b8;
-  font-size: 8px;
+  font-size: 10px;
   font-style: normal;
   font-weight: 800;
 }
@@ -401,7 +401,7 @@
   flex: 0 0 auto;
   border-radius: 9px;
   color: #111;
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 900;
 }
 
@@ -510,7 +510,7 @@
 .auction-player-identity p {
   margin: 5px 0 0;
   color: #898f93;
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .auction-player-status {
@@ -528,7 +528,7 @@
   background:
     rgba(70, 230, 161, 0.15);
   color: #8df4c7;
-  font-size: 7px;
+  font-size: 9px;
   font-weight: 850;
 
   transition:
@@ -591,7 +591,7 @@
 
 .auction-main-value span {
   color: #82898d;
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .auction-main-value strong {
@@ -616,7 +616,7 @@
 
 .auction-main-value.auction-history-value small {
   color: #77745f;
-  font-size: 7px;
+  font-size: 9px;
 }
 
 /* =========================
@@ -643,7 +643,7 @@
 
 .auction-insight-row span {
   color: #838a8e;
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .auction-insight-row strong {
@@ -735,7 +735,7 @@
 
 .auction-recommendation-primary span {
   color: #858c90;
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .auction-recommendation-primary strong {
@@ -745,7 +745,7 @@
 
 .auction-recommendation-primary small {
   color: #747b7f;
-  font-size: 7px;
+  font-size: 9px;
 }
 
 .auction-price-limits {
@@ -772,7 +772,7 @@
 
 .auction-price-limit span {
   color: #7b8286;
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .auction-price-limit strong {
@@ -782,7 +782,7 @@
 
 .auction-price-limit small {
   color: #6f767a;
-  font-size: 7px;
+  font-size: 9px;
   line-height: 1.25;
 }
 
@@ -838,7 +838,7 @@
 
 .auction-live-price-field > span {
   color: #7c8387;
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .auction-live-price-field input {
@@ -885,7 +885,7 @@
   height: 40px;
   padding: 0 12px;
   border-radius: 13px;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 800;
   cursor: pointer;
 }
@@ -919,7 +919,7 @@
   background:
     rgba(90, 168, 255, 0.055);
   color: #c2d9ef;
-  font-size: 9px;
+  font-size: 11px;
 
   animation:
     auctionFeedbackEnter
@@ -957,7 +957,7 @@
   background:
     rgba(242, 154, 90, 0.08);
   color: #9ca1a4;
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .auction-current-assignment button {
@@ -967,7 +967,7 @@
   border-radius: 10px;
   background: #25292b;
   color: #cbd0d2;
-  font-size: 7px;
+  font-size: 9px;
   cursor: pointer;
 }
 
@@ -1087,7 +1087,7 @@
 .auction-call-recommendation-head
 span:not(.auction-role-badge) {
   color: #858d89;
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .auction-call-reasons {
@@ -1117,13 +1117,13 @@ span:not(.auction-role-badge) {
   background:
     rgba(70, 230, 161, 0.12);
   color: #46e6a1;
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .auction-call-reason p {
   margin: 1px 0 0;
   color: #b8c0bc;
-  font-size: 8px;
+  font-size: 10px;
   line-height: 1.35;
 }
 
@@ -1168,7 +1168,7 @@ span:not(.auction-role-badge) {
 .auction-call-discard-button {
   min-height: 37px;
   border-radius: 13px;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 900;
   cursor: pointer;
 }
@@ -1204,7 +1204,7 @@ span:not(.auction-role-badge) {
 
 .auction-call-alternatives-title {
   color: #747b7f;
-  font-size: 7px;
+  font-size: 9px;
   font-weight: 800;
   text-transform: uppercase;
 }
@@ -1232,14 +1232,14 @@ span:not(.auction-role-badge) {
 .auction-call-alternative strong {
   overflow: hidden;
   color: #d8ddda;
-  font-size: 9px;
+  font-size: 11px;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
 .auction-call-alternative span {
   color: #6f7673;
-  font-size: 7px;
+  font-size: 9px;
 }
 
 .auction-call-alternative button {
@@ -1252,7 +1252,7 @@ span:not(.auction-role-badge) {
   background:
     rgba(70, 230, 161, 0.06);
   color: #82f2c0;
-  font-size: 7px;
+  font-size: 9px;
   cursor: pointer;
 }
 
@@ -1282,7 +1282,7 @@ span:not(.auction-role-badge) {
   background:
     rgba(228, 94, 94, 0.035);
   color: #9b8585;
-  font-size: 7px;
+  font-size: 9px;
   font-weight: 800;
   cursor: pointer;
 }
@@ -1318,14 +1318,14 @@ span:not(.auction-role-badge) {
 .auction-discarded-row strong {
   overflow: hidden;
   color: #b8bdbb;
-  font-size: 8px;
+  font-size: 10px;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
 .auction-discarded-row span {
   color: #686f72;
-  font-size: 7px;
+  font-size: 9px;
 }
 
 .auction-discarded-row button,
@@ -1339,7 +1339,7 @@ span:not(.auction-role-badge) {
   background:
     rgba(90, 168, 255, 0.055);
   color: #8ebef5;
-  font-size: 7px;
+  font-size: 9px;
   cursor: pointer;
 }
 
@@ -1356,7 +1356,7 @@ span:not(.auction-role-badge) {
     rgba(255, 255, 255, 0.1);
   border-radius: 14px;
   color: #747b7f;
-  font-size: 8px;
+  font-size: 10px;
 }
 
 /* =========================
@@ -1389,14 +1389,14 @@ span:not(.auction-role-badge) {
 .auction-top-ica-row strong {
   overflow: hidden;
   color: #d6dbd9;
-  font-size: 9px;
+  font-size: 11px;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
 .auction-top-ica-row b {
   color: #8b9390;
-  font-size: 9px;
+  font-size: 11px;
   text-align: right;
 }
 
@@ -1407,7 +1407,7 @@ span:not(.auction-role-badge) {
   border-radius: 9px;
   background: #232729;
   color: #aeb5b2;
-  font-size: 7px;
+  font-size: 9px;
   font-weight: 800;
   cursor: pointer;
 }
@@ -1435,7 +1435,7 @@ span:not(.auction-role-badge) {
 .overlay-header p {
   margin: 4px 0 0;
   color: #7d8488;
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .auction-award-section {
@@ -1483,7 +1483,7 @@ span:not(.auction-role-badge) {
 
 .auction-award-section-kicker {
   color: #46e6a1;
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 950;
   letter-spacing: 0.12em;
 }
@@ -1503,7 +1503,7 @@ strong {
 .auction-award-section-heading
 strong {
   color: #9da3a6;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -1568,7 +1568,7 @@ strong {
 .auction-award-field
 > span {
   color: #858d90;
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 750;
 }
 
@@ -1640,7 +1640,7 @@ input {
     translateY(-50%);
   pointer-events: none;
   color: #6f7874;
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 800;
 }
 
@@ -1672,13 +1672,13 @@ input {
 .auction-award-note
 strong {
   color: #c6d2d9;
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .auction-award-note
 span {
   color: #707c83;
-  font-size: 7px;
+  font-size: 9px;
   line-height: 1.4;
 }
 
@@ -1713,7 +1713,7 @@ span {
 .auction-award-grid
 label > span {
   color: #7d8488;
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .auction-award-grid input,
@@ -1800,7 +1800,7 @@ select:focus {
 .auction-participant-top strong {
   min-width: 0;
   overflow: hidden;
-  font-size: 9px;
+  font-size: 11px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -1841,7 +1841,7 @@ select:focus {
   padding: 2px 4px;
   border-radius:
     var(--radius-pill);
-  font-size: 7px;
+  font-size: 9px;
   font-weight: 850;
 
   transition:
@@ -1883,7 +1883,7 @@ select:focus {
     var(--radius-pill);
   background: #25292b;
   color: #7c8387;
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .auction-history-empty {
@@ -1891,7 +1891,7 @@ select:focus {
   border: 1px dashed #34393c;
   border-radius: 15px;
   color: #70777b;
-  font-size: 9px;
+  font-size: 11px;
   text-align: center;
 }
 
@@ -1941,13 +1941,13 @@ select:focus {
 .auction-history-manager small,
 .auction-history-price span {
   color: #72797d;
-  font-size: 7px;
+  font-size: 9px;
 }
 
 .auction-history-manager strong,
 .auction-history-price strong {
   color: #d8dddf;
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .auction-history-manager small {
@@ -1970,7 +1970,7 @@ select:focus {
   border-radius: 10px;
   background: #25292b;
   color: #cbd0d2;
-  font-size: 7px;
+  font-size: 9px;
   cursor: pointer;
 }
 
@@ -2011,7 +2011,7 @@ button.danger {
 .auction-finalization-summary p {
   margin: 0;
   color: #92999d;
-  font-size: 9px;
+  font-size: 11px;
   line-height: 1.45;
 }
 
@@ -2455,11 +2455,11 @@ button.danger {
   }
 
   .auction-insight-row span {
-    font-size: 7px;
+    font-size: 9px;
   }
 
   .auction-insight-row strong {
-    font-size: 9px;
+    font-size: 11px;
   }
 
   .auction-live-price-row {

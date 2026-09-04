@@ -6,6 +6,7 @@ import {
   loadPlayerDetail, loadPlayersDataset, loadTeamGuide,
 } from '../services/playerRepository'
 import { getLegacyIdFromFldaId } from '../services/playerIdentity'
+import { getAssignmentFldaId } from '../services/auctionPlayerResolver'
 import {
   auctionStatusClass, auctionStatusLabel, display, displayCount, escapePlayerHtml,
   field, latestHistory, renderCurrentMetrics,
@@ -146,11 +147,11 @@ export function renderFullPlayerPage(reference: string | null, state: AppState):
   const detail = flda.player_id ? getCachedPlayerDetail(flda.player_id) : undefined
   const guide = getCachedTeamGuide(flda.team)
   const role = flda.role.toUpperCase()
-  const assigned = Boolean(legacyId && state.auctionAssignments.some((item) => item.playerId === legacyId))
-  const view: PlayerViewModel = { flda, legacy, legacyId, detail, guide, assigned, auctionLive: state.auctionPhase === 'live', identityAvailable: Boolean(flda.player_id && legacyId), pmaConfiguration: state.pmaConfiguration }
+  const assigned = Boolean(flda.player_id && state.auctionAssignments.some((item) => getAssignmentFldaId(item) === flda.player_id))
+  const view: PlayerViewModel = { flda, legacy, legacyId, detail, guide, assigned, auctionLive: state.auctionPhase === 'live', identityAvailable: Boolean(flda.player_id), pmaConfiguration: state.pmaConfiguration }
   const latest = latestHistory(detail)
   return `<section class="page player-full-page">
-    <header class="player-full-header"><button type="button" data-player-detail-back>← Giocatori</button><div class="player-full-identity"><span class="player-detail-role player-detail-role-${role.toLowerCase()}">${escapePlayerHtml(role)}</span><div><small>SCHEDA GIOCATORE</small><h1>${escapePlayerHtml(flda.name)}</h1><p>${escapePlayerHtml(flda.team)}</p>${renderPlayerBadges(view)}</div></div><div class="player-full-actions"><span class="player-status player-status-${auctionStatusClass(view)}">${auctionStatusLabel(view)}</span>${legacyId ? `<button type="button" data-full-player-call="${escapePlayerHtml(legacyId)}" ${state.auctionPhase === 'live' && !assigned ? '' : 'disabled'}>${assigned ? 'ASSEGNATO' : 'CHIAMA'}</button>` : ''}</div></header>
+    <header class="player-full-header"><button type="button" data-player-detail-back>← Giocatori</button><div class="player-full-identity"><span class="player-detail-role player-detail-role-${role.toLowerCase()}">${escapePlayerHtml(role)}</span><div><small>SCHEDA GIOCATORE</small><h1>${escapePlayerHtml(flda.name)}</h1><p>${escapePlayerHtml(flda.team)}</p>${renderPlayerBadges(view)}</div></div><div class="player-full-actions"><span class="player-status player-status-${auctionStatusClass(view)}">${auctionStatusLabel(view)}</span>${flda.player_id ? `<button type="button" data-full-player-call="${escapePlayerHtml(flda.player_id)}" ${state.auctionPhase === 'live' && !assigned ? '' : 'disabled'}>${assigned ? 'ASSEGNATO' : 'CHIAMA'}</button>` : ''}</div></header>
     ${!view.identityAvailable ? '<p class="player-data-alert">Dati FLDA non disponibili per questa identità.</p>' : ''}${detailError ? `<p class="player-data-alert">${escapePlayerHtml(detailError)}</p>` : ''}
     <section class="player-full-section"><div class="player-section-heading"><span>ULTIMA STAGIONE</span><h2>Panoramica</h2></div>${latestKpis(role, latest)}</section>
     <div class="player-chart-grid"><section class="player-full-section"><h2>Prezzi dei Saggi</h2>${renderSageChart(detail)}</section><section class="player-full-section"><h2>Storico MV / FMV</h2>${renderPerformanceChart(detail)}</section></div>

@@ -37,6 +37,7 @@ type LegacyState =
       | 'auctionPhase'
       | 'objectives'
       | 'currentAuctionPlayerId'
+      | 'currentAuctionFldaPlayerId'
       | 'auctionAssignments'
       | 'archivedAuctions'
       | 'recommendedDiscards'
@@ -45,6 +46,7 @@ type LegacyState =
     auctionPhase?: unknown
 
     currentAuctionPlayerId?: unknown
+    currentAuctionFldaPlayerId?: unknown
 
     auctionAssignments?: unknown
 
@@ -477,6 +479,7 @@ function migrateAuctionAssignments(
         item as {
           id?: unknown
           playerId?: unknown
+          fldaPlayerId?: unknown
           managerId?: unknown
           participantId?: unknown
           price?: unknown
@@ -485,16 +488,16 @@ function migrateAuctionAssignments(
           secondBidPrice?: unknown
         }
 
-      if (
-        typeof candidate.playerId !==
-          'string' ||
-        !candidate.playerId.trim()
-      ) {
+      const playerId = typeof candidate.playerId === 'string'
+        ? candidate.playerId.trim()
+        : ''
+      const fldaPlayerId = typeof candidate.fldaPlayerId === 'string'
+        ? candidate.fldaPlayerId.trim()
+        : ''
+
+      if (!playerId && !fldaPlayerId) {
         return
       }
-
-      const playerId =
-        candidate.playerId.trim()
 
       const managerId =
         normalizeManagerId(
@@ -520,17 +523,14 @@ function migrateAuctionAssignments(
         return
       }
 
-      if (
-        seenPlayerIds.has(
-          playerId,
-        )
-      ) {
+      const identityKey = fldaPlayerId
+        ? `flda:${fldaPlayerId}`
+        : `legacy:${playerId}`
+      if (seenPlayerIds.has(identityKey)) {
         return
       }
 
-      seenPlayerIds.add(
-        playerId,
-      )
+      seenPlayerIds.add(identityKey)
 
       const secondBidderManagerId =
         normalizeManagerId(
@@ -565,7 +565,8 @@ function migrateAuctionAssignments(
             ? candidate.id.trim()
             : `assignment_migrated_${index}`,
 
-        playerId,
+        ...(playerId ? { playerId } : {}),
+        ...(fldaPlayerId ? { fldaPlayerId } : {}),
 
         managerId,
 
@@ -714,6 +715,14 @@ function normalizeState(
         )
       : null
 
+  const currentAuctionFldaPlayerId =
+    auctionPhase === 'live' ||
+    auctionPhase === 'finalizing'
+      ? normalizeCurrentAuctionPlayerId(
+          parsed.currentAuctionFldaPlayerId,
+        )
+      : null
+
   const pmaConfiguration =
     normalizePmaConfiguration(
       parsed.pmaConfiguration,
@@ -724,6 +733,8 @@ function normalizeState(
     auctionPhase,
 
     currentAuctionPlayerId,
+
+    currentAuctionFldaPlayerId,
 
     auctionAssignments,
 

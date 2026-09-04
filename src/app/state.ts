@@ -47,7 +47,10 @@ export interface Manager {
 
 export interface AuctionAssignment {
   id: string
-  playerId: string
+  /** ID legacy: presente sui record creati prima della migrazione FLDA. */
+  playerId?: string
+  /** UUID FLDA: identità canonica per i nuovi acquisti. */
+  fldaPlayerId?: string
   managerId: string
   price: number
 
@@ -74,6 +77,11 @@ export interface AppState {
   auctionPhase: AuctionPhase
 
   currentAuctionPlayerId:
+    | string
+    | null
+
+  /** UUID FLDA del giocatore chiamato dai nuovi flussi Asta. */
+  currentAuctionFldaPlayerId:
     | string
     | null
 
@@ -117,6 +125,9 @@ export const defaultState:
       'setup',
 
     currentAuctionPlayerId:
+      null,
+
+    currentAuctionFldaPlayerId:
       null,
 
     auctionAssignments:

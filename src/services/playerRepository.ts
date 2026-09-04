@@ -23,6 +23,7 @@ import {
 export interface PlayersDataset {
   source: 'flda' | 'legacy'
   players: FldaPlayer[]
+  byId: ReadonlyMap<string, FldaPlayer>
   error?: string
 }
 
@@ -41,7 +42,8 @@ function legacyAsFlda(player: Player): FldaPlayer {
     name: player.name,
     team: player.team,
     role: player.role,
-    fm_exp: player.fmv ?? null,
+    // FMV legacy e xFM FLDA sono grandezze diverse.
+    fm_exp: null,
     integrita: null,
     titolarita_display: player.startingProbability ?? null,
   }
@@ -51,6 +53,28 @@ function readableError(error: unknown): string {
   return error instanceof Error
     ? error.message
     : 'Dati FLDA non disponibili.'
+}
+
+export function indexFldaPlayers(
+  players: FldaPlayer[],
+): Map<string, FldaPlayer> {
+  const index = new Map<string, FldaPlayer>()
+  const duplicates = new Set<string>()
+  for (const player of players) {
+    const id = player.player_id?.trim()
+    if (!id) continue
+    if (index.has(id)) {
+      duplicates.add(id)
+      continue
+    }
+    index.set(id, player)
+  }
+  if (duplicates.size) {
+    throw new Error(
+      `Catalogo FLDA non valido: UUID duplicati (${[...duplicates].join(', ')}).`,
+    )
+  }
+  return index
 }
 
 function numericRank(value: unknown): number | null {
@@ -104,8 +128,9 @@ export async function loadPlayersDataset(
   datasetRequest = getFldaPlayers()
     .then(async (page) => {
       const players = await enrichPlayerSignals(page.players)
+      const byId = indexFldaPlayers(players)
       initializePlayerIdentity(legacyPlayers, players)
-      dataset = { source: 'flda', players }
+      dataset = { source: 'flda', players, byId }
       return dataset
     })
     .catch((error: unknown) => {
@@ -113,6 +138,7 @@ export async function loadPlayersDataset(
       dataset = {
         source: 'legacy',
         players: legacyPlayers.map(legacyAsFlda),
+        byId: new Map(),
         error: readableError(error),
       }
       return dataset

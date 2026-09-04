@@ -575,7 +575,7 @@ function getOwnerPlayers(
       (assignment) =>
         getPlayerById(
           allPlayers,
-          assignment.playerId,
+          assignment.playerId ?? '',
         ),
     )
     .filter(

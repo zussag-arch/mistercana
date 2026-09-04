@@ -50,6 +50,8 @@ import {
 import {
   players,
 } from './data/players'
+import { getCachedPlayersDataset } from './services/playerRepository'
+import { isFldaPlayerAssigned } from './services/auctionPlayerResolver'
 
 import {
   renderCompetitorAnalysis,
@@ -617,16 +619,23 @@ function callPlayerInAuction(
     return
   }
 
-  const player =
-    players.find(
-      (item) =>
-        item.id ===
-        playerId,
-    )
+  const dataset = getCachedPlayersDataset()
+  const fldaPlayer = dataset?.source === 'flda'
+    ? dataset.byId.get(playerId)
+    : undefined
 
-  if (!player) {
+  if (fldaPlayer) {
+    if (isFldaPlayerAssigned(state.auctionAssignments, playerId)) return
+    state.currentAuctionFldaPlayerId = playerId
+    state.currentAuctionPlayerId = null
+    navigateTo('auction')
+    saveState(state)
+    render()
     return
   }
+
+  const player = players.find((item) => item.id === playerId)
+  if (!player) return
 
   const alreadyAssigned =
     state.auctionAssignments.some(
@@ -641,6 +650,7 @@ function callPlayerInAuction(
 
   state.currentAuctionPlayerId =
     playerId
+  state.currentAuctionFldaPlayerId = null
 
   navigateTo('auction')
 
@@ -680,6 +690,7 @@ function startAuction():
 
   state.currentAuctionPlayerId =
     null
+  state.currentAuctionFldaPlayerId = null
 
   state.auctionPhase =
     'live'
@@ -737,6 +748,7 @@ function archiveAuction():
 
   state.currentAuctionPlayerId =
     null
+  state.currentAuctionFldaPlayerId = null
 
   state.auctionPhase =
     'setup'
@@ -761,6 +773,7 @@ function discardAuction():
 
   state.currentAuctionPlayerId =
     null
+  state.currentAuctionFldaPlayerId = null
 
   state.auctionPhase =
     'setup'

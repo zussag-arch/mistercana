@@ -8,3 +8,12 @@
 
 .players-team-filter{position:relative}.players-team-filter>summary{display:flex;align-items:center;min-width:116px;min-height:38px;padding:0 12px;border:1px solid #343a3e;border-radius:12px;background:#171a1c;cursor:pointer;list-style:none}.players-team-filter>summary::-webkit-details-marker{display:none}.players-team-filter>.auction-team-selector{position:absolute;z-index:35;top:calc(100% + 6px);left:0;width:min(520px,calc(100vw - 32px));padding:9px;border:1px solid #3a4246;border-radius:15px;background:#171a1c;box-shadow:0 16px 35px rgba(0,0,0,.45)}
 @media(max-width:760px){.players-team-filter{flex:0 0 auto}.players-team-filter>.auction-team-selector{position:fixed;z-index:1700;left:12px;right:12px;top:auto;bottom:12px;width:auto;grid-template-columns:repeat(3,minmax(0,1fr));max-height:70vh;overflow-y:auto}}
+
+/* Compact, softer framing for the player catalogue controls. */
+.players-page-header{padding:11px 14px;border:1px solid #292f32;border-radius:24px;background:#121516}
+.players-toolbar{border-radius:22px}
+.players-auction-nav-button,.players-toolbar button,.players-toolbar select,.players-toolbar input,.players-simple-toggle,.players-filters>summary,.players-team-filter>summary{border-radius:16px}
+.players-toolbar input[type=search]{flex:0 1 260px;width:min(260px,100%);min-width:160px;min-height:34px}
+.players-table-card{border-radius:24px}
+.players-ica{display:inline;min-width:0;padding:0;border:0;border-radius:0;background:none;color:hsl(var(--ica-hue),82%,58%);font-variant-numeric:tabular-nums}
+@media(max-width:760px){.players-page-header{padding:10px 12px;border-radius:20px}.players-toolbar input[type=search]{flex:1 1 150px;width:auto;min-width:0}.players-filters{flex:0 0 auto}}
