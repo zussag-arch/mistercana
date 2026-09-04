@@ -33,6 +33,11 @@ import type {
 import {
   renderPlayerDetailOverlay,
 } from '../components/playerDetailOverlay'
+import { displayHistoricalAuctionPrices } from '../domain/historicalAuctionPrice'
+import { getCachedPlayerDetail, getFldaIdForLegacyId, loadPlayerDetail, loadPlayersDataset } from '../services/playerRepository'
+
+const loadingHistoricalPrices = new Set<string>()
+const attemptedHistoricalPrices = new Set<string>()
 
 type AuctionRole =
   PlayerRole
@@ -1406,6 +1411,8 @@ function renderPlayerCard(
   state: AppState,
   player: Player,
 ): string {
+  const fldaId = getFldaIdForLegacyId(player.id)
+  const historicalDetail = fldaId ? getCachedPlayerDetail(fldaId) : undefined
   const assignment =
     getAssignmentByPlayer(
       state,
@@ -1596,15 +1603,15 @@ function renderPlayerCard(
           "
         >
           <span>
-            Prezzo passata stagione
+            Prezzo storico A/B
           </span>
 
           <strong>
-            —
+            ${displayHistoricalAuctionPrices(historicalDetail)}
           </strong>
 
           <small>
-            storico non disponibile
+            ${historicalDetail?.auction_prices?.length ? 'stagione 2025/26' : 'storico non disponibile'}
           </small>
         </div>
       </div>
@@ -3857,6 +3864,21 @@ export function bindAuctionEvents(
   state: AppState,
   actions: AuctionActions,
 ): void {
+  const selectedLegacyId = state.currentAuctionPlayerId
+  const selectedFldaId = selectedLegacyId ? getFldaIdForLegacyId(selectedLegacyId) : undefined
+  if (selectedLegacyId && (!selectedFldaId || !getCachedPlayerDetail(selectedFldaId))
+      && !loadingHistoricalPrices.has(selectedLegacyId)
+      && !attemptedHistoricalPrices.has(selectedLegacyId)) {
+    loadingHistoricalPrices.add(selectedLegacyId)
+    void loadPlayersDataset().then(() => {
+      const fldaId = getFldaIdForLegacyId(selectedLegacyId)
+      return fldaId ? loadPlayerDetail(fldaId) : undefined
+    }).finally(() => {
+      loadingHistoricalPrices.delete(selectedLegacyId)
+      attemptedHistoricalPrices.add(selectedLegacyId)
+      actions.onStateChange()
+    })
+  }
   if (
     state.auctionPhase ===
     'finalizing'

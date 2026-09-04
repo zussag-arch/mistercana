@@ -66,12 +66,20 @@ export interface FldaPlayersPage {
 
 export type FldaRecord = Record<string, unknown>
 
+export interface FldaHistoricalAuctionPrice {
+  season: string
+  division: 'SERIE_A' | 'SERIE_B'
+  coach_name: string
+  price: number
+}
+
 export interface FldaPlayerDetail {
   current: FldaPlayer
   history: FldaRecord[]
   guide: FldaRecord | null
   hierarchies: FldaRecord[]
   saggi: FldaRecord[]
+  auction_prices: FldaHistoricalAuctionPrice[]
 }
 
 export type FldaFixtureContext =
@@ -264,6 +272,14 @@ export function getFldaPlayerDetail(
 ): Promise<FldaPlayerDetail> {
   return fldaFetch<FldaPlayerDetail>(
     `/api/players/${encodeURIComponent(playerId)}`,
+  )
+}
+
+export function getFldaHistoricalAuctionPrices(
+  playerId: string,
+): Promise<FldaHistoricalAuctionPrice[]> {
+  return fldaFetch<FldaHistoricalAuctionPrice[]>(
+    `/api/players/${encodeURIComponent(playerId)}/auction-prices`,
   )
 }
 

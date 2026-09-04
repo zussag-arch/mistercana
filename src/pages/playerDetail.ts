@@ -12,6 +12,7 @@ import {
   renderPerformanceChart, renderPlayerBadges, renderSageChart,
 } from '../components/playerDataView'
 import type { PlayerViewModel } from '../components/playerDataView'
+import { displayHistoricalAuctionPrices } from '../domain/historicalAuctionPrice'
 
 export interface PlayerDetailActions {
   onBack: () => void
@@ -153,7 +154,7 @@ export function renderFullPlayerPage(reference: string | null, state: AppState):
     ${!view.identityAvailable ? '<p class="player-data-alert">Dati FLDA non disponibili per questa identità.</p>' : ''}${detailError ? `<p class="player-data-alert">${escapePlayerHtml(detailError)}</p>` : ''}
     <section class="player-full-section"><div class="player-section-heading"><span>ULTIMA STAGIONE</span><h2>Panoramica</h2></div>${latestKpis(role, latest)}</section>
     <div class="player-chart-grid"><section class="player-full-section"><h2>Prezzi dei Saggi</h2>${renderSageChart(detail)}</section><section class="player-full-section"><h2>Storico MV / FMV</h2>${renderPerformanceChart(detail)}</section></div>
-    <section class="player-full-section"><div class="player-section-heading"><span>ASTA</span><h2>Dati correnti</h2></div>${renderCurrentMetrics(view, true)}<div class="player-previous-price"><span>Prezzo precedente</span><strong>${display(field(latest, 'previous_price') ?? field(latest, 'prezzo_precedente'), 0)}</strong></div></section>
+    <section class="player-full-section"><div class="player-section-heading"><span>ASTA</span><h2>Dati correnti</h2></div>${renderCurrentMetrics(view, true, displayHistoricalAuctionPrices(detail))}</section>
     ${qualitativeGuide(view, guide)}
     <section class="player-full-section"><div class="player-section-heading"><span>${escapePlayerHtml(role)}</span><h2>Statistiche ruolo</h2></div>${roleStats(role, latest)}</section>
     ${guideSummary(guide)}

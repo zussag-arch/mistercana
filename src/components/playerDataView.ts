@@ -87,22 +87,27 @@ export function renderPlayerBadges(view: PlayerViewModel): string {
   return badges.length ? `<div class="player-signals">${badges.join('')}</div>` : ''
 }
 
-export function renderCurrentMetrics(view: PlayerViewModel, compact = false): string {
+export function renderCurrentMetrics(view: PlayerViewModel, compact = false,
+  historicalPrice?: string): string {
   const fldaPma = view.pmaConfiguration ? getFldaPma(view.flda, view.pmaConfiguration) : undefined
   const pmaValue = fldaPma ?? (!view.flda.player_id ? view.legacy?.pmaPercent : undefined)
   const pma = typeof pmaValue === 'number' ? `${display(pmaValue, 1)}%` : '—'
-  const items = [
-    ['iCà', display(view.legacy?.iCa, 1), 'Indice MisterCanà'],
+  const items: Array<[string, string, string, string?]> = [
+    ['iCà', display(view.legacy?.iCa, 1), 'Indice MisterCanà', 'player-metric-ica'],
     ['PMA', pma, pma === '—' ? 'dato non disponibile' : view.pmaConfiguration ? `${view.pmaConfiguration.mode === 'classic' ? 'Classic' : 'Mantra'} · ${view.pmaConfiguration.participants} · ${view.pmaConfiguration.defenseModifier ? 'con modificatore' : 'senza modificatore'}` : 'budget iniziale'],
     ['xFM', display(view.flda.fm_exp, 2), 'FM Exp. FLDA'],
     ['Integrità', display(view.flda.integrita, 0), ''],
   ]
+  if (compact) items.push(
+    ['Titolarità', `${display(view.flda.titolarita_display, 0)}${typeof view.flda.titolarita_display === 'number' ? '%' : ''}`, 'indicatore editoriale'],
+    ['Prezzo storico A/B', historicalPrice ?? '— / —', 'stagione 2025/26', 'player-metric-history'],
+  )
   if (!compact) items.push(
     ['MV', display(view.legacy?.mv, 2), 'dato legacy'],
     ['FMV', display(view.legacy?.fmv, 2), 'dato legacy'],
     ['Titolarità', `${display(view.flda.titolarita_display, 0)}${typeof view.flda.titolarita_display === 'number' ? '%' : ''}`, 'indicatore editoriale'],
   )
-  return `<div class="player-current-metrics">${items.map(([label, value, note]) => `<div><span>${label}</span><strong>${value}</strong>${note ? `<small>${note}</small>` : ''}</div>`).join('')}</div>`
+  return `<div class="player-current-metrics${compact ? ' player-current-metrics-full' : ''}">${items.map(([label, value, note, className]) => `<div class="${className ?? ''}"${className === 'player-metric-ica' ? ` style="--ica-hue:${icaHue(view.legacy?.iCa)}"` : ''}><span>${label}</span><strong>${value}</strong>${note ? `<small>${note}</small>` : ''}</div>`).join('')}</div>`
 }
 
 function chartEmpty(message: string): string {

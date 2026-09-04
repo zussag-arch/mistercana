@@ -68,6 +68,20 @@ test('shows the centrally selected FLDA PMA in list and shared detail metrics', 
   assert.match(view, /getFldaPma\(view\.flda, view\.pmaConfiguration\)/)
 })
 
+test('renders the two historical prices and the requested full-page KPI layout', () => {
+  const detail = readFileSync('src/pages/playerDetail.ts', 'utf8')
+  const auction = readFileSync('src/pages/auction.ts', 'utf8')
+  const metrics = readFileSync('src/components/playerDataView.ts', 'utf8')
+  const styles = readFileSync('src/styles/playerDetail.css', 'utf8')
+  assert.match(detail, /displayHistoricalAuctionPrices\(detail\)/)
+  assert.match(auction, /displayHistoricalAuctionPrices\(historicalDetail\)/)
+  assert.match(metrics, /player-current-metrics-full/)
+  assert.match(metrics, /Titolarità/)
+  assert.match(styles, /player-metric-ica/)
+  assert.match(styles, /player-metric-history/)
+  assert.match(styles, /@media\(max-width:700px\).*player-current-metrics-full/)
+})
+
 test('uses compact requested columns, role/iCa default order and offline-only retry', () => {
   const page = source('src/pages/players.ts')
   assert.match(page, /sortKey: 'default'/)

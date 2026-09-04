@@ -2,6 +2,7 @@ import { players as legacyPlayers } from '../data/players'
 import type { Player } from '../domain/player'
 import {
   getFldaPlayerDetail,
+  getFldaHistoricalAuctionPrices,
   getFldaPlayers,
   getFldaTeamFixtures,
   getFldaTeamGuide,
@@ -157,7 +158,11 @@ export async function loadPlayerDetail(id: string): Promise<FldaPlayerDetail> {
   const pending = detailRequests.get(id)
   if (pending) return pending
   const request = getFldaPlayerDetail(id)
-    .then((value) => {
+    .then(async (value) => {
+      if (!Array.isArray(value.auction_prices)) {
+        value.auction_prices = await getFldaHistoricalAuctionPrices(id)
+          .catch(() => [])
+      }
       detailCache.set(id, value)
       return value
     })
