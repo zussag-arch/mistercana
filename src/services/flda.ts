@@ -66,6 +66,39 @@ export interface FldaPlayersPage {
 
 export type FldaRecord = Record<string, unknown>
 
+export interface FldaHistoryRecord extends FldaRecord {
+  season: string
+  season_id?: number | null
+  presenze?: number | null
+  starts_eleven?: number | null
+  min_playing_time?: number | null
+  mv?: number | null
+  fmv?: number | null
+  gol_fatti?: number | null
+  assist?: number | null
+  amm?: number | null
+  esp?: number | null
+  rigori_fatti?: number | null
+  rigori_sbagliati?: number | null
+  gol_subiti?: number | null
+  rigori_parati?: number | null
+  clean_sheet?: number | null
+  xg?: number | null
+  xa?: number | null
+  injury_games_missed?: number | null
+}
+
+export interface FldaBulkHistoryPlayer {
+  player_id: string
+  history: FldaHistoryRecord[]
+}
+
+export interface FldaBulkHistoryResponse {
+  seasons: number
+  fields: string[]
+  players: FldaBulkHistoryPlayer[]
+}
+
 export interface FldaHistoricalAuctionPrice {
   season: string
   division: 'SERIE_A' | 'SERIE_B'
@@ -264,6 +297,15 @@ export function getFldaPlayers(
 
   return fldaFetch<FldaPlayersPage>(
     `/api/players?${query.toString()}`,
+  )
+}
+
+export function getFldaBulkHistory(
+  seasons = 3,
+): Promise<FldaBulkHistoryResponse> {
+  const query = new URLSearchParams({ seasons: String(seasons) })
+  return fldaFetch<FldaBulkHistoryResponse>(
+    `/api/history/bulk?${query.toString()}`,
   )
 }
 

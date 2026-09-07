@@ -35,9 +35,13 @@ import {
 } from '../components/playerDetailOverlay'
 import { displayHistoricalAuctionPrices } from '../domain/historicalAuctionPrice'
 import type { FldaPlayer } from '../services/flda'
-import { getCachedPlayerDetail, getCachedPlayersDataset, getFldaIdForLegacyId, loadPlayerDetail, loadPlayersDataset } from '../services/playerRepository'
+import { getCachedPlayerDetail, getCachedPlayersDataset, getFldaIdForLegacyId, getLegacyPlayerForFldaId, loadPlayerDetail, loadPlayersDataset } from '../services/playerRepository'
 import { getAssignmentFldaId, isFldaPlayerAssigned, resolveAssignmentPlayer, resolveCurrentAuctionPlayer, resolveFldaPlayer, summarizeManagerAssignments } from '../services/auctionPlayerResolver'
 import type { CanonicalAuctionPlayer } from '../services/auctionPlayerResolver'
+import { calculateRosterMetrics } from '../domain/rosterMetrics'
+import type { RosterMetricPlayer, RosterMetrics } from '../domain/rosterMetrics'
+import { buildAuctionStrategyContext } from '../services/auctionStrategyAdapter'
+import { getCachedICaV2 } from '../services/playerRepository'
 
 const loadingHistoricalPrices = new Set<string>()
 const attemptedHistoricalPrices = new Set<string>()
@@ -66,6 +70,7 @@ interface AuctionActions {
 
   onGoToPlayers: () => void
   onGoToObjectives: () => void
+  onOpenFullPlayer: (reference: string) => void
 }
 
 interface AuctionParticipantState {
@@ -296,15 +301,6 @@ function getSelectedCanonicalPlayer(
   state: AppState,
 ): CanonicalAuctionPlayer | undefined {
   return resolveCurrentAuctionPlayer(state, getCachedPlayersDataset())
-}
-
-function getRolePlayers(
-  role: AuctionRole,
-): Player[] {
-  return players.filter(
-    (player) =>
-      player.role === role,
-  )
 }
 
 function getAssignmentByPlayer(
@@ -761,8 +757,13 @@ function updateLiveBidPrice(
   input.value =
     String(next)
 
-  if (player.legacy) {
-    const advice = calculatePriceAdvice(state, player.legacy, players)
+  const strategy = buildAuctionStrategyContext(state, getCachedPlayersDataset())
+  if (strategy.currentPlayer) {
+    const advice = calculatePriceAdvice(
+      strategy.state,
+      strategy.currentPlayer,
+      strategy.players,
+    )
     updateBidSignalElement(advice, next)
   }
 }
@@ -1372,6 +1373,8 @@ function renderPlayerCard(
   state: AppState,
   player: Player,
 ): string {
+  const strategy = buildAuctionStrategyContext(state, getCachedPlayersDataset())
+  const strategyPlayer = strategy.currentPlayer
   const fldaId = getFldaIdForLegacyId(player.id)
   const historicalDetail = fldaId ? getCachedPlayerDetail(fldaId) : undefined
   const assignment =
@@ -1395,9 +1398,9 @@ function renderPlayerCard(
 
   const priceAdvice =
     calculatePriceAdvice(
-      state,
-      player,
-      players,
+      strategy.state,
+      strategyPlayer ?? { ...player, iCa: undefined },
+      strategy.players,
     )
 
   const bindingLabel =
@@ -1529,7 +1532,7 @@ function renderPlayerCard(
 
           <strong>
             ${formatNumber(
-              player.iCa,
+              strategyPlayer?.iCa,
               2,
             )}
           </strong>
@@ -2341,11 +2344,15 @@ function renderDiscardedPlayers(
 function renderSuggestedPlayersPanel(
   state: AppState,
 ): string {
+  const strategy = buildAuctionStrategyContext(
+    state,
+    getCachedPlayersDataset(),
+  )
   const recommendation =
     calculateRecommendation(
-      state,
+      strategy.state,
       activeRole,
-      players,
+      strategy.players,
     )
 
   const recommended =
@@ -2732,14 +2739,14 @@ function renderSuggestedPlayersPanel(
 function renderTopICaPanel(
   state: AppState,
 ): string {
+  const strategy = buildAuctionStrategyContext(state, getCachedPlayersDataset())
   const candidates =
-    getRolePlayers(
-      activeRole,
-    )
+    strategy.players
       .filter(
         (player) =>
+          player.role === activeRole &&
           !isPlayerAssigned(
-            state,
+            strategy.state,
             player.id,
           ) &&
           player.iCa !==
@@ -2846,10 +2853,82 @@ function renderSidePanels(
         state,
       )}
 
-      ${renderTopICaPanel(
-        state,
-      )}
+      ${renderRosterMetricsPanel(state)}
     </div>
+  `
+}
+
+function getRosterMetrics(state: AppState): RosterMetrics {
+  const dataset = getCachedPlayersDataset()
+  const metricCatalog: RosterMetricPlayer[] = dataset?.source === 'flda'
+    ? dataset.players.flatMap((flda) => {
+        if (!flda.player_id || !['P', 'D', 'C', 'A'].includes(flda.role)) return []
+        const legacy = getLegacyPlayerForFldaId(flda.player_id)
+        return [{
+          id: flda.player_id,
+          team: flda.team,
+          role: flda.role as AuctionRole,
+          iCa: getCachedICaV2(flda.player_id)?.score,
+          titolarita: flda.titolarita_display,
+          xFm: flda.fm_exp,
+          presenze: legacy?.appearances,
+          mv: legacy?.mv,
+          rigoriParati: legacy?.penaltiesSaved,
+          ammonizioni: legacy?.yellowCards,
+          espulsioni: legacy?.redCards,
+        }]
+      })
+    : players.map((player) => ({
+        id: player.id,
+        team: player.team,
+        role: player.role,
+        iCa: undefined,
+        titolarita: null,
+        xFm: null,
+        presenze: player.appearances,
+        mv: player.mv,
+        rigoriParati: player.penaltiesSaved,
+        ammonizioni: player.yellowCards,
+        espulsioni: player.redCards,
+      }))
+  const ownerId = state.managers.find((manager) => manager.isOwner)?.id
+  const ownedIds = new Set(state.auctionAssignments
+    .filter((assignment) => assignment.managerId === ownerId)
+    .map((assignment) => resolveAssignmentPlayer(assignment, dataset)?.canonicalId)
+    .filter((id): id is string => Boolean(id)))
+  return calculateRosterMetrics(metricCatalog, ownedIds, state.pmaConfiguration.participants)
+}
+
+function renderRosterMetricCard(
+  title: string,
+  metric: keyof Pick<RosterMetrics['P'], 'iCa' | 'titolarita' | 'prestazione'>,
+  values: RosterMetrics,
+): string {
+  return `
+    <article class="auction-roster-metric-card">
+      <span class="auction-kicker">ROSA OWNER</span>
+      <h3>${title}</h3>
+      <div class="auction-roster-metric-values">
+        ${ROLE_ORDER.map((role) => `
+          <div>
+            <span>${role}</span>
+            <strong>${metric === 'titolarita'
+              ? formatPercent(values[role][metric] ?? undefined, 1)
+              : formatNumber(values[role][metric] ?? undefined, 1)}</strong>
+          </div>
+        `).join('')}
+      </div>
+    </article>
+  `
+}
+
+function renderRosterMetricsPanel(state: AppState): string {
+  const metrics = getRosterMetrics(state)
+  return `
+    <section class="auction-roster-metrics" aria-label="Metriche rosa">
+      ${renderRosterMetricCard('Titolarità rosa', 'titolarita', metrics)}
+      ${renderRosterMetricCard('Prestazione rosa', 'prestazione', metrics)}
+    </section>
   `
 }
 
@@ -3720,9 +3799,10 @@ function renderLiveAuction(
         participants,
       )}
 
-      ${renderAssignmentHistory(
-        state,
-      )}
+      <div class="auction-market-followup">
+        ${renderTopICaPanel(state)}
+        ${renderAssignmentHistory(state)}
+      </div>
 
       ${
         finalizing
@@ -3826,17 +3906,17 @@ export function bindAuctionEvents(
     })
   }
   const selectedLegacyId = state.currentAuctionPlayerId
-  const selectedFldaId = selectedLegacyId ? getFldaIdForLegacyId(selectedLegacyId) : undefined
-  if (selectedLegacyId && (!selectedFldaId || !getCachedPlayerDetail(selectedFldaId))
-      && !loadingHistoricalPrices.has(selectedLegacyId)
-      && !attemptedHistoricalPrices.has(selectedLegacyId)) {
-    loadingHistoricalPrices.add(selectedLegacyId)
+  const selectedFldaId = state.currentAuctionFldaPlayerId
+    ?? (selectedLegacyId ? getFldaIdForLegacyId(selectedLegacyId) : undefined)
+  if (selectedFldaId && !getCachedPlayerDetail(selectedFldaId)
+      && !loadingHistoricalPrices.has(selectedFldaId)
+      && !attemptedHistoricalPrices.has(selectedFldaId)) {
+    loadingHistoricalPrices.add(selectedFldaId)
     void loadPlayersDataset().then(() => {
-      const fldaId = getFldaIdForLegacyId(selectedLegacyId)
-      return fldaId ? loadPlayerDetail(fldaId) : undefined
+      return loadPlayerDetail(selectedFldaId)
     }).finally(() => {
-      loadingHistoricalPrices.delete(selectedLegacyId)
-      attemptedHistoricalPrices.add(selectedLegacyId)
+      loadingHistoricalPrices.delete(selectedFldaId)
+      attemptedHistoricalPrices.add(selectedFldaId)
       actions.onStateChange()
     })
   }
@@ -3978,12 +4058,14 @@ export function bindAuctionEvents(
               button.dataset
                 .openPlayerDetail
 
-            if (
-              !playerId ||
-              !getPlayer(
-                playerId,
-              )
-            ) {
+            if (!playerId) {
+              return
+            }
+
+            if (!getPlayer(playerId)) {
+              if (resolveFldaPlayer(playerId, getCachedPlayersDataset())) {
+                actions.onOpenFullPlayer(playerId)
+              }
               return
             }
 
@@ -4466,14 +4548,13 @@ export function bindAuctionEvents(
     ?.addEventListener(
       'input',
       () => {
-        const player = getSelectedCanonicalPlayer(state)
-
-        if (!player) {
-          return
-        }
-
-        if (!player.legacy) return
-        const advice = calculatePriceAdvice(state, player.legacy, players)
+        const strategy = buildAuctionStrategyContext(state, getCachedPlayersDataset())
+        if (!strategy.currentPlayer) return
+        const advice = calculatePriceAdvice(
+          strategy.state,
+          strategy.currentPlayer,
+          strategy.players,
+        )
 
         const currentPrice =
           Number(
@@ -5249,22 +5330,46 @@ function renderFldaPlayerCard(
     player.canonicalId,
   )
   const flda = player.flda
+  const strategy = buildAuctionStrategyContext(state, getCachedPlayersDataset())
+  const strategyPlayer = strategy.currentPlayer
+  const priceAdvice = strategyPlayer
+    ? calculatePriceAdvice(strategy.state, strategyPlayer, strategy.players)
+    : undefined
+  const historicalDetail = getCachedPlayerDetail(player.canonicalId)
+  const startingWidth = clamp(flda?.titolarita_display ?? 0, 0, 100)
   return `
     <section class="auction-player-card">
       <div class="auction-player-header">
         <div class="auction-player-identity">
           <span class="auction-role-badge large role-${player.role.toLowerCase()}">${player.role}</span>
-          <div><span class="auction-kicker">GIOCATORE IN ASTA · FLDA</span><h2>${escapeHtml(player.name)}</h2><p>${escapeHtml(player.team)} · ${player.role}</p></div>
+          <div><span class="auction-kicker">GIOCATORE IN ASTA · FLDA</span><h2>${escapeHtml(player.name)}</h2><p>${escapeHtml(player.team)} · ${player.role}${priceAdvice?.playerSlot ? ` · Slot ${priceAdvice.playerSlot}` : ''}</p>
+          <button type="button" class="auction-player-detail-trigger" data-open-player-detail="${escapeHtml(player.canonicalId)}">Apri scheda completa</button></div>
         </div>
         <span class="auction-availability ${assigned ? 'assigned' : ''}">${assigned ? 'ASSEGNATO' : 'DA ASSEGNARE'}</span>
       </div>
       <div class="auction-main-values">
         <div class="auction-main-value"><span>xFM</span><strong>${formatNumber(flda?.fm_exp ?? undefined, 2)}</strong></div>
         <div class="auction-main-value"><span>Titolarità</span><strong>${formatPercent(flda?.titolarita_display ?? undefined, 0)}</strong></div>
-        <div class="auction-main-value"><span>iCà</span><strong>—</strong></div>
-        <div class="auction-main-value"><span>Consiglio prezzo</span><strong>—</strong></div>
+        <div class="auction-main-value"><span>iCà V2</span><strong>${formatNumber(strategyPlayer?.iCa, 2)}</strong></div>
+        <div class="auction-main-value auction-history-value"><span>Prezzo storico A/B</span><strong>${displayHistoricalAuctionPrices(historicalDetail)}</strong><small>${historicalDetail?.auction_prices?.length ? 'stagione 2025/26' : 'storico non disponibile'}</small></div>
       </div>
-      <p class="muted-text">Le metriche strategiche legacy non sono disponibili per questo giocatore FLDA e non bloccano la chiamata.</p>
+      <div class="auction-insight-row">
+        <div class="auction-insight-metric"><span>PMA</span><strong>${formatPercent(strategyPlayer?.pmaPercent, 1)}</strong></div>
+        <div class="auction-starting-insight"><span>Titolarità</span><div class="auction-insight-progress" aria-label="Titolarità ${formatPercent(flda?.titolarita_display ?? undefined, 0)}"><span style="width:${startingWidth}%"></span></div><strong>${formatPercent(flda?.titolarita_display ?? undefined, 0)}</strong></div>
+      </div>
+      ${priceAdvice ? `
+        <div class="auction-recommendation">
+          <div class="auction-price-summary">
+            <div class="auction-recommendation-primary"><span>Tetto consigliato</span><strong>${formatCredits(priceAdvice.recommendedCeiling)}</strong><small>motore strategico corrente</small></div>
+            ${renderBidSignal(priceAdvice)}
+          </div>
+          <div class="auction-price-limits">
+            <div class="auction-price-limit value"><span>Valore asta</span><strong>${formatCredits(priceAdvice.valueLimit)}</strong><small>PMA ${formatCredits(priceAdvice.pmaCredits)}</small></div>
+            <div class="auction-price-limit role"><span>Limite reparto</span><strong>${formatCredits(priceAdvice.roleLimit)}</strong><small>strategia ${player.role}</small></div>
+            <div class="auction-price-limit financial"><span>Limite finanziario</span><strong>${formatCredits(priceAdvice.financialLimit)}</strong><small>hard cap rosa</small></div>
+          </div>
+        </div>
+      ` : '<p class="muted-text">Le metriche prive di input FLDA verificabili restano non disponibili.</p>'}
       <div class="auction-live-price-row">
         <label class="auction-live-price-field"><span>Prezzo corrente</span><input id="auctionPriceInput" type="number" inputmode="numeric" min="0" step="1" placeholder="0" ${assigned ? 'disabled' : ''}></label>
         <div class="auction-price-stepper"><button id="auctionPricePlusOneButton" type="button" ${assigned ? 'disabled' : ''}>+1</button><button id="auctionPricePlusTenButton" type="button" ${assigned ? 'disabled' : ''}>+10</button></div>

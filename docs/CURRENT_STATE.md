@@ -392,7 +392,27 @@ Riparsa listone, Saggi e Battitori per alimentare la scheda dettagliata: prezzi 
 
 ## 10. Algoritmi implementati
 
-### 10.1 iCà
+### 10.1 iCà V2 — provvisorio Alpha/Beta
+
+Aggiornamento mirato del working tree: questa sezione sostituisce la descrizione legacy dell'iCà riportata sotto; le altre sezioni del documento mantengono la data della ricognizione originaria.
+
+iCà V2 è adottato come indice provvisorio per Alpha/Beta. La struttura è stabile abbastanza per procedere con lo sviluppo, ma la calibrazione numerica dello storico H non è considerata definitiva. Dopo la Beta deve essere effettuata una revisione dell'indice usando risultati reali, ranking osservati e casi campione.
+
+Il calcolatore è `src/domain/icaV2.ts`, con parametri centralizzati in `ICA_V2_PARAMETERS`:
+
+- `iCàBase = 0.55 * P + 0.45 * H` quando entrambi sono disponibili.
+- `P = 0.40 * xFMScore + 0.30 * Utilizzo + 0.20 * IntegritaScore + 0.10 * GerarchieScore`.
+- Ogni stagione: `S = 0.35 * BonusScore + 0.20 * MalusScore + 0.15 * MVScore + 0.20 * DisponibilitaScore + 0.10 * AssenzeScore`.
+- H è la media ponderata delle ultime tre stagioni disponibili, ordinate dalla più recente, con pesi `0.50`, `0.333333`, `0.166667`. I pesi si rinormalizzano sulle stagioni calcolabili: nessuna divisione aggiuntiva per il numero di stagioni, penalità 1/2/3 stagioni, regressione di H verso 50 o stagione mancante trattata come zero.
+- Le sottocomponenti non disponibili vengono escluse e i pesi validi rinormalizzati. `injury_games_missed` non è attualmente disponibile nel bulk FLDA: AssenzeScore resta non disponibile, senza derivazioni da `injured` o Pt.Inf e senza zero artificiale.
+- La reliability campione resta quella implementata: 10 presenze → 0.40; 20 → 0.70; 30 → 0.90; 35–38 → 1.00, con interpolazione continua.
+- Restano i correttori editoriali moltiplicativi, il cap 0–100 e l'arrotondamento finale a due decimali. I Saggi non entrano nell'iCà V2.
+
+`src/services/playerRepository.ts` carica `/api/history/bulk?seasons=3`, indicizza per UUID e costruisce reference P95 per ruolo/evento e risultati P/H/iCà nella cache condivisa. Players, Asta e schede leggono `getCachedICaV2`: loading/error restituiscono un valore non disponibile, mentre `history: []` realmente caricata consente il comportamento previsto per assenza di storico. Il caricamento storico non introduce richieste detail per giocatore. La cache è in memoria e non modifica localStorage o archivi.
+
+I parametri numerici restano configurabili nel modulo domain e NON vanno considerati definitivi fino alla revisione post-Beta. TODO: **RICALIBRAZIONE iCà POST-BETA**, descritta in `BETA_BACKLOG.md`.
+
+#### iCà legacy — ricognizione precedente, non indice V2 di Players/Asta
 
 `src/domain/ica.ts` calcola un punteggio 0–100 da quattro componenti. I pesi correnti, configurabili tramite `ICaConfig`, sono:
 

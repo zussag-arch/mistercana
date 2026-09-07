@@ -2,6 +2,7 @@ import type { FldaPlayer, FldaPlayerDetail, FldaRecord } from '../services/flda'
 import type { Player } from '../domain/player'
 import type { PmaConfiguration } from '../app/state'
 import { getFldaPma } from '../domain/pma'
+import { getCachedICaV2 } from '../services/playerRepository'
 
 export interface PlayerViewModel {
   flda: FldaPlayer
@@ -89,11 +90,14 @@ export function renderPlayerBadges(view: PlayerViewModel): string {
 
 export function renderCurrentMetrics(view: PlayerViewModel, compact = false,
   historicalPrice?: string): string {
+  const iCaV2 = view.flda.player_id
+    ? getCachedICaV2(view.flda.player_id)?.score
+    : undefined
   const fldaPma = view.pmaConfiguration ? getFldaPma(view.flda, view.pmaConfiguration) : undefined
   const pmaValue = fldaPma ?? (!view.flda.player_id ? view.legacy?.pmaPercent : undefined)
   const pma = typeof pmaValue === 'number' ? `${display(pmaValue, 1)}%` : '—'
   const items: Array<[string, string, string, string?]> = [
-    ['iCà', display(view.legacy?.iCa, 1), 'Indice MisterCanà', 'player-metric-ica'],
+    ['iCà', display(iCaV2, 2), 'Indice MisterCanà V2', 'player-metric-ica'],
     ['PMA', pma, pma === '—' ? 'dato non disponibile' : view.pmaConfiguration ? `${view.pmaConfiguration.mode === 'classic' ? 'Classic' : 'Mantra'} · ${view.pmaConfiguration.participants} · ${view.pmaConfiguration.defenseModifier ? 'con modificatore' : 'senza modificatore'}` : 'budget iniziale'],
     ['xFM', display(view.flda.fm_exp, 2), 'FM Exp. FLDA'],
     ['Integrità', display(view.flda.integrita, 0), ''],
@@ -107,7 +111,7 @@ export function renderCurrentMetrics(view: PlayerViewModel, compact = false,
     ['FMV', display(view.legacy?.fmv, 2), 'dato legacy'],
     ['Titolarità', `${display(view.flda.titolarita_display, 0)}${typeof view.flda.titolarita_display === 'number' ? '%' : ''}`, 'indicatore editoriale'],
   )
-  return `<div class="player-current-metrics${compact ? ' player-current-metrics-full' : ''}">${items.map(([label, value, note, className]) => `<div class="${className ?? ''}"${className === 'player-metric-ica' ? ` style="--ica-hue:${icaHue(view.legacy?.iCa)}"` : ''}><span>${label}</span><strong>${value}</strong>${note ? `<small>${note}</small>` : ''}</div>`).join('')}</div>`
+  return `<div class="player-current-metrics${compact ? ' player-current-metrics-full' : ''}">${items.map(([label, value, note, className]) => `<div class="${className ?? ''}"${className === 'player-metric-ica' ? ` style="--ica-hue:${icaHue(iCaV2)}"` : ''}><span>${label}</span><strong>${value}</strong>${note ? `<small>${note}</small>` : ''}</div>`).join('')}</div>`
 }
 
 function chartEmpty(message: string): string {

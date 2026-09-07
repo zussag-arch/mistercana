@@ -52,6 +52,7 @@ import {
 } from './data/players'
 import { getCachedPlayersDataset } from './services/playerRepository'
 import { isFldaPlayerAssigned } from './services/auctionPlayerResolver'
+import { buildAuctionStrategyContext } from './services/auctionStrategyAdapter'
 
 import {
   renderCompetitorAnalysis,
@@ -536,19 +537,11 @@ function mountAuctionCompetitors(
     return
   }
 
-  const playerId =
-    state.currentAuctionPlayerId
-
-  if (!playerId) {
-    return
-  }
-
-  const player =
-    players.find(
-      (item) =>
-        item.id ===
-        playerId,
-    )
+  const strategy = buildAuctionStrategyContext(
+    state,
+    getCachedPlayersDataset(),
+  )
+  const player = strategy.currentPlayer
 
   if (!player) {
     return
@@ -571,9 +564,9 @@ function mountAuctionCompetitors(
 
   const markup =
     renderCompetitorAnalysis(
-      state,
+      strategy.state,
       player,
-      players,
+      strategy.players,
     )
 
   if (!markup.trim()) {
@@ -838,6 +831,12 @@ function bindPageEvents(
               navigateAndRender(
                 'objectives',
               )
+            },
+
+          onOpenFullPlayer:
+            (reference) => {
+              selectedPlayerReference = reference
+              navigateAndRender('playerDetail')
             },
         },
       )

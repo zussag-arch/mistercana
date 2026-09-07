@@ -3,7 +3,7 @@ import { runOverlayExit } from '../app/motion'
 import type { Player, PlayerRole } from '../domain/player'
 import type { FldaPlayer } from '../services/flda'
 import {
-  findLegacyPlayerByIdentity, getCachedPlayerDetail, getCachedPlayersDataset,
+  findLegacyPlayerByIdentity, getCachedICaV2, getCachedPlayerDetail, getCachedPlayersDataset,
   getFldaIdForLegacyId, getLegacyPlayer, getLegacyPlayerForFldaId,
   loadPlayerDetail, loadPlayersDataset,
 } from '../services/playerRepository'
@@ -71,6 +71,9 @@ function statusLabel(state: AppState, player: FldaPlayer): string {
   return isAssigned(state, player) ? 'ASSEGNATO' : 'DA ASSEGNARE'
 }
 function numeric(value: unknown): number { return typeof value === 'number' ? value : -Infinity }
+function fldaICa(player: FldaPlayer): number | undefined {
+  return player.player_id ? getCachedICaV2(player.player_id)?.score : undefined
+}
 
 function filteredPlayers(state: AppState, source: FldaPlayer[]): FldaPlayer[] {
   const query = viewState.search.trim().toLocaleLowerCase('it')
@@ -89,14 +92,14 @@ function filteredPlayers(state: AppState, source: FldaPlayer[]): FldaPlayer[] {
       const roleOrder = ['P', 'D', 'C', 'A']
       const roleResult = roleOrder.indexOf(a.role.toUpperCase()) - roleOrder.indexOf(b.role.toUpperCase())
       if (roleResult) return roleResult
-      return numeric(findLegacy(b)?.iCa) - numeric(findLegacy(a)?.iCa)
+      return numeric(fldaICa(b)) - numeric(fldaICa(a))
     }
     let first: string | number
     let second: string | number
     if (viewState.sortKey === 'status') {
       first = statusValue(state, a); second = statusValue(state, b)
     } else if (viewState.sortKey === 'ica') {
-      first = numeric(findLegacy(a)?.iCa); second = numeric(findLegacy(b)?.iCa)
+      first = numeric(fldaICa(a)); second = numeric(fldaICa(b))
     } else if (viewState.sortKey === 'mv_fmv') {
       first = numeric(findLegacy(a)?.fmv ?? findLegacy(a)?.mv)
       second = numeric(findLegacy(b)?.fmv ?? findLegacy(b)?.mv)
@@ -163,9 +166,10 @@ function renderRow(state: AppState, player: FldaPlayer): string {
     pmaConfiguration: state.pmaConfiguration,
   }
   const pma = getFldaPma(player, state.pmaConfiguration)
+  const iCa = fldaICa(player)
   return `<button type="button" class="players-table-row" data-player-ref="${escapePlayerHtml(fldaReference(player))}">
     <div class="players-player-cell"><span class="role-badge role-${player.role.toLowerCase()}">${escapePlayerHtml(player.role)}</span><span><span class="players-name-line"><strong>${escapePlayerHtml(player.name)}</strong>${renderPlayerBadges(view)}</span><small>${escapePlayerHtml(player.team)}</small></span></div>
-    <div data-label="iCà"><span class="players-ica" style="--ica-hue:${icaHue(legacy?.iCa)}">${display(legacy?.iCa, 2)}</span></div>
+    <div data-label="iCà"><span class="players-ica" style="--ica-hue:${icaHue(iCa)}">${display(iCa, 2)}</span></div>
     <div data-label="PMA">${typeof pma === 'number' ? `${display(pma, 1)}%` : '—'}</div>
     <div data-label="xFM">${display(player.fm_exp, 2)}</div>
     <div data-label="Titolarità">${display(player.titolarita_display, 0)}${typeof player.titolarita_display === 'number' ? '%' : ''}</div>

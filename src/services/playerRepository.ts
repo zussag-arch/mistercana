@@ -1,6 +1,7 @@
 import { players as legacyPlayers } from '../data/players'
 import type { Player } from '../domain/player'
 import {
+  getFldaBulkHistory,
   getFldaPlayerDetail,
   getFldaHistoricalAuctionPrices,
   getFldaPlayers,
@@ -9,11 +10,14 @@ import {
   getFldaTeamHierarchies,
 } from './flda'
 import type {
+  FldaBulkHistoryResponse,
   FldaFixtureContext,
   FldaPlayer,
   FldaPlayerDetail,
   FldaRecord,
 } from './flda'
+import { buildFldaICaV2Input, buildICaReferences, calculateICaV2 } from '../domain/icaV2'
+import type { ICaReferences, ICaV2Result } from '../domain/icaV2'
 import {
   getFldaIdFromLegacyId,
   getLegacyIdFromFldaId,
@@ -35,6 +39,70 @@ const fixtureCache = new Map<string, FldaRecord[]>()
 const fixtureRequests = new Map<string, Promise<FldaRecord[]>>()
 let dataset: PlayersDataset | null = null
 let datasetRequest: Promise<PlayersDataset> | null = null
+
+export type BulkHistoryStatus = 'idle' | 'loading' | 'loaded' | 'error'
+
+export interface BulkHistoryState {
+  status: BulkHistoryStatus
+  byPlayerId: ReadonlyMap<string, FldaRecord[]>
+  references?: ICaReferences
+  error?: string
+}
+
+let historyState: BulkHistoryState = { status: 'idle', byPlayerId: new Map() }
+let historyRequest: Promise<BulkHistoryState> | null = null
+let icaV2Cache = new Map<string, ICaV2Result>()
+
+function indexBulkHistory(response: FldaBulkHistoryResponse): Map<string, FldaRecord[]> {
+  const byPlayerId = new Map<string, FldaRecord[]>()
+  for (const player of response.players) {
+    if (!player.player_id || byPlayerId.has(player.player_id)) {
+      throw new Error('Storico bulk FLDA non valido: player_id mancante o duplicato.')
+    }
+    byPlayerId.set(player.player_id, player.history)
+  }
+  return byPlayerId
+}
+
+function rebuildICaV2Cache(): void {
+  icaV2Cache = new Map()
+  if (dataset?.source !== 'flda' || historyState.status !== 'loaded') return
+  const inputs = dataset.players.flatMap((player) => {
+    if (!player.player_id) return []
+    return [buildFldaICaV2Input(player, historyState.byPlayerId.get(player.player_id) ?? [])]
+  })
+  const references = buildICaReferences(inputs)
+  historyState = { ...historyState, references }
+  for (const input of inputs) {
+    if (input.player.player_id) {
+      icaV2Cache.set(input.player.player_id, calculateICaV2(input, references))
+    }
+  }
+}
+
+export function loadBulkHistory(force = false): Promise<BulkHistoryState> {
+  if (historyState.status === 'loaded' && !force) return Promise.resolve(historyState)
+  if (historyRequest) return historyRequest
+  historyState = { status: 'loading', byPlayerId: historyState.byPlayerId }
+  historyRequest = getFldaBulkHistory(3)
+    .then((response) => {
+      historyState = { status: 'loaded', byPlayerId: indexBulkHistory(response) }
+      rebuildICaV2Cache()
+      return historyState
+    })
+    .catch((error: unknown) => {
+      historyState = { status: 'error', byPlayerId: new Map(), error: readableError(error) }
+      icaV2Cache = new Map()
+      return historyState
+    })
+    .finally(() => { historyRequest = null })
+  return historyRequest
+}
+
+export function getBulkHistoryState(): BulkHistoryState { return historyState }
+export function getCachedICaV2(playerId: string): ICaV2Result | undefined {
+  return historyState.status === 'loaded' ? icaV2Cache.get(playerId) : undefined
+}
 
 function legacyAsFlda(player: Player): FldaPlayer {
   return {
@@ -125,12 +193,15 @@ export async function loadPlayersDataset(
   if (dataset && !force) return dataset
   if (datasetRequest && !force) return datasetRequest
 
+  const bulkHistory = loadBulkHistory(force)
   datasetRequest = getFldaPlayers()
     .then(async (page) => {
       const players = await enrichPlayerSignals(page.players)
       const byId = indexFldaPlayers(players)
       initializePlayerIdentity(legacyPlayers, players)
       dataset = { source: 'flda', players, byId }
+      await bulkHistory
+      rebuildICaV2Cache()
       return dataset
     })
     .catch((error: unknown) => {

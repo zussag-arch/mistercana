@@ -488,6 +488,30 @@ Dopo le due aste:
 
 ---
 
+# Post-Beta — RICALIBRAZIONE iCà POST-BETA
+
+**Stato: RIMANDATO alla revisione post-Beta.** Questa voce è aggiuntiva rispetto alle 29 voci Beta conteggiate sotto.
+
+iCà V2 è adottato come indice provvisorio per Alpha/Beta. La struttura è stabile abbastanza per procedere con lo sviluppo, ma la calibrazione numerica dello storico H non è considerata definitiva. Dopo la Beta deve essere effettuata una revisione dell'indice usando risultati reali, ranking osservati e casi campione.
+
+Da riesaminare in particolare:
+
+- peso relativo P/H 55/45;
+- BonusScore storico;
+- reliability legata alla dimensione del campione;
+- reference P95 per ruolo/evento;
+- MalusScore;
+- scala MV assoluta D/C/A;
+- DisponibilitaScore;
+- trattamento dei giocatori con 1, 2 o 3 stagioni disponibili;
+- eventuali distorsioni tra giocatori con storico Serie A lungo e giocatori con storico corto;
+- correttori xG/xA;
+- differenze sistematiche tra P/D/C/A.
+
+I parametri numerici restano configurabili e NON vanno considerati definitivi fino alla revisione post-Beta. Questa voce non autorizza modifiche ai coefficienti durante il consolidamento Alpha/Beta. La revisione dovrà usare benchmark riproducibili con dati sorgente e contributi P/H, distinguendo errori dati, errori tecnici e scelte di calibrazione.
+
+---
+
 # 17. Riepilogo delle voci
 
 ## Conteggio per priorità

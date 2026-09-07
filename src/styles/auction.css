@@ -471,6 +471,50 @@
   gap: 12px;
 }
 
+.auction-roster-metrics {
+  display: grid;
+  gap: 7px;
+}
+
+.auction-roster-metric-card {
+  padding: 11px 12px;
+  border: 1px solid rgba(70, 230, 161, 0.13);
+  border-radius: 16px;
+  background: #151819;
+}
+
+.auction-roster-metric-card h3 {
+  margin: 2px 0 8px;
+  font-size: 12px;
+}
+
+.auction-roster-metric-values {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.auction-roster-metric-values > div {
+  display: grid;
+  gap: 2px;
+  padding: 6px;
+  border-radius: 10px;
+  background: #1b1e20;
+  text-align: center;
+}
+
+.auction-roster-metric-values span {
+  color: #777f83;
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.auction-roster-metric-values strong {
+  color: #dfe5e2;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
 /* =========================
    PLAYER
 ========================= */
@@ -736,11 +780,14 @@
 .auction-recommendation-primary span {
   color: #858c90;
   font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
 }
 
 .auction-recommendation-primary strong {
   color: #fff;
   font-size: 22px;
+  font-variant-numeric: tabular-nums;
 }
 
 .auction-recommendation-primary small {
@@ -773,11 +820,14 @@
 .auction-price-limit span {
   color: #7b8286;
   font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
 }
 
 .auction-price-limit strong {
   font-size: 18px;
   font-weight: 900;
+  font-variant-numeric: tabular-nums;
 }
 
 .auction-price-limit small {
@@ -1063,6 +1113,65 @@
     rgba(70, 230, 161, 0.045);
 }
 
+.auction-recommendation-name-button {
+  display: block;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #eef3f0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.auction-recommendation-name-button strong {
+  display: block;
+  overflow: hidden;
+  color: inherit;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.auction-recommendation-name-button:hover {
+  color: #67edb2;
+}
+
+.auction-recommendation-name-button:focus-visible {
+  border-radius: 5px;
+  outline: 2px solid rgba(70, 230, 161, 0.72);
+  outline-offset: 3px;
+}
+
+.auction-player-detail-trigger {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  margin-top: 7px;
+  padding: 6px 10px;
+  border: 1px solid rgba(70, 230, 161, 0.28);
+  border-radius: 999px;
+  background: rgba(70, 230, 161, 0.08);
+  color: #9cf4ca;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 850;
+  line-height: 1.2;
+  text-align: left;
+  cursor: pointer;
+}
+
+.auction-player-detail-trigger:hover {
+  border-color: rgba(70, 230, 161, 0.55);
+  background: rgba(70, 230, 161, 0.14);
+  color: #eafff5;
+}
+
+.auction-player-detail-trigger:focus-visible {
+  outline: 2px solid rgba(70, 230, 161, 0.75);
+  outline-offset: 2px;
+}
+
 .auction-call-recommendation-head {
   display: flex;
   justify-content: space-between;
@@ -1145,7 +1254,7 @@ span:not(.auction-role-badge) {
     rgba(255, 255, 255, 0.055);
   border-radius: 11px;
   color: #737b77;
-  font-size: 6px;
+  font-size: 10px;
   text-transform: uppercase;
 }
 
@@ -1538,7 +1647,7 @@ strong {
   background:
     rgba(255, 255, 255, 0.035);
   color: #697175;
-  font-size: 6px;
+  font-size: 10px;
   font-weight: 850;
   letter-spacing: 0.08em;
 }
@@ -1750,6 +1859,18 @@ select:focus {
     rgba(255, 255, 255, 0.08);
   border-radius: 22px;
   background: #121416;
+}
+
+.auction-market-followup {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.75fr) minmax(0, 1.75fr);
+  align-items: start;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.auction-market-followup .auction-history-section {
+  margin-top: 0;
 }
 
 .auction-section-heading,
@@ -2286,6 +2407,10 @@ button.danger {
       minmax(220px, 1fr);
     gap: 16px;
   }
+
+  .auction-market-followup {
+    grid-template-columns: minmax(250px, 0.8fr) minmax(0, 1.2fr);
+  }
 }
 
 @media (max-width: 680px) {
@@ -2367,6 +2492,10 @@ button.danger {
   }
 
   .auction-side-panels {
+    grid-template-columns: 1fr;
+  }
+
+  .auction-market-followup {
     grid-template-columns: 1fr;
   }
 
