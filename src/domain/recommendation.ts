@@ -7,7 +7,6 @@ import {
   getOwnerManagerId,
   getOwnerRemainingStrategicSlots,
   getPlayerById,
-  getPlayerSlot,
   isPlayerAssigned,
 } from './auctionContext'
 
