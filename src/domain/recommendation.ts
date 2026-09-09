@@ -12,6 +12,7 @@ import {
 } from './auctionContext'
 
 import {
+  calculateGoalkeeperReserveForOutfieldAdvice,
   calculatePriceAdvice,
 } from './priceAdvice'
 
@@ -813,20 +814,20 @@ function calculateCandidate(
     number | undefined,
   parameters:
     RecommendationParameters,
+  precomputedGoalkeeperReserve?:
+    number,
 ): RecommendationCandidate {
   const priceAdvice =
     calculatePriceAdvice(
       state,
       candidate,
       allPlayers,
+      undefined,
+      precomputedGoalkeeperReserve,
     )
 
   const playerSlot =
-    getPlayerSlot(
-      state,
-      candidate,
-      allPlayers,
-    )
+    priceAdvice.playerSlot
 
   /*
     iCà è già 0-100.
@@ -837,7 +838,7 @@ function calculateCandidate(
       ? undefined
       : clamp(
           candidate.iCa /
-          100,
+            100,
           0,
           1,
         )
@@ -1001,6 +1002,14 @@ export function calculateRecommendation(
     RecommendationParameters =
       DEFAULT_RECOMMENDATION_PARAMETERS,
 ): RecommendationResult {
+  const precomputedGoalkeeperReserve =
+    role === 'P'
+      ? undefined
+      : calculateGoalkeeperReserveForOutfieldAdvice(
+          state,
+          allPlayers,
+        )
+
   const ownerId =
     getOwnerManagerId(
       state,
@@ -1093,6 +1102,7 @@ export function calculateRecommendation(
             allPlayers,
             targetSlot,
             parameters,
+            precomputedGoalkeeperReserve,
           ),
       )
       /*

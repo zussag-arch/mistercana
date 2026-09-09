@@ -867,6 +867,8 @@ function calculateGlobalReserveForOutfieldPlayer(
     >,
   parameters:
     PriceAdviceParameters,
+  precomputedGoalkeeperReserve?:
+    number,
 ): number {
   const nonGoalkeeperReserve =
     calculateNonGoalkeeperGlobalReserve(
@@ -877,17 +879,15 @@ function calculateGlobalReserveForOutfieldPlayer(
       parameters,
     )
 
-  const goalkeeperPlans =
-    getValidGoalkeeperPlans(
-      state,
-      allPlayers,
-    )
-
   const goalkeeperReserve =
+    precomputedGoalkeeperReserve ??
     calculateGoalkeeperCompletionReserve(
       state,
       allPlayers,
-      goalkeeperPlans,
+      getValidGoalkeeperPlans(
+        state,
+        allPlayers,
+      ),
       parameters
         .minimumFutureSlotCost,
       (goalkeeper) =>
@@ -902,6 +902,35 @@ function calculateGlobalReserveForOutfieldPlayer(
   return (
     nonGoalkeeperReserve +
     goalkeeperReserve
+  )
+}
+
+export function calculateGoalkeeperReserveForOutfieldAdvice(
+  state: AppState,
+  allPlayers: Player[],
+  parameters:
+    PriceAdviceParameters =
+      DEFAULT_PRICE_ADVICE_PARAMETERS,
+): number {
+  const goalkeeperPlans =
+    getValidGoalkeeperPlans(
+      state,
+      allPlayers,
+    )
+
+  return calculateGoalkeeperCompletionReserve(
+    state,
+    allPlayers,
+    goalkeeperPlans,
+    parameters
+      .minimumFutureSlotCost,
+    (goalkeeper) =>
+      calculateBaseAuctionValue(
+        state,
+        goalkeeper,
+        allPlayers,
+        parameters,
+      ).baseAuctionValue,
   )
 }
 
@@ -1337,6 +1366,8 @@ export function calculatePriceAdvice(
   parameters:
     PriceAdviceParameters =
       DEFAULT_PRICE_ADVICE_PARAMETERS,
+  precomputedGoalkeeperReserve?:
+    number,
 ): PriceAdvice {
   /*
     PORTIERI
@@ -1460,6 +1491,7 @@ export function calculatePriceAdvice(
           allPlayers,
           adjustedTargets,
           parameters,
+          precomputedGoalkeeperReserve,
         )
 
   const financialLimit =

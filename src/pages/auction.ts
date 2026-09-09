@@ -427,18 +427,51 @@ function callPlayer(
     | undefined,
   actions: AuctionActions,
 ): void {
-  const fldaId = playerId && (
-    resolveFldaPlayer(playerId, getCachedPlayersDataset())
-      ? playerId
-      : getFldaIdForLegacyId(playerId)
-  )
-  const player = resolveFldaPlayer(
-    fldaId,
-    getCachedPlayersDataset(),
-  )
+  if (!playerId) {
+    return
+  }
+
+  const dataset =
+    getCachedPlayersDataset()
+
+  const directPlayer =
+    resolveFldaPlayer(
+      playerId,
+      dataset,
+    )
+
+  const fldaId =
+    directPlayer?.canonicalId ??
+    getFldaIdForLegacyId(
+      playerId,
+    )
+
+  if (!fldaId) {
+    console.warn(
+      'Asta: impossibile risolvere il giocatore',
+      playerId,
+    )
+    return
+  }
+
+  const player =
+    resolveFldaPlayer(
+      fldaId,
+      dataset,
+    )
+
+  if (!player) {
+    console.warn(
+      'Asta: giocatore FLDA non trovato',
+      {
+        playerId,
+        fldaId,
+      },
+    )
+    return
+  }
 
   if (
-    !player ||
     isFldaPlayerAssigned(
       state.auctionAssignments,
       player.canonicalId,
@@ -449,7 +482,9 @@ function callPlayer(
 
   state.currentAuctionFldaPlayerId =
     player.canonicalId
-  state.currentAuctionPlayerId = null
+
+  state.currentAuctionPlayerId =
+    null
 
   activeRole =
     player.role
@@ -1013,9 +1048,9 @@ function renderRoleTabs():
           type="button"
           class="
             auction-role-tab
+            role-${role.toLowerCase()}
             ${
-              role ===
-              activeRole
+              role === activeRole
                 ? 'active'
                 : ''
             }
@@ -1070,12 +1105,25 @@ function renderSelector(
   if (dataset.source !== 'flda') {
     return `<div id="auctionPlayerSelectorOverlay" class="overlay" aria-hidden="false"><div class="overlay-backdrop"></div><div class="overlay-card auction-selector-card"><div class="overlay-header"><h2>FLDA non disponibile</h2><button id="closeAuctionSelectorButton" type="button" class="icon-button" aria-label="Chiudi">×</button></div><p>${escapeHtml(dataset.error ?? 'Impossibile caricare il catalogo FLDA.')}</p><button id="retryAuctionCatalogButton" type="button">Riprova</button></div></div>`
   }
-  const catalog = dataset.players.filter(
-    (player): player is FldaPlayer & { player_id: string } =>
-      Boolean(player.player_id) && ROLE_ORDER.includes(player.role as AuctionRole),
-  )
+    const catalog =
+    dataset.players.filter(
+      (
+        player,
+      ): player is FldaPlayer & {
+        player_id: string
+      } =>
+        Boolean(
+          player.player_id,
+        ) &&
+        player.role ===
+          activeRole &&
+        !isFldaPlayerAssigned(
+          state.auctionAssignments,
+          player.player_id!,
+        ),
+    )
+
   const visiblePlayers =
-    teamMode &&
     selectedTeamFilter
       ? catalog.filter(
           (player) =>
@@ -1086,7 +1134,7 @@ function renderSelector(
               selectedTeamFilter,
             ),
         )
-      : catalog
+      : []
 
   return `
     <div
@@ -1325,38 +1373,21 @@ function renderPlayerSearchStrip():
         <button
           id="selectAuctionTeamButton"
           type="button"
-          class="auction-call-selector"
-        >
-          <span>▦</span>
-
-          <div>
-            <small>
-              Ricerca rapida
-            </small>
-
-            <strong>
-              Seleziona squadra
-            </strong>
-          </div>
-        </button>
-
-        <button
-          id="selectAuctionPlayerButton"
-          type="button"
           class="
             auction-call-selector
             primary
+            role-${activeRole.toLowerCase()}
           "
         >
           <span>⌕</span>
 
           <div>
             <small>
-              Tutto il listone
+              Ruolo ${activeRole}
             </small>
 
             <strong>
-              Seleziona giocatore
+              Squadra → giocatore
             </strong>
           </div>
         </button>
@@ -2344,16 +2375,45 @@ function renderDiscardedPlayers(
 function renderSuggestedPlayersPanel(
   state: AppState,
 ): string {
-  const strategy = buildAuctionStrategyContext(
-    state,
-    getCachedPlayersDataset(),
-  )
+  const strategyStart =
+    performance.now()
+
+  const strategy =
+    buildAuctionStrategyContext(
+      state,
+      getCachedPlayersDataset(),
+    )
+
+  const strategyMs =
+    performance.now() -
+    strategyStart
+
+  const recommendationStart =
+    performance.now()
+
   const recommendation =
     calculateRecommendation(
       strategy.state,
       activeRole,
       strategy.players,
     )
+
+  const recommendationMs =
+    performance.now() -
+    recommendationStart
+
+  console.log(
+    'RECOMMENDATION DEBUG',
+    {
+      role: activeRole,
+      strategyMs:
+        Math.round(strategyMs),
+      recommendationMs:
+        Math.round(
+          recommendationMs,
+        ),
+    },
+  )
 
   const recommended =
     recommendation.recommended
@@ -4222,27 +4282,7 @@ export function bindAuctionEvents(
       },
     )
 
-  document
-    .querySelector(
-      '#selectAuctionPlayerButton',
-    )
-    ?.addEventListener(
-      'click',
-      () => {
-        selectorMode =
-          'player'
-
-        selectedTeamFilter =
-          ''
-
-        detailPlayerId =
-          null
-
-        actions.onRender()
-      },
-    )
-
-  const closeSelector =
+    const closeSelector =
     (): void => {
       runOverlayExit(
         '#auctionPlayerSelectorOverlay',
