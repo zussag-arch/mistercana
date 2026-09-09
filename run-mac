@@ -1,0 +1,137 @@
+#!/bin/bash
+
+MISTERCANA="$HOME/Documents/GitHub/mistercana"
+FLDA="$HOME/Documents/GitHub/fantalab-data-agent"
+FLDA_EXE="$FLDA/.venv/bin/flda"
+
+echo ""
+echo "======================================"
+echo "   Avvio ambiente locale Mistercana"
+echo "======================================"
+echo ""
+
+# --------------------------------------------------
+# Controllo repository Mistercana
+# --------------------------------------------------
+
+if [ ! -d "$MISTERCANA" ]; then
+    echo "ERRORE: repository Mistercana non trovata:"
+    echo "$MISTERCANA"
+    exit 1
+fi
+
+# --------------------------------------------------
+# Controllo repository FLDA
+# --------------------------------------------------
+
+if [ ! -d "$FLDA" ]; then
+    echo "ERRORE: repository FLDA non trovata:"
+    echo "$FLDA"
+    exit 1
+fi
+
+# --------------------------------------------------
+# Controllo npm
+# --------------------------------------------------
+
+if ! command -v npm >/dev/null 2>&1; then
+    echo "ERRORE: npm non disponibile."
+    echo "Installa/configura Node.js prima di avviare Mistercana."
+    exit 1
+fi
+
+# --------------------------------------------------
+# Avvio FLDA
+# --------------------------------------------------
+
+if lsof -iTCP:8765 -sTCP:LISTEN >/dev/null 2>&1; then
+    echo "✓ FLDA già attivo sulla porta 8765."
+else
+    if [ ! -x "$FLDA_EXE" ]; then
+        echo ""
+        echo "ERRORE: FLDA non trovato nella virtualenv:"
+        echo "$FLDA_EXE"
+        echo ""
+        echo "Devi prima configurare FLDA sul Mac."
+        echo ""
+        echo "Dalla repository FLDA:"
+        echo ""
+        echo "cd \"$FLDA\""
+        echo "python3.11 -m venv .venv"
+        echo "source .venv/bin/activate"
+        echo "python -m pip install --upgrade pip setuptools wheel"
+        echo "pip install -e ."
+        echo ""
+        exit 1
+    fi
+
+    echo "→ Avvio FLDA..."
+
+    osascript <<EOF
+tell application "Terminal"
+    do script "cd \"$FLDA\" && \"$FLDA_EXE\" serve"
+    activate
+end tell
+EOF
+fi
+
+# --------------------------------------------------
+# Attesa FLDA
+# --------------------------------------------------
+
+echo "→ Attendo FLDA..."
+
+for i in {1..15}; do
+    if lsof -iTCP:8765 -sTCP:LISTEN >/dev/null 2>&1; then
+        echo "✓ FLDA pronto."
+        break
+    fi
+    sleep 1
+done
+
+# --------------------------------------------------
+# Avvio Mistercana / Vite
+# --------------------------------------------------
+
+if lsof -iTCP:5173 -sTCP:LISTEN >/dev/null 2>&1; then
+    echo "✓ Mistercana già attivo sulla porta 5173."
+else
+    echo "→ Avvio Mistercana..."
+
+    osascript <<EOF
+tell application "Terminal"
+    do script "cd \"$MISTERCANA\" && npm run dev"
+    activate
+end tell
+EOF
+fi
+
+# --------------------------------------------------
+# Attesa Vite
+# --------------------------------------------------
+
+echo "→ Attendo localhost..."
+
+for i in {1..15}; do
+    if lsof -iTCP:5173 -sTCP:LISTEN >/dev/null 2>&1; then
+        echo "✓ Mistercana pronto."
+        break
+    fi
+    sleep 1
+done
+
+# --------------------------------------------------
+# Apertura browser
+# --------------------------------------------------
+
+echo "→ Apro http://localhost:5173"
+open "http://localhost:5173"
+
+echo ""
+echo "======================================"
+echo "   Ambiente locale avviato"
+echo "======================================"
+echo ""
+echo "FLDA:       http://127.0.0.1:8765"
+echo "Mistercana: http://localhost:5173"
+echo ""
