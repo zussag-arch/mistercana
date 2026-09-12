@@ -1128,3 +1128,95 @@ input[type="search"] {
     transition: none;
   }
 }
+/* =========================
+   MOBILE COMPACT PLAYERS
+========================= */
+
+@media (max-width: 760px) {
+  .players-table-row {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+
+    gap: 7px 10px;
+
+    padding: 10px 12px;
+  }
+
+  .players-player-cell {
+    grid-column: 1 / -1;
+
+    gap: 8px;
+
+    padding-bottom: 2px;
+  }
+
+  .players-player-cell strong {
+    font-size: 13px;
+  }
+
+  .players-player-cell small {
+    margin-top: 0;
+
+    font-size: 10px;
+  }
+
+  .role-badge {
+    width: 27px;
+    height: 27px;
+
+    border-radius: 9px;
+  }
+
+  .players-name-line {
+    height: 18px;
+  }
+
+  .players-table-row
+  > div:not(.players-player-cell) {
+    min-width: 0;
+
+    font-size: 12px;
+    line-height: 1.15;
+  }
+
+  .players-table-row
+  > div:not(.players-player-cell)::before {
+    display: inline;
+
+    margin: 0 5px 0 0;
+
+    font-size: 7px;
+    line-height: 1;
+
+    color: #747d82;
+
+    white-space: nowrap;
+  }
+
+  .players-ica {
+    font-size: 14px;
+  }
+
+  .players-dual-value {
+    font-size: 11px;
+  }
+
+  .player-status {
+    padding: 3px 5px;
+
+    font-size: 7px;
+
+    white-space: nowrap;
+  }
+
+  .player-signal {
+    padding: 2px 4px;
+
+    font-size: 7px;
+  }
+
+  .players-name-line .player-signals {
+    max-width:
+      calc(100vw - 145px);
+  }
+}
