@@ -2375,45 +2375,16 @@ function renderDiscardedPlayers(
 function renderSuggestedPlayersPanel(
   state: AppState,
 ): string {
-  const strategyStart =
-    performance.now()
-
-  const strategy =
-    buildAuctionStrategyContext(
-      state,
-      getCachedPlayersDataset(),
-    )
-
-  const strategyMs =
-    performance.now() -
-    strategyStart
-
-  const recommendationStart =
-    performance.now()
-
+  const strategy = buildAuctionStrategyContext(
+    state,
+    getCachedPlayersDataset(),
+  )
   const recommendation =
     calculateRecommendation(
       strategy.state,
       activeRole,
       strategy.players,
     )
-
-  const recommendationMs =
-    performance.now() -
-    recommendationStart
-
-  console.log(
-    'RECOMMENDATION DEBUG',
-    {
-      role: activeRole,
-      strategyMs:
-        Math.round(strategyMs),
-      recommendationMs:
-        Math.round(
-          recommendationMs,
-        ),
-    },
-  )
 
   const recommended =
     recommendation.recommended
