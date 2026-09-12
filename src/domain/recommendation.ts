@@ -93,11 +93,11 @@ export const DEFAULT_RECOMMENDATION_PARAMETERS:
 
       La somma dei pesi è 1:
 
-      Qualità         15%
-      Bisogno         30%
-      Sostenibilità   12%
-      Mercato          8%
-      Obiettivo       35%
+      Qualità         30%
+      Fit slot        25%
+      Sostenibilità   10%
+      Mercato         10%
+      Obiettivo       25%
 
       Verranno rivalutati durante
       la fase beta sulla base delle
@@ -105,19 +105,19 @@ export const DEFAULT_RECOMMENDATION_PARAMETERS:
     */
 
     qualityWeight:
-      0.15,
-
-    needFitWeight:
       0.30,
 
+    needFitWeight:
+      0.25,
+
     sustainabilityWeight:
-      0.12,
+      0.10,
 
     opportunityWeight:
-      0.08,
+      0.10,
 
     objectiveWeight:
-      0.35,
+      0.25,
 
     betterSlotDecay:
       0.45,
@@ -158,13 +158,13 @@ export const DEFAULT_RECOMMENDATION_PARAMETERS:
       1.00,
 
     objectiveSecondary:
-      0.82,
+      0.80,
 
     objectiveThird:
-      0.68,
+      0.65,
 
     objectiveFourth:
-      0.55,
+      0.50,
 
     objectiveBet:
       0.60,

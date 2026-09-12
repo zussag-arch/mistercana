@@ -45,6 +45,7 @@ export interface FldaPlayer {
   name: string
   team: string
   role: string
+  mantra_roles?: string[] | null
   fm_exp?: number | null
   integrita?: number | null
   tit_index_raw?: number | null

@@ -17,7 +17,12 @@ import type {
   FldaRecord,
 } from './flda'
 import { buildFldaICaV2Input, buildICaReferences, calculateICaV2 } from '../domain/icaV2'
-import type { ICaReferences, ICaV2Result } from '../domain/icaV2'
+import type {
+  ICaCoachRole,
+  ICaFixture,
+  ICaReferences,
+  ICaV2Result,
+} from '../domain/icaV2'
 import {
   getFldaIdFromLegacyId,
   getLegacyIdFromFldaId,
@@ -37,6 +42,7 @@ const guideCache = new Map<string, FldaRecord>()
 const guideRequests = new Map<string, Promise<FldaRecord>>()
 const fixtureCache = new Map<string, FldaRecord[]>()
 const fixtureRequests = new Map<string, Promise<FldaRecord[]>>()
+const coachRolesCache = new Map<string, ICaCoachRole[]>()
 let dataset: PlayersDataset | null = null
 let datasetRequest: Promise<PlayersDataset> | null = null
 
@@ -64,13 +70,49 @@ function indexBulkHistory(response: FldaBulkHistoryResponse): Map<string, FldaRe
   return byPlayerId
 }
 
-function rebuildICaV2Cache(): void {
-  icaV2Cache = new Map()
-  if (dataset?.source !== 'flda' || historyState.status !== 'loaded') return
-  const inputs = dataset.players.flatMap((player) => {
-    if (!player.player_id) return []
-    return [buildFldaICaV2Input(player, historyState.byPlayerId.get(player.player_id) ?? [])]
+function fixtureContextForRole(role: string): FldaFixtureContext {
+  return role === 'P' ? 'goalkeeper' : 'attacker'
+}
+
+function toICaFixtures(rows: FldaRecord[]): ICaFixture[] {
+  return rows.flatMap((row) => {
+    const { day, difficulty_category } = row
+    if (typeof day !== 'number' || !Number.isFinite(day)) return []
+    return [{ day, difficulty_category:
+      difficulty_category === 'easy' || difficulty_category === 'medium' || difficulty_category === 'difficult'
+        ? difficulty_category : undefined }]
   })
+}
+
+async function rebuildICaV2Cache(): Promise<void> {
+  const currentDataset = dataset
+  const currentHistory = historyState
+  icaV2Cache = new Map()
+  if (currentDataset?.source !== 'flda' || currentHistory.status !== 'loaded') return
+  const fixturesByTeamContext = new Map<string, Promise<ICaFixture[]>>()
+  for (const player of currentDataset.players) {
+    if (!player.player_id) continue
+    const context = fixtureContextForRole(player.role)
+    const key = `${player.team}|${context}`
+    if (!fixturesByTeamContext.has(key)) {
+      fixturesByTeamContext.set(key, loadTeamFixtures(player.team, context)
+        .then(toICaFixtures)
+        .catch(() => []))
+    }
+  }
+  const inputs = await Promise.all(currentDataset.players.flatMap((player) => {
+    if (!player.player_id) return []
+    return [Promise.resolve(fixturesByTeamContext.get(`${player.team}|${fixtureContextForRole(player.role)}`))
+      .then((fixtures) => ({
+        ...buildFldaICaV2Input(player, currentHistory.byPlayerId.get(player.player_id!) ?? []),
+        rolePlayers: currentDataset.players,
+        coachRoles: coachRolesCache.get(player.team) ?? [],
+        fixtures,
+        currentMatchday: 4,
+      }))]
+  }))
+  // A response from an older catalog/history must not overwrite a newer cache.
+  if (dataset !== currentDataset || historyState !== currentHistory) return
   const references = buildICaReferences(inputs)
   historyState = { ...historyState, references }
   for (const input of inputs) {
@@ -85,9 +127,10 @@ export function loadBulkHistory(force = false): Promise<BulkHistoryState> {
   if (historyRequest) return historyRequest
   historyState = { status: 'loading', byPlayerId: historyState.byPlayerId }
   historyRequest = getFldaBulkHistory(3)
-    .then((response) => {
+    .then(async (response) => {
       historyState = { status: 'loaded', byPlayerId: indexBulkHistory(response) }
-      rebuildICaV2Cache()
+      // The dataset loader rebuilds after its enrichment and history have both completed.
+      if (!datasetRequest) await rebuildICaV2Cache()
       return historyState
     })
     .catch((error: unknown) => {
@@ -165,7 +208,17 @@ async function enrichPlayerSignals(players: FldaPlayer[]): Promise<FldaPlayer[]>
     signals.set(id, current)
     return current
   }
-  for (const { guide, hierarchies } of bundles) {
+  for (const { team, guide, hierarchies } of bundles) {
+    const coachRoles: ICaCoachRole[] = []
+    if (Array.isArray(guide.key_roles)) {
+      for (const row of guide.key_roles) {
+        if (row && typeof row === 'object' && typeof row.role === 'string' &&
+            (row.tone === 'good' || row.tone === 'bad')) {
+          coachRoles.push({ role: row.role, tone: row.tone })
+        }
+      }
+    }
+    coachRolesCache.set(team, coachRoles)
     const starting = guide.starting_xi
     if (Array.isArray(starting)) {
       for (const row of starting as FldaRecord[]) {
@@ -201,7 +254,7 @@ export async function loadPlayersDataset(
       initializePlayerIdentity(legacyPlayers, players)
       dataset = { source: 'flda', players, byId }
       await bulkHistory
-      rebuildICaV2Cache()
+      await rebuildICaV2Cache()
       return dataset
     })
     .catch((error: unknown) => {
