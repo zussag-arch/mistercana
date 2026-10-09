@@ -4,11 +4,23 @@
 
 Questo documento descrive esclusivamente il comportamento osservabile nel codice attualmente presente nella repository.
 
-La ricognizione è riferita al commit `e550c19` del branch `main`, analizzato il 2 settembre 2026.
+La ricognizione è riferita al commit `72f550e` del branch `main` (12 settembre 2026), analizzato il 9 ottobre 2026. La versione precedente del documento descriveva il commit `e550c19` del 2 settembre 2026.
 
 Il documento non definisce requisiti futuri e non trasforma i valori numerici correnti in invarianti. I principi di prodotto e gli invarianti concettuali sono descritti separatamente in [`docs/CONCEPTS.md`](./CONCEPTS.md). Quando il codice contiene commenti su sviluppi futuri, tali commenti sono riportati soltanto come indicazione di una parte incompleta, non come funzionalità disponibile.
 
-In sintesi, la repository contiene una SPA client-side per la gestione di un'asta Fantacalcio, utilizzabile localmente e distribuita tramite GitHub Pages. Lo stato operativo è salvato nel browser; i database di riferimento sono CSV inclusi nel bundle; tutti i calcoli sono eseguiti nel client. Non risultano implementati backend, autenticazione, sincronizzazione remota o integrazione con un modello AI.
+In sintesi, la repository contiene una SPA client-side per la gestione di un'asta Fantacalcio, utilizzabile localmente e distribuita tramite GitHub Pages. Lo stato operativo è salvato nel browser e tutti i calcoli sono eseguiti nel client. I dati dei giocatori provengono, quando raggiungibile, dal servizio esterno **FLDA** (`fantalab-data-agent`, progetto separato) tramite API HTTP; se FLDA non risponde, l'app ricade sui CSV inclusi nel bundle (modalità "legacy"). Non risultano implementati backend proprio, autenticazione, sincronizzazione remota dello stato o integrazione con un modello AI.
+
+### Principali cambiamenti rispetto alla ricognizione del 2 settembre
+
+- integrazione FLDA: client HTTP, repository giocatori con cache, mappatura identità legacy ↔ FLDA, pannello di stato/aggiornamento in Import/Export;
+- assegnazioni identificate con UUID FLDA (`fldaPlayerId`), con compatibilità per i record legacy;
+- iCà V2 (da storico FLDA) come indice mostrato in Players, Asta e schede;
+- pagina Players riscritta su dati FLDA; nuova pagina "scheda completa giocatore";
+- indicatori della rosa (`rosterMetrics`) e prezzo storico d'asta 2025/26 nella pagina Asta;
+- configurazione PMA (`pmaConfiguration`: Classic/Mantra, partecipanti, modificatore);
+- nuovi pesi della Chiamata consigliata;
+- suite di test con `npm test`;
+- script di avvio locale (`run-local.ps1`, `run-mac`).
 
 ---
 
@@ -23,8 +35,10 @@ In sintesi, la repository contiene una SPA client-side per la gestione di un'ast
 - Rendering tramite stringhe HTML assegnate a `innerHTML` e binding diretto degli eventi DOM.
 - Persistenza tramite `window.localStorage`.
 - Import dei CSV come testo tramite query Vite `?raw`.
+- Chiamate HTTP al servizio FLDA tramite `fetch` nativo (`src/services/flda.ts`).
+- Test con il runner nativo di Node (`node --test`), che esegue direttamente i file `.ts`.
 
-Le sole dipendenze dichiarate sono TypeScript e Vite, entrambe in `devDependencies` (`package.json`). Non risultano librerie runtime esterne, framework frontend, client HTTP, SDK AI o librerie di stato.
+Le sole dipendenze dichiarate sono TypeScript e Vite, entrambe in `devDependencies` (`package.json`). Non risultano librerie runtime esterne, framework frontend, librerie client HTTP, SDK AI o librerie di stato.
 
 ### Struttura
 
@@ -33,16 +47,20 @@ Le sole dipendenze dichiarate sono TypeScript e Vite, entrambe in `devDependenci
 | `index.html` | Shell HTML con elemento `#app` e caricamento di `src/main.ts`. |
 | `src/main.ts` | Bootstrap, stato in memoria, rendering globale, navigazione e ciclo di vita dell'asta. |
 | `src/app/` | Stato, persistenza, router in memoria, motion degli overlay e favicon dinamica. |
-| `src/pages/` | Rendering e interazioni delle sei pagine. |
-| `src/components/` | Navigazione e scheda dettagliata condivisa del giocatore. |
+| `src/pages/` | Rendering e interazioni delle sei pagine di navigazione e della pagina "scheda completa giocatore". |
+| `src/components/` | Navigazione, snapshot giocatore in overlay e funzioni di rendering condivise dei dati giocatore. |
 | `src/data/` | Parsing e indicizzazione dei CSV incorporati. |
 | `src/domain/` | Modello del giocatore e algoritmi deterministici. |
+| `src/services/` | Client FLDA, repository giocatori con cache, identità legacy ↔ FLDA, risoluzione dei giocatori in asta e adattatore verso gli algoritmi. |
 | `src/styles/` e `src/style.css` | Stili globali, per pagina e responsive. |
-| `database/` | Sette file CSV inclusi nella build. |
+| `database/` | Sette file CSV inclusi nella build (fonte legacy e dati Insights/portieri). |
 | `public/` | Favicon e sprite SVG. |
+| `tests/` | Dieci file di test (`*.test.ts`). |
+| `.env.production` | Variabile `VITE_FLDA_API_URL` con l'indirizzo FLDA usato dalla build di produzione. |
+| `run-local.ps1`, `run-mac` | Avvio locale di FLDA (porta 8765) e del dev server Vite (porta 5173). |
 | `.github/workflows/deploy.yml` | Build e deploy su GitHub Pages. |
 
-Non esiste una suite di test nella repository e `package.json` non espone script `test` o `lint`.
+`package.json` espone lo script `test` (`node --test tests/*.test.ts`); non esiste uno script `lint`.
 
 ---
 
@@ -77,7 +95,10 @@ Gli identificativi di pagina sono definiti in `src/components/navigation.ts`:
 - `players`;
 - `objectives`;
 - `insights`;
-- `importExport`.
+- `importExport`;
+- `playerDetail`.
+
+`playerDetail` (scheda completa giocatore) non compare fra le voci della topbar: vi si accede dallo snapshot giocatore della pagina Players. Il riferimento del giocatore selezionato è una variabile di modulo in `src/main.ts` e non viene persistito.
 
 La voce Asta è disabilitata soltanto durante `setup`; rimane accessibile durante `live` e `finalizing` (`src/components/navigation.ts`).
 
@@ -92,7 +113,7 @@ Implementata in `src/pages/dashboard.ts`.
 La Dashboard consente, durante la fase `setup`, di:
 
 - impostare i crediti iniziali, con minimo 1;
-- attivare o disattivare il modificatore difesa;
+- attivare o disattivare il modificatore difesa (il valore viene scritto sia in `defenseModifierEnabled` sia in `pmaConfiguration.defenseModifier`);
 - scegliere un profilo di budget o inserire percentuali personalizzate per P, D, C e A;
 - creare e modificare manager;
 - distinguere nome, cognome, alias e nome squadra;
@@ -121,8 +142,10 @@ Durante `live` offre:
 
 - selezione del ruolo attivo P/D/C/A;
 - selezione di un giocatore per squadra o per nome;
-- chiamata dalla pagina Players o dalla scheda giocatore;
-- visualizzazione di iCà, PMA, consenso, MV, FMV e titolarità;
+- chiamata dalla pagina Players, dallo snapshot o dalla scheda completa del giocatore;
+- visualizzazione di iCà (V2), PMA, consenso, MV, FMV e titolarità;
+- prezzo storico d'asta 2025/26 Serie A / Serie B, se fornito da FLDA (`src/domain/historicalAuctionPrice.ts`);
+- indicatori della rosa dell'owner per reparto (iCà, titolarità, prestazione), descritti nella sezione 10.4;
 - visualizzazione del consiglio prezzo e dei tre limiti;
 - input rapido del prezzo e pulsanti di incremento/decremento;
 - segnale `SALI`, `ATTENZIONE` o `STOP` aggiornato sul prezzo inserito;
@@ -147,6 +170,8 @@ L'aggiudicazione valida che:
 
 I limiti di rosa correnti sono `P 3, D 8, C 8, A 6` (`src/domain/auctionContext.ts`).
 
+Quando i dati FLDA sono disponibili, il giocatore chiamato viene memorizzato in `currentAuctionFldaPlayerId` e le nuove aggiudicazioni salvano soltanto `fldaPlayerId` (UUID FLDA), senza `playerId` legacy. Il controllo "già assegnato" (`isFldaPlayerAssigned`) riconosce sia i record FLDA sia quelli legacy tramite la mappatura delle identità. Gli algoritmi di prezzo, raccomandazione e concorrenti ricevono uno stato e un elenco giocatori adattati da `buildAuctionStrategyContext` (`src/services/auctionStrategyAdapter.ts`, sezione 8.1).
+
 Il segnale d'offerta (`getBidSignal` in `src/pages/auction.ts`) funziona così:
 
 - `STOP` se il prezzo supera il limite finanziario o il tetto consigliato;
@@ -164,28 +189,32 @@ Entrambe le operazioni azzerano anche la selezione corrente; gli scarti della ra
 
 Implementata in `src/pages/players.ts`.
 
-Mostra il listone elaborato in una tabella con:
+La pagina è stata riscritta sul dataset FLDA (`loadPlayersDataset` in `src/services/playerRepository.ts`). Mostra una tabella con:
 
-- ruolo, nome e squadra;
-- iCà;
-- PMA percentuale;
-- consenso;
+- ruolo, nome, squadra e badge (titolare, P1, rigori, punizioni, corner) ricavati da FLDA;
+- iCà V2;
+- PMA percentuale, calcolato da FLDA secondo `pmaConfiguration` (`src/domain/pma.ts`);
+- xFM (`fm_exp` FLDA);
 - titolarità;
-- MV/FMV;
-- stato rispetto all'asta corrente;
-- indicatori di rigoristi e piazzati ricavati dal CSV Battitori.
+- MV/FMV, letti dal giocatore legacy collegato tramite identità;
+- stato rispetto all'asta corrente.
 
 Sono disponibili:
 
-- filtri per ruolo;
+- filtri per ruolo e per squadra;
 - ricerca per nome o squadra;
-- filtro rigoristi;
-- filtro “Solo liberi”, attivo soltanto durante un'asta live;
-- ordinamento per nome, iCà, PMA, consenso, titolarità, statistiche e stato;
-- apertura della scheda giocatore;
-- chiamata diretta in Asta se la sessione è live e il giocatore non è assegnato.
+- filtri "Solo liberi" (attivo soltanto durante un'asta live), "Titolare XI", "P1", "Rigorista", "Punizioni", "Corner";
+- ordinamento per iCà, xFM, titolarità, MV/FMV, stato, nome e squadra;
+- snapshot del giocatore in overlay, con dettaglio FLDA caricato su richiesta;
+- passaggio alla scheda completa (`playerDetail`);
+- chiamata diretta in Asta se la sessione è live e il giocatore non è assegnato;
+- pulsante di nuovo tentativo se il caricamento FLDA fallisce.
 
-L'ordinamento iniziale raggruppa P, D, C, A e ordina ogni ruolo per iCà decrescente. Lo stato visualizzato viene derivato da `auctionAssignments`; il campo statico `Player.status`, inizializzato sempre a `free`, non governa la disponibilità reale (`src/pages/players.ts`, `src/data/players.ts`).
+Se FLDA non è raggiungibile la pagina usa il listone legacy convertito in forma FLDA, senza iCà V2 e senza xFM; il piè di pagina indica "Fonte FLDA" oppure "Fonte legacy". La colonna "consenso" non è più presente.
+
+### Scheda completa giocatore
+
+Implementata in `src/pages/playerDetail.ts`. Carica dettaglio giocatore e guida squadra da FLDA e mostra: intestazione con badge e pulsante CHIAMA, panoramica dell'ultima stagione, grafici prezzi dei Saggi e storico MV/FMV, dati d'asta correnti con prezzo storico, statistiche di ruolo, indicazioni qualitative, guida della squadra (allenatore, modulo, attacco, difesa, commenti) e statistiche avanzate. Il pulsante "← Giocatori" riporta alla pagina Players.
 
 ### Objectives
 
@@ -200,6 +229,8 @@ Consente di:
 - rimuovere l'obiettivo;
 - visualizzare gli obiettivi raggruppati per ruolo e priorità;
 - tornare rapidamente all'Asta quando è live.
+
+La ricerca di Objectives usa ancora il listone legacy (`src/data/players.ts`): gli obiettivi sono quindi salvati con ID legacy. In modalità FLDA l'adattatore della strategia conserva l'ID legacy per i giocatori collegati, così la priorità continua a essere riconosciuta.
 
 Ogni obiettivo contiene anche `weight: 1`. Questo campo è un placeholder: viene normalizzato a 1 e non è usato dagli algoritmi. La Chiamata consigliata usa invece direttamente la categoria `priority` (`src/domain/objective.ts`, `src/app/storage.ts`, `src/domain/recommendation.ts`).
 
@@ -223,10 +254,10 @@ Implementata in `src/pages/importExport.ts`, con serializzazione e validazione i
 
 La pagina presenta:
 
+- sezione **Fonti dati locali** (FLDA): indirizzo del servizio in uso, stato di salute (`/api/health`), stato dei dataset (`/api/status`) con esito, numero di record, avvisi e blocchi, e pulsanti di aggiornamento (`/api/update`) per tutti i dataset o per `players`, `guide`, `grid`, `history`;
 - esportazione del backup JSON completo;
 - selezione, validazione, anteprima e conferma di ripristino del backup;
-- esportazione CSV delle assegnazioni correnti;
-- due card disabilitate per database esterni e dati storici.
+- esportazione CSV delle assegnazioni correnti.
 
 Gli handler vengono registrati automaticamente al caricamento del modulo tramite event delegation. Il ramo `importExport` di `bindPageEvents()` in `src/main.ts` non registra handler, ma la pagina non è puramente visiva: le funzioni sono operative grazie alla chiamata a `bindImportExportEvents()` in fondo al relativo modulo.
 
@@ -240,7 +271,11 @@ Gli handler vengono registrati automaticamente al caricamento del modulo tramite
 
 ### Scheda dettagli giocatore
 
-`src/components/playerDetailOverlay.ts` è condivisa fra Auction e Players. Mostra dati anagrafici e prestazionali, titolarità, indicatori, prezzi dei Saggi, grafici SVG generati nel markup e un'azione di chiamata quando applicabile. I dati arrivano da `src/data/playerDetail.ts`.
+`src/components/playerDetailOverlay.ts` è stata ridotta a uno **snapshot** in overlay ("SNAPSHOT GIOCATORE"): badge, stato, metriche correnti, grafici prezzi dei Saggi e storico MV/FMV, ultime statistiche di ruolo, pulsante CHIAMA e, dalla pagina Players, il pulsante "Apri scheda completa". I dati arrivano dal dettaglio FLDA; se l'identità FLDA manca, viene mostrato un avviso e si usano i dati legacy.
+
+`src/components/playerDataView.ts` raccoglie le funzioni di rendering condivise fra snapshot, scheda completa e Players: view model del giocatore, badge, metriche correnti (con PMA secondo `pmaConfiguration`), grafici SVG, gerarchie ed escaping HTML.
+
+`src/data/playerDetail.ts` (parsing dei CSV per la vecchia scheda) esiste ancora.
 
 ### Modal
 
@@ -257,7 +292,9 @@ Il modello è definito in `src/app/state.ts`.
 | Campo | Contenuto corrente |
 | --- | --- |
 | `auctionPhase` | `setup`, `live` o `finalizing` nello stato normalizzato. I tipi includono anche `archived` e `discarded`, ma il loader li converte in `setup`. |
-| `currentAuctionPlayerId` | ID del giocatore attualmente chiamato o `null`. |
+| `currentAuctionPlayerId` | ID legacy del giocatore attualmente chiamato o `null`. |
+| `currentAuctionFldaPlayerId` | UUID FLDA del giocatore chiamato dai flussi FLDA, o `null`. I due campi sono alternativi: chiamare un giocatore FLDA azzera l'ID legacy e viceversa. |
+| `pmaConfiguration` | `mode` (`classic`/`mantra`), `participants` (8/10/12) e `defenseModifier`: selezionano la colonna PMA FLDA da usare. |
 | `auctionAssignments` | Acquisti della sessione corrente. |
 | `archivedAuctions` | Aste archiviate con ID, data ISO e copia delle assegnazioni. |
 | `recommendedDiscards` | ID esclusi dalla raccomandazione automatica corrente. |
@@ -268,7 +305,7 @@ Il modello è definito in `src/app/state.ts`.
 | `managers` | Identità, alias, squadra, owner, attività e archiviazione. |
 | `objectives` | Giocatore, priorità e peso placeholder. |
 
-Un'assegnazione contiene ID, giocatore, manager, prezzo e, facoltativamente, ID e prezzo del secondo offerente. Viene registrato al massimo un secondo offerente: il modello non conserva l'intera sequenza dei rilanci né l'elenco completo dei manager che hanno partecipato all'asta del giocatore.
+Un'assegnazione contiene ID, manager, prezzo, l'identità del giocatore e, facoltativamente, ID e prezzo del secondo offerente. L'identità del giocatore è `playerId` (ID legacy, presente sui record creati prima della migrazione FLDA) e/o `fldaPlayerId` (UUID FLDA, usato dalle nuove aggiudicazioni); almeno uno dei due è obbligatorio. Viene registrato al massimo un secondo offerente: il modello non conserva l'intera sequenza dei rilanci né l'elenco completo dei manager che hanno partecipato all'asta del giocatore.
 
 Il manager possiede un ID persistente nello stato. Il contesto storico del manager, incluso il nome della squadra relativo a una specifica stagione o asta, non viene però versionato dentro `ArchivedAuction`: le assegnazioni archiviate continuano a riferirsi al manager tramite il suo ID e i dati contestuali restano quelli presenti nell'array globale `managers`.
 
@@ -278,7 +315,8 @@ Il manager possiede un ID persistente nello stato. Il contesto storico del manag
 
 - fase `setup`;
 - 500 crediti;
-- modificatore difesa disattivato;
+- modificatore difesa **attivato** (`defenseModifierEnabled: true`; nella ricognizione del 2 settembre era disattivato);
+- `pmaConfiguration`: Classic, 8 partecipanti, con modificatore;
 - profilo `equilibrata`;
 - distribuzione `P 11, D 21, C 23, A 45`;
 - un owner attivo con ID `owner` e nome `Gabriele`;
@@ -288,7 +326,9 @@ Questi sono valori correnti del codice, non invarianti concettuali.
 
 ### Stato UI non persistito
 
-Routing e varie selezioni visuali sono variabili di modulo e non vengono salvati. Fra queste: pagina attiva, ruolo attivo dell'Asta, filtri Players, ricerca e priorità selezionata in Objectives, selezione squadra in Insights, overlay aperti e feedback temporanei.
+Routing e varie selezioni visuali sono variabili di modulo e non vengono salvati. Fra queste: pagina attiva, giocatore della scheda completa, ruolo attivo dell'Asta, filtri e ordinamento Players, ricerca e priorità selezionata in Objectives, selezione squadra in Insights, overlay aperti e feedback temporanei.
+
+Anche i dati FLDA (dataset giocatori, storico bulk, risultati iCà V2, dettagli giocatore, guide e calendari squadra) sono tenuti soltanto in cache in memoria (`src/services/playerRepository.ts`) e vengono ricaricati a ogni avvio; non sono scritti in `localStorage` né nei backup.
 
 ---
 
@@ -308,6 +348,9 @@ Non risultano altre chiavi `localStorage` né usi di `sessionStorage`, IndexedDB
 - normalizza fase, selezione, manager, obiettivi, assegnazioni, archivi e scarti;
 - migra il vecchio campo manager `name` verso nome/cognome;
 - accetta il vecchio `participantId` per le assegnazioni;
+- accetta assegnazioni con `playerId`, `fldaPlayerId` o entrambi, scartando quelle prive di entrambi; i duplicati sono riconosciuti per chiave `flda:<uuid>` oppure `legacy:<id>`;
+- conserva `currentAuctionFldaPlayerId` soltanto nelle fasi `live` o `finalizing`;
+- normalizza `pmaConfiguration`; se manca o non è valida usa il default, ereditando il vecchio `defenseModifierEnabled` quando presente;
 - converte la vecchia fase `completed` in `finalizing`;
 - converte `archived` e `discarded` in `setup`;
 - conserva assegnazioni correnti, scarti e giocatore selezionato soltanto nelle fasi `live` o `finalizing`;
@@ -333,6 +376,22 @@ I CSV sono separati da `;` e importati nel bundle come testo.
 | `database/MisterCana_DB_Portieri.csv` | 21 | Matrice legacy di abbinamento fra squadre, usata nella pagina Insights. |
 
 I conteggi indicano la presenza fisica delle righe; i parser possono scartare righe incomplete o invalide. Non è presente un controllo automatico di integrità referenziale fra tutti i CSV.
+
+Con FLDA attivo, il listone e le statistiche mostrate in Players, Asta e schede provengono da FLDA. I CSV restano la fonte di: fallback legacy, ricerca Objectives, MV/FMV legacy mostrati in Players, pagina Insights, motore strategico portieri (calendario, gerarchie, Saggi) e campi legacy conservati nei giocatori adattati.
+
+### Fonte esterna FLDA
+
+L'indirizzo è letto da `VITE_FLDA_API_URL` (in produzione da `.env.production`); in assenza vale `http://127.0.0.1:8765`. Timeout: 8 s per le letture, 120 s per gli aggiornamenti. Endpoint usati (`src/services/flda.ts`):
+
+| Endpoint | Uso |
+| --- | --- |
+| `GET /api/health`, `GET /api/status` | Stato del servizio e dei dataset (Import/Export). |
+| `GET /api/players` | Listone giocatori FLDA. |
+| `GET /api/history/bulk?seasons=3` | Storico delle ultime tre stagioni per l'iCà V2. |
+| `GET /api/players/{id}` | Dettaglio giocatore (snapshot e scheda completa). |
+| `GET /api/players/{id}/auction-prices` | Prezzi d'asta storici, se assenti nel dettaglio. |
+| `GET /api/teams/{team}/guide`, `/hierarchies`, `/fixtures?context=` | Guida squadra, gerarchie (badge rigori/punizioni/corner), calendario. |
+| `POST /api/update` | Aggiornamento dei dataset FLDA. |
 
 ---
 
@@ -373,13 +432,30 @@ Riparsa listone, Saggi e Battitori per alimentare la scheda dettagliata: prezzi 
 
 ---
 
+## 8.1 Moduli `services`
+
+| Modulo | Responsabilità implementata |
+| --- | --- |
+| `flda.ts` | Client HTTP FLDA: tipi, `fetch` con timeout, gestione errori (`FldaApiError`: timeout, non raggiungibile, errore API). |
+| `playerRepository.ts` | Caricamento del dataset giocatori (FLDA o fallback legacy), arricchimento con gerarchie (rigori, punizioni, corner), storico bulk, riferimenti P95 e cache dei risultati iCà V2; cache di dettagli, guide e calendari squadra. |
+| `playerIdentity.ts` | Mappatura legacy ↔ FLDA: per ID esterni (fantacalcio, fantalab, sportsmonks) o per nome/squadra/ruolo normalizzati; esiti `matched_id`, `matched_deterministic_normalized`, `unmatched`, `ambiguous`. |
+| `auctionPlayerResolver.ts` | Risoluzione del giocatore corrente e delle assegnazioni (FLDA o legacy), verifica di assegnazione, riepilogo per manager. |
+| `auctionStrategyAdapter.ts` | Converte i giocatori FLDA nel modello `Player` usato dagli algoritmi (PMA FLDA, xFM, iCà V2, rigorista) e adatta lo stato: assegnazioni, giocatore corrente e scarti vengono riportati agli ID usati dagli algoritmi. In fallback legacy restituisce i giocatori legacy **con `iCa` impostato a `undefined`**. |
+
+---
+
 ## 9. Moduli `domain`
 
 | Modulo | Responsabilità implementata |
 | --- | --- |
 | `player.ts` | Tipi e campi del giocatore. |
 | `objective.ts` | Priorità e struttura degli obiettivi. |
-| `ica.ts` | Calcolo dell'indice iCà. |
+| `ica.ts` | Calcolo dell'indice iCà legacy (usato ancora da `src/data/players.ts`). |
+| `icaV2.ts` | Calcolo dell'iCà V2 da dati FLDA (sezione 10.1). |
+| `icaV3-beta.ts` | Variante sperimentale con parametri propri; **non è importata da nessun modulo**. |
+| `pma.ts` | Lettura del PMA FLDA secondo `pmaConfiguration` (colonna `{mode}_{partecipanti}[_mod/_no_mod]_median_value`). |
+| `historicalAuctionPrice.ts` | Prezzo d'asta 2025/26 Serie A / Serie B dal dettaglio FLDA. |
+| `rosterMetrics.ts` | Indicatori della rosa per reparto (sezione 10.4). |
 | `auctionContext.ts` | Lookup, budget, slot, benchmark, supply e domanda. |
 | `priceAdvice.ts` | Valore d'asta, riserve e limiti di prezzo. |
 | `recommendation.ts` | Ranking D/C/A e delega al motore P. |
@@ -393,8 +469,6 @@ Riparsa listone, Saggi e Battitori per alimentare la scheda dettagliata: prezzi 
 ## 10. Algoritmi implementati
 
 ### 10.1 iCà V2 — provvisorio Alpha/Beta
-
-Aggiornamento mirato del working tree: questa sezione sostituisce la descrizione legacy dell'iCà riportata sotto; le altre sezioni del documento mantengono la data della ricognizione originaria.
 
 iCà V2 è adottato come indice provvisorio per Alpha/Beta. La struttura è stabile abbastanza per procedere con lo sviluppo, ma la calibrazione numerica dello storico H non è considerata definitiva. Dopo la Beta deve essere effettuata una revisione dell'indice usando risultati reali, ranking osservati e casi campione.
 
@@ -412,7 +486,9 @@ Il calcolatore è `src/domain/icaV2.ts`, con parametri centralizzati in `ICA_V2_
 
 I parametri numerici restano configurabili nel modulo domain e NON vanno considerati definitivi fino alla revisione post-Beta. TODO: **RICALIBRAZIONE iCà POST-BETA**, descritta in `BETA_BACKLOG.md`.
 
-#### iCà legacy — ricognizione precedente, non indice V2 di Players/Asta
+#### iCà legacy — non usato da Players/Asta
+
+L'iCà legacy è ancora calcolato in `src/data/players.ts`, ma l'adattatore della strategia lo azzera: Players, Asta e algoritmi usano soltanto l'iCà V2. Senza FLDA, quindi, nessun iCà è disponibile.
 
 `src/domain/ica.ts` calcola un punteggio 0–100 da quattro componenti. I pesi correnti, configurabili tramite `ICaConfig`, sono:
 
@@ -462,6 +538,25 @@ Per D/C/A e per un candidato con slot calcolabile:
 - **domanda:** numero di manager attivi che hanno almeno uno slot strategico mancante compatibile con quello del candidato.
 
 La domanda non verifica direttamente la capacità economica del singolo manager (`src/domain/auctionContext.ts`). La capacità economica entra invece nell'analisi concorrenti.
+
+In modalità FLDA il PMA usato da fasce, slot e prezzi è quello FLDA scelto da `pmaConfiguration`, non più il PMA del CSV legacy.
+
+### 10.4 Indicatori della rosa
+
+`src/domain/rosterMetrics.ts` (parametri in `ROSTER_METRICS_V1`, dichiarati come input V1 sostituibili) calcola per l'owner tre medie per reparto, mostrate nella pagina Asta: iCà, titolarità e prestazione.
+
+**D/C/A.** Ogni giocatore posseduto riceve uno slot strutturale `ceil((1 + giocatori dello stesso ruolo con iCà maggiore) / partecipanti)`, dove i partecipanti sono `pmaConfiguration.participants`. Il peso dello slot vale:
+
+| Ruolo | Peso 1 | Peso 0,60 | Peso 0,35 | Peso 0 |
+| --- | --- | --- | --- | --- |
+| D, C | slot 1–4 | slot 5–6 | slot 7–8 | oltre 8 o slot non calcolabile |
+| A | slot 1–3 | slot 4 | slot 5–6 | oltre 6 o slot non calcolabile |
+
+La prestazione combina `xFM × 10` e un punteggio attacco di squadra (gol fatti Serie A 2025/26 riscalati fra 25 e 89; neopromosse a 3), con pesi individuale/squadra 0,90/0,10 (D), 0,80/0,20 (C), 0,70/0,30 (A).
+
+**P.** I portieri posseduti sono raggruppati per squadra. Per ogni squadra la copertura è la somma delle quote di titolarità dei portieri posseduti sul totale della squadra; iCà e prestazione sono pesati per quota. La prestazione del portiere combina squadra (0,65: gol subiti e punti 2025/26) e individuale (0,35: MV, rigori parati, ammonizioni, espulsioni, attenuati con la stessa curva di affidabilità campione dell'iCà V2). Il reparto P è la media semplice dei pacchetti di squadra.
+
+Esempio D/C: con 8 partecipanti, un difensore con 10 difensori di iCà superiore ha slot `ceil(11/8) = 2` e peso 1; con 40 superiori ha slot `ceil(41/8) = 6` e peso 0,60.
 
 ---
 
@@ -561,19 +656,21 @@ L'opportunità è `pressione / (1 + pressione)`.
 Le priorità obiettivo valgono attualmente:
 
 - primary `1,00`;
-- secondary `0,82`;
-- third `0,68`;
-- fourth `0,55`;
+- secondary `0,80`;
+- third `0,65`;
+- fourth `0,50`;
 - bet `0,60`;
 - non obiettivo `0`.
 
-Il punteggio alpha corrente usa:
+Il punteggio alpha corrente usa (fra parentesi i valori della ricognizione del 2 settembre):
 
-- qualità/iCà: 15%;
-- bisogno: 30%;
-- sostenibilità: 12%;
-- opportunità: 8%;
-- obiettivo: 35%.
+- qualità/iCà: 30% (15%);
+- fit slot (bisogno): 25% (30%);
+- sostenibilità: 10% (12%);
+- opportunità/mercato: 10% (8%);
+- obiettivo: 25% (35%).
+
+Per ottimizzazione, la riserva portieri usata nei limiti dei giocatori di movimento viene calcolata una sola volta per ranking (`calculateGoalkeeperReserveForOutfieldAdvice`) e passata ai singoli consigli prezzo; lo slot del candidato viene letto dal consiglio prezzo anziché ricalcolato.
 
 I pesi disponibili vengono rinormalizzati se una metrica è assente. Successivamente il risultato viene moltiplicato per un fattore di diversificazione della squadra reale. La penalità è quadratica (`0,015 × stessoTeam² + 0,020 × stessoTeamStessoRuolo²`) e limitata al 50%.
 
@@ -752,6 +849,10 @@ Esporta soltanto `auctionAssignments`, con BOM UTF-8 e separatore `;`. Le colonn
 
 Le aste archiviate non sono esportate in questo CSV, ma restano incluse nel backup JSON.
 
+Il CSV cerca il giocatore soltanto nel listone legacy tramite `playerId`. Le aggiudicazioni create con FLDA hanno solo `fldaPlayerId`: per esse le colonne `player_id`, `giocatore`, `squadra_reale` e `ruolo` risultano vuote (`buildCurrentAuctionCsv` in `src/pages/importExport.ts`).
+
+Il backup JSON resta alla versione 1 e include i nuovi campi (`currentAuctionFldaPlayerId`, `pmaConfiguration`, `fldaPlayerId` delle assegnazioni); i backup precedenti vengono completati dal loader con i valori predefiniti.
+
 ---
 
 ## 17. Motion e UI implementate
@@ -791,7 +892,24 @@ Da `package.json`:
 
 - `npm run dev` → `vite`;
 - `npm run build` → `tsc && vite build`;
-- `npm run preview` → `vite preview`.
+- `npm run preview` → `vite preview`;
+- `npm test` → `node --test tests/*.test.ts`.
+
+### Test
+
+Dieci file in `tests/`: migrazione FLDA dell'asta, adattatore strategia, storico bulk, prezzo storico, iCà V2, identità giocatori, iCà nel repository, architettura UI giocatori, PMA, indicatori rosa. Alla data di questa ricognizione `npm test` esegue 62 test: **57 superati, 5 falliti**:
+
+- "repository has shared loading loaded and error states distinct from empty history";
+- "repository forwards enriched ICA inputs and deduplicates fixtures by team/context";
+- "renders the requested descriptive charts and avoids viewport-wide mobile content";
+- "renders the two historical prices and the requested full-page KPI layout";
+- "Auction mobile layout stacks top players and assignment history".
+
+`npm run build` termina senza errori.
+
+### Avvio locale
+
+`run-local.ps1` (Windows) e `run-mac` (macOS) avviano FLDA (`flda serve`, porta 8765) se non è già in ascolto, poi il dev server Vite (porta 5173), e aprono `http://localhost:5173`. Lo script Windows usa percorsi fissi `C:\Users\Gabriele\Documents\GitHub\mistercana` e `...\fantalab-data-agent`.
 
 `tsconfig.json` usa target ES2023, DOM, risoluzione `bundler`, `noEmit`, controlli su simboli inutilizzati e fallthrough. Non è abilitato esplicitamente `strict`.
 
@@ -801,7 +919,7 @@ Da `package.json`:
 base: '/mistercana/'
 ```
 
-La build produce `dist`, che è ignorata da Git.
+La build produce `dist`, che è ignorata da Git. La build di produzione legge `VITE_FLDA_API_URL` da `.env.production`, file tracciato in Git.
 
 ### Deploy
 
@@ -820,26 +938,30 @@ La build produce `dist`, che è ignorata da Git.
 
 Questa sezione elenca soltanto condizioni osservate nel codice.
 
-1. **Nessuna integrazione AI.** Non risultano SDK, chiamate di rete o moduli di conversazione. Tutte le raccomandazioni sono deterministiche.
-2. **Nessun backend o sincronizzazione.** Stato e storico esistono soltanto nel `localStorage` del browser o nei backup scaricati.
-3. **Nessun test automatico.** Non ci sono file test/spec né script dedicati.
+1. **Nessuna integrazione AI.** Non risultano SDK o moduli di conversazione. Le uniche chiamate di rete sono verso FLDA. Tutte le raccomandazioni sono deterministiche.
+2. **Nessun backend proprio o sincronizzazione dello stato.** Stato e storico dell'asta esistono soltanto nel `localStorage` del browser o nei backup scaricati. FLDA fornisce soltanto dati giocatori.
+3. **Test parzialmente falliti.** 5 test su 62 falliscono (sezione 18).
 4. **`src/components/modal.ts` è vuoto.** Gli overlay sono duplicati nelle pagine/componenti.
 5. **Commenti non allineati in `src/main.ts`.** Il ramo Import/Export dice che la pagina è puramente visiva, ma il modulo auto-registra handler operativi. Anche Insights auto-registra il binder e viene inoltre chiamato da `main.ts`; il guard interno evita duplicazioni.
 6. **Preset equilibrato incoerente col default.** Il default è `11/21/23/45`, il pulsante Equilibrata applica `10/25/30/35`.
-7. **`defenseModifierEnabled` non entra negli algoritmi.** È configurato, mostrato e persistito, ma non è letto dai moduli `domain`.
-8. **Campi giocatore non ancora consumati.** `valorizzato`, `penalizzato` e `nomeNascosto` sono importati ma non usati; `xMv` e `xFmv` non vengono popolati; `penaltyTaker` resta false; `pma` legacy non viene popolato.
-9. **Storico prezzi stagionale non disponibile.** Auction e scheda giocatore mostrano esplicitamente un placeholder per il prezzo della passata stagione. I prezzi Saggi presenti nel CSV sono mostrabili nella scheda, ma non equivalgono a uno storico d'asta e non alimentano il consiglio prezzo.
+7. **Modificatore difesa duplicato.** `defenseModifierEnabled` e `pmaConfiguration.defenseModifier` sono aggiornati insieme dalla Dashboard. Il secondo seleziona la colonna PMA FLDA; nessuno dei due entra direttamente negli algoritmi `domain`.
+8. **Campi giocatore non ancora consumati.** Nel listone legacy `valorizzato`, `penalizzato` e `nomeNascosto` sono importati ma non usati, e `xMv` non viene popolato. In modalità FLDA `xFmv` è valorizzato con `fm_exp` e `penaltyTaker` con la gerarchia rigori.
+9. **Storico prezzi d'asta limitato.** È mostrato il prezzo 2025/26 Serie A / Serie B, se fornito da FLDA, ma non alimenta il consiglio prezzo. I prezzi dei Saggi sono mostrati nei grafici ma non equivalgono a uno storico d'asta.
 10. **Aste archiviate poco utilizzate.** Vengono conservate e incluse nel backup/anteprima, ma non esiste una pagina di consultazione e non alimentano analisi concorrenti o algoritmi.
 11. **Fasi `archived` e `discarded` non persistono come stato operativo.** Sono nel tipo e nelle etichette Dashboard, ma le azioni correnti riportano direttamente a `setup` e il loader normalizza tali valori a `setup`.
 12. **Il secondo offerente è solo registrato/esportato.** Non alimenta prezzo, ranking o analisi concorrenti.
 13. **Obiettivi non formalmente legati alla singola asta.** Persistono globalmente nello stato finché l'utente non li modifica o importa un backup.
 14. **Scarti senza ID di asta.** Il ciclo di vita corrente li azzera alla chiusura, ma il modello dati non li associa a un'entità asta identificata.
 15. **Matrice portieri doppia.** Insights usa il database legacy `MisterCana_DB_Portieri.csv`; il motore strategico usa invece calendario e gerarchie. Sono due percorsi dati separati.
-16. **Dati storici esterni e database esterni non collegati.** Le relative card Import/Export sono disabilitate e marcate in attesa.
+16. **Dipendenza da FLDA per l'iCà.** Senza FLDA l'app funziona sul listone legacy, ma senza iCà (l'adattatore azzera l'iCà legacy) e senza xFM, badge FLDA, dettaglio e scheda completa.
 17. **Validazione backup minima.** Il core viene controllato, ma alcuni campi, come `budgetProfile` e i singoli valori di `budgetDistribution`, non ricevono una validazione esaustiva di dominio.
 18. **Possibile owner implicito.** Se nessun manager attivo ha `isOwner`, vari algoritmi trattano il primo manager attivo come owner; la UI permette inoltre di deselezionare l'owner senza imporre immediatamente un sostituto (`src/domain/auctionContext.ts`, `src/pages/dashboard.ts`).
-19. **Nessuna documentazione tecnica precedente oltre ai concetti.** Prima di questo file, l'unico Markdown tracciato era `docs/CONCEPTS.md`.
+19. **Export CSV incompleto per le aggiudicazioni FLDA.** Nome, squadra, ruolo e ID giocatore restano vuoti per i record con solo `fldaPlayerId` (sezione 16).
 20. **Nessuna entità lega/divisione o sessione attiva identificata.** L'`AppState` contiene una sola configurazione e una sola asta corrente, senza un'entità lega/divisione né un identificatore della sessione attiva; Lega A e Lega B non possono quindi convivere nello stesso `AppState` con stato indipendente.
+21. **Configurazione PMA modificabile solo in parte.** `pmaConfiguration.mode` e `participants` (default Classic, 8) non hanno un controllo in UI; la Dashboard modifica soltanto il modificatore difesa. Il numero di partecipanti PMA è indipendente dal numero di manager attivi usato per le fasce.
+22. **Identità miste.** Obiettivi e scarti usano ID legacy, le nuove aggiudicazioni UUID FLDA; la coerenza dipende dalla mappatura di `playerIdentity.ts`. I giocatori FLDA senza corrispondenza legacy usano l'UUID come ID nella strategia.
+23. **Modulo non collegato.** `src/domain/icaV3-beta.ts` non è importato da alcun file.
+24. **Percorsi fissi negli script di avvio.** `run-local.ps1` punta a `C:\Users\Gabriele\Documents\GitHub\...`, non alla posizione attuale della repository se è stata spostata.
 
 ---
 
@@ -865,6 +987,7 @@ Sono soltanto parziali o assenti, fra gli altri:
 - adattamento basato sul secondo offerente;
 - integrazione AI come livello interpretativo;
 - associazione formale di strategia, obiettivi e scarti a una specifica asta;
-- consultazione e uso algoritmico dello storico archiviato.
+- consultazione e uso algoritmico dello storico archiviato;
+- uso dei prezzi storici d'asta nel consiglio prezzo.
 
 Queste differenze descrivono lo stato reale corrente; non costituiscono da sole un backlog o una decisione di implementazione futura.
