@@ -200,6 +200,8 @@ export function localTeamGuide(team: string): FldaRecord {
     coach: row['Allenatore'],
     module: row['Modulo'],
     attack: num(row['Voto allenatore Attacco']),
+    team_attack_index: num(row['Indice squadra Attacco']),
+    team_defense_index: num(row['Indice squadra Difesa']),
     defense: num(row['Voto allenatore Difesa']),
     key_points: (row['Punti chiave'] ?? '').split('|')
       .map((text) => text.trim()).filter(Boolean).map((text) => ({ text })),

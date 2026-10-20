@@ -7,7 +7,9 @@ import goalkeepersCsv
 import fantalabCoachesCsv
   from '../../database/fantalab_allenatori.csv?raw'
 
-import { getCachedPlayersDataset } from '../services/playerRepository'
+import { getCachedICaV2, getCachedPlayersDataset } from '../services/playerRepository'
+import { getICaV3Results } from '../data/icaV3Data'
+import { localPlayers } from '../services/fantalabLocal'
 
 import {
   runOverlayExit,
@@ -1372,6 +1374,48 @@ function renderSetPieceList(team: string, label: string, players: string[]): str
   `
 }
 
+// iCà 3 per ruolo: i migliori per valore atteso (con la V2 accanto per
+// confronto) e i migliori affari (valore alto rispetto al prezzo).
+function renderICaV3Section(): string {
+  const results = getICaV3Results()
+  const roles: Array<['P' | 'D' | 'C' | 'A', string]> = [['P', 'Portieri'], ['D', 'Difensori'], ['C', 'Centrocampisti'], ['A', 'Attaccanti']]
+  const fmt = (value: number | undefined) => typeof value === 'number' ? String(Math.round(value)) : '—'
+  const signed = (value: number | undefined) => typeof value === 'number' ? `${value > 0 ? '+' : ''}${Math.round(value)}` : '—'
+  const players = localPlayers().players
+  const column = (role: 'P' | 'D' | 'C' | 'A', label: string) => {
+    const rows = players.filter((player) => player.role === role && player.player_id)
+      .map((player) => ({ player, v3: results.get(player.player_id as string), v2: getCachedICaV2(player.player_id as string)?.score }))
+      .filter((row) => typeof row.v3?.score === 'number')
+    const top = [...rows].sort((a, b) => (b.v3!.score! - a.v3!.score!)).slice(0, 6)
+    const deals = rows.filter((row) => row.v3!.score! >= 40 && typeof row.v3!.affare === 'number')
+      .sort((a, b) => b.v3!.affare! - a.v3!.affare!).slice(0, 4)
+    const line = (row: typeof rows[number], deal: boolean) => `<li data-player-ref="${escapeHtml(row.player.player_id ?? '')}">
+      <span class="ica3-name">${escapeHtml(row.player.name)}<small>${escapeHtml(row.player.team)}</small></span>
+      <span class="ica3-score">${fmt(row.v3!.score)}</span>
+      ${deal ? `<span class="ica3-affare">${signed(row.v3!.affare)}</span>` : `<span class="ica3-v2">V2 ${fmt(row.v2)}</span>`}
+    </li>`
+    return `<article class="ica3-role role-tone-${role.toLowerCase()}">
+      <header><span class="role-badge role-${role.toLowerCase()}">${role}</span><strong>${label}</strong></header>
+      <span class="ica3-label">Migliori per valore atteso</span>
+      <ol>${top.map((row) => line(row, false)).join('') || '<li class="ica3-empty">—</li>'}</ol>
+      <span class="ica3-label">Migliori affari</span>
+      <ol>${deals.map((row) => line(row, true)).join('') || '<li class="ica3-empty">—</li>'}</ol>
+    </article>`
+  }
+  return `
+    <section class="insight-section ica3-section">
+      <div class="insight-section-header">
+        <div>
+          <span class="insight-eyebrow">Valutazione</span>
+          <h2>iCà 3 e affari</h2>
+          <p>iCà 3 = fantapunti attesi rispetto al ruolo (0-100). Affare = posizione per iCà 3 meno posizione per prezzo: positivo se rende più di quanto costa.</p>
+        </div>
+        <span class="insight-database-status">FantaLab · ${results.size} giocatori</span>
+      </div>
+      <div class="ica3-grid">${roles.map(([role, label]) => column(role, label)).join('')}</div>
+    </section>`
+}
+
 function renderSetPiecesSection():
   string {
   return `
@@ -2257,6 +2301,7 @@ export function renderInsightsPage():
         </div>
       </div>
 
+      ${renderICaV3Section()}
       ${renderGoalkeeperSection()}
 
       ${renderSetPiecesSection()}

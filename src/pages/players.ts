@@ -1,3 +1,4 @@
+import { getICaV3 } from '../data/icaV3Data'
 import type { AppState } from '../app/state'
 import { runOverlayExit } from '../app/motion'
 import type { Player, PlayerRole } from '../domain/player'
@@ -76,8 +77,18 @@ function statusLabel(state: AppState, player: FldaPlayer): string {
   return isAssigned(state, player) ? 'ASSEGNATO' : 'DA ASSEGNARE'
 }
 function numeric(value: unknown): number { return typeof value === 'number' ? value : -Infinity }
+// iCà 3 (valore atteso) per ordinare e mostrare; la V2 resta visibile per confronto.
 function fldaICa(player: FldaPlayer): number | undefined {
+  return getICaV3(player.player_id)?.score
+}
+function fldaICaV2(player: FldaPlayer): number | undefined {
   return player.player_id ? getCachedICaV2(player.player_id)?.score : undefined
+}
+function affareChip(value: number | undefined): string {
+  if (typeof value !== 'number') return ''
+  const rounded = Math.round(value)
+  const tone = rounded >= 15 ? 'good' : rounded <= -15 ? 'bad' : 'neutral'
+  return `<small class="players-affare affare-${tone}" title="Affare: iCà 3 rispetto al prezzo nel ruolo">${rounded > 0 ? '+' : ''}${rounded}</small>`
 }
 
 function filteredPlayers(state: AppState, source: FldaPlayer[]): FldaPlayer[] {
@@ -176,8 +187,8 @@ function renderRow(state: AppState, player: FldaPlayer): string {
   const iCa = fldaICa(player)
   return `<button type="button" class="players-table-row" data-player-ref="${escapePlayerHtml(fldaReference(player))}">
     <div class="players-player-cell"><span class="role-badge role-${player.role.toLowerCase()}">${escapePlayerHtml(player.role)}</span><span><span class="players-name-line"><strong>${escapePlayerHtml(player.name)}</strong>${renderPlayerBadges(view)}</span><small>${escapePlayerHtml(player.team)}</small></span></div>
-    <div data-label="iCà"><span class="players-ica" style="--ica-hue:${icaHue(iCa)}">${display(iCa, 2)}</span></div>
-    <div data-label="PMA">${typeof pma === 'number' ? `${display(pma, 1)}%` : '—'}</div>
+    <div data-label="iCà"><span class="players-ica" style="--ica-hue:${icaHue(iCa)}">${display(iCa, 0)}</span><small class="players-ica-v2">V2 ${display(fldaICaV2(player), 0)}</small></div>
+    <div data-label="PMA">${typeof pma === 'number' ? `${display(pma, 1)}%` : '—'}${affareChip(getICaV3(player.player_id)?.affare)}</div>
     <div data-label="xFM">${display(player.fm_exp, 2)}</div>
     <div data-label="Titolarità">${display(player.titolarita_display, 0)}${typeof player.titolarita_display === 'number' ? '%' : ''}</div>
     <div data-label="MV/FMV"><span class="players-dual-value">${display(legacy?.mv, 2)} <small>/</small> ${display(legacy?.fmv, 2)}</span></div>

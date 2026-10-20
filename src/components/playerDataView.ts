@@ -3,6 +3,7 @@ import type { Player } from '../domain/player'
 import type { PmaConfiguration } from '../app/state'
 import { getFldaPma } from '../domain/pma'
 import { getCachedICaV2 } from '../services/playerRepository'
+import { getICaV3 } from '../data/icaV3Data'
 
 export interface PlayerViewModel {
   flda: FldaPlayer
@@ -94,11 +95,12 @@ export function renderCurrentMetrics(view: PlayerViewModel, compact = false,
   const iCaV2 = view.flda.player_id
     ? getCachedICaV2(view.flda.player_id)?.score
     : undefined
+  const iCaV3 = getICaV3(view.flda.player_id)
   const fldaPma = view.pmaConfiguration ? getFldaPma(view.flda, view.pmaConfiguration) : undefined
   const pmaValue = fldaPma ?? (!view.flda.player_id ? view.legacy?.pmaPercent : undefined)
   const pma = typeof pmaValue === 'number' ? `${display(pmaValue, 1)}%` : '—'
   const items: Array<[string, string, string, string?]> = [
-    ['iCà', display(iCaV2, 2), 'Indice MisterCanà V2', 'player-metric-ica'],
+    ['iCà 3', display(iCaV3?.score, 0), `valore atteso · V2 ${display(iCaV2, 0)}${typeof iCaV3?.affare === 'number' ? ` · affare ${iCaV3.affare > 0 ? '+' : ''}${Math.round(iCaV3.affare)}` : ''}`, 'player-metric-ica'],
     ['PMA', pma, pma === '—' ? 'dato non disponibile' : view.pmaConfiguration ? `${view.pmaConfiguration.mode === 'classic' ? 'Classic' : 'Mantra'} · ${view.pmaConfiguration.participants} · ${view.pmaConfiguration.defenseModifier ? 'con modificatore' : 'senza modificatore'}` : 'budget iniziale'],
     ['xFM', display(view.flda.fm_exp, 2), 'FM Exp. FLDA'],
     ['Integrità', display(view.flda.integrita, 0), ''],
@@ -343,5 +345,32 @@ export function renderTeamContext(view: PlayerViewModel): string {
         ${form('FMV', field(latest, 'fmv'), field(latest, 'fmv_5'))}
       </div>
     </div>
+  </div>`
+}
+
+// "Perché questo iCà": come nasce l'iCà 3 del giocatore, passo per passo.
+export function renderICaV3Explanation(view: PlayerViewModel): string {
+  const result = getICaV3(view.flda.player_id)
+  if (!result) return '<p class="player-data-empty">iCà 3 non disponibile per questo giocatore.</p>'
+  if (result.score === undefined) {
+    return `<p class="player-data-empty">iCà 3 non calcolabile: manca ${result.missing.join(' e ') || 'un dato'}.</p>`
+  }
+  const sign = (value: number) => `${value > 0 ? '+' : value < 0 ? '−' : ''}${display(Math.abs(value), 2)}`
+  const affare = result.affare
+  const affareText = typeof affare !== 'number' ? 'prezzo non disponibile'
+    : affare >= 15 ? 'rende più di quanto costa' : affare <= -15 ? 'costa più di quanto rende' : 'prezzo in linea con il valore'
+  return `<div class="ica-explain">
+    <div class="ica-explain-score">
+      <span class="ica-explain-kicker">iCà 3</span>
+      <strong>${display(result.score, 0)}</strong>
+      <small>su 100, nel ruolo</small>
+      ${typeof affare === 'number' ? `<span class="ica-explain-affare tone-${affare >= 15 ? 'good' : affare <= -15 ? 'bad' : 'neutral'}">Affare ${affare > 0 ? '+' : ''}${Math.round(affare)}</span><small>${affareText}</small>` : ''}
+    </div>
+    <ol class="ica-explain-steps">
+      <li><b>Fantamedia attesa ${display(result.expectedFm, 2)}</b><small>stagione in corso e scorsa, frenate dalla media del ruolo</small></li>
+      ${result.contributions.map((item) => `<li class="${item.value > 0 ? 'up' : 'down'}"><b>${sign(item.value)}</b> ${item.label}</li>`).join('')}
+      <li><b>Fantamedia corretta ${display(result.adjustedFm, 2)}</b><small>rimpiazzo del ruolo: ${display(result.replacementFm, 2)}</small></li>
+      <li><b>Presenze attese ${display((result.expectedShare ?? 0) * 100, 0)}%</b><small>titolarità Guida, ridotta dagli infortuni</small></li>
+    </ol>
   </div>`
 }
