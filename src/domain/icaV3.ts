@@ -13,7 +13,7 @@
  *    (peso pari a 8 partite: frena i giudizi su pochi dati).
  * 2. Correttivi in punti di FM: piazzati, indice squadra, allenatore.
  * 3. Presenze attese = titolarità Guida, ridotta dagli infortuni.
- * 4. iCà = fantapunti attesi a partita = FM corretta × presenze attese.
+ * 4. iCà = fantapunti attesi a partita × 100 = FM corretta × presenze attese × 100.
  *    È un valore assoluto: il migliore non vale 100, vale quello che rende.
  * 5. Posizione nel ruolo (0-100) = percentile dell'iCà fra i pari ruolo:
  *    serve agli algoritmi (qualità 0-1) e all'indice Affare.
@@ -25,6 +25,8 @@
 export type ICaV3Role = 'P' | 'D' | 'C' | 'A'
 
 export const ICA_V3_PARAMETERS = {
+  // l'iCà è espresso in centesimi di fantapunto a partita
+  displayScale: 100,
   priorMatches: 8,
   previousSeasonWeight: 0.5,
   previousSeasonMaxMatches: 20,
@@ -179,7 +181,8 @@ export function calculateICaV3(inputs: ICaV3Input[]): Map<string, ICaV3Result> {
       const adjustedFm = finite(fm) ? fm + adjustments.reduce((sum, item) => sum + item.value, 0) : undefined
       const share = expectedShare(input)
       if (!finite(share)) missing.push('titolarità')
-      const score = finite(adjustedFm) && finite(share) ? adjustedFm * share : undefined
+      // ×100 per leggerlo come numero intero (7,39 fantapunti → 739)
+      const score = finite(adjustedFm) && finite(share) ? adjustedFm * share * ICA_V3_PARAMETERS.displayScale : undefined
       return { input, fm, adjustedFm, share, score, adjustments, missing }
     })
 

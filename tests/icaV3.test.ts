@@ -45,9 +45,9 @@ test('scores rank players inside their role and Affare compares value with price
   assert.ok(score('star') > score('mid') && score('mid') > score('bench'))
   assert.ok(results.get('bargain')!.affare! > 0, 'rende tanto e costa poco')
   assert.ok(results.get('overpriced')!.affare! < 0, 'costa tanto e rende poco')
-  // iCà assoluto: fantapunti attesi a partita, nessun tetto a 100
-  assert.equal(results.get('star')!.score!.toFixed(2), (results.get('star')!.adjustedFm! * 0.95).toFixed(2))
-  assert.ok(score('star') < 10)
+  // iCà assoluto: fantapunti attesi a partita ×100, nessun tetto
+  assert.equal(results.get('star')!.score!.toFixed(2), (results.get('star')!.adjustedFm! * 0.95 * 100).toFixed(2))
+  assert.ok(score('star') > 100 && score('star') < 1000)
   assert.equal(results.get('star')!.rolePercentile, 100)
   for (const result of results.values()) assert.ok(result.rolePercentile! >= 0 && result.rolePercentile! <= 100)
 })

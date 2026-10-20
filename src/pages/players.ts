@@ -184,7 +184,7 @@ function renderRow(state: AppState, player: FldaPlayer): string {
   const iCa = fldaICa(player)
   return `<button type="button" class="players-table-row" data-player-ref="${escapePlayerHtml(fldaReference(player))}">
     <div class="players-player-cell"><span class="role-badge role-${player.role.toLowerCase()}">${escapePlayerHtml(player.role)}</span><span><span class="players-name-line"><strong>${escapePlayerHtml(player.name)}</strong>${renderPlayerBadges(view)}</span><small>${escapePlayerHtml(player.team)}</small></span></div>
-    <div data-label="iCà"><span class="players-ica" style="--ica-hue:${icaHue(getICaV3(player.player_id)?.rolePercentile)}">${display(iCa, 2)}</span></div>
+    <div data-label="iCà"><span class="players-ica" style="--ica-hue:${icaHue(getICaV3(player.player_id)?.rolePercentile)}">${display(iCa, 0)}</span></div>
     <div data-label="PMA">${typeof pma === 'number' ? `${display(pma, 1)}%` : '—'}${affareChip(getICaV3(player.player_id)?.affare)}</div>
     <div data-label="xFM">${display(player.fm_exp, 2)}</div>
     <div data-label="Titolarità">${display(player.titolarita_display, 0)}${typeof player.titolarita_display === 'number' ? '%' : ''}</div>

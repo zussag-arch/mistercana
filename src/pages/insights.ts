@@ -1379,7 +1379,7 @@ function renderSetPieceList(team: string, label: string, players: string[]): str
 function renderICaV3Section(): string {
   const results = getICaV3Results()
   const roles: Array<['P' | 'D' | 'C' | 'A', string]> = [['P', 'Portieri'], ['D', 'Difensori'], ['C', 'Centrocampisti'], ['A', 'Attaccanti']]
-  const fmt = (value: number | undefined) => typeof value === 'number' ? value.toFixed(2).replace('.', ',') : '—'
+  const fmt = (value: number | undefined) => typeof value === 'number' ? String(Math.round(value)) : '—'
   const signed = (value: number | undefined) => typeof value === 'number' ? `${value > 0 ? '+' : ''}${Math.round(value)}` : '—'
   const players = localPlayers().players
   const column = (role: 'P' | 'D' | 'C' | 'A', label: string) => {
@@ -1408,7 +1408,7 @@ function renderICaV3Section(): string {
         <div>
           <span class="insight-eyebrow">Valutazione</span>
           <h2>iCà e affari</h2>
-          <p>iCà = fantapunti attesi a partita (fantamedia corretta × probabilità di giocare). Affare = posizione nel ruolo per iCà meno posizione per prezzo: positivo se rende più di quanto costa.</p>
+          <p>iCà = fantapunti attesi a partita × 100 (fantamedia corretta × probabilità di giocare × 100). Affare = posizione nel ruolo per iCà meno posizione per prezzo: positivo se rende più di quanto costa.</p>
         </div>
         <span class="insight-database-status">FantaLab · ${results.size} giocatori</span>
       </div>
