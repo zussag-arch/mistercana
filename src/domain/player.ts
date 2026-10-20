@@ -20,6 +20,10 @@ export interface Player {
   */
   id: string
 
+  /* ID esterni dal listone FantaLab: chiave sicura per l'abbinamento con FLDA. */
+  fantalabId?: string
+  fantacalcioId?: string
+
   name: string
   team: string
   role: PlayerRole

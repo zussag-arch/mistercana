@@ -1,4 +1,5 @@
 import playersCsv from '../../database/MisterCana_DB_Giocatori_2026_27.csv?raw'
+import fantalabPlayersCsv from '../../database/fantalab_giocatori.csv?raw'
 
 import {
   buildHistoricalBenchmarks,
@@ -482,9 +483,114 @@ function parsePlayersCsv(
    BASE PLAYERS
 ========================= */
 
+/*
+  Il listone è quello FantaLab aggiornato (database/fantalab_giocatori.csv).
+  Il vecchio CSV serve solo a conservare i codici storici ("0280"…): un
+  giocatore già presente mantiene il suo codice, così obiettivi, assegnazioni
+  e Saggi salvati restano collegati; i giocatori nuovi usano l'ID FantaLab.
+  Chi non è più nel listone FantaLab viene escluso.
+*/
+function normalizeText(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLocaleLowerCase('it')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+}
+
+function fantalabNumber(value: string | undefined): number | undefined {
+  if (!value) return undefined
+  const parsed = Number(value.replace(',', '.'))
+  return Number.isFinite(parsed) ? parsed : undefined
+}
+
+function buildPlayersFromFantaLab(legacy: Player[]): Player[] {
+  const rows = parseCsv(fantalabPlayersCsv.replace(/^﻿/, ''))
+  if (rows.length < 2) return legacy
+  const header = rows[0].map((cell) => cell.trim())
+  const records = rows.slice(1).map((cells) =>
+    Object.fromEntries(header.map((name, index) => [name, (cells[index] ?? '').trim()])) as Record<string, string>)
+    .filter((row) => row['ID FantaLab'] && row['Nel listone'] !== 'No')
+
+  const byFull = new Map<string, Player[]>()
+  const byNameRole = new Map<string, Player[]>()
+  for (const player of legacy) {
+    const full = [normalizeText(player.name), normalizeText(player.team), player.role].join('|')
+    const nameRole = [normalizeText(player.name), player.role].join('|')
+    byFull.set(full, [...(byFull.get(full) ?? []), player])
+    byNameRole.set(nameRole, [...(byNameRole.get(nameRole) ?? []), player])
+  }
+  const used = new Set<string>()
+  const pick = (candidates: Player[] | undefined) => {
+    const free = (candidates ?? []).filter((player) => !used.has(player.id))
+    return free.length === 1 ? free[0] : undefined
+  }
+
+  // Prima i match pieni (nome+squadra+ruolo), poi chi ha cambiato squadra.
+  const matches = new Map<string, Player>()
+  for (const row of records) {
+    const old = pick(byFull.get([normalizeText(row['Nome']), normalizeText(row['Squadra']), row['Ruolo']].join('|')))
+    if (old) { used.add(old.id); matches.set(row['ID FantaLab'], old) }
+  }
+  for (const row of records) {
+    if (matches.has(row['ID FantaLab'])) continue
+    const old = pick(byNameRole.get([normalizeText(row['Nome']), row['Ruolo']].join('|')))
+    if (old) { used.add(old.id); matches.set(row['ID FantaLab'], old) }
+  }
+
+  return records.flatMap((row): Player[] => {
+    const role = parseRole(row['Ruolo'])
+    if (!role) return []
+    const old = matches.get(row['ID FantaLab'])
+    const base: Player = old
+      // statistiche storiche del vecchio listone (stagione precedente)
+      ? { ...old }
+      // giocatore nuovo: statistiche della stagione in corso da FantaLab
+      : {
+          id: row['ID FantaLab'],
+          name: row['Nome'],
+          team: row['Squadra'],
+          role,
+          mv: fantalabNumber(row['Media Voto']),
+          fmv: fantalabNumber(row['Fantamedia']),
+          appearances: fantalabNumber(row['Presenze']),
+          minutes: fantalabNumber(row['Minuti Giocati']),
+          goals: fantalabNumber(row['Gol Totali']),
+          assists: fantalabNumber(row['Assist Totali']),
+          yellowCards: fantalabNumber(row['Ammonizioni']),
+          redCards: fantalabNumber(row['Espulsioni']),
+          penaltiesScored: fantalabNumber(row['Rigori Segnati']),
+          penaltiesMissed: fantalabNumber(row['Rigori Sbagliati']),
+          goalsConceded: fantalabNumber(row['Gol Subiti']),
+          penaltiesSaved: fantalabNumber(row['Rigori Parati']),
+          iCa: undefined,
+          pma: undefined,
+          consensus: undefined,
+          xMv: undefined,
+          xFmv: undefined,
+          penaltyTaker: false,
+          status: 'free',
+        }
+    return [{
+      ...base,
+      // dati correnti sempre dal listone aggiornato
+      name: row['Nome'],
+      team: row['Squadra'],
+      role,
+      fantalabId: row['ID FantaLab'],
+      fantacalcioId: row['ID Fantacalcio'] || undefined,
+      startingProbability: fantalabNumber(row['Titolarità % (Guida)']) ?? base.startingProbability,
+      pmaPercent: fantalabNumber(row['PMA % budget (Guida)']) ?? base.pmaPercent,
+    }]
+  })
+}
+
 const basePlayers =
-  parsePlayersCsv(
-    playersCsv,
+  buildPlayersFromFantaLab(
+    parsePlayersCsv(
+      playersCsv,
+    ),
   )
 
 /* =========================

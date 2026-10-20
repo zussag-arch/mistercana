@@ -244,7 +244,9 @@ export function getCachedICaV2(playerId: string): ICaV2Result | undefined {
 
 function legacyAsFlda(player: Player): FldaPlayer {
   return {
-    player_id: null,
+    player_id: player.fantalabId ?? null,
+    fantalab_id: player.fantalabId ?? null,
+    fantacalcio_id: player.fantacalcioId ?? null,
     name: player.name,
     team: player.team,
     role: player.role,
