@@ -2544,3 +2544,16 @@ input:focus {
 .ica3-empty {
   color: var(--muted-soft);
 }
+
+.ica-explain-steps li.total {
+  border-left-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface-light));
+}
+
+.ica-explain-steps li.total b {
+  color: var(--accent);
+}
+
+.ica-explain-score > strong {
+  font-size: 56px;
+}

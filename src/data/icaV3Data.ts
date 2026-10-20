@@ -44,6 +44,8 @@ function buildInputs(): ICaV3Input[] {
     const rankOf = (type: string) => ranks.find((row) => row.player_id === id && row.hierarchy_type === type)?.source_rank as number | undefined
     const index = role === 'P' || role === 'D' ? guide.team_defense_index : guide.team_attack_index
     const coach = coachScore(player, (guide.key_roles ?? []) as ICaCoachRole[])
+    const named = (key: string) => Array.isArray(guide[key])
+      && (guide[key] as unknown[]).some((name) => String(name).trim().toLocaleLowerCase('it') === player.name.trim().toLocaleLowerCase('it'))
     return [{
       id,
       name: player.name,
@@ -60,6 +62,7 @@ function buildInputs(): ICaV3Input[] {
       cornerRank: rankOf('CORNER'),
       teamIndex: finite(index) ? index : undefined,
       coachTone: coach > 50 ? 'good' : coach < 50 ? 'bad' : 'neutral',
+      coachPlayerTone: named('valorizzati') ? 'good' : named('penalizzati') ? 'bad' : undefined,
       pmaPercent: finite(player.classic_8_mod_median_value) ? player.classic_8_mod_median_value : undefined,
     }]
   })

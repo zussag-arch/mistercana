@@ -1379,7 +1379,7 @@ function renderSetPieceList(team: string, label: string, players: string[]): str
 function renderICaV3Section(): string {
   const results = getICaV3Results()
   const roles: Array<['P' | 'D' | 'C' | 'A', string]> = [['P', 'Portieri'], ['D', 'Difensori'], ['C', 'Centrocampisti'], ['A', 'Attaccanti']]
-  const fmt = (value: number | undefined) => typeof value === 'number' ? String(Math.round(value)) : '—'
+  const fmt = (value: number | undefined) => typeof value === 'number' ? value.toFixed(2).replace('.', ',') : '—'
   const signed = (value: number | undefined) => typeof value === 'number' ? `${value > 0 ? '+' : ''}${Math.round(value)}` : '—'
   const players = localPlayers().players
   const column = (role: 'P' | 'D' | 'C' | 'A', label: string) => {
@@ -1387,7 +1387,7 @@ function renderICaV3Section(): string {
       .map((player) => ({ player, v3: results.get(player.player_id as string) }))
       .filter((row) => typeof row.v3?.score === 'number')
     const top = [...rows].sort((a, b) => (b.v3!.score! - a.v3!.score!)).slice(0, 6)
-    const deals = rows.filter((row) => row.v3!.score! >= 40 && typeof row.v3!.affare === 'number')
+    const deals = rows.filter((row) => (row.v3!.rolePercentile ?? 0) >= 40 && typeof row.v3!.affare === 'number')
       .sort((a, b) => b.v3!.affare! - a.v3!.affare!).slice(0, 4)
     const line = (row: typeof rows[number], deal: boolean) => `<li data-player-ref="${escapeHtml(row.player.player_id ?? '')}">
       <span class="ica3-name">${escapeHtml(row.player.name)}<small>${escapeHtml(row.player.team)}</small></span>
@@ -1408,7 +1408,7 @@ function renderICaV3Section(): string {
         <div>
           <span class="insight-eyebrow">Valutazione</span>
           <h2>iCà e affari</h2>
-          <p>iCà = fantapunti attesi rispetto al ruolo (0-100). Affare = posizione per iCà meno posizione per prezzo: positivo se rende più di quanto costa.</p>
+          <p>iCà = fantapunti attesi a partita (fantamedia corretta × probabilità di giocare). Affare = posizione nel ruolo per iCà meno posizione per prezzo: positivo se rende più di quanto costa.</p>
         </div>
         <span class="insight-database-status">FantaLab · ${results.size} giocatori</span>
       </div>

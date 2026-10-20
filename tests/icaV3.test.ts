@@ -20,6 +20,8 @@ test('set pieces, team index and coach become explicit FM adjustments', () => {
   const items = fmAdjustments(attacker('x', { penaltyRank: 1, teamIndex: 4, coachTone: 'good' }))
   assert.deepEqual(items.map((item) => item.label), ['Rigorista n.1', 'Squadra in attacco 4/5', 'Ruolo valorizzato dall\'allenatore'])
   assert.equal(items.reduce((sum, item) => sum + item.value, 0).toFixed(2), '0.43')
+  const named = fmAdjustments(attacker('x', { coachPlayerTone: 'bad' }))
+  assert.deepEqual(named.map((item) => [item.label, item.value]), [['Penalizzato dall\'allenatore', -0.15]])
   // il portiere sente di più la difesa della squadra
   const keeper = fmAdjustments({ ...attacker('p'), role: 'P', teamIndex: 2 })
   assert.equal(keeper[0].value, -0.15)
@@ -43,7 +45,11 @@ test('scores rank players inside their role and Affare compares value with price
   assert.ok(score('star') > score('mid') && score('mid') > score('bench'))
   assert.ok(results.get('bargain')!.affare! > 0, 'rende tanto e costa poco')
   assert.ok(results.get('overpriced')!.affare! < 0, 'costa tanto e rende poco')
-  for (const result of results.values()) assert.ok(result.score! >= 0 && result.score! <= 100)
+  // iCà assoluto: fantapunti attesi a partita, nessun tetto a 100
+  assert.equal(results.get('star')!.score!.toFixed(2), (results.get('star')!.adjustedFm! * 0.95).toFixed(2))
+  assert.ok(score('star') < 10)
+  assert.equal(results.get('star')!.rolePercentile, 100)
+  for (const result of results.values()) assert.ok(result.rolePercentile! >= 0 && result.rolePercentile! <= 100)
 })
 
 test('missing titolarità is reported instead of inventing a score', () => {

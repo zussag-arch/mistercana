@@ -8,7 +8,7 @@ test('FLDA-only adapter maps direct inputs, iCà 3 and does not mutate assignmen
   assert.match(adapter, /startingProbability:[\s\S]*flda\.titolarita_display/)
   assert.match(adapter, /pmaPercent: getFldaPma\(flda, state\.pmaConfiguration\)/)
   assert.match(adapter, /xFmv:[\s\S]*flda\.fm_exp/)
-  assert.match(adapter, /iCa: getICaV3\(flda\.player_id\)\?\.score/)
+  assert.match(adapter, /iCa: getICaV3\(flda\.player_id\)\?\.rolePercentile/)
   assert.match(adapter, /adapted \? \{ \.\.\.assignment, playerId: adapted\.id \} : \{ \.\.\.assignment \}/)
 })
 

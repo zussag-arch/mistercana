@@ -36,7 +36,9 @@ export function adaptFldaPlayer(
       : undefined,
     pmaPercent: getFldaPma(flda, state.pmaConfiguration),
     xFmv: typeof flda.fm_exp === 'number' ? flda.fm_exp : undefined,
-    iCa: getICaV3(flda.player_id)?.score,
+    // agli algoritmi serve una qualità 0-100: la posizione nel ruolo
+    iCa: getICaV3(flda.player_id)?.rolePercentile,
+    fantalabId: flda.player_id,
     penaltyTaker: legacy?.penaltyTaker ?? flda.penalty_rank === 1,
     status: 'free',
   }

@@ -13,9 +13,11 @@
  *    (peso pari a 8 partite: frena i giudizi su pochi dati).
  * 2. Correttivi in punti di FM: piazzati, indice squadra, allenatore.
  * 3. Presenze attese = titolarità Guida, ridotta dagli infortuni.
- * 4. Valore = presenze attese × (FM corretta − FM di rimpiazzo del ruolo).
- * 5. iCà 3 = valore in scala 0-100 dentro il ruolo (dal 5° percentile al migliore).
- * 6. Affare = percentile iCà 3 − percentile PMA, dentro il ruolo.
+ * 4. iCà = fantapunti attesi a partita = FM corretta × presenze attese.
+ *    È un valore assoluto: il migliore non vale 100, vale quello che rende.
+ * 5. Posizione nel ruolo (0-100) = percentile dell'iCà fra i pari ruolo:
+ *    serve agli algoritmi (qualità 0-1) e all'indice Affare.
+ * 6. Affare = posizione nel ruolo per iCà − posizione nel ruolo per PMA.
  *
  * Tutti i numeri sono parametri configurabili, non invarianti.
  */
@@ -26,10 +28,6 @@ export const ICA_V3_PARAMETERS = {
   priorMatches: 8,
   previousSeasonWeight: 0.5,
   previousSeasonMaxMatches: 20,
-  // percentile della FM di ruolo usato come "rimpiazzo"
-  replacementPercentile: 0.25,
-  scaleLow: 0.05,
-  scaleHigh: 1,
   setPieces: {
     penalty: { 1: 0.25, 2: 0.1 } as Record<number, number>,
     freeKick: { 1: 0.08 } as Record<number, number>,
@@ -37,7 +35,10 @@ export const ICA_V3_PARAMETERS = {
   },
   // punti FM per ogni punto di indice squadra sopra/sotto 3 (scala 1-5)
   teamIndex: { neutral: 3, perPoint: 0.08, perPointGoalkeeper: 0.15 },
+  // giudizio dell'allenatore sul ruolo del giocatore (ruoli chiave)
   coach: { good: 0.1, bad: -0.1 },
+  // giocatore citato per nome dalla Guida tra valorizzati / penalizzati
+  coachPlayer: { good: 0.15, bad: -0.15 },
   injury: { maxReduction: 0.3 },
 }
 
@@ -61,6 +62,8 @@ export interface ICaV3Input {
   /** indice squadra 1-5: attacco per C/A, difesa per P/D */
   teamIndex?: number
   coachTone?: 'good' | 'bad' | 'neutral'
+  /** valorizzato / penalizzato per nome dall'allenatore */
+  coachPlayerTone?: 'good' | 'bad'
   /** PMA in % del budget, solo per l'indice Affare */
   pmaPercent?: number
 }
@@ -74,28 +77,21 @@ export interface ICaV3Contribution {
 
 export interface ICaV3Result {
   id: string
+  /** fantapunti attesi a partita */
   score?: number
+  /** percentile dell'iCà nel ruolo, 0-100 */
+  rolePercentile?: number
   /** percentile iCà 3 − percentile PMA (−100…+100) */
   affare?: number
   expectedFm?: number
   adjustedFm?: number
   expectedShare?: number
-  value?: number
-  replacementFm?: number
   contributions: ICaV3Contribution[]
   missing: string[]
 }
 
 function finite(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value)
-}
-
-function quantile(sorted: number[], q: number): number | undefined {
-  if (!sorted.length) return undefined
-  const position = (sorted.length - 1) * q
-  const low = Math.floor(position)
-  const high = Math.ceil(position)
-  return sorted[low] + (sorted[high] - sorted[low]) * (position - low)
 }
 
 function percentileRank(sorted: number[], value: number): number {
@@ -151,6 +147,8 @@ export function fmAdjustments(input: ICaV3Input): ICaV3Contribution[] {
   }
   if (input.coachTone === 'good') items.push({ label: 'Ruolo valorizzato dall\'allenatore', value: p.coach.good, unit: 'fm' })
   if (input.coachTone === 'bad') items.push({ label: 'Ruolo penalizzato dall\'allenatore', value: p.coach.bad, unit: 'fm' })
+  if (input.coachPlayerTone === 'good') items.push({ label: 'Valorizzato dall\'allenatore', value: p.coachPlayer.good, unit: 'fm' })
+  if (input.coachPlayerTone === 'bad') items.push({ label: 'Penalizzato dall\'allenatore', value: p.coachPlayer.bad, unit: 'fm' })
   return items
 }
 
@@ -167,17 +165,12 @@ export function expectedShare(input: ICaV3Input): number | undefined {
 
 /** Calcola iCà 3 e Affare per un insieme di giocatori (confronti dentro il ruolo). */
 export function calculateICaV3(inputs: ICaV3Input[]): Map<string, ICaV3Result> {
-  const p = ICA_V3_PARAMETERS
   const results = new Map<string, ICaV3Result>()
   const roles: ICaV3Role[] = ['P', 'D', 'C', 'A']
 
   for (const role of roles) {
     const group = inputs.filter((input) => input.role === role)
     const prior = roleMeanFm(group)
-    const fmValues = group.filter((input) => finite(input.fm) && (input.appearances ?? 0) >= 3)
-      .map((input) => input.fm as number).sort((a, b) => a - b)
-    const replacement = quantile(fmValues, p.replacementPercentile)
-
     const partial = group.map((input) => {
       const missing: string[] = []
       const fm = expectedFm(input, prior)
@@ -186,38 +179,26 @@ export function calculateICaV3(inputs: ICaV3Input[]): Map<string, ICaV3Result> {
       const adjustedFm = finite(fm) ? fm + adjustments.reduce((sum, item) => sum + item.value, 0) : undefined
       const share = expectedShare(input)
       if (!finite(share)) missing.push('titolarità')
-      const value = finite(adjustedFm) && finite(share) && finite(replacement)
-        ? share * (adjustedFm - replacement)
-        : undefined
-      return { input, fm, adjustedFm, share, value, adjustments, missing }
+      const score = finite(adjustedFm) && finite(share) ? adjustedFm * share : undefined
+      return { input, fm, adjustedFm, share, score, adjustments, missing }
     })
 
-    const values = partial.flatMap((item) => finite(item.value) ? [item.value] : []).sort((a, b) => a - b)
-    const low = quantile(values, p.scaleLow)
-    const high = quantile(values, p.scaleHigh)
-    const scored = partial.map((item) => {
-      const score = finite(item.value) && finite(low) && finite(high) && high > low
-        ? Math.max(0, Math.min(100, ((item.value - low) / (high - low)) * 100))
-        : undefined
-      return { ...item, score }
-    })
+    const scores = partial.flatMap((item) => finite(item.score) ? [item.score] : []).sort((a, b) => a - b)
+    const pmas = partial.flatMap((item) => finite(item.input.pmaPercent) ? [item.input.pmaPercent] : []).sort((a, b) => a - b)
 
-    const scores = scored.flatMap((item) => finite(item.score) ? [item.score] : []).sort((a, b) => a - b)
-    const pmas = scored.flatMap((item) => finite(item.input.pmaPercent) ? [item.input.pmaPercent] : []).sort((a, b) => a - b)
-
-    for (const item of scored) {
-      const affare = finite(item.score) && finite(item.input.pmaPercent) && scores.length > 1 && pmas.length > 1
-        ? percentileRank(scores, item.score) - percentileRank(pmas, item.input.pmaPercent)
+    for (const item of partial) {
+      const rolePercentile = finite(item.score) && scores.length > 1 ? percentileRank(scores, item.score) : undefined
+      const affare = finite(rolePercentile) && finite(item.input.pmaPercent) && pmas.length > 1
+        ? rolePercentile - percentileRank(pmas, item.input.pmaPercent)
         : undefined
       results.set(item.input.id, {
         id: item.input.id,
         score: item.score,
+        rolePercentile,
         affare,
         expectedFm: item.fm,
         adjustedFm: item.adjustedFm,
         expectedShare: item.share,
-        value: item.value,
-        replacementFm: replacement,
         contributions: item.adjustments,
         missing: item.missing,
       })

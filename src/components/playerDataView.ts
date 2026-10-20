@@ -96,7 +96,7 @@ export function renderCurrentMetrics(view: PlayerViewModel, compact = false,
   const pmaValue = fldaPma ?? (!view.flda.player_id ? view.legacy?.pmaPercent : undefined)
   const pma = typeof pmaValue === 'number' ? `${display(pmaValue, 1)}%` : '—'
   const items: Array<[string, string, string, string?]> = [
-    ['iCà', display(iCaV3?.score, 0), `valore atteso${typeof iCaV3?.affare === 'number' ? ` · affare ${iCaV3.affare > 0 ? '+' : ''}${Math.round(iCaV3.affare)}` : ''}`, 'player-metric-ica'],
+    ['iCà', display(iCaV3?.score, 2), `fantapunti a partita${typeof iCaV3?.rolePercentile === 'number' ? ` · meglio del ${Math.round(iCaV3.rolePercentile)}% del ruolo` : ''}${typeof iCaV3?.affare === 'number' ? ` · affare ${iCaV3.affare > 0 ? '+' : ''}${Math.round(iCaV3.affare)}` : ''}`, 'player-metric-ica'],
     ['PMA', pma, pma === '—' ? 'dato non disponibile' : view.pmaConfiguration ? `${view.pmaConfiguration.mode === 'classic' ? 'Classic' : 'Mantra'} · ${view.pmaConfiguration.participants} · ${view.pmaConfiguration.defenseModifier ? 'con modificatore' : 'senza modificatore'}` : 'budget iniziale'],
     ['xFM', display(view.flda.fm_exp, 2), 'FM Exp. FLDA'],
     ['Integrità', display(view.flda.integrita, 0), ''],
@@ -115,7 +115,7 @@ export function renderCurrentMetrics(view: PlayerViewModel, compact = false,
     ['FMV', display(typeof latestFmv === 'number' ? latestFmv : view.legacy?.fmv, 2), typeof latestFmv === 'number' ? seasonNote : 'dato legacy'],
     ['Titolarità', `${display(view.flda.titolarita_display, 0)}${typeof view.flda.titolarita_display === 'number' ? '%' : ''}`, 'indicatore editoriale'],
   )
-  return `<div class="player-current-metrics${compact ? ' player-current-metrics-full' : ''}">${items.map(([label, value, note, className]) => `<div class="${className ?? ''}"${className === 'player-metric-ica' ? ` style="--ica-hue:${icaHue(iCaV3?.score)}"` : ''}><span>${label}</span><strong>${value}</strong>${note ? `<small>${note}</small>` : ''}</div>`).join('')}</div>`
+  return `<div class="player-current-metrics${compact ? ' player-current-metrics-full' : ''}">${items.map(([label, value, note, className]) => `<div class="${className ?? ''}"${className === 'player-metric-ica' ? ` style="--ica-hue:${icaHue(iCaV3?.rolePercentile)}"` : ''}><span>${label}</span><strong>${value}</strong>${note ? `<small>${note}</small>` : ''}</div>`).join('')}</div>`
 }
 
 function chartEmpty(message: string): string {
@@ -358,15 +358,16 @@ export function renderICaV3Explanation(view: PlayerViewModel): string {
   return `<div class="ica-explain">
     <div class="ica-explain-score">
       <span class="ica-explain-kicker">iCà</span>
-      <strong>${display(result.score, 0)}</strong>
-      <small>su 100, nel ruolo</small>
+      <strong>${display(result.score, 2)}</strong>
+      <small>fantapunti attesi a partita${typeof result.rolePercentile === 'number' ? ` · meglio del ${Math.round(result.rolePercentile)}% del ruolo` : ''}</small>
       ${typeof affare === 'number' ? `<span class="ica-explain-affare tone-${affare >= 15 ? 'good' : affare <= -15 ? 'bad' : 'neutral'}">Affare ${affare > 0 ? '+' : ''}${Math.round(affare)}</span><small>${affareText}</small>` : ''}
     </div>
     <ol class="ica-explain-steps">
       <li><b>Fantamedia attesa ${display(result.expectedFm, 2)}</b><small>stagione in corso e scorsa, frenate dalla media del ruolo</small></li>
       ${result.contributions.map((item) => `<li class="${item.value > 0 ? 'up' : 'down'}"><b>${sign(item.value)}</b> ${item.label}</li>`).join('')}
-      <li><b>Fantamedia corretta ${display(result.adjustedFm, 2)}</b><small>rimpiazzo del ruolo: ${display(result.replacementFm, 2)}</small></li>
-      <li><b>Presenze attese ${display((result.expectedShare ?? 0) * 100, 0)}%</b><small>titolarità Guida, ridotta dagli infortuni</small></li>
+      <li><b>Fantamedia corretta ${display(result.adjustedFm, 2)}</b><small>fantamedia attesa più i correttivi</small></li>
+      <li><b>× presenze attese ${display((result.expectedShare ?? 0) * 100, 0)}%</b><small>titolarità Guida, ridotta dagli infortuni</small></li>
+      <li class="total"><b>= iCà ${display(result.score, 2)}</b><small>fantapunti attesi a partita</small></li>
     </ol>
   </div>`
 }
