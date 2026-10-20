@@ -6,13 +6,14 @@
  * Domanda: quanti fantapunti mi aspetto da questo giocatore nel resto
  * della stagione, rispetto agli altri del suo ruolo?
  * Il prezzo NON entra: è misurato a parte dall'indice "Affare".
- * Il calendario entra per tutte le giornate che restano (non solo le prossime 5).
+ * La facilità delle partite entra dalle griglie abbinamenti (portieri per P/D,
+ * attaccanti per C/A): media della riga della squadra, scalata fra −1 e +1.
  *
  * 1. FM attesa = media pesata di stagione corrente (peso 1 per presenza),
  *    stagione scorsa (peso 0,5 per presenza, max 20) e media del ruolo
  *    (peso pari a 8 partite: frena i giudizi su pochi dati).
  * 2. Correttivi in punti di FM: piazzati, indice squadra, allenatore,
- *    calendario delle giornate rimanenti (partite facili / difficili).
+ *    facilità partite dalle griglie abbinamenti.
  * 3. Presenze attese = titolarità Guida, ridotta dagli infortuni.
  * 4. iCà = fantapunti attesi a partita × 100 = FM corretta × presenze attese × 100.
  *    È un valore assoluto: il migliore non vale 100, vale quello che rende.
@@ -43,8 +44,8 @@ export const ICA_V3_PARAMETERS = {
   // giocatore citato per nome dalla Guida tra valorizzati / penalizzati
   coachPlayer: { good: 0.15, bad: -0.15 },
   injury: { maxReduction: 0.3 },
-  // calendario rimanente: punti FM per un calendario tutto facile (o tutto
-  // difficile) rispetto a uno medio. Valori giornata: 2 facile, 1 medio, 0 difficile.
+  // facilità partite: punti FM per la squadra più favorita (+1) o più
+  // sfavorita (−1) nella griglia del ruolo, rispetto alla media (0).
   calendar: { P: 0.6, D: 0.4, C: 0.25, A: 0.3 } as Record<ICaV3Role, number>,
 }
 
@@ -70,10 +71,11 @@ export interface ICaV3Input {
   coachTone?: 'good' | 'bad' | 'neutral'
   /** valorizzato / penalizzato per nome dall'allenatore */
   coachPlayerTone?: 'good' | 'bad'
-  /** partite rimanenti per difficoltà (calendario 0/1/2) */
-  calendarEasy?: number
-  calendarMedium?: number
-  calendarHard?: number
+  /** facilità partite da griglia abbinamenti, −1 … +1 (0 = media) */
+  easeIndex?: number
+  /** valore medio della squadra nella griglia, per la spiegazione */
+  easeGridValue?: number
+  easeGridName?: string
   /** PMA in % del budget, solo per l'indice Affare */
   pmaPercent?: number
 }
@@ -159,15 +161,12 @@ export function fmAdjustments(input: ICaV3Input): ICaV3Contribution[] {
   if (input.coachTone === 'bad') items.push({ label: 'Ruolo penalizzato dall\'allenatore', value: p.coach.bad, unit: 'fm' })
   if (input.coachPlayerTone === 'good') items.push({ label: 'Valorizzato dall\'allenatore', value: p.coachPlayer.good, unit: 'fm' })
   if (input.coachPlayerTone === 'bad') items.push({ label: 'Penalizzato dall\'allenatore', value: p.coachPlayer.bad, unit: 'fm' })
-  const easy = input.calendarEasy ?? 0
-  const medium = input.calendarMedium ?? 0
-  const hard = input.calendarHard ?? 0
-  const total = easy + medium + hard
-  if (total > 0) {
-    const average = (2 * easy + medium) / total
-    const delta = (average - 1) * p.calendar[input.role]
+  if (finite(input.easeIndex)) {
+    const delta = Math.max(-1, Math.min(1, input.easeIndex)) * p.calendar[input.role]
     if (Math.abs(delta) >= 0.005) {
-      items.push({ label: `Calendario: ${easy} facili, ${hard} difficili su ${total}`, value: delta, unit: 'fm' })
+      const grid = input.easeGridName ? `griglia ${input.easeGridName}` : 'griglia'
+      const mean = finite(input.easeGridValue) ? ` (media ${input.easeGridValue.toFixed(1).replace('.', ',')})` : ''
+      items.push({ label: `Partite ${delta > 0 ? 'favorevoli' : 'sfavorevoli'}: ${grid}${mean}`, value: delta, unit: 'fm' })
     }
   }
   return items

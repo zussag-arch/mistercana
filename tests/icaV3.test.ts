@@ -27,14 +27,14 @@ test('set pieces, team index and coach become explicit FM adjustments', () => {
   assert.equal(keeper[0].value, -0.15)
 })
 
-test('remaining calendar adds or removes FM according to easy and hard matches', () => {
-  const easy = fmAdjustments({ ...attacker('x'), role: 'D', calendarEasy: 20, calendarMedium: 6, calendarHard: 5 })
-  const hard = fmAdjustments({ ...attacker('y'), role: 'D', calendarEasy: 5, calendarMedium: 6, calendarHard: 20 })
-  assert.equal(easy[0].label, 'Calendario: 20 facili, 5 difficili su 31')
-  assert.ok(easy[0].value > 0 && hard[0].value < 0)
-  assert.equal(easy[0].value.toFixed(3), (((2 * 20 + 6) / 31 - 1) * 0.4).toFixed(3))
-  // calendario perfettamente medio: nessun correttivo
-  assert.equal(fmAdjustments({ ...attacker('z'), calendarEasy: 5, calendarMedium: 10, calendarHard: 5 }).length, 0)
+test('grid ease adds or removes FM by role weight', () => {
+  const easy = fmAdjustments({ ...attacker('x'), role: 'D', easeIndex: 0.5, easeGridValue: 87.4, easeGridName: 'portieri' })
+  const hard = fmAdjustments({ ...attacker('y'), role: 'P', easeIndex: -1 })
+  assert.equal(easy[0].label, 'Partite favorevoli: griglia portieri (media 87,4)')
+  assert.equal(easy[0].value, 0.2)
+  assert.equal(hard[0].value, -0.6)
+  // squadra nella media: nessun correttivo
+  assert.equal(fmAdjustments({ ...attacker('z'), easeIndex: 0 }).length, 0)
 })
 
 test('injuries reduce expected appearances up to the configured cap', () => {

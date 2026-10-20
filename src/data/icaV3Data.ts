@@ -12,10 +12,27 @@ import type { ICaCoachRole } from '../domain/icaV2'
 import { calculateICaV3 } from '../domain/icaV3'
 import type { ICaV3Input, ICaV3Result, ICaV3Role } from '../domain/icaV3'
 import { players as listone } from './players'
-import { getGoalkeeperTeamCalendar } from './goalkeeperCalendar'
+import goalkeeperGridCsv from '../../database/griglia_portieri.csv?raw'
+import attackerGridCsv from '../../database/griglia_attaccanti.csv?raw'
 
 function finite(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value)
+}
+
+// Facilità partite per squadra da una griglia abbinamenti (CSV squadra × squadra):
+// media della riga, scalata fra −1 (squadra più sfavorita) e +1 (più favorita).
+function gridEase(csv: string): Map<string, { mean: number; index: number }> {
+  const lines = csv.replace(/^\uFEFF/, '').split(/\r?\n/).filter((line) => line.trim())
+  const means = new Map<string, number>()
+  for (const line of lines.slice(1)) {
+    const [team, ...cells] = line.split(/[,;]/)
+    const values = cells.map((cell) => Number(cell.replace(',', '.'))).filter((value, index) => cells[index].trim() !== '' && Number.isFinite(value))
+    if (team && values.length) means.set(team.trim(), values.reduce((sum, value) => sum + value, 0) / values.length)
+  }
+  const all = [...means.values()]
+  const center = all.reduce((sum, value) => sum + value, 0) / (all.length || 1)
+  const spread = Math.max(...all.map((value) => Math.abs(value - center)), 0)
+  return new Map([...means].map(([team, mean]) => [team, { mean, index: spread > 0 ? (mean - center) / spread : 0 }]))
 }
 
 function buildInputs(): ICaV3Input[] {
@@ -35,15 +52,14 @@ function buildInputs(): ICaV3Input[] {
     return entry
   }
 
-  // giornata corrente = massimo di presenze registrate nella stagione in corso
-  const currentMatchday = Math.max(0, ...[...history.values()].map((row) => finite(row?.presenze) ? row.presenze : 0))
-  const remaining = (teamName: string) => {
-    const days = getGoalkeeperTeamCalendar(teamName)?.matchups.slice(currentMatchday) ?? []
-    return {
-      calendarEasy: days.filter((value) => value === 2).length,
-      calendarMedium: days.filter((value) => value === 1).length,
-      calendarHard: days.filter((value) => value === 0).length,
-    }
+  const goalkeeperEase = gridEase(goalkeeperGridCsv)
+  const attackerEase = gridEase(attackerGridCsv)
+  const ease = (teamName: string, role: ICaV3Role) => {
+    const defensive = role === 'P' || role === 'D'
+    const entry = (defensive ? goalkeeperEase : attackerEase).get(teamName)
+    return entry
+      ? { easeIndex: entry.index, easeGridValue: entry.mean, easeGridName: defensive ? 'portieri' : 'attaccanti' }
+      : {}
   }
 
   return page.players.flatMap((player): ICaV3Input[] => {
@@ -75,7 +91,7 @@ function buildInputs(): ICaV3Input[] {
       teamIndex: finite(index) ? index : undefined,
       coachTone: coach > 50 ? 'good' : coach < 50 ? 'bad' : 'neutral',
       coachPlayerTone: named('valorizzati') ? 'good' : named('penalizzati') ? 'bad' : undefined,
-      ...remaining(player.team),
+      ...ease(player.team, role),
       pmaPercent: finite(player.classic_8_mod_median_value) ? player.classic_8_mod_median_value : undefined,
     }]
   })
