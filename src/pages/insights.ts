@@ -2,7 +2,10 @@ import coachesCsv
   from '../../database/MisterCana_DB_Allenatori.csv?raw'
 
 import goalkeepersCsv
-  from '../../database/MisterCana_DB_Portieri.csv?raw'
+  from '../../database/griglia_portieri.csv?raw'
+
+import attackersCsv
+  from '../../database/griglia_attaccanti.csv?raw'
 
 import fantalabCoachesCsv
   from '../../database/fantalab_allenatori.csv?raw'
@@ -587,9 +590,15 @@ const COACHES =
     ),
   )
 
+// Griglie di abbinamento (CSV con virgole: convertite al separatore del parser).
 const GOALKEEPER_MATRIX =
   parseGoalkeeperCsv(
-    goalkeepersCsv,
+    goalkeepersCsv.replace(/,/g, ';'),
+  )
+
+const ATTACKER_MATRIX =
+  parseGoalkeeperCsv(
+    attackersCsv.replace(/,/g, ';'),
   )
 
 // Gerarchie dei battitori dalla tabella FantaLab, nell'ordine della fonte.
@@ -948,41 +957,29 @@ function renderGoalkeeperSuggestions(
    LEGACY MATRIX HELPERS
 ========================= */
 
+// soglie della scala colori: ottimo, buono, medio (sotto = basso)
+interface MatrixThresholds { excellent: number; good: number; medium: number }
+const GOALKEEPER_THRESHOLDS: MatrixThresholds = { excellent: 90, good: 86, medium: 82 }
+const ATTACKER_THRESHOLDS: MatrixThresholds = { excellent: 100, good: 90, medium: 80 }
+
 function getMatrixScoreClass(
   score: number | null,
+  thresholds: MatrixThresholds = GOALKEEPER_THRESHOLDS,
 ): string {
-  if (
-    score === null
-  ) {
-    return 'matrix-empty'
-  }
-
-  if (
-    score >= 90
-  ) {
-    return 'matrix-excellent'
-  }
-
-  if (
-    score >= 86
-  ) {
-    return 'matrix-good'
-  }
-
-  if (
-    score >= 82
-  ) {
-    return 'matrix-medium'
-  }
-
+  if (score === null) return 'matrix-empty'
+  if (score >= thresholds.excellent) return 'matrix-excellent'
+  if (score >= thresholds.good) return 'matrix-good'
+  if (score >= thresholds.medium) return 'matrix-medium'
   return 'matrix-low'
 }
 
 function renderGoalkeeperMatrix(
   selectedTeam = '',
+  matrix: GoalkeeperMatrix = GOALKEEPER_MATRIX,
+  thresholds: MatrixThresholds = GOALKEEPER_THRESHOLDS,
 ): string {
   if (
-    GOALKEEPER_MATRIX
+    matrix
       .teams.length === 0
   ) {
     return `
@@ -1017,7 +1014,7 @@ function renderGoalkeeperMatrix(
               Squadra
             </th>
 
-            ${GOALKEEPER_MATRIX
+            ${matrix
               .teams
               .map(
                 (team) => `
@@ -1046,7 +1043,7 @@ function renderGoalkeeperMatrix(
         </thead>
 
         <tbody>
-          ${GOALKEEPER_MATRIX
+          ${matrix
             .teams
             .map(
               (rowTeam) => `
@@ -1064,14 +1061,14 @@ function renderGoalkeeperMatrix(
                     )}
                   </th>
 
-                  ${GOALKEEPER_MATRIX
+                  ${matrix
                     .teams
                     .map(
                       (
                         columnTeam,
                       ) => {
                         const score =
-                          GOALKEEPER_MATRIX
+                          matrix
                             .scores[
                               rowTeam
                             ]?.[
@@ -1088,9 +1085,7 @@ function renderGoalkeeperMatrix(
                         return `
                           <td
                             class="
-                              ${getMatrixScoreClass(
-                                score,
-                              )}
+                              ${getMatrixScoreClass(score, thresholds)}
                               ${
                                 selected
                                   ? 'is-selected'
@@ -1414,6 +1409,130 @@ function renderICaV3Section(): string {
       </div>
       <div class="ica3-grid">${roles.map(([role, label]) => column(role, label)).join('')}</div>
     </section>`
+}
+
+/* =========================
+   ATTACCANTI: abbinamenti
+========================= */
+
+let selectedAttackerTeam = ''
+
+function bestAttacker(team: string): { name: string; score?: number } | undefined {
+  const results = getICaV3Results()
+  return localPlayers().players
+    .filter((player) => player.team === team && player.role === 'A' && player.player_id)
+    .map((player) => ({ name: player.name, score: results.get(player.player_id as string)?.score }))
+    .filter((item) => typeof item.score === 'number')
+    .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))[0]
+}
+
+function renderAttackerTopThree(): string {
+  const team = selectedAttackerTeam
+  if (!team) {
+    return '<div class="goalkeeper-recommendations-empty"><span>Scegli una squadra</span><small>Le tre squadre i cui attaccanti si alternano meglio compariranno qui.</small></div>'
+  }
+  const row = ATTACKER_MATRIX.scores[team] ?? {}
+  // a parità di compatibilità (valori a scatti di 10) vince l'attaccante con iCà più alto
+  const ranked = Object.entries(row)
+    .filter(([other, value]) => other !== team && typeof value === 'number')
+    .map(([other, value]) => ({ other, value: value as number, best: bestAttacker(other) }))
+    .sort((a, b) => b.value - a.value || (b.best?.score ?? 0) - (a.best?.score ?? 0))
+  const partners = ranked.slice(0, 3).map((item) => [item.other, item.value] as const)
+  const topValue = ranked[0]?.value
+  const tiedOutside = ranked.slice(3).filter((item) => item.value === topValue).length
+  if (!partners.length) return '<div class="goalkeeper-recommendations-empty">Nessun abbinamento disponibile.</div>'
+  const own = bestAttacker(team)
+  return `
+    <div class="goalkeeper-selection-heading">
+      <span>Migliori abbinamenti attacco</span>
+      <strong>${escapeHtml(team)}${own ? ` <small>· ${escapeHtml(own.name)}</small>` : ''}</strong>
+    </div>
+    <div class="goalkeeper-recommendations-list">
+      ${partners.map(([other, value], index) => {
+        const best = bestAttacker(other)
+        return `<div class="goalkeeper-recommendation">
+          <span class="goalkeeper-rank">${index + 1}</span>
+          <div class="goalkeeper-recommendation-team"><strong>${escapeHtml(other)}</strong>${best ? `<span class="goalkeeper-keeper">⚽ ${escapeHtml(best.name)} · iCà ${Math.round(best.score ?? 0)}</span>` : ''}<small>compatibilità dalla griglia attaccanti</small></div>
+          <span class="goalkeeper-score">${value}</span>
+        </div>`
+      }).join('')}
+    </div>
+    ${tiedOutside ? `<div class="goalkeeper-recommendations-empty" style="margin-top: 8px; min-height: 0; padding: 8px 10px;"><small>Altre ${tiedOutside} squadre hanno compatibilità ${topValue}: a parità conta l'iCà del loro miglior attaccante.</small></div>` : ''}`
+}
+
+function renderAttackerTeamChips(): string {
+  return ATTACKER_MATRIX.teams.map((team) => `<button type="button" class="goalkeeper-team-chip attacker-team-chip${team === selectedAttackerTeam ? ' selected' : ''}" data-attacker-team="${escapeHtml(team)}" aria-pressed="${team === selectedAttackerTeam}">${escapeHtml(team)}</button>`).join('')
+}
+
+function renderAttackerSection(): string {
+  return `
+    <section class="insight-section attacker-section">
+      <div class="insight-section-header">
+        <div>
+          <span class="insight-eyebrow">Attaccanti</span>
+          <h2>Abbinamenti attaccanti</h2>
+          <p>Scegli una squadra: le tre squadre con la compatibilità più alta nella griglia attaccanti, con il loro miglior attaccante per iCà.</p>
+        </div>
+        <button type="button" class="insight-database-button" data-open-attacker-matrix>Vedi griglia</button>
+      </div>
+      <div class="goalkeeper-tool">
+        <div class="goalkeeper-search-area">
+          <div id="attackerTeamChips" class="goalkeeper-team-chips">${renderAttackerTeamChips()}</div>
+        </div>
+        <div id="attackerRecommendations" class="goalkeeper-recommendations">${renderAttackerTopThree()}</div>
+      </div>
+    </section>
+    <div id="attackerMatrixOverlay" class="goalkeeper-matrix-overlay" hidden aria-hidden="true" data-attacker-overlay>
+      <div class="goalkeeper-matrix-dialog" role="dialog" aria-modal="true" aria-labelledby="attackerMatrixTitle">
+        <div class="goalkeeper-matrix-header">
+          <div>
+            <span class="insight-eyebrow">Attaccanti</span>
+            <h2 id="attackerMatrixTitle">Griglia abbinamenti attacco</h2>
+            <p>Compatibilità tra le squadre per alternare gli attaccanti. Scegli una squadra per evidenziarne riga e colonna.</p>
+          </div>
+          <button type="button" class="goalkeeper-matrix-close" data-close-attacker-matrix aria-label="Chiudi griglia attaccanti">×</button>
+        </div>
+        <div id="attackerMatrixContent" class="goalkeeper-matrix-content">${renderGoalkeeperMatrix(selectedAttackerTeam, ATTACKER_MATRIX, ATTACKER_THRESHOLDS)}</div>
+      </div>
+    </div>
+  `
+}
+
+function updateAttackerUi(): void {
+  const chips = document.querySelector<HTMLElement>('#attackerTeamChips')
+  if (chips) chips.innerHTML = renderAttackerTeamChips()
+  const list = document.querySelector<HTMLElement>('#attackerRecommendations')
+  if (list) list.innerHTML = renderAttackerTopThree()
+  const matrix = document.querySelector<HTMLElement>('#attackerMatrixContent')
+  if (matrix) matrix.innerHTML = renderGoalkeeperMatrix(selectedAttackerTeam, ATTACKER_MATRIX, ATTACKER_THRESHOLDS)
+}
+
+function setAttackerMatrixOpen(open: boolean): void {
+  const overlay = document.querySelector<HTMLElement>('#attackerMatrixOverlay')
+  if (!overlay) return
+  overlay.hidden = !open
+  overlay.setAttribute('aria-hidden', String(!open))
+  document.body.classList.toggle('insights-overlay-open', open)
+}
+
+function bindAttackerEvents(): void {
+  document.addEventListener('click', (event) => {
+    const target = event.target
+    if (!(target instanceof Element)) return
+    const chip = target.closest<HTMLElement>('[data-attacker-team]')
+    if (chip?.dataset.attackerTeam) {
+      selectedAttackerTeam = chip.dataset.attackerTeam
+      updateAttackerUi()
+      return
+    }
+    if (target.closest('[data-open-attacker-matrix]')) { setAttackerMatrixOpen(true); return }
+    if (target.closest('[data-close-attacker-matrix]')) { setAttackerMatrixOpen(false); return }
+    const overlay = target.closest('[data-attacker-overlay]')
+    if (overlay && target === overlay) setAttackerMatrixOpen(false)
+  })
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') setAttackerMatrixOpen(false)
+  })
 }
 
 function renderSetPiecesSection():
@@ -2303,6 +2422,7 @@ export function renderInsightsPage():
 
       ${renderICaV3Section()}
       ${renderGoalkeeperSection()}
+      ${renderAttackerSection()}
 
       ${renderSetPiecesSection()}
 
@@ -2456,6 +2576,7 @@ export function bindInsightsEvents():
   }
 
   insightsEventsBound = true
+  bindAttackerEvents()
 
   document.addEventListener(
     'input',

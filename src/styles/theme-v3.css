@@ -2557,3 +2557,14 @@ input:focus {
 .ica-explain-score > strong {
   font-size: 56px;
 }
+
+/* abbinamenti attaccanti: colore del ruolo A */
+.attacker-team-chip.selected {
+  border-color: var(--role-a);
+  background: var(--role-a);
+  color: #0f1214;
+}
+
+.attacker-section .goalkeeper-recommendation:not(:first-child) .goalkeeper-rank {
+  background: var(--role-a);
+}
