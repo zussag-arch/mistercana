@@ -69,9 +69,7 @@ export function renderNavigation(
   return `
     <header class="topbar">
       <div class="topbar-brand-stack">
-        <div class="brand">
-          MisterCanà
-        </div>
+        <div class="brand"><span class="brand-mister">Mister</span><span class="brand-cana">Canà</span></div>
 
         ${
           auctionLive

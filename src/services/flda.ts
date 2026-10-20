@@ -263,6 +263,32 @@ async function fldaFetch<T>(
   return body as T
 }
 
+// Fallback sulle tabelle FantaLab in database/ quando FLDA non risponde.
+// Dopo il primo fallimento di rete resta in modalità locale per la sessione,
+// così le richieste successive non attendono il timeout.
+let localMode = false
+
+export function isFldaLocalMode(): boolean {
+  return localMode
+}
+
+async function withLocal<T>(
+  remote: () => Promise<T>,
+  local: (source: typeof import('./fantalabLocal')) => T,
+): Promise<T> {
+  if (!localMode) {
+    try {
+      return await remote()
+    } catch (error) {
+      const offline = error instanceof FldaApiError
+        && (error.kind === 'unreachable' || error.kind === 'timeout')
+      if (!offline) throw error
+      localMode = true
+    }
+  }
+  return local(await import('./fantalabLocal'))
+}
+
 export function getFldaHealth():
   Promise<FldaHealth> {
   return fldaFetch<FldaHealth>(
@@ -296,8 +322,9 @@ export function getFldaPlayers(
       offset: String(offset),
     })
 
-  return fldaFetch<FldaPlayersPage>(
-    `/api/players?${query.toString()}`,
+  return withLocal(
+    () => fldaFetch<FldaPlayersPage>(`/api/players?${query.toString()}`),
+    (source) => source.localPlayers(),
   )
 }
 
@@ -305,40 +332,45 @@ export function getFldaBulkHistory(
   seasons = 3,
 ): Promise<FldaBulkHistoryResponse> {
   const query = new URLSearchParams({ seasons: String(seasons) })
-  return fldaFetch<FldaBulkHistoryResponse>(
-    `/api/history/bulk?${query.toString()}`,
+  return withLocal(
+    () => fldaFetch<FldaBulkHistoryResponse>(`/api/history/bulk?${query.toString()}`),
+    (source) => source.localBulkHistory(),
   )
 }
 
 export function getFldaPlayerDetail(
   playerId: string,
 ): Promise<FldaPlayerDetail> {
-  return fldaFetch<FldaPlayerDetail>(
-    `/api/players/${encodeURIComponent(playerId)}`,
+  return withLocal(
+    () => fldaFetch<FldaPlayerDetail>(`/api/players/${encodeURIComponent(playerId)}`),
+    (source) => source.localPlayerDetail(playerId),
   )
 }
 
 export function getFldaHistoricalAuctionPrices(
   playerId: string,
 ): Promise<FldaHistoricalAuctionPrice[]> {
-  return fldaFetch<FldaHistoricalAuctionPrice[]>(
-    `/api/players/${encodeURIComponent(playerId)}/auction-prices`,
+  return withLocal(
+    () => fldaFetch<FldaHistoricalAuctionPrice[]>(`/api/players/${encodeURIComponent(playerId)}/auction-prices`),
+    () => [],
   )
 }
 
 export function getFldaTeamGuide(
   team: string,
 ): Promise<FldaRecord> {
-  return fldaFetch<FldaRecord>(
-    `/api/teams/${encodeURIComponent(team)}/guide`,
+  return withLocal(
+    () => fldaFetch<FldaRecord>(`/api/teams/${encodeURIComponent(team)}/guide`),
+    (source) => source.localTeamGuide(team),
   )
 }
 
 export function getFldaTeamHierarchies(
   team: string,
 ): Promise<FldaRecord[]> {
-  return fldaFetch<FldaRecord[]>(
-    `/api/teams/${encodeURIComponent(team)}/hierarchies`,
+  return withLocal(
+    () => fldaFetch<FldaRecord[]>(`/api/teams/${encodeURIComponent(team)}/hierarchies`),
+    (source) => source.localTeamHierarchies(team),
   )
 }
 
@@ -347,8 +379,9 @@ export function getFldaTeamFixtures(
   context: FldaFixtureContext,
 ): Promise<FldaRecord[]> {
   const query = new URLSearchParams({ context })
-  return fldaFetch<FldaRecord[]>(
-    `/api/teams/${encodeURIComponent(team)}/fixtures?${query.toString()}`,
+  return withLocal(
+    () => fldaFetch<FldaRecord[]>(`/api/teams/${encodeURIComponent(team)}/fixtures?${query.toString()}`),
+    () => [],
   )
 }
 

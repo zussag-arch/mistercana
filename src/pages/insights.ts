@@ -4,8 +4,10 @@ import coachesCsv
 import goalkeepersCsv
   from '../../database/MisterCana_DB_Portieri.csv?raw'
 
-import setPiecesCsv
-  from '../../database/MisterCana_DB_Battitori.csv?raw'
+import fantalabCoachesCsv
+  from '../../database/fantalab_allenatori.csv?raw'
+
+import { getCachedPlayersDataset } from '../services/playerRepository'
 
 import {
   runOverlayExit,
@@ -51,6 +53,10 @@ interface Coach {
     CoachRoleKey,
     number
   >
+
+  // false se l'allenatore attuale (FantaLab) non è quello del CSV con gli impatti
+  impactsAvailable: boolean
+  keyRoles: Array<{ label: string; tone: 'good' | 'bad' | 'neutral' }>
 }
 
 interface CoachMacroRole {
@@ -86,8 +92,10 @@ interface GoalkeeperPairResult {
 
 interface SetPieceTeam {
   team: string
+  short: string
   penalties: string[]
-  setPieces: string[]
+  freeKicks: string[]
+  corners: string[]
 }
 
 /* =========================
@@ -525,80 +533,56 @@ function parseGoalkeeperCsv(
    SET PIECES DATABASE
 ========================= */
 
-function parseSetPiecesCsv(
-  csv: string,
-): SetPieceTeam[] {
-  const rows =
-    parseCsv(csv)
-
-  if (
-    rows.length < 2
-  ) {
-    return []
-  }
-
-  return rows
-    .slice(1)
-    .map(
-      (columns) => {
-        const [
-          team,
-          penalty1,
-          penalty2,
-          penalty3,
-          penalty4,
-          setPiece1,
-          setPiece2,
-          setPiece3,
-        ] = columns
-
-        if (!team) {
-          return null
-        }
-
-        return {
-          team,
-
-          penalties: [
-            penalty1,
-            penalty2,
-            penalty3,
-            penalty4,
-          ].filter(
-            (
-              value,
-            ): value is string =>
-              Boolean(value),
-          ),
-
-          setPieces: [
-            setPiece1,
-            setPiece2,
-            setPiece3,
-          ].filter(
-            (
-              value,
-            ): value is string =>
-              Boolean(value),
-          ),
-        }
-      },
-    )
-    .filter(
-      (
-        item,
-      ): item is SetPieceTeam =>
-        item !== null,
-    )
-}
-
 /* =========================
    DATABASES
 ========================= */
 
+/* Tabella FantaLab di oggi: allenatore, modulo, ruoli chiave e battitori. */
+const FANTALAB_TEAMS = (() => {
+  const lines = fantalabCoachesCsv.replace(/^﻿/, '').split(/\r?\n/).filter((line) => line.trim())
+  const header = lines[0].split(';')
+  return lines.slice(1).map((line) => {
+    const cells = line.split(';')
+    return Object.fromEntries(header.map((name, index) => [name.trim(), (cells[index] ?? '').trim()]))
+  })
+})()
+
+const splitNames = (value: string | undefined): string[] =>
+  (value ?? '').split(',').map((name) => name.trim()).filter(Boolean)
+
+function surname(value: string): string {
+  return value.trim().split(/\s+/).pop()?.toLocaleLowerCase('it') ?? ''
+}
+
+function mergeCoaches(legacy: Coach[]): Coach[] {
+  if (!FANTALAB_TEAMS.length) return legacy
+  return FANTALAB_TEAMS.map((row) => {
+    const old = legacy.find((coach) => coach.team === row['Squadra'])
+    const sameCoach = Boolean(old && surname(row['Allenatore']) === surname(old.name))
+    const hasValues = Boolean(old && Object.values(old.impacts).some((value) => value !== 0))
+    const keyRoles = (row['Ruoli chiave'] ?? '').split('|').flatMap((item) => {
+      const match = item.trim().match(/^(.+?)\s*\((positivo|negativo|neutro)\)$/i)
+      if (!match) return []
+      const tone = match[2].toLowerCase() === 'positivo' ? 'good' as const
+        : match[2].toLowerCase() === 'negativo' ? 'bad' as const : 'neutral' as const
+      return [{ label: match[1], tone }]
+    })
+    return {
+      team: row['Squadra'],
+      name: row['Allenatore'] || old?.name || '—',
+      formation: row['Modulo'] || old?.formation || '',
+      impacts: old?.impacts ?? Object.fromEntries(COACH_MACRO_ROLES.map((role) => [role.key, 0])) as Coach['impacts'],
+      impactsAvailable: sameCoach && hasValues,
+      keyRoles,
+    }
+  })
+}
+
 const COACHES =
-  parseCoachesCsv(
-    coachesCsv,
+  mergeCoaches(
+    parseCoachesCsv(
+      coachesCsv,
+    ),
   )
 
 const GOALKEEPER_MATRIX =
@@ -606,10 +590,15 @@ const GOALKEEPER_MATRIX =
     goalkeepersCsv,
   )
 
-const SET_PIECE_TEAMS =
-  parseSetPiecesCsv(
-    setPiecesCsv,
-  )
+// Gerarchie dei battitori dalla tabella FantaLab, nell'ordine della fonte.
+const SET_PIECE_TEAMS: SetPieceTeam[] =
+  FANTALAB_TEAMS.map((row) => ({
+    team: row['Squadra'],
+    short: row['Sigla'] ?? '',
+    penalties: splitNames(row['Rigoristi']).slice(0, 3),
+    freeKicks: splitNames(row['Punizioni']).slice(0, 3),
+    corners: splitNames(row["Calci d'angolo"]).slice(0, 3),
+  }))
 
 /* =========================
    GOALKEEPER CALENDAR
@@ -773,15 +762,8 @@ function renderGoalkeeperTopThree(
         goalkeeper-selection-heading
       "
     >
-      <span>
-        Migliori abbinamenti calendario
-      </span>
-
-      <strong>
-        ${escapeHtml(
-          team,
-        )}
-      </strong>
+      <span>Migliori abbinamenti calendario</span>
+        <strong>${escapeHtml(team)}${starterKeeper(team) ? ` <small>· 🧤 ${escapeHtml(starterKeeper(team) ?? "")}</small>` : ''}</strong>
     </div>
 
     <div
@@ -817,7 +799,7 @@ function renderGoalkeeperTopThree(
                   ${escapeHtml(
                     result.team,
                   )}
-                </strong>
+                </strong>${starterKeeper(result.team) ? `<span class="goalkeeper-keeper">🧤 ${escapeHtml(starterKeeper(result.team) ?? "")}</span>` : ''}
 
                 <small>
                   Favorevoli
@@ -869,6 +851,19 @@ function renderGoalkeeperTopThree(
       </small>
     </div>
   `
+}
+
+// Portiere titolare della squadra secondo i dati correnti (Guida FantaLab o FLDA).
+function starterKeeper(team: string): string | undefined {
+  const keepers = getCachedPlayersDataset()?.players
+    .filter((player) => player.team === team && player.role === 'P') ?? []
+  const starter = keepers.find((player) => player.goalkeeper_rank === 1)
+    ?? keepers.find((player) => player.is_starting_xi)
+  return starter?.name
+}
+
+function renderGoalkeeperTeamChips(): string {
+  return goalkeeperCalendarTeams.map((team) => `<button type="button" class="goalkeeper-team-chip${team === selectedGoalkeeperTeam ? ' selected' : ''}" data-goalkeeper-team="${escapeHtml(team)}" aria-pressed="${team === selectedGoalkeeperTeam}">${escapeHtml(team)}</button>`).join('')
 }
 
 function getGoalkeeperMatches(
@@ -1222,6 +1217,7 @@ function renderGoalkeeperSection():
               goalkeeperSearchValue,
             )}
           </div>
+          <div id="goalkeeperTeamChips" class="goalkeeper-team-chips">${renderGoalkeeperTeamChips()}</div>
         </div>
 
         <div
@@ -1252,9 +1248,7 @@ function renderGoalkeeperSection():
         "
         role="dialog"
         aria-modal="true"
-        aria-labelledby="
-          goalkeeperMatrixTitle
-        "
+        aria-labelledby="goalkeeperMatrixTitle"
       >
         <div
           class="
@@ -1271,17 +1265,13 @@ function renderGoalkeeperSection():
             </span>
 
             <h2
-              id="
-                goalkeeperMatrixTitle
-              "
+              id="goalkeeperMatrixTitle"
             >
               Griglia abbinamenti
             </h2>
 
             <p>
-              Matrice legacy di
-              compatibilità tra le
-              squadre.
+              Compatibilità tra le squadre: più alto il valore, più le due squadre si alternano bene in calendario. Scegli una squadra per evidenziarne riga e colonna.
             </p>
           </div>
 
@@ -1291,18 +1281,14 @@ function renderGoalkeeperSection():
               goalkeeper-matrix-close
             "
             data-close-goalkeeper-matrix
-            aria-label="
-              Chiudi griglia portieri
-            "
+            aria-label="Chiudi griglia portieri"
           >
             ×
           </button>
         </div>
 
         <div
-          id="
-            goalkeeperMatrixContent
-          "
+          id="goalkeeperMatrixContent"
           class="
             goalkeeper-matrix-content
           "
@@ -1362,188 +1348,56 @@ function renderGoalkeeperSection():
    SET PIECES
 ========================= */
 
-function renderSetPiecesSection():
-  string {
+function setPieceRole(team: string, name: string): string | undefined {
+  const wanted = name.trim().toLocaleLowerCase('it')
+  return getCachedPlayersDataset()?.players.find((player) =>
+    player.team === team && player.name.trim().toLocaleLowerCase('it') === wanted)?.role
+}
+
+function renderSetPieceList(team: string, label: string, players: string[]): string {
   return `
-    <section
-      class="
-        insight-section
-      "
-    >
-      <div
-        class="
-          insight-section-header
-        "
-      >
-        <div>
-          <span
-            class="
-              insight-eyebrow
-            "
-          >
-            SPECIALISTI
-          </span>
-
-          <h2>
-            Rigori / Piazzati
-          </h2>
-
-          <p>
-            Gerarchie dei battitori
-            suddivise per squadra.
-          </p>
-        </div>
-
-        <span
-          class="
-            insight-database-status
-          "
-        >
-          ${SET_PIECE_TEAMS.length}
-          squadre dal database
-        </span>
-      </div>
-
-      ${
-        SET_PIECE_TEAMS.length
-          ? `
-            <div
-              class="
-                set-pieces-grid
-              "
-            >
-              ${SET_PIECE_TEAMS
-                .map(
-                  (item) => `
-                    <article
-                      class="
-                        set-piece-card
-                      "
-                    >
-                      <div
-                        class="
-                          set-piece-team
-                        "
-                      >
-                        ${escapeHtml(
-                          item.team,
-                        )}
-                      </div>
-
-                      <div
-                        class="
-                          set-piece-columns
-                        "
-                      >
-                        <div>
-                          <span
-                            class="
-                              set-piece-label
-                            "
-                          >
-                            Rigori
-                          </span>
-
-                          <ol>
-                            ${
-                              item
-                                .penalties
-                                .length
-                                ? item
-                                    .penalties
-                                    .map(
-                                      (
-                                        player,
-                                      ) => `
-                                        <li>
-                                          ${escapeHtml(
-                                            player,
-                                          )}
-                                        </li>
-                                      `,
-                                    )
-                                    .join(
-                                      '',
-                                    )
-                                : `
-                                  <li
-                                    class="
-                                      set-piece-empty
-                                    "
-                                  >
-                                    —
-                                  </li>
-                                `
-                            }
-                          </ol>
-                        </div>
-
-                        <div>
-                          <span
-                            class="
-                              set-piece-label
-                            "
-                          >
-                            Piazzati
-                          </span>
-
-                          <ol>
-                            ${
-                              item
-                                .setPieces
-                                .length
-                                ? item
-                                    .setPieces
-                                    .map(
-                                      (
-                                        player,
-                                      ) => `
-                                        <li>
-                                          ${escapeHtml(
-                                            player,
-                                          )}
-                                        </li>
-                                      `,
-                                    )
-                                    .join(
-                                      '',
-                                    )
-                                : `
-                                  <li
-                                    class="
-                                      set-piece-empty
-                                    "
-                                  >
-                                    —
-                                  </li>
-                                `
-                            }
-                          </ol>
-                        </div>
-                      </div>
-                    </article>
-                  `,
-                )
-                .join('')}
-            </div>
-          `
-          : `
-            <div
-              class="
-                insight-database-empty
-              "
-            >
-              Database battitori vuoto.
-            </div>
-          `
-      }
-    </section>
+    <div class="set-piece-column">
+      <span class="set-piece-label">${label}</span>
+      ${players.length
+        ? `<ol>${players.map((player, index) => {
+            const role = setPieceRole(team, player)
+            return `<li class="${index === 0 ? 'is-first' : ''}">
+              <span class="set-piece-rank">${index + 1}</span>
+              ${role ? `<span class="role-badge role-${role.toLowerCase()} set-piece-role">${escapeHtml(role)}</span>` : ''}
+              <span class="set-piece-name">${escapeHtml(player)}</span>
+            </li>`
+          }).join('')}</ol>`
+        : '<p class="set-piece-empty">—</p>'}
+    </div>
   `
 }
 
-/* =========================
-   FORMATIONS
-========================= */
+function renderSetPiecesSection():
+  string {
+  return `
+    <section class="insight-section set-pieces-section">
+      <div class="insight-section-header">
+        <div>
+          <span class="insight-eyebrow">Specialisti</span>
+          <h2>Rigori e piazzati</h2>
+          <p>Gerarchie dei battitori per squadra: il primo è il titolare del compito.</p>
+        </div>
+        <span class="insight-database-status">${SET_PIECE_TEAMS.length} squadre · FantaLab</span>
+      </div>
+      ${SET_PIECE_TEAMS.length
+        ? `<div class="set-pieces-grid">${SET_PIECE_TEAMS.map((item) => `
+            <article class="set-piece-card">
+              <header class="set-piece-team"><strong>${escapeHtml(item.team)}</strong>${item.short ? `<small>${escapeHtml(item.short)}</small>` : ''}</header>
+              <div class="set-piece-columns">
+                ${renderSetPieceList(item.team, 'Rigori', item.penalties)}
+                ${renderSetPieceList(item.team, 'Punizioni', item.freeKicks)}
+                ${renderSetPieceList(item.team, 'Angoli', item.corners)}
+              </div>
+            </article>`).join('')}</div>`
+        : '<p class="set-piece-empty">Tabella battitori non disponibile.</p>'}
+    </section>
+  `
+}
 
 function marker(
   role: CoachRoleKey,
@@ -1805,6 +1659,36 @@ function getFormationMarkers(
         ),
       ]
 
+    // 3-4-3: tre centrali, quattro di centrocampo, due ali e una punta
+    case '3-4-3':
+      return [
+        marker('goalkeeper', 'Por', 50, 91),
+        marker('centreBack', 'Dc', 27, 75),
+        marker('centreBack', 'Dc', 50, 79),
+        marker('centreBack', 'Dc', 73, 75),
+        marker('wideMid', 'E', 14, 52),
+        marker('centralMid', 'C', 38, 56),
+        marker('centralMid', 'C', 62, 56),
+        marker('wideMid', 'E', 86, 52),
+        marker('winger', 'W', 24, 26),
+        marker('striker', 'Pc', 50, 16),
+        marker('winger', 'W', 76, 26),
+      ]
+    // 3-5-1-1: come il 3-5-2 con un trequartista dietro la punta
+    case '3-5-1-1':
+      return [
+        marker('goalkeeper', 'Por', 50, 91),
+        marker('centreBack', 'Dc', 27, 75),
+        marker('centreBack', 'Dc', 50, 79),
+        marker('centreBack', 'Dc', 73, 75),
+        marker('wideMid', 'E', 14, 50),
+        marker('centralMid', 'C', 34, 54),
+        marker('defensiveMid', 'M', 50, 58),
+        marker('centralMid', 'C', 66, 54),
+        marker('wideMid', 'E', 86, 50),
+        marker('attackingMid', 'T', 50, 33),
+        marker('striker', 'Pc', 50, 15),
+      ]
     case '3-5-2':
       return [
         marker(
@@ -2242,6 +2126,7 @@ function renderCoachSection():
                           )}
                         </span>
                       </div>
+                      ${coach.keyRoles.length ? `<div class="coach-key-roles">${coach.keyRoles.map((item) => `<span class="coach-key-role coach-key-${item.tone}">${escapeHtml(item.label)}${item.tone === 'good' ? ' +' : item.tone === 'bad' ? ' −' : ''}</span>`).join('')}</div>` : ''}
 
                       <div
                         class="
@@ -2306,14 +2191,14 @@ function renderCoachSection():
                                     <span
                                       class="
                                         coach-impact-value
-                                        coach-impact-${getImpactClass(
+                                        coach-impact-${coach.impactsAvailable ? getImpactClass(
                                           value,
-                                        )}
+                                        ) : 'neutral'}
                                       "
                                     >
-                                      ${formatImpact(
+                                      ${coach.impactsAvailable ? formatImpact(
                                         value,
-                                      )}
+                                      ) : 'n.d.'}
                                     </span>
                                   </div>
                                 `
@@ -2387,6 +2272,9 @@ export function renderInsightsPage():
 
 function updateGoalkeeperUi():
   void {
+  const chips = document.querySelector<HTMLElement>('#goalkeeperTeamChips')
+  if (chips) chips.innerHTML = renderGoalkeeperTeamChips()
+
   const recommendations =
     document.querySelector<HTMLElement>(
       '#goalkeeperRecommendations',

@@ -68,7 +68,7 @@ interface AuctionActions {
   onStateChange: () => void
   onRender: () => void
 
-  onGoToPlayers: () => void
+  onGoToPlayers: (role: PlayerRole) => void
   onGoToObjectives: () => void
   onOpenFullPlayer: (reference: string) => void
 }
@@ -3101,6 +3101,45 @@ function renderParticipants(
    HISTORY
 ========================= */
 
+// Stato di attesa tra una chiamata e l'altra, con recap degli ultimi assegnati.
+const WAITING_RECAP_SIZE = 5
+
+function renderWaitingForCall(
+  state: AppState,
+): string {
+  const recent = state.auctionAssignments
+    .slice(-WAITING_RECAP_SIZE)
+    .reverse()
+    .map((assignment) => {
+      const player = resolveAssignmentPlayer(assignment, getCachedPlayersDataset())
+      if (!player) return ''
+      const manager = getManagerById(state, assignment.managerId)
+      return `
+        <li class="auction-waiting-row">
+          <span class="auction-role-badge role-${player.role.toLowerCase()}">${player.role}</span>
+          <span class="auction-waiting-name">${escapeHtml(player.name)}</span>
+          <span class="auction-waiting-manager">${manager ? escapeHtml(managerDisplayName(manager)) : '—'}</span>
+          <strong>${assignment.price}</strong>
+        </li>
+      `
+    })
+    .join('')
+
+  return `
+    <section class="auction-player-card auction-no-player">
+      <span class="auction-kicker">CHIAMATA CORRENTE</span>
+      <h2>${state.auctionAssignments.length ? 'In attesa della prossima chiamata' : 'Nessun giocatore selezionato'}</h2>
+      <p>Seleziona squadra o giocatore.</p>
+      ${recent
+        ? `<div class="auction-waiting-recap">
+            <span class="auction-kicker">ULTIMI ASSEGNATI</span>
+            <ol>${recent}</ol>
+          </div>`
+        : ''}
+    </section>
+  `
+}
+
 function renderAssignmentHistory(
   state: AppState,
 ): string {
@@ -3795,28 +3834,7 @@ function renderLiveAuction(
               ? selectedPlayer.legacy
                 ? renderPlayerCard(state, selectedPlayer.legacy)
                 : renderFldaPlayerCard(state, selectedPlayer)
-              : `
-                <section
-                  class="
-                    auction-player-card
-                    auction-no-player
-                  "
-                >
-                  <span class="auction-kicker">
-                    CHIAMATA CORRENTE
-                  </span>
-
-                  <h2>
-                    Nessun giocatore
-                    selezionato
-                  </h2>
-
-                  <p>
-                    Seleziona squadra
-                    o giocatore.
-                  </p>
-                </section>
-              `
+              : renderWaitingForCall(state)
           }
         </div>
 
@@ -4174,7 +4192,7 @@ export function bindAuctionEvents(
     )
     ?.addEventListener(
       'click',
-      actions.onGoToPlayers,
+      () => actions.onGoToPlayers(activeRole),
     )
 
   document
@@ -5026,6 +5044,12 @@ export function bindAuctionEvents(
 
         pendingAwardPrice =
           null
+
+        // BETA-020: chiude scheda e chiamata del giocatore aggiudicato,
+        // così limiti e consigli vengono ricalcolati sul nuovo stato.
+        state.currentAuctionPlayerId = null
+        state.currentAuctionFldaPlayerId = null
+        detailPlayerId = null
 
         auctionFeedback =
           `${player.name} aggiudicato a ${winner.name} per ${price} crediti.`

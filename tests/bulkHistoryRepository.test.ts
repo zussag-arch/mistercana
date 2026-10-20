@@ -15,7 +15,7 @@ test('bulk history client performs one typed request for three seasons', () => {
 test('repository has shared loading loaded and error states distinct from empty history', () => {
   assert.match(repository, /'idle' \| 'loading' \| 'loaded' \| 'error'/)
   assert.match(repository, /byPlayerId\.set\(player\.player_id, player\.history\)/)
-  assert.match(repository, /historyState = \{ status: 'loaded'/)
+  assert.match(repository, /historyState = \{\s*status: 'loaded'/)
   assert.match(repository, /historyState = \{ status: 'error'/)
 })
 

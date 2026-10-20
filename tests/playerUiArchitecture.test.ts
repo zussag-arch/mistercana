@@ -45,7 +45,7 @@ test('renders the requested descriptive charts and avoids viewport-wide mobile c
   assert.match(view, /chart-tick/)
   assert.match(view, /Andamento multi-stagione MV e FMV/)
   assert.equal(/min-width:\s*[4-9]\d{2}px/i.test(playersCss + detailCss), false)
-  assert.match(detailCss, /overflow-x:hidden/)
+  assert.match(detailCss, /overflow-x:\s*hidden/)
 })
 
 test('uses the auction team-grid pattern and filters teams locally', () => {
@@ -79,7 +79,7 @@ test('renders the two historical prices and the requested full-page KPI layout',
   assert.match(metrics, /Titolarità/)
   assert.match(styles, /player-metric-ica/)
   assert.match(styles, /player-metric-history/)
-  assert.match(styles, /@media\(max-width:700px\).*player-current-metrics-full/)
+  assert.match(styles, /@media\s*\(max-width:\s*700px\)[\s\S]*player-current-metrics-full/)
 })
 
 test('uses compact requested columns, role/iCa default order and offline-only retry', () => {

@@ -106,5 +106,5 @@ test('Auction places roster cards at right and top/history below participants', 
 
 test('Auction mobile layout stacks top players and assignment history', () => {
   const css = readFileSync(new URL('../src/styles/auction.css', import.meta.url), 'utf8')
-  assert.match(css, /@media \(max-width: 680px\)[\s\S]*\.auction-market-followup\s*\{\s*grid-template-columns: 1fr/)
+  assert.match(css, /@media \(max-width: 680px\)[\s\S]*\.auction-market-followup\s*\{\s*grid-template-columns:\s*1fr/)
 })

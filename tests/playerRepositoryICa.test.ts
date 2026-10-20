@@ -40,6 +40,7 @@ function repositoryFixture(historyFails = false) {
   const exports: Record<string, (...args: any[]) => any> = {}
   runInNewContext(compiled, { exports, require: (name: string) => {
     if (name === '../data/players') return { players: [] }
+    if (name === '../data/saggi') return { getSaggiForPlayer: () => [] }
     if (name === './flda') return transport
     if (name === './playerIdentity') return { initializePlayerIdentity() {} }
     if (name === '../domain/icaV2') return { ...ica, calculateICaV2: (input: ica.ICaV2Input, refs: ica.ICaReferences) => {
@@ -54,7 +55,7 @@ function repositoryFixture(historyFails = false) {
 test('repository forwards enriched ICA inputs and deduplicates fixtures by team/context', async () => {
   const { repository, calls, inputs } = repositoryFixture()
   const dataset = await repository.loadPlayersDataset()
-  assert.equal(dataset.source, 'flda')
+  assert.equal(dataset.source, 'flda', dataset.error)
   assert.equal(inputs.length, 4)
   assert.deepEqual(calls.sort(), ['Test|attacker', 'Test|goalkeeper', 'Unavailable|attacker'])
   const input = inputs.find((item) => item.player.player_id === 'd1')!

@@ -1,0 +1,2304 @@
+/* =========================
+   TEMA V3
+   Linee guida grafiche della "Scheda Giocatore V3" (ottobre 2026):
+   scuro + verde, colori ruolo, Unbounded per titoli e numeri,
+   Lexend per l'interfaccia, card molto arrotondate, pillole,
+   titoli di sezione con il punto finale colorato.
+   Caricato per ultimo: sovrascrive token e componenti comuni
+   senza toccare i fogli di stile delle pagine.
+========================= */
+
+@import url("https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700;800;900&family=Lexend:wght@300;400;500;600;700;800&display=swap");
+
+:root {
+  --font-display: "Unbounded", "Lexend", system-ui, sans-serif;
+  --font-ui: "Lexend", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  font-family: var(--font-ui);
+  background: #121517;
+
+  --bg: #121517;
+  --surface: #191d20;
+  --surface-soft: #161a1c;
+  --surface-light: #1f2427;
+  --surface-control: #1f2427;
+  --surface-raised: #283034;
+
+  --text: #f3f6f5;
+  --text-soft: #d3dbd8;
+  --muted: #8e9a97;
+  --muted-soft: #6c7774;
+
+  --accent: #46e6a1;
+  --accent-strong: #2fc786;
+  --accent-soft: #b6f5d7;
+  --accent-ink: #06261a;
+
+  --green: #46e6a1;
+  --red: #ff7a7a;
+  --yellow: #f2d45c;
+  --blue: #6cb4ff;
+  --purple: #cfa3f7;
+
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+  --radius-2xl: 28px;
+}
+
+body {
+  font-family: var(--font-ui);
+  letter-spacing: 0.01em;
+  background:
+    radial-gradient(900px 500px at 85% -10%, rgba(70, 230, 161, 0.1), transparent 60%),
+    radial-gradient(700px 500px at -10% 30%, rgba(97, 168, 255, 0.06), transparent 60%),
+    var(--bg);
+  background-attachment: fixed;
+}
+
+/* ---------- titoli e numeri ---------- */
+
+h1,
+h2,
+h3,
+.brand {
+  font-family: var(--font-display);
+  letter-spacing: -0.03em;
+  word-spacing: 0.08em;
+}
+
+h1 {
+  letter-spacing: -0.045em;
+}
+
+.page-heading h1,
+.auction-live-title h1 {
+  font-weight: 800;
+  line-height: 1.05;
+}
+
+.page-heading h1::after,
+.auction-live-title h1::after,
+.player-full-section h2::after,
+.player-section h2::after,
+.auction-section h2::after {
+  content: ".";
+  color: var(--accent);
+}
+
+.brand {
+  font-weight: 900;
+  letter-spacing: -0.06em;
+  color: var(--accent);
+}
+
+strong,
+.num,
+td.n {
+  font-variant-numeric: tabular-nums;
+}
+
+.auction-toolbar-stat strong,
+.auction-roster-metric-values strong,
+.auction-history-count,
+.budget-total,
+.auction-selector-player em {
+  font-family: var(--font-display);
+  letter-spacing: -0.04em;
+}
+
+/* eyebrow: le etichette maiuscole diventano piccole e con il rombo del colore ruolo */
+.auction-kicker {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: lowercase;
+  color: var(--muted);
+}
+
+.auction-kicker::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 7px;
+  border-radius: 2px;
+  background: var(--accent);
+  transform: rotate(45deg) translateY(-1px);
+}
+
+/* ---------- contenitori ---------- */
+
+.auction-player-card,
+.auction-panel,
+.auction-section,
+.auction-search-strip,
+.auction-participants-section,
+.auction-history-section,
+.player-section,
+.player-full-section,
+.player-data-section,
+.player-detail-card,
+.players-table-card,
+.data-transfer-card,
+.data-transfer-section,
+.flda-panel,
+.flda-dataset-card,
+.data-integrity-panel,
+.overlay-card,
+.panel {
+  border-radius: var(--radius-xl);
+  border-color: rgba(255, 255, 255, 0.07);
+  background: var(--surface);
+  box-shadow: none;
+}
+
+.auction-roster-metric-card {
+  border-radius: var(--radius-md);
+  border-color: rgba(255, 255, 255, 0.07);
+  background: var(--surface);
+}
+
+.auction-roster-metric-values > div {
+  border-radius: var(--radius-sm);
+  background: var(--surface-light);
+}
+
+/* ---------- controlli: pillole ---------- */
+
+.auction-toolbar-button,
+.players-filter-button,
+.secondary-button,
+.auction-team-choice {
+  border-radius: var(--radius-pill);
+  border-color: rgba(255, 255, 255, 0.13);
+  background: rgba(255, 255, 255, 0.04);
+  font-weight: 700;
+  transition: transform var(--motion-fast), background var(--motion-fast);
+}
+
+.auction-toolbar-button:hover:not(:disabled),
+.players-filter-button:hover,
+.auction-team-choice:hover {
+  transform: translateY(-1px);
+}
+
+.players-filter-button.selected,
+.auction-team-choice.selected,
+.auction-role-tab.active {
+  background: var(--text);
+  border-color: var(--text);
+  color: var(--bg);
+}
+
+.auction-role-switcher > div {
+  border-radius: var(--radius-pill);
+  background: var(--surface-light);
+}
+
+.auction-role-tab {
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+}
+
+.auction-quick-nav {
+  border-color: var(--accent);
+  background: transparent;
+  color: var(--accent);
+}
+
+/* bottone primario: rettangolo pieno con freccia e ombra a scatto */
+.primary-button {
+  border-radius: 0;
+  border: 1.5px solid var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 800;
+  transition: transform var(--motion-fast), box-shadow var(--motion-fast);
+}
+
+.primary-button:hover:not(:disabled) {
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 var(--accent-soft);
+}
+
+input[type="search"],
+.auction-selector-search input {
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+}
+
+input[type="search"]:focus,
+.auction-selector-search input:focus {
+  border-color: var(--accent);
+}
+
+/* ---------- badge ruolo ---------- */
+
+.auction-role-badge {
+  border-radius: 10px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  color: #0f1214;
+}
+
+.auction-role-badge.role-p { background: var(--role-p); }
+.auction-role-badge.role-d { background: var(--role-d); }
+.auction-role-badge.role-c { background: var(--role-c); }
+.auction-role-badge.role-a { background: var(--role-a); }
+
+.auction-role-badge.large {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  font-size: 22px;
+  transform: rotate(-6deg);
+}
+
+/* ---------- attesa prossima chiamata (BETA-020) ---------- */
+
+.auction-waiting-recap {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  background: var(--surface-light);
+}
+
+.auction-waiting-recap ol {
+  display: grid;
+  gap: 4px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.auction-waiting-row {
+  display: grid;
+  grid-template-columns: 25px minmax(0, 1fr) minmax(0, auto) 36px;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 4px;
+}
+
+.auction-waiting-name {
+  overflow: hidden;
+  font-weight: 700;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.auction-waiting-manager {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 12px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.auction-waiting-row strong {
+  font-family: var(--font-display);
+  text-align: right;
+  letter-spacing: -0.04em;
+  color: var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auction-role-badge.large { transform: none; }
+  .primary-button,
+  .auction-toolbar-button,
+  .players-filter-button,
+  .auction-team-choice { transition: none; }
+}
+
+/* =========================
+   TEMA V3 — RINFORZO PER PAGINA
+========================= */
+
+/* etichette: niente MAIUSCOLO, piccole, grigie, con il rombo */
+.eyebrow,
+.auction-kicker,
+.dashboard-eyebrow,
+.dashboard-stat-label,
+.dashboard-manager-label,
+.players-eyebrow,
+.objectives-eyebrow,
+.insight-eyebrow,
+.data-transfer-eyebrow,
+.player-detail-eyebrow,
+.auction-award-section-kicker,
+.auction-call-alternatives-title,
+.set-piece-label,
+.players-table-header,
+.goalkeeper-selection-heading span {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: lowercase;
+  color: var(--muted);
+}
+
+.eyebrow::before,
+.dashboard-eyebrow::before,
+.dashboard-stat-label::before,
+.players-eyebrow::before,
+.objectives-eyebrow::before,
+.insight-eyebrow::before,
+.data-transfer-eyebrow::before,
+.player-detail-eyebrow::before,
+.auction-award-section-kicker::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 7px;
+  border-radius: 2px;
+  background: var(--accent);
+  transform: rotate(45deg) translateY(-1px);
+}
+
+/* navigazione e marchio */
+.brand {
+  font-size: 22px;
+  text-transform: lowercase;
+}
+
+.nav-item {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: lowercase;
+  border-radius: var(--radius-pill);
+}
+
+/* titoli di sezione: grandi, stretti, col punto verde */
+.dashboard-panel-header-row h2,
+.dashboard-hero-title,
+.auction-section-heading h2,
+.auction-panel-title,
+.auction-history-heading h3,
+.auction-competitors-heading h2,
+.players-page-header h1,
+.objectives-page-header h1,
+.insights-page-header h1,
+.import-export-page-header h1,
+.insight-section-header h2,
+.data-transfer-section-header h2,
+.objective-role-title,
+.player-section-heading h2 {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  line-height: 1.1;
+}
+
+.players-page-header h1,
+.objectives-page-header h1,
+.insights-page-header h1,
+.import-export-page-header h1 {
+  font-size: clamp(28px, 4vw, 44px);
+}
+
+.dashboard-panel-header-row h2::after,
+.dashboard-hero-title::after,
+.auction-section-heading h2::after,
+.auction-history-heading h3::after,
+.auction-competitors-heading h2::after,
+.players-page-header h1::after,
+.objectives-page-header h1::after,
+.insights-page-header h1::after,
+.import-export-page-header h1::after,
+.insight-section-header h2::after,
+.data-transfer-section-header h2::after,
+.player-section-heading h2::after {
+  content: ".";
+  color: var(--accent);
+}
+
+/* card KPI: numeri grandi; la prima è la card "guida" verde piena */
+.dashboard-stat-card,
+.dashboard-recap-kpi {
+  padding: 16px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.dashboard-stat-value {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.06em;
+  font-variant-numeric: tabular-nums;
+  text-transform: lowercase;
+}
+
+.dashboard-stat-card:first-child {
+  border: 0;
+  background: linear-gradient(150deg, var(--accent), var(--accent-strong));
+  color: var(--accent-ink);
+}
+
+.dashboard-stat-card:first-child *,
+.dashboard-stat-card:first-child .dashboard-stat-label::before {
+  color: var(--accent-ink);
+}
+
+.dashboard-stat-card:first-child .dashboard-stat-label::before {
+  background: var(--accent-ink);
+}
+
+/* pannelli grandi */
+.dashboard-panel,
+.dashboard-hero,
+.insight-section,
+.objective-priority-section,
+.auction-competitors-section,
+.coach-card,
+.set-piece-card,
+.objective-player-card {
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: none;
+}
+
+.dashboard-manager-card,
+.auction-participant-card,
+.auction-competitor-card,
+.budget-field {
+  border-radius: var(--radius-md);
+  background: var(--surface-light);
+}
+
+.dashboard-add-manager-card,
+.add-manager-card {
+  border: 1.5px dashed rgba(255, 255, 255, 0.13);
+  border-radius: var(--radius-md);
+  background: transparent;
+}
+
+/* testata della pagina Asta e scheda giocatore: sfumatura + cerchi tratteggiati */
+.auction-player-card,
+.player-full-header,
+.player-detail-header,
+.dashboard-hero {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(520px 260px at 100% 0%, rgba(70, 230, 161, 0.18), transparent 70%),
+    linear-gradient(135deg, var(--surface-light), var(--surface));
+}
+
+.auction-player-card::after,
+.player-full-header::after {
+  content: "";
+  position: absolute;
+  right: -140px;
+  top: 50%;
+  width: 520px;
+  height: 520px;
+  transform: translateY(-50%);
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 600'%3E%3Cg fill='none' stroke='rgba(255,255,255,0.13)' stroke-width='2' stroke-dasharray='6 14' stroke-linecap='round'%3E%3Ccircle cx='300' cy='300' r='120'/%3E%3Ccircle cx='300' cy='300' r='190'/%3E%3Ccircle cx='300' cy='300' r='260'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat;
+  pointer-events: none;
+}
+
+.auction-player-card > *,
+.player-full-header > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* campi: sempre scuri (prima alcuni restavano bianchi di default) */
+input[type="number"],
+input[type="text"],
+input:not([type]),
+select,
+textarea {
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+}
+
+input[type="number"],
+.percentage-input input {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  text-align: center;
+}
+
+input:focus {
+  border-color: var(--accent);
+}
+
+/* pillole di stato e profili budget */
+.dashboard-toggle-chip,
+.dashboard-budget-total-pill,
+.dashboard-live-pill,
+.dashboard-cta-button,
+.dashboard-secondary-footer-button,
+.danger-button,
+.archive-button,
+.profile-button {
+  border-radius: var(--radius-pill);
+}
+
+.dashboard-budget-total-pill,
+.budget-total.valid {
+  border: 0;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+
+.dashboard-cta-button {
+  border-radius: 0;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 800;
+}
+
+.dashboard-cta-button::after {
+  content: " →";
+}
+
+/* tabelle */
+.players-table-card table th {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: none;
+}
+
+/* ritocchi */
+.nav-item {
+  border-radius: 0;
+}
+
+.dashboard-panel h2,
+.panel h2,
+.dashboard-manager-header h2 {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+}
+
+/* i titoli col punto diventano flex: così lo spazio a capo nel markup
+   non stacca il punto dalla parola */
+.page-heading h1,
+.auction-live-title h1,
+.panel h2,
+.dashboard-panel h2,
+.dashboard-hero-title,
+.auction-section-heading h2,
+.auction-history-heading h3,
+.auction-competitors-heading h2,
+.players-page-header h1,
+.objectives-page-header h1,
+.insights-page-header h1,
+.import-export-page-header h1,
+.insight-section-header h2,
+.data-transfer-section-header h2,
+.player-section-heading h2,
+.player-full-section h2,
+.player-section h2,
+.auction-section h2 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+}
+
+.panel h2::after,
+.dashboard-panel h2::after {
+  content: ".";
+  color: var(--accent);
+}
+
+/* =========================
+   PAGINA GIOCATORI — come la Scheda V2/V3
+========================= */
+
+.role-badge {
+  width: 30px;
+  height: 30px;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 10px;
+  color: #0f1214;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 800;
+  box-shadow: none;
+}
+
+.role-badge.role-p { background: var(--role-p); }
+.role-badge.role-d { background: var(--role-d); }
+.role-badge.role-c { background: var(--role-c); }
+.role-badge.role-a { background: var(--role-a); }
+
+/* filtri ruolo: pillole, quella attiva prende il colore del ruolo */
+.players-filter-button {
+  font-family: var(--font-display);
+  font-size: 12px;
+}
+
+.players-filter-button[data-player-role="P"].selected { background: var(--role-p); border-color: var(--role-p); color: #0f1214; }
+.players-filter-button[data-player-role="D"].selected { background: var(--role-d); border-color: var(--role-d); color: #0f1214; }
+.players-filter-button[data-player-role="C"].selected { background: var(--role-c); border-color: var(--role-c); color: #0f1214; }
+.players-filter-button[data-player-role="A"].selected { background: var(--role-a); border-color: var(--role-a); color: #0f1214; }
+
+.players-toolbar input,
+.players-team-filter summary {
+  border-radius: var(--radius-pill);
+}
+
+/* tabella: righe staccate che si evidenziano, niente linee */
+.players-table-card {
+  padding: 6px;
+}
+
+.players-table-header {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: none;
+  color: var(--muted);
+}
+
+.players-table-row {
+  border: 0;
+  border-bottom: 0;
+  border-radius: 12px;
+  background: none;
+  transition: background var(--motion-fast);
+}
+
+.players-table-row:hover {
+  background: var(--surface-light);
+}
+
+.players-name-line strong {
+  font-weight: 700;
+}
+
+.players-player-cell small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* numeri della tabella in Unbounded */
+.players-table-row > div:not(.players-player-cell) {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-soft);
+}
+
+.players-ica {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.players-dual-value small {
+  color: var(--muted);
+}
+
+/* stato: pillola leggibile, non maiuscola */
+.player-status {
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: lowercase;
+}
+
+.player-status-free {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* badge segnali (XI, P1, rigorista…) come nella scheda */
+.player-signal {
+  border-radius: var(--radius-pill);
+  font-family: var(--font-ui);
+  font-weight: 700;
+}
+
+/* =========================
+   SNAPSHOT E SCHEDA GIOCATORE — come la Scheda V2/V3
+========================= */
+
+.player-detail-card {
+  border-radius: var(--radius-xl);
+}
+
+/* testata: sfumatura del colore ruolo + cerchi tratteggiati */
+.player-detail-header {
+  --rc: var(--accent);
+  position: relative;
+  overflow: hidden;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-xl);
+  background:
+    radial-gradient(520px 260px at 100% 0%, color-mix(in srgb, var(--rc) 26%, transparent), transparent 70%),
+    linear-gradient(135deg, var(--surface-light), var(--surface));
+}
+
+.player-detail-header:has(.player-detail-role-p) { --rc: var(--role-p); }
+.player-detail-header:has(.player-detail-role-d) { --rc: var(--role-d); }
+.player-detail-header:has(.player-detail-role-c) { --rc: var(--role-c); }
+.player-detail-header:has(.player-detail-role-a) { --rc: var(--role-a); }
+
+.player-detail-header::after {
+  content: "";
+  position: absolute;
+  right: -140px;
+  top: 50%;
+  width: 520px;
+  height: 520px;
+  transform: translateY(-50%);
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 600'%3E%3Cg fill='none' stroke='rgba(255,255,255,0.13)' stroke-width='2' stroke-dasharray='6 14' stroke-linecap='round'%3E%3Ccircle cx='300' cy='300' r='120'/%3E%3Ccircle cx='300' cy='300' r='190'/%3E%3Ccircle cx='300' cy='300' r='260'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat;
+  pointer-events: none;
+}
+
+.player-detail-header > * {
+  position: relative;
+  z-index: 1;
+}
+
+.player-detail-identity {
+  align-items: center;
+  gap: 20px;
+}
+
+/* quadrato ruolo grande e inclinato */
+.player-detail-role {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 20px;
+  background: var(--rc, var(--accent));
+  color: #0f1214;
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 800;
+  transform: rotate(-6deg);
+  box-shadow: 0 10px 30px -8px var(--rc, var(--accent));
+}
+
+.player-detail-role-p { --rc: var(--role-p); background: var(--role-p); }
+.player-detail-role-d { --rc: var(--role-d); background: var(--role-d); }
+.player-detail-role-c { --rc: var(--role-c); background: var(--role-c); }
+.player-detail-role-a { --rc: var(--role-a); background: var(--role-a); }
+
+.player-detail-eyebrow::before {
+  background: var(--rc, var(--accent));
+}
+
+.player-detail-header h2 {
+  margin: 4px 0 0;
+  font-size: clamp(28px, 4.2vw, 48px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.055em;
+}
+
+.player-detail-header h2::after {
+  content: ".";
+  color: var(--rc, var(--accent));
+}
+
+.player-detail-header p {
+  margin-top: 8px;
+  color: var(--text-soft);
+  font-size: 15px;
+}
+
+.player-detail-call-button {
+  border-radius: 0;
+  border: 1.5px solid var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 800;
+  text-transform: lowercase;
+}
+
+.player-detail-call-button:hover:not(:disabled) {
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 var(--accent-soft);
+}
+
+.player-detail-close-button {
+  border-radius: var(--radius-pill);
+}
+
+/* card dei numeri: grandi, la prima verde piena */
+.player-current-metrics > div {
+  padding: 16px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.player-current-metrics > div > span,
+.player-role-stats > div > span {
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--muted);
+}
+
+.player-current-metrics > div > span::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 7px;
+  border-radius: 2px;
+  background: var(--accent);
+  transform: rotate(45deg) translateY(-1px);
+}
+
+.player-current-metrics > div > strong {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.06em;
+  font-variant-numeric: tabular-nums;
+}
+
+.player-current-metrics > div > small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.player-current-metrics > div:first-child {
+  border: 0;
+  background: linear-gradient(150deg, var(--accent), var(--accent-strong));
+}
+
+.player-current-metrics > div:first-child,
+.player-current-metrics > div:first-child * {
+  color: var(--accent-ink);
+}
+
+.player-current-metrics > div:first-child > span::before {
+  background: var(--accent-ink);
+}
+
+/* sezioni grafico e ultima stagione */
+.player-chart-grid > *,
+.player-overlay-stats {
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+}
+
+.player-chart-grid h3,
+.player-overlay-stats h3 {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+}
+
+.player-chart-grid h3::after,
+.player-overlay-stats h3::after {
+  content: ".";
+  color: var(--accent);
+}
+
+.player-role-stats > div {
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--surface-light);
+}
+
+.player-role-stats > div > strong {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+}
+
+.player-detail-full-button {
+  border-radius: 0;
+  border: 1.5px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.player-detail-full-button::after {
+  content: " →";
+}
+
+@media (max-width: 520px) {
+  .player-detail-role {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    font-size: 24px;
+  }
+
+  .player-current-metrics > div > strong {
+    font-size: 26px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .player-detail-role { transform: none; }
+}
+
+/* badge ruolo: la lettera era colorata come lo sfondo (regola .role-x di players.css) */
+.role-badge.role-p,
+.role-badge.role-d,
+.role-badge.role-c,
+.role-badge.role-a {
+  color: #0f1214;
+}
+
+/* =========================
+   PREZZO E SAGGI — come la Scheda V2
+========================= */
+
+.player-chart-grid > .player-sage-section {
+  grid-column: 1 / -1;
+}
+
+.player-sage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.player-sage-lead {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.player-sage-kicker {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.player-sage-kicker::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 7px;
+  border-radius: 2px;
+  background: var(--accent);
+  transform: rotate(45deg) translateY(-1px);
+}
+
+.player-sage-big {
+  font-family: var(--font-display);
+  font-size: 72px;
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -0.07em;
+  color: var(--text);
+}
+
+.player-sage-big small {
+  margin-left: 6px;
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--muted);
+}
+
+.player-sage-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.player-sage-strip {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 6px;
+}
+
+.player-sage-strip text {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  fill: var(--muted);
+}
+
+.player-sage-strip .strip-axis { stroke: var(--surface-raised); stroke-width: 2; }
+.player-sage-strip .strip-range { stroke: var(--accent); stroke-width: 4; stroke-linecap: round; opacity: 0.45; }
+.player-sage-strip .strip-dot { fill: var(--accent); stroke: var(--surface); stroke-width: 2; }
+.player-sage-strip .strip-median { stroke: var(--text); stroke-width: 1.5; }
+.player-sage-strip .strip-median-label { fill: var(--text); font-weight: 700; }
+
+.player-sage-table {
+  overflow-x: auto;
+  padding: 6px 10px;
+  border-radius: var(--radius-md);
+  background: var(--surface-light);
+}
+
+.player-sage-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+.player-sage-table th,
+.player-sage-table td {
+  padding: 9px 7px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.player-sage-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.player-sage-table th {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.player-sage-table .n {
+  text-align: right;
+}
+
+.player-sage-table td.n {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.player-sage-median td {
+  color: var(--muted);
+}
+
+.player-sage-median td.n {
+  color: var(--text);
+}
+
+.player-sage-dots {
+  display: inline-flex;
+  gap: 3px;
+  vertical-align: middle;
+}
+
+.player-sage-dots i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--surface-raised);
+}
+
+.player-sage-dots i.on {
+  background: var(--accent);
+}
+
+@media (max-width: 900px) {
+  .player-sage {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .player-sage-big {
+    font-size: 56px;
+  }
+}
+
+/* =========================
+   SCHEDA COMPLETA — impaginazione V2
+========================= */
+
+.player-full-page-v3 {
+  --rc: var(--accent);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 1300px;
+}
+
+.player-full-page-v3.player-tone-p { --rc: var(--role-p); }
+.player-full-page-v3.player-tone-d { --rc: var(--role-d); }
+.player-full-page-v3.player-tone-c { --rc: var(--role-c); }
+.player-full-page-v3.player-tone-a { --rc: var(--role-a); }
+
+.player-full-page-v3 > * {
+  margin: 0;
+}
+
+.player-full-page-v3 .player-full-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 20px;
+  padding: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-xl);
+  background:
+    radial-gradient(520px 260px at 100% 0%, color-mix(in srgb, var(--rc) 26%, transparent), transparent 70%),
+    linear-gradient(135deg, var(--surface-light), var(--surface));
+}
+
+/* la parola del ruolo, gigante e solo contorno, sul fondo della testata */
+.player-full-page-v3 .player-full-header::before {
+  content: attr(data-role-word);
+  position: absolute;
+  right: -10px;
+  bottom: -0.22em;
+  font-family: var(--font-display);
+  font-size: clamp(64px, 11vw, 150px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.06em;
+  color: transparent;
+  -webkit-text-stroke: 1px color-mix(in srgb, var(--rc) 35%, transparent);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.player-full-page-v3 .player-full-identity {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  min-width: 0;
+  text-align: left;
+}
+
+.player-full-page-v3 .player-full-identity small {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--muted);
+}
+
+.player-full-page-v3 .player-full-identity small::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 7px;
+  border-radius: 2px;
+  background: var(--rc);
+  transform: rotate(45deg) translateY(-1px);
+}
+
+.player-full-page-v3 .player-full-identity h1 {
+  display: block;
+  margin: 4px 0 0;
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.055em;
+  text-wrap: balance;
+}
+
+.player-full-page-v3 .player-full-identity h1::after {
+  content: ".";
+  color: var(--rc);
+}
+
+.player-full-page-v3 .player-full-identity p {
+  margin: 8px 0 12px;
+  color: var(--text-soft);
+  font-size: 15px;
+}
+
+.player-full-page-v3 .player-full-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.player-full-back {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 17px;
+  cursor: pointer;
+  transition: background var(--motion-fast), color var(--motion-fast);
+}
+
+.player-full-back:hover {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* numeri chiave in fila sotto la testata */
+.player-full-page-v3 > .player-current-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+}
+
+/* sezioni */
+.player-full-page-v3 .player-full-section {
+  padding: 24px;
+}
+
+.player-section-heading {
+  margin-bottom: 18px;
+}
+
+.player-section-heading > span {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--muted);
+}
+
+.player-section-heading > span::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 7px;
+  border-radius: 2px;
+  background: var(--rc, var(--accent));
+  transform: rotate(45deg) translateY(-1px);
+}
+
+.player-section-heading h2 {
+  margin: 6px 0 0;
+}
+
+.player-full-page-v3 .player-role-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.player-full-page-v3 .player-role-stats > div,
+.player-guide-summary > div,
+.player-advanced-grid > div {
+  padding: 10px 12px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--surface-light);
+}
+
+.player-guide-summary > div > span,
+.player-advanced-grid > div > span {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: 11.5px;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--muted);
+}
+
+.player-guide-summary > div > strong,
+.player-advanced-grid > div > strong {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+}
+
+.player-advanced-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+}
+
+.player-full-page-v3 .player-full-section ul {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.player-full-page-v3 .player-full-section li {
+  position: relative;
+  padding-left: 18px;
+  color: var(--text-soft);
+}
+
+.player-full-page-v3 .player-full-section li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--muted);
+  transform: rotate(45deg);
+}
+
+@media (max-width: 820px) {
+  .player-full-page-v3 .player-full-header {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 22px;
+  }
+
+  .player-full-page-v3 .player-full-actions {
+    justify-content: flex-end;
+  }
+
+  .player-full-page-v3 .player-full-section {
+    padding: 18px;
+  }
+}
+
+.player-full-page-v3 .player-full-identity h1.no-dot::after,
+.player-detail-header h2.no-dot::after {
+  content: none;
+}
+
+/* =========================
+   INSIGHTS — allenatori compatti, battitori FantaLab
+========================= */
+
+.coach-grid {
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 12px;
+}
+
+.coach-card {
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  background: var(--surface-light);
+}
+
+.coach-card-header {
+  padding: 0 0 12px;
+  border-bottom: 0;
+}
+
+.coach-title-row strong {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.coach-card-header small {
+  color: var(--muted);
+}
+
+.coach-formation {
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+.coach-key-roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 12px;
+}
+
+.coach-key-role {
+  padding: 3px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: var(--radius-pill);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-soft);
+}
+
+.coach-key-good { border-color: var(--good, var(--accent)); background: var(--accent); color: var(--accent-ink); }
+.coach-key-bad { border-color: var(--red); background: var(--red); color: #2b0a0a; }
+
+.coach-card-body {
+  display: grid;
+  grid-template-columns: 130px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 0;
+}
+
+.coach-pitch {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4.2;
+  min-height: 0;
+  max-height: 190px;
+  border-radius: var(--radius-sm);
+}
+
+.coach-player-marker {
+  width: 18px;
+  height: 18px;
+  font-size: 0;
+}
+
+.coach-macro-role-list {
+  display: grid;
+  gap: 2px;
+}
+
+.coach-macro-role-row {
+  min-height: 0;
+  padding: 3px 6px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+}
+
+.coach-macro-role-row:hover {
+  background: var(--surface);
+}
+
+.coach-macro-role-name {
+  gap: 8px;
+}
+
+.coach-macro-role-name strong {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.coach-macro-role-name small {
+  display: none;
+}
+
+.coach-role-dot {
+  width: 22px;
+  height: 22px;
+  font-size: 9px;
+}
+
+.coach-impact-value {
+  min-width: 52px;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  text-align: right;
+}
+
+.coach-impact-neutral {
+  color: var(--muted-soft);
+  background: none;
+}
+
+/* battitori */
+.set-piece-card {
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  background: var(--surface-light);
+}
+
+.set-piece-card ol,
+.set-piece-card li {
+  font-size: 13px;
+}
+
+.set-piece-label {
+  font-size: 12px;
+}
+
+/* =========================
+   RIGORI E PIAZZATI — card V3
+========================= */
+
+.set-pieces-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
+}
+
+.set-pieces-section .set-piece-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-lg);
+  background: var(--surface-light);
+}
+
+.set-pieces-section .set-piece-team {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+}
+
+.set-pieces-section .set-piece-team strong {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.set-pieces-section .set-piece-team strong::after {
+  content: ".";
+  color: var(--accent);
+}
+
+.set-pieces-section .set-piece-team small {
+  padding: 2px 9px;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.set-pieces-section .set-piece-columns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.set-piece-column {
+  min-width: 0;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+
+.set-pieces-section .set-piece-label {
+  display: block;
+  margin-bottom: 8px;
+  font-family: var(--font-ui);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--muted);
+}
+
+.set-pieces-section .set-piece-label::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 6px;
+  border-radius: 2px;
+  background: var(--accent);
+  transform: rotate(45deg) translateY(-1px);
+}
+
+.set-pieces-section ol {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.set-pieces-section li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: 12.5px;
+  color: var(--text-soft);
+}
+
+.set-piece-rank {
+  width: 18px;
+  height: 18px;
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 6px;
+  background: var(--surface-raised);
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.set-pieces-section li.is-first {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.set-pieces-section li.is-first .set-piece-rank {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.set-pieces-section .set-piece-role {
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  font-size: 9.5px;
+}
+
+.set-piece-name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.set-pieces-section .set-piece-empty {
+  margin: 0;
+  color: var(--muted-soft);
+}
+
+/* tre righe per card invece di tre colonne: i nomi restano leggibili */
+.set-pieces-section .set-piece-columns {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+}
+
+.set-piece-column {
+  display: grid;
+  grid-template-columns: 82px minmax(0, 1fr);
+  align-items: start;
+  gap: 8px;
+  padding: 8px 10px;
+}
+
+.set-pieces-section .set-piece-label {
+  margin: 2px 0 0;
+  white-space: nowrap;
+}
+
+.set-pieces-section ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+}
+
+.set-pieces-section li {
+  font-size: 13px;
+}
+
+/* =========================
+   ABBINAMENTI PORTIERI
+========================= */
+
+.goalkeeper-search-area {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.goalkeeper-search-box {
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+}
+
+.goalkeeper-team-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.goalkeeper-team-chip {
+  padding: 6px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-soft);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform var(--motion-fast), background var(--motion-fast);
+}
+
+.goalkeeper-team-chip:hover {
+  transform: translateY(-1px);
+}
+
+.goalkeeper-team-chip.selected {
+  border-color: var(--role-p);
+  background: var(--role-p);
+  color: #0f1214;
+}
+
+.goalkeeper-recommendations {
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-lg);
+  background: var(--surface-light);
+}
+
+.goalkeeper-selection-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.goalkeeper-selection-heading strong {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.goalkeeper-selection-heading strong small {
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--muted);
+}
+
+.goalkeeper-recommendations-list {
+  display: grid;
+  gap: 8px;
+}
+
+.goalkeeper-recommendation {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.goalkeeper-recommendation:first-child {
+  background: linear-gradient(150deg, var(--accent), var(--accent-strong));
+  color: var(--accent-ink);
+}
+
+.goalkeeper-recommendation:first-child * {
+  color: var(--accent-ink);
+}
+
+.goalkeeper-rank {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  background: var(--role-p);
+  color: #0f1214;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.goalkeeper-recommendation:first-child .goalkeeper-rank {
+  background: var(--accent-ink);
+  color: var(--accent);
+}
+
+.goalkeeper-recommendation-team {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 10px;
+  min-width: 0;
+}
+
+.goalkeeper-recommendation-team strong {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.goalkeeper-keeper {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-soft);
+}
+
+.goalkeeper-recommendation-team small {
+  flex-basis: 100%;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.goalkeeper-recommendation:first-child small {
+  opacity: 0.8;
+}
+
+.goalkeeper-score {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.06em;
+  color: var(--accent);
+}
+
+.goalkeeper-recommendations-empty {
+  border-radius: var(--radius-md);
+  color: var(--muted);
+}
+
+/* =========================
+   GRIGLIA ABBINAMENTI
+========================= */
+
+.goalkeeper-matrix-dialog {
+  width: min(1400px, calc(100vw - 32px));
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-xl);
+  background: var(--bg);
+}
+
+.goalkeeper-matrix-header h2::after {
+  content: ".";
+  color: var(--accent);
+}
+
+.goalkeeper-matrix-header p {
+  max-width: 70ch;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.goalkeeper-matrix-close {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 18px;
+}
+
+.goalkeeper-matrix-close:hover {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.goalkeeper-matrix-scroll {
+  scrollbar-color: var(--surface-raised) transparent;
+  scrollbar-width: thin;
+}
+
+.goalkeeper-matrix-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 3px;
+  table-layout: fixed;
+}
+
+.goalkeeper-matrix-table th,
+.goalkeeper-matrix-table td {
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* intestazioni fisse durante lo scorrimento */
+.goalkeeper-matrix-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.goalkeeper-matrix-table tbody th {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  width: 104px;
+  padding: 0 10px;
+  background: var(--surface);
+  color: var(--text-soft);
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  text-align: left;
+}
+
+.goalkeeper-matrix-corner {
+  left: 0;
+  z-index: 3 !important;
+  width: 104px;
+}
+
+/* scala di colore leggibile: rosso → giallo → verde */
+.goalkeeper-matrix-table td.matrix-low { background: color-mix(in srgb, var(--red) 22%, var(--surface)); color: #ffc2c2; }
+.goalkeeper-matrix-table td.matrix-medium { background: color-mix(in srgb, var(--yellow) 18%, var(--surface)); color: #f6e7a6; }
+.goalkeeper-matrix-table td.matrix-good { background: color-mix(in srgb, var(--accent) 22%, var(--surface)); color: var(--accent-soft); }
+.goalkeeper-matrix-table td.matrix-excellent { background: var(--accent); color: var(--accent-ink); }
+.goalkeeper-matrix-table td.matrix-empty { background: transparent; color: var(--muted-soft); }
+
+/* squadra scelta: riga e colonna evidenziate, il resto si attenua */
+.goalkeeper-matrix-table:has(.is-selected) td:not(.is-selected) {
+  opacity: 0.45;
+}
+
+.goalkeeper-matrix-table tr.is-selected td,
+.goalkeeper-matrix-table td.is-selected {
+  opacity: 1;
+  box-shadow: inset 0 0 0 1.5px var(--role-p);
+}
+
+.goalkeeper-matrix-table th.is-selected,
+.goalkeeper-matrix-table tr.is-selected th {
+  background: var(--role-p);
+  color: #0f1214;
+}
+
+.goalkeeper-matrix-table td:hover {
+  outline: 2px solid var(--text);
+  outline-offset: -2px;
+}
+
+.goalkeeper-matrix-legend span {
+  font-size: 12px;
+}
+
+@media (max-width: 820px) {
+  .goalkeeper-recommendation {
+    grid-template-columns: 30px minmax(0, 1fr) auto;
+    padding: 10px 12px;
+  }
+
+  .goalkeeper-score {
+    font-size: 22px;
+  }
+
+  .goalkeeper-matrix-table {
+    width: auto;
+    table-layout: auto;
+  }
+
+  .goalkeeper-matrix-table td {
+    min-width: 38px;
+  }
+}
+
+/* griglia: larghezza naturale (riempie la finestra quando c'è spazio) */
+.goalkeeper-matrix-table {
+  width: max-content;
+  min-width: 100%;
+  table-layout: auto;
+}
+
+.goalkeeper-matrix-table td {
+  min-width: 46px;
+}
+
+.goalkeeper-matrix-header h2 {
+  display: flex;
+  align-items: baseline;
+}
+
+.goalkeeper-matrix-scroll::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.goalkeeper-matrix-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.goalkeeper-matrix-scroll::-webkit-scrollbar-thumb {
+  border: 2px solid var(--bg);
+  border-radius: var(--radius-pill);
+  background: var(--surface-raised);
+}
+
+.goalkeeper-matrix-scroll::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+.goalkeeper-matrix-table td.matrix-excellent {
+  color: var(--accent-ink) !important;
+}
+
+/* =========================
+   SNAPSHOT — parola del ruolo e storico MV/FMV
+========================= */
+
+.player-detail-header::before {
+  content: attr(data-role-word);
+  position: absolute;
+  right: -10px;
+  bottom: -0.22em;
+  z-index: 0;
+  font-family: var(--font-display);
+  font-size: clamp(56px, 9vw, 120px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.06em;
+  color: transparent;
+  -webkit-text-stroke: 1px color-mix(in srgb, var(--rc, var(--accent)) 35%, transparent);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* storico a tutta larghezza come Prezzo e Saggi, su fondo più chiaro */
+.player-chart-grid > .player-history-section {
+  grid-column: 1 / -1;
+  background: var(--surface-light);
+}
+
+.player-history-section .player-chart svg {
+  max-height: 260px;
+}
+
+.player-history-section .chart-grid-line,
+.player-history-section .chart-axis {
+  stroke: rgba(255, 255, 255, 0.16);
+}
+
+.player-history-section .chart-tick,
+.player-history-section .chart-label,
+.player-history-section .chart-axis-title,
+.player-history-section .chart-legend {
+  fill: var(--text-soft);
+  color: var(--text-soft);
+}
+
+.player-history-section .chart-line {
+  stroke-width: 3;
+}
+
+.player-history-section .chart-line-mv { stroke: var(--blue); }
+.player-history-section .chart-line-fmv { stroke: var(--accent); }
+.player-history-section .chart-dot-mv { fill: var(--blue); }
+.player-history-section .chart-dot-fmv { fill: var(--accent); }
+
+.player-history-section .chart-value {
+  fill: var(--text);
+  font-weight: 700;
+}
+
+.player-chart-grid > .player-history-section {
+  border-color: rgba(255, 255, 255, 0.12);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02)),
+    var(--surface-raised);
+}
+
+/* barre di scorrimento scure in tutta l'app */
+* {
+  scrollbar-color: var(--surface-raised) transparent;
+  scrollbar-width: thin;
+}
+
+/* =========================
+   CONTESTO SQUADRA (snapshot)
+========================= */
+
+.player-chart-grid > .player-history-section {
+  background: var(--surface);
+  border-color: rgba(255, 255, 255, 0.07);
+}
+
+.team-context {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 0.9fr);
+  gap: 12px;
+}
+
+.team-context > div {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: var(--surface-light);
+}
+
+.team-context-kicker {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.team-context-kicker::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 7px;
+  border-radius: 2px;
+  background: var(--rc, var(--accent));
+  transform: rotate(45deg) translateY(-1px);
+}
+
+.team-context-team > strong {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.05em;
+}
+
+.team-context-meta,
+.team-context-roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.team-context-pill {
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--text-soft);
+  font-family: var(--font-display);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.team-context-role {
+  padding: 3px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: var(--radius-pill);
+  color: var(--text-soft);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.team-context-role.tone-good { border-color: var(--accent); background: var(--accent); color: var(--accent-ink); }
+.team-context-role.tone-bad { border-color: var(--red); background: var(--red); color: #2b0a0a; }
+
+.team-context-player ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.team-context-player li {
+  position: relative;
+  padding-left: 18px;
+  color: var(--text-soft);
+  font-size: 13.5px;
+}
+
+.team-context-player li b {
+  color: var(--text);
+  font-weight: 800;
+}
+
+.team-context-player li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.45em;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--muted);
+  transform: rotate(45deg);
+}
+
+.team-context-player li.tone-good::before { background: var(--accent); }
+.team-context-player li.tone-bad::before { background: var(--red); }
+
+.team-context-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.team-context-form-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+
+.team-context-form-item > span {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.team-context-form-item > strong {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.06em;
+}
+
+.team-context-form-item > small {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.team-context-form-item .trend-up { color: var(--accent); }
+.team-context-form-item .trend-down { color: var(--red); }
+
+@media (max-width: 900px) {
+  .team-context {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* logo: "Mister" bianco, "Canà" verde */
+.brand {
+  text-transform: none;
+}
+
+.brand-mister {
+  color: var(--text);
+}
+
+.brand-cana {
+  color: var(--accent);
+}

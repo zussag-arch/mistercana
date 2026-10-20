@@ -1,4 +1,5 @@
 import { players as legacyPlayers } from '../data/players'
+import { getSaggiForPlayer } from '../data/saggi'
 import type { Player } from '../domain/player'
 import {
   getFldaBulkHistory,
@@ -108,6 +109,7 @@ async function rebuildICaV2Cache(): Promise<void> {
 
   if (
     currentDataset?.source !== 'flda'
+    || historyState.status !== 'loaded'
   ) {
     return
   }
@@ -305,6 +307,7 @@ async function enrichPlayerSignals(players: FldaPlayer[]): Promise<FldaPlayer[]>
     const keyRoles = Array.isArray(guide.key_roles)
   ? (guide.key_roles as FldaRecord[])
       .flatMap((row): ICaCoachRole[] => {
+        if (!row || typeof row !== 'object') return []
         const role =
           typeof row.role === 'string'
             ? row.role
@@ -412,6 +415,9 @@ export async function loadPlayerDetail(id: string): Promise<FldaPlayerDetail> {
   if (pending) return pending
   const request = getFldaPlayerDetail(id)
     .then(async (value) => {
+      if (!Array.isArray(value.saggi) || !value.saggi.length) {
+        value.saggi = legacySaggiFor(id)
+      }
       if (!Array.isArray(value.auction_prices)) {
         value.auction_prices = await getFldaHistoricalAuctionPrices(id)
           .catch(() => [])
@@ -422,6 +428,20 @@ export async function loadPlayerDetail(id: string): Promise<FldaPlayerDetail> {
     .finally(() => detailRequests.delete(id))
   detailRequests.set(id, request)
   return request
+}
+
+// Prezzi dei Saggi dal CSV storico, collegati tramite la mappa identità legacy ↔ FLDA.
+function legacySaggiFor(fldaId: string): FldaRecord[] {
+  const legacyId = getLegacyIdFromFldaId(fldaId)
+  if (!legacyId) return []
+  return getSaggiForPlayer(legacyId).map((record) => ({
+    saggio: record.saggio,
+    fascia: record.fasciaOriginale,
+    fascia_valore: record.fasciaValore ?? null,
+    affidabilita: record.affidabilita ?? null,
+    integrita: record.integrita ?? null,
+    prezzo: record.prezzo ?? null,
+  }))
 }
 
 export function getCachedPlayerDetail(id: string): FldaPlayerDetail | undefined {

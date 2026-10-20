@@ -8,6 +8,10 @@ import './styles/playerDetail.css'
 import './styles/objectives.css'
 import './styles/insights.css'
 import './styles/importExport.css'
+import './styles/theme-v3.css'
+import './styles/theme-v3-auction.css'
+import './styles/theme-v3-dashboard.css'
+import './styles/theme-v3-objectives.css'
 
 import {
   renderNavigation,
@@ -26,6 +30,7 @@ import {
 import {
   renderPlayersPage,
   bindPlayersEvents,
+  setPlayersRoleFilter,
 } from './pages/players'
 
 import {
@@ -820,7 +825,8 @@ function bindPageEvents(
             render,
 
           onGoToPlayers:
-            () => {
+            (role) => {
+              setPlayersRoleFilter(role)
               navigateAndRender(
                 'players',
               )

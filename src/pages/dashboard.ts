@@ -1,3 +1,7 @@
+import { getCachedPlayersDataset, loadPlayersDataset } from '../services/playerRepository'
+import { summarizeManagerAssignments } from '../services/auctionPlayerResolver'
+import { ROSTER_SLOT_LIMITS } from '../domain/auctionContext'
+
 import type {
   AppState,
   BudgetProfile,
@@ -946,6 +950,73 @@ function renderRecapOverlay(
   `
 }
 
+
+const ROLE_NAMES: Record<BudgetRole, string> = { P: 'Portieri', D: 'Difensori', C: 'Centrocampisti', A: 'Attaccanti' }
+
+// Durante l'asta: situazione dell'owner (crediti, slot, previsto contro speso per reparto).
+function renderLiveSummary(state: AppState): string {
+  const owner = state.managers.find((manager) => manager.isOwner)
+  if (!owner) return ''
+  const { spent, slots } = summarizeManagerAssignments(state.auctionAssignments, owner.id, getCachedPlayersDataset())
+  const roles: BudgetRole[] = ['P', 'D', 'C', 'A']
+  const totalSpent = roles.reduce((sum, role) => sum + spent[role], 0)
+  const credits = state.initialCredits - totalSpent
+  const totalSlots = roles.reduce((sum, role) => sum + ROSTER_SLOT_LIMITS[role], 0)
+  const filled = roles.reduce((sum, role) => sum + slots[role], 0)
+  const missing = totalSlots - filled
+  // ogni slot ancora vuoto costa almeno 1 credito
+  const maxBid = missing > 0 ? Math.max(0, credits - (missing - 1)) : 0
+  const ownerAssignments = state.auctionAssignments.filter((item) => item.managerId === owner.id).length
+
+  return `
+    <section class="dashboard-live-summary">
+      <header>
+        <div>
+          <span class="dashboard-eyebrow">Asta in corso</span>
+          <h2>La tua asta</h2>
+        </div>
+        <span class="dashboard-live-count">${state.auctionAssignments.length} assegnati in totale · ${ownerAssignments} tuoi</span>
+      </header>
+      <div class="dashboard-live-kpis">
+        <div class="dashboard-live-kpi lead"><span>Crediti rimasti</span><strong>${credits}</strong><small>su ${state.initialCredits}</small></div>
+        <div class="dashboard-live-kpi"><span>Rilancio massimo</span><strong>${maxBid}</strong><small>tenendo 1 cr per slot vuoto</small></div>
+        <div class="dashboard-live-kpi"><span>Rosa</span><strong>${filled}<small>/${totalSlots}</small></strong><small>${missing} slot da coprire</small></div>
+        <div class="dashboard-live-kpi"><span>Spesi</span><strong>${totalSpent}</strong><small>${Math.round(totalSpent / state.initialCredits * 100)}% del budget</small></div>
+      </div>
+      <div class="dashboard-live-roles">
+        ${roles.map((role) => {
+          const planned = Math.round(state.budgetDistribution[role] / 100 * state.initialCredits)
+          const used = spent[role]
+          const ratio = planned > 0 ? used / planned : 0
+          const tone = ratio > 1 ? 'over' : ratio > 0.85 ? 'near' : 'ok'
+          return `
+            <article class="dashboard-live-role live-role-${role.toLowerCase()} tone-${tone}">
+              <div class="dashboard-live-role-head">
+                <span class="role-badge role-${role.toLowerCase()}">${role}</span>
+                <strong>${ROLE_NAMES[role]}</strong>
+                <small>${slots[role]}/${ROSTER_SLOT_LIMITS[role]} slot</small>
+              </div>
+              <div class="dashboard-live-bar" aria-label="${used} spesi su ${planned} previsti">
+                <i style="width:${Math.min(100, Math.round(ratio * 100))}%"></i>
+              </div>
+              <p><b>${used}</b> spesi su <b>${planned}</b> previsti · ${used > planned ? `<span class="over">+${used - planned} oltre</span>` : `${planned - used} disponibili`}</p>
+            </article>`
+        }).join('')}
+      </div>
+    </section>`
+}
+
+// Prima dell'asta: i tre passi da completare, con lo stato di ciascuno.
+function renderSetupSteps(state: AppState, activeCount: number, distributionIsValid: boolean): string {
+  const steps: Array<[string, string, boolean]> = [
+    ['Allenatori', activeCount >= 2 ? `${activeCount} partecipanti` : 'aggiungi almeno un avversario', activeCount >= 2],
+    ['Budget', distributionIsValid ? `${state.initialCredits} crediti · distribuzione 100%` : 'la distribuzione deve fare 100%', distributionIsValid],
+    ['Avvio', "apri il Recap e avvia l'asta", false],
+  ]
+  return `<ol class="dashboard-setup-steps">${steps.map(([title, text, done], index) => `
+    <li class="${done ? 'done' : ''}"><span class="dashboard-step-number">${done ? '✓' : index + 1}</span><div><strong>${title}</strong><small>${text}</small></div></li>`).join('')}</ol>`
+}
+
 export function renderDashboardPage(
   state: AppState,
 ): string {
@@ -1040,6 +1111,7 @@ export function renderDashboardPage(
           </button>
         </div>
       </div>
+      ${state.auctionPhase === 'live' ? renderLiveSummary(state) : renderSetupSteps(state, activeManagers.length, distributionIsValid)}
 
       <section
         class="
@@ -1614,6 +1686,12 @@ export function bindDashboardEvents(
   state: AppState,
   actions: DashboardActions,
 ): void {
+  // "La tua asta" ha bisogno dei ruoli dei giocatori: se il catalogo non è ancora
+  // caricato lo carica e ridisegna una volta.
+  if (state.auctionPhase === 'live' && !getCachedPlayersDataset()) {
+    void loadPlayersDataset().then(() => actions.onStateChange())
+  }
+
   const locked =
     isDashboardLocked(
       state,

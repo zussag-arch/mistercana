@@ -24,6 +24,11 @@ interface PlayersActions {
   onOpenFullPlayer: (reference: string) => void
 }
 
+// Passaggio contestuale Asta → Players: allinea il filtro al ruolo attivo dell'asta.
+export function setPlayersRoleFilter(role: PlayerRole): void {
+  viewState.role = role
+}
+
 const viewState = {
   role: 'ALL' as RoleFilter,
   team: 'ALL',
@@ -143,6 +148,7 @@ function renderOverlay(state: AppState, bulk: FldaPlayer[]): string {
     assigned: isAssigned(state, selected.flda), auctionLive: state.auctionPhase === 'live',
     identityAvailable: Boolean(fldaId),
     pmaConfiguration: state.pmaConfiguration,
+    initialCredits: state.initialCredits,
     detail: fldaId ? getCachedPlayerDetail(fldaId) : undefined,
   }
   const shell: Player = selected.legacy ?? {
@@ -164,6 +170,7 @@ function renderRow(state: AppState, player: FldaPlayer): string {
     assigned: isAssigned(state, player), auctionLive: state.auctionPhase === 'live',
     identityAvailable: Boolean(player.player_id),
     pmaConfiguration: state.pmaConfiguration,
+    initialCredits: state.initialCredits,
   }
   const pma = getFldaPma(player, state.pmaConfiguration)
   const iCa = fldaICa(player)
