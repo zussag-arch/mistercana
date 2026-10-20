@@ -7,7 +7,7 @@ import goalkeepersCsv
 import fantalabCoachesCsv
   from '../../database/fantalab_allenatori.csv?raw'
 
-import { getCachedICaV2, getCachedPlayersDataset } from '../services/playerRepository'
+import { getCachedPlayersDataset } from '../services/playerRepository'
 import { getICaV3Results } from '../data/icaV3Data'
 import { localPlayers } from '../services/fantalabLocal'
 
@@ -1384,7 +1384,7 @@ function renderICaV3Section(): string {
   const players = localPlayers().players
   const column = (role: 'P' | 'D' | 'C' | 'A', label: string) => {
     const rows = players.filter((player) => player.role === role && player.player_id)
-      .map((player) => ({ player, v3: results.get(player.player_id as string), v2: getCachedICaV2(player.player_id as string)?.score }))
+      .map((player) => ({ player, v3: results.get(player.player_id as string) }))
       .filter((row) => typeof row.v3?.score === 'number')
     const top = [...rows].sort((a, b) => (b.v3!.score! - a.v3!.score!)).slice(0, 6)
     const deals = rows.filter((row) => row.v3!.score! >= 40 && typeof row.v3!.affare === 'number')
@@ -1392,7 +1392,7 @@ function renderICaV3Section(): string {
     const line = (row: typeof rows[number], deal: boolean) => `<li data-player-ref="${escapeHtml(row.player.player_id ?? '')}">
       <span class="ica3-name">${escapeHtml(row.player.name)}<small>${escapeHtml(row.player.team)}</small></span>
       <span class="ica3-score">${fmt(row.v3!.score)}</span>
-      ${deal ? `<span class="ica3-affare">${signed(row.v3!.affare)}</span>` : `<span class="ica3-v2">V2 ${fmt(row.v2)}</span>`}
+      ${deal || (row.v3!.affare ?? 0) >= 15 ? `<span class="ica3-affare">${signed(row.v3!.affare)}</span>` : `<span class="ica3-v2">affare ${signed(row.v3!.affare)}</span>`}
     </li>`
     return `<article class="ica3-role role-tone-${role.toLowerCase()}">
       <header><span class="role-badge role-${role.toLowerCase()}">${role}</span><strong>${label}</strong></header>
@@ -1407,8 +1407,8 @@ function renderICaV3Section(): string {
       <div class="insight-section-header">
         <div>
           <span class="insight-eyebrow">Valutazione</span>
-          <h2>iCà 3 e affari</h2>
-          <p>iCà 3 = fantapunti attesi rispetto al ruolo (0-100). Affare = posizione per iCà 3 meno posizione per prezzo: positivo se rende più di quanto costa.</p>
+          <h2>iCà e affari</h2>
+          <p>iCà = fantapunti attesi rispetto al ruolo (0-100). Affare = posizione per iCà meno posizione per prezzo: positivo se rende più di quanto costa.</p>
         </div>
         <span class="insight-database-status">FantaLab · ${results.size} giocatori</span>
       </div>

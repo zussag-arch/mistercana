@@ -1,3 +1,4 @@
+import { getICaV3 } from '../data/icaV3Data'
 import type { AppState, AuctionAssignment } from '../app/state'
 import { players as legacyPlayers } from '../data/players'
 import { getFldaPma } from '../domain/pma'
@@ -6,7 +7,6 @@ import type { FldaPlayer } from './flda'
 import { getAssignmentFldaId } from './auctionPlayerResolver'
 import { getFldaIdFromLegacyId, getLegacyIdFromFldaId } from './playerIdentity'
 import type { PlayersDataset } from './playerRepository'
-import { getCachedICaV2 } from './playerRepository'
 
 export interface AuctionStrategyContext {
   state: AppState
@@ -36,7 +36,7 @@ export function adaptFldaPlayer(
       : undefined,
     pmaPercent: getFldaPma(flda, state.pmaConfiguration),
     xFmv: typeof flda.fm_exp === 'number' ? flda.fm_exp : undefined,
-    iCa: getCachedICaV2(flda.player_id)?.score,
+    iCa: getICaV3(flda.player_id)?.score,
     penaltyTaker: legacy?.penaltyTaker ?? flda.penalty_rank === 1,
     status: 'free',
   }

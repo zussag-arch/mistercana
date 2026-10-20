@@ -2,7 +2,6 @@ import type { FldaPlayer, FldaPlayerDetail, FldaRecord } from '../services/flda'
 import type { Player } from '../domain/player'
 import type { PmaConfiguration } from '../app/state'
 import { getFldaPma } from '../domain/pma'
-import { getCachedICaV2 } from '../services/playerRepository'
 import { getICaV3 } from '../data/icaV3Data'
 
 export interface PlayerViewModel {
@@ -92,15 +91,12 @@ export function renderPlayerBadges(view: PlayerViewModel): string {
 
 export function renderCurrentMetrics(view: PlayerViewModel, compact = false,
   historicalPrice?: string): string {
-  const iCaV2 = view.flda.player_id
-    ? getCachedICaV2(view.flda.player_id)?.score
-    : undefined
   const iCaV3 = getICaV3(view.flda.player_id)
   const fldaPma = view.pmaConfiguration ? getFldaPma(view.flda, view.pmaConfiguration) : undefined
   const pmaValue = fldaPma ?? (!view.flda.player_id ? view.legacy?.pmaPercent : undefined)
   const pma = typeof pmaValue === 'number' ? `${display(pmaValue, 1)}%` : '—'
   const items: Array<[string, string, string, string?]> = [
-    ['iCà 3', display(iCaV3?.score, 0), `valore atteso · V2 ${display(iCaV2, 0)}${typeof iCaV3?.affare === 'number' ? ` · affare ${iCaV3.affare > 0 ? '+' : ''}${Math.round(iCaV3.affare)}` : ''}`, 'player-metric-ica'],
+    ['iCà', display(iCaV3?.score, 0), `valore atteso${typeof iCaV3?.affare === 'number' ? ` · affare ${iCaV3.affare > 0 ? '+' : ''}${Math.round(iCaV3.affare)}` : ''}`, 'player-metric-ica'],
     ['PMA', pma, pma === '—' ? 'dato non disponibile' : view.pmaConfiguration ? `${view.pmaConfiguration.mode === 'classic' ? 'Classic' : 'Mantra'} · ${view.pmaConfiguration.participants} · ${view.pmaConfiguration.defenseModifier ? 'con modificatore' : 'senza modificatore'}` : 'budget iniziale'],
     ['xFM', display(view.flda.fm_exp, 2), 'FM Exp. FLDA'],
     ['Integrità', display(view.flda.integrita, 0), ''],
@@ -119,7 +115,7 @@ export function renderCurrentMetrics(view: PlayerViewModel, compact = false,
     ['FMV', display(typeof latestFmv === 'number' ? latestFmv : view.legacy?.fmv, 2), typeof latestFmv === 'number' ? seasonNote : 'dato legacy'],
     ['Titolarità', `${display(view.flda.titolarita_display, 0)}${typeof view.flda.titolarita_display === 'number' ? '%' : ''}`, 'indicatore editoriale'],
   )
-  return `<div class="player-current-metrics${compact ? ' player-current-metrics-full' : ''}">${items.map(([label, value, note, className]) => `<div class="${className ?? ''}"${className === 'player-metric-ica' ? ` style="--ica-hue:${icaHue(iCaV2)}"` : ''}><span>${label}</span><strong>${value}</strong>${note ? `<small>${note}</small>` : ''}</div>`).join('')}</div>`
+  return `<div class="player-current-metrics${compact ? ' player-current-metrics-full' : ''}">${items.map(([label, value, note, className]) => `<div class="${className ?? ''}"${className === 'player-metric-ica' ? ` style="--ica-hue:${icaHue(iCaV3?.score)}"` : ''}><span>${label}</span><strong>${value}</strong>${note ? `<small>${note}</small>` : ''}</div>`).join('')}</div>`
 }
 
 function chartEmpty(message: string): string {
@@ -351,9 +347,9 @@ export function renderTeamContext(view: PlayerViewModel): string {
 // "Perché questo iCà": come nasce l'iCà 3 del giocatore, passo per passo.
 export function renderICaV3Explanation(view: PlayerViewModel): string {
   const result = getICaV3(view.flda.player_id)
-  if (!result) return '<p class="player-data-empty">iCà 3 non disponibile per questo giocatore.</p>'
+  if (!result) return '<p class="player-data-empty">iCà non disponibile per questo giocatore.</p>'
   if (result.score === undefined) {
-    return `<p class="player-data-empty">iCà 3 non calcolabile: manca ${result.missing.join(' e ') || 'un dato'}.</p>`
+    return `<p class="player-data-empty">iCà non calcolabile: manca ${result.missing.join(' e ') || 'un dato'}.</p>`
   }
   const sign = (value: number) => `${value > 0 ? '+' : value < 0 ? '−' : ''}${display(Math.abs(value), 2)}`
   const affare = result.affare
@@ -361,7 +357,7 @@ export function renderICaV3Explanation(view: PlayerViewModel): string {
     : affare >= 15 ? 'rende più di quanto costa' : affare <= -15 ? 'costa più di quanto rende' : 'prezzo in linea con il valore'
   return `<div class="ica-explain">
     <div class="ica-explain-score">
-      <span class="ica-explain-kicker">iCà 3</span>
+      <span class="ica-explain-kicker">iCà</span>
       <strong>${display(result.score, 0)}</strong>
       <small>su 100, nel ruolo</small>
       ${typeof affare === 'number' ? `<span class="ica-explain-affare tone-${affare >= 15 ? 'good' : affare <= -15 ? 'bad' : 'neutral'}">Affare ${affare > 0 ? '+' : ''}${Math.round(affare)}</span><small>${affareText}</small>` : ''}

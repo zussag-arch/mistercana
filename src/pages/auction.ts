@@ -1,3 +1,4 @@
+import { getICaV3 } from '../data/icaV3Data'
 import type {
   AppState,
   AuctionAssignment,
@@ -41,7 +42,6 @@ import type { CanonicalAuctionPlayer } from '../services/auctionPlayerResolver'
 import { calculateRosterMetrics } from '../domain/rosterMetrics'
 import type { RosterMetricPlayer, RosterMetrics } from '../domain/rosterMetrics'
 import { buildAuctionStrategyContext } from '../services/auctionStrategyAdapter'
-import { getCachedICaV2 } from '../services/playerRepository'
 
 const loadingHistoricalPrices = new Set<string>()
 const attemptedHistoricalPrices = new Set<string>()
@@ -2899,7 +2899,7 @@ function getRosterMetrics(state: AppState): RosterMetrics {
           id: flda.player_id,
           team: flda.team,
           role: flda.role as AuctionRole,
-          iCa: getCachedICaV2(flda.player_id)?.score,
+          iCa: getICaV3(flda.player_id)?.score,
           titolarita: flda.titolarita_display,
           xFm: flda.fm_exp,
           presenze: legacy?.appearances,
@@ -5385,7 +5385,7 @@ function renderFldaPlayerCard(
       <div class="auction-main-values">
         <div class="auction-main-value"><span>xFM</span><strong>${formatNumber(flda?.fm_exp ?? undefined, 2)}</strong></div>
         <div class="auction-main-value"><span>Titolarità</span><strong>${formatPercent(flda?.titolarita_display ?? undefined, 0)}</strong></div>
-        <div class="auction-main-value"><span>iCà V2</span><strong>${formatNumber(strategyPlayer?.iCa, 2)}</strong></div>
+        <div class="auction-main-value"><span>iCà</span><strong>${formatNumber(strategyPlayer?.iCa, 0)}</strong></div>
         <div class="auction-main-value auction-history-value"><span>Prezzo storico A/B</span><strong>${displayHistoricalAuctionPrices(historicalDetail)}</strong><small>${historicalDetail?.auction_prices?.length ? 'stagione 2025/26' : 'storico non disponibile'}</small></div>
       </div>
       <div class="auction-insight-row">

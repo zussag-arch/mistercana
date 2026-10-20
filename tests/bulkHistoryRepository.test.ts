@@ -27,7 +27,7 @@ test('bulk history fetch and computation are cached once without per-player deta
   assert.doesNotMatch(loadBody, /getFldaPlayerDetail/)
 })
 
-test('Players and Auction consume the same cached V2 value', () => {
-  assert.match(playersPage, /getCachedICaV2\(player\.player_id\)\?\.score/)
-  assert.match(auction, /getCachedICaV2\(flda\.player_id\)\?\.score/)
+test('Players and Auction consume the same iCà 3 value', () => {
+  assert.match(playersPage, /getICaV3\(player\.player_id\)\?\.score/)
+  assert.match(auction, /getICaV3\(flda\.player_id\)\?\.score/)
 })
