@@ -12,6 +12,7 @@ import type { ICaCoachRole } from '../domain/icaV2'
 import { calculateICaV3 } from '../domain/icaV3'
 import type { ICaV3Input, ICaV3Result, ICaV3Role } from '../domain/icaV3'
 import { players as listone } from './players'
+import { getGoalkeeperTeamCalendar } from './goalkeeperCalendar'
 
 function finite(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value)
@@ -32,6 +33,17 @@ function buildInputs(): ICaV3Input[] {
       teams.set(name, entry)
     }
     return entry
+  }
+
+  // giornata corrente = massimo di presenze registrate nella stagione in corso
+  const currentMatchday = Math.max(0, ...[...history.values()].map((row) => finite(row?.presenze) ? row.presenze : 0))
+  const remaining = (teamName: string) => {
+    const days = getGoalkeeperTeamCalendar(teamName)?.matchups.slice(currentMatchday) ?? []
+    return {
+      calendarEasy: days.filter((value) => value === 2).length,
+      calendarMedium: days.filter((value) => value === 1).length,
+      calendarHard: days.filter((value) => value === 0).length,
+    }
   }
 
   return page.players.flatMap((player): ICaV3Input[] => {
@@ -63,6 +75,7 @@ function buildInputs(): ICaV3Input[] {
       teamIndex: finite(index) ? index : undefined,
       coachTone: coach > 50 ? 'good' : coach < 50 ? 'bad' : 'neutral',
       coachPlayerTone: named('valorizzati') ? 'good' : named('penalizzati') ? 'bad' : undefined,
+      ...remaining(player.team),
       pmaPercent: finite(player.classic_8_mod_median_value) ? player.classic_8_mod_median_value : undefined,
     }]
   })

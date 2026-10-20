@@ -27,6 +27,16 @@ test('set pieces, team index and coach become explicit FM adjustments', () => {
   assert.equal(keeper[0].value, -0.15)
 })
 
+test('remaining calendar adds or removes FM according to easy and hard matches', () => {
+  const easy = fmAdjustments({ ...attacker('x'), role: 'D', calendarEasy: 20, calendarMedium: 6, calendarHard: 5 })
+  const hard = fmAdjustments({ ...attacker('y'), role: 'D', calendarEasy: 5, calendarMedium: 6, calendarHard: 20 })
+  assert.equal(easy[0].label, 'Calendario: 20 facili, 5 difficili su 31')
+  assert.ok(easy[0].value > 0 && hard[0].value < 0)
+  assert.equal(easy[0].value.toFixed(3), (((2 * 20 + 6) / 31 - 1) * 0.4).toFixed(3))
+  // calendario perfettamente medio: nessun correttivo
+  assert.equal(fmAdjustments({ ...attacker('z'), calendarEasy: 5, calendarMedium: 10, calendarHard: 5 }).length, 0)
+})
+
 test('injuries reduce expected appearances up to the configured cap', () => {
   assert.equal(expectedShare(attacker('x', { titolarita: 80 })), 0.8)
   assert.equal(expectedShare(attacker('x', { titolarita: 80, appearances: 3, injuryGamesMissed: 3 })), 0.8 * 0.7)
