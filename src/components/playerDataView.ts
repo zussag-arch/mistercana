@@ -96,7 +96,7 @@ export function renderCurrentMetrics(view: PlayerViewModel, compact = false,
   const pmaValue = fldaPma ?? (!view.flda.player_id ? view.legacy?.pmaPercent : undefined)
   const pma = typeof pmaValue === 'number' ? `${display(pmaValue, 1)}%` : '—'
   const items: Array<[string, string, string, string?]> = [
-    ['iCà', display(iCaV3?.score, 0), `fantapunti a partita ×100${typeof iCaV3?.rolePercentile === 'number' ? ` · meglio del ${Math.round(iCaV3.rolePercentile)}% del ruolo` : ''}${typeof iCaV3?.affare === 'number' ? ` · affare ${iCaV3.affare > 0 ? '+' : ''}${Math.round(iCaV3.affare)}` : ''}`, 'player-metric-ica'],
+    ['iCà', display(iCaV3?.score, 0), `fantapunti a partita ×10${typeof iCaV3?.rolePercentile === 'number' ? ` · meglio del ${Math.round(iCaV3.rolePercentile)}% del ruolo` : ''}${typeof iCaV3?.affare === 'number' ? ` · affare ${iCaV3.affare > 0 ? '+' : ''}${Math.round(iCaV3.affare)}` : ''}`, 'player-metric-ica'],
     ['PMA', pma, pma === '—' ? 'dato non disponibile' : view.pmaConfiguration ? `${view.pmaConfiguration.mode === 'classic' ? 'Classic' : 'Mantra'} · ${view.pmaConfiguration.participants} · ${view.pmaConfiguration.defenseModifier ? 'con modificatore' : 'senza modificatore'}` : 'budget iniziale'],
     ['xFM', display(view.flda.fm_exp, 2), 'FM Exp. FLDA'],
     ['Integrità', display(view.flda.integrita, 0), ''],
@@ -359,7 +359,7 @@ export function renderICaV3Explanation(view: PlayerViewModel): string {
     <div class="ica-explain-score">
       <span class="ica-explain-kicker">iCà</span>
       <strong>${display(result.score, 0)}</strong>
-      <small>fantapunti attesi a partita ×100${typeof result.rolePercentile === 'number' ? ` · meglio del ${Math.round(result.rolePercentile)}% del ruolo` : ''}</small>
+      <small>fantapunti attesi a partita ×10${typeof result.rolePercentile === 'number' ? ` · meglio del ${Math.round(result.rolePercentile)}% del ruolo` : ''}</small>
       ${typeof affare === 'number' ? `<span class="ica-explain-affare tone-${affare >= 15 ? 'good' : affare <= -15 ? 'bad' : 'neutral'}">Affare ${affare > 0 ? '+' : ''}${Math.round(affare)}</span><small>${affareText}</small>` : ''}
     </div>
     <ol class="ica-explain-steps">
@@ -367,7 +367,7 @@ export function renderICaV3Explanation(view: PlayerViewModel): string {
       ${result.contributions.map((item) => `<li class="${item.value > 0 ? 'up' : 'down'}"><b>${sign(item.value)}</b> ${item.label}</li>`).join('')}
       <li><b>Fantamedia corretta ${display(result.adjustedFm, 2)}</b><small>fantamedia attesa più i correttivi</small></li>
       <li><b>× presenze attese ${display((result.expectedShare ?? 0) * 100, 0)}%</b><small>titolarità Guida, ridotta dagli infortuni</small></li>
-      <li class="total"><b>= iCà ${display(result.score, 0)}</b><small>${display((result.score ?? 0) / 100, 2)} fantapunti attesi a partita, ×100</small></li>
+      <li class="total"><b>= iCà ${display(result.score, 0)}</b><small>${display((result.score ?? 0) / 10, 2)} fantapunti attesi a partita, ×10</small></li>
     </ol>
   </div>`
 }

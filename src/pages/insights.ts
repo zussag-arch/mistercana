@@ -1403,7 +1403,7 @@ function renderICaV3Section(): string {
         <div>
           <span class="insight-eyebrow">Valutazione</span>
           <h2>iCà e affari</h2>
-          <p>iCà = fantapunti attesi a partita × 100 (fantamedia corretta × probabilità di giocare × 100). Affare = posizione nel ruolo per iCà meno posizione per prezzo: positivo se rende più di quanto costa.</p>
+          <p>iCà = fantapunti attesi a partita × 10 (fantamedia corretta × probabilità di giocare × 10). Affare = posizione nel ruolo per iCà meno posizione per prezzo: positivo se rende più di quanto costa.</p>
         </div>
         <span class="insight-database-status">FantaLab · ${results.size} giocatori</span>
       </div>
