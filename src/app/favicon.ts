@@ -19,7 +19,7 @@ const PULSE_STEP_MS =
 
 // quota del ciclo in cui il pallino resta acceso al 100%
 const PULSE_HOLD =
-  0.45
+  0.15
 
 const DOT_RED_ON =
   '#F04F4F'
