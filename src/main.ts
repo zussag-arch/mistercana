@@ -8,6 +8,20 @@ import './styles/playerDetail.css'
 import './styles/objectives.css'
 import './styles/insights.css'
 import './styles/importExport.css'
+import './styles/theme-v3.css'
+import './styles/theme-v3-auction.css'
+import './styles/theme-v3-dashboard.css'
+import './styles/theme-v3-objectives.css'
+import './styles/theme-v3-data.css'
+import './styles/theme-light.css'
+import './styles/theme-refine.css'
+import { initTheme } from './theme'
+import { initRoundSelects } from './components/roundSelect'
+import { initAuctionShortcuts } from './components/auctionShortcuts'
+
+initTheme()
+initRoundSelects()
+initAuctionShortcuts()
 
 import {
   renderNavigation,
@@ -26,6 +40,7 @@ import {
 import {
   renderPlayersPage,
   bindPlayersEvents,
+  setPlayersRoleFilter,
 } from './pages/players'
 
 import {
@@ -573,10 +588,17 @@ function mountAuctionCompetitors(
     return
   }
 
-  workspaceMain.insertAdjacentHTML(
-    'beforeend',
-    markup,
-  )
+  // sopra lo storico assegnazioni, se presente
+  const historySlot =
+    workspaceMain.querySelector<HTMLElement>(
+      '.auction-history-slot',
+    )
+
+  if (historySlot) {
+    historySlot.insertAdjacentHTML('beforebegin', markup)
+  } else {
+    workspaceMain.insertAdjacentHTML('beforeend', markup)
+  }
 }
 
 /* =========================
@@ -820,7 +842,8 @@ function bindPageEvents(
             render,
 
           onGoToPlayers:
-            () => {
+            (role) => {
+              setPlayersRoleFilter(role)
               navigateAndRender(
                 'players',
               )
@@ -1050,3 +1073,10 @@ function render():
 }
 
 render()
+
+// PWA: registra il service worker solo nella versione pubblicata
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch(() => { /* senza copia offline l'app funziona lo stesso */ })
+  })
+}

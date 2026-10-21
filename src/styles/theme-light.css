@@ -1,0 +1,203 @@
+/* =========================
+   TEMI
+   Scuro (predefinito) e chiaro "bianco caldo": pastelli rosso,
+   giallo, verde e azzurro, scritte in grigio antracite.
+   Tutti i fogli di stile usano questi colori "a ruolo".
+========================= */
+
+:root {
+  --ink-rgb: 255, 255, 255;          /* velature e linee sottili */
+  --line-1: rgba(255, 255, 255, 0.12);
+  --line-2: rgba(255, 255, 255, 0.06);
+  --on-color: #101315;               /* scritte sopra i badge colorati */
+  --orange: #e98a55;
+  --shadow-strength: 1;
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  background: #f6f1e8;
+
+  --bg: #f6f1e8;
+  --surface: #fffcf6;
+  --surface-soft: #fbf7ef;
+  --surface-light: #f2ece2;
+  --surface-control: #efe8dc;
+  --surface-raised: #e7dfd1;
+
+  --text: #34383c;
+  --text-soft: #4a4f54;
+  --muted: #7a7e80;
+  --muted-soft: #9d9f9e;
+
+  /* accento rosso: il contrasto bianco/rosso del tema chiaro */
+  --accent: #e07a7a;
+  --accent-strong: #c95d5d;
+  --accent-soft: #f6dada;
+  --accent-ink: #fffcf6;
+
+  --green: #58c294;
+  --red: #e58b8b;
+  --orange: #eba27a;
+  --yellow: #e6c35c;
+  --blue: #7db3e3;
+  --purple: #b49fdb;
+
+  --role-p: #f0d77c;
+  --role-d: #8fbde9;
+  --role-c: #8ad3a8;
+  --role-a: #ef9f9f;
+
+  --ink-rgb: 52, 56, 60;
+  --line-1: color-mix(in srgb, var(--bg) 16%, transparent);
+  --line-2: color-mix(in srgb, var(--bg) 9%, transparent);
+  --on-color: #2e3236;
+}
+
+:root[data-theme="light"] body {
+  background:
+    radial-gradient(900px 500px at 85% -10%, rgba(224, 122, 122, 0.12), transparent 60%),
+    radial-gradient(700px 500px at -10% 30%, rgba(125, 179, 227, 0.12), transparent 60%),
+    var(--bg);
+}
+
+/* ombre più leggere su fondo chiaro */
+:root[data-theme="light"] .card,
+:root[data-theme="light"] [class*="card"],
+:root[data-theme="light"] [class*="panel"] {
+  box-shadow: 0 1px 2px rgba(52, 56, 60, 0.05), 0 6px 18px rgba(52, 56, 60, 0.06);
+}
+
+/* ---------- pulsante tema ---------- */
+
+.theme-toggle {
+  flex: none;
+  width: 38px;
+  height: 38px;
+  margin-left: 8px;
+  border-radius: 999px;
+  border: 1px solid var(--line-1);
+  background: var(--surface-light);
+  color: var(--text);
+  cursor: pointer;
+  display: inline-grid;
+  place-items: center;
+  transition: background 0.2s, transform 0.2s, border-color 0.2s;
+}
+.theme-toggle:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+/* luna nel tema scuro, sole in quello chiaro */
+.theme-toggle-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  box-shadow: inset -5px -3px 0 0 var(--yellow);
+  transform: rotate(-20deg);
+}
+:root[data-theme="light"] .theme-toggle-icon {
+  background: var(--yellow);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--yellow) 35%, transparent);
+  transform: none;
+  width: 12px;
+  height: 12px;
+}
+
+/* il pulsante tema sta in fondo alla topbar */
+@media (min-width: 901px) {
+  .topbar {
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+  }
+}
+@media (max-width: 900px) {
+  .topbar {
+    position: relative;
+  }
+  .theme-toggle {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+  }
+}
+
+/* numeri iCà: colori più profondi per restare leggibili sul bianco */
+:root[data-theme="light"] .players-ica {
+  color: hsl(var(--ica-hue), 52%, 42%);
+}
+
+/* etichette pastello usate come testo: più scure sul bianco */
+:root[data-theme="light"] .objective-priority-header span {
+  color: color-mix(in srgb, var(--pc) 55%, var(--text));
+}
+
+/* con l'accento rosso, ciò che è "buono" o "centrocampo" resta verde */
+.dashboard-page .budget-field:nth-child(3)::before { background: var(--role-c); }
+.dashboard-page .budget-field:nth-child(3) > span { color: var(--role-c); }
+:root[data-theme="light"] .players-affare.affare-good { background: var(--green); color: var(--on-color); }
+:root[data-theme="light"] .players-affare.affare-bad { background: var(--surface-raised); color: var(--red); }
+:root[data-theme="light"] .dashboard-live-role.live-role-c .dashboard-live-bar span { background: var(--role-c); }
+:root[data-theme="light"] .player-status-free { background: var(--green); color: var(--on-color); }
+
+/* profilo budget selezionato: pillola antracite con scritta chiara */
+:root[data-theme="light"] .profile-button.selected {
+  background: var(--text);
+  border-color: var(--text);
+  color: var(--surface);
+}
+
+/* overlay aggiudicazione: tutti i campi con bordo e fondo chiaro */
+:root[data-theme="light"] .auction-award-field select,
+:root[data-theme="light"] .auction-award-field input {
+  border: 1px solid var(--line-1);
+  background-color: var(--surface);
+}
+
+/* tendina arrotondata (sostituisce quella del sistema) */
+.round-select-menu {
+  position: fixed;
+  z-index: 5000;
+  max-height: 320px;
+  overflow: auto;
+  padding: 6px;
+  display: grid;
+  gap: 2px;
+  border: 1px solid var(--line-1);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.28);
+  scrollbar-width: thin;
+}
+.round-select-option {
+  padding: 9px 14px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text-soft);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.round-select-option:hover { background: rgba(var(--ink-rgb), 0.07); color: var(--text); }
+.round-select-option.selected { background: var(--accent); color: var(--accent-ink); font-weight: 700; }
+.round-select-option:disabled { opacity: 0.4; cursor: default; }
+
+/* tutti i bottoni a pillola (lati destro e sinistro tondi);
+   restano esclusi i bottoni che sono tessere o righe di elenco */
+button:not([class*="card"]):not([class*="tile"]):not([class*="row"]):not(.round-select-option):not(.dashboard-go-button):not(.auction-selector-player):not(.auction-call-selector):not(.players-filter-toggle):not([class*="chip"]):not(.nav-item):not(.auction-role-tab),
+.primary-button,
+.secondary-button,
+.danger-button,
+.archive-button,
+.icon-button,
+.profile-button,
+.auction-toolbar-button,
+.auction-primary-action,
+.insight-database-button {
+  border-radius: 999px !important;
+}

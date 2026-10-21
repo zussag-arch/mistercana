@@ -1,9 +1,11 @@
+import { isFldaLocalMode } from '../services/flda'
+import { getICaV3 } from '../data/icaV3Data'
 import type { AppState } from '../app/state'
 import { runOverlayExit } from '../app/motion'
 import type { Player, PlayerRole } from '../domain/player'
 import type { FldaPlayer } from '../services/flda'
 import {
-  findLegacyPlayerByIdentity, getCachedICaV2, getCachedPlayerDetail, getCachedPlayersDataset,
+  findLegacyPlayerByIdentity, getCachedPlayerDetail, getCachedPlayersDataset,
   getFldaIdForLegacyId, getLegacyPlayer, getLegacyPlayerForFldaId,
   loadPlayerDetail, loadPlayersDataset,
 } from '../services/playerRepository'
@@ -22,6 +24,11 @@ interface PlayersActions {
   onCallPlayer: (legacyId: string) => void
   onGoToAuction: () => void
   onOpenFullPlayer: (reference: string) => void
+}
+
+// Passaggio contestuale Asta → Players: allinea il filtro al ruolo attivo dell'asta.
+export function setPlayersRoleFilter(role: PlayerRole): void {
+  viewState.role = role
 }
 
 const viewState = {
@@ -71,8 +78,15 @@ function statusLabel(state: AppState, player: FldaPlayer): string {
   return isAssigned(state, player) ? 'ASSEGNATO' : 'DA ASSEGNARE'
 }
 function numeric(value: unknown): number { return typeof value === 'number' ? value : -Infinity }
+// iCà (valore fantacalcistico atteso) per ordinare e mostrare.
 function fldaICa(player: FldaPlayer): number | undefined {
-  return player.player_id ? getCachedICaV2(player.player_id)?.score : undefined
+  return getICaV3(player.player_id)?.score
+}
+function affareChip(value: number | undefined): string {
+  if (typeof value !== 'number') return ''
+  const rounded = Math.round(value)
+  const tone = rounded >= 15 ? 'good' : rounded <= -15 ? 'bad' : 'neutral'
+  return `<small class="players-affare affare-${tone}" title="Affare: iCà rispetto al prezzo nel ruolo">${rounded > 0 ? '+' : ''}${rounded}</small>`
 }
 
 function filteredPlayers(state: AppState, source: FldaPlayer[]): FldaPlayer[] {
@@ -143,6 +157,7 @@ function renderOverlay(state: AppState, bulk: FldaPlayer[]): string {
     assigned: isAssigned(state, selected.flda), auctionLive: state.auctionPhase === 'live',
     identityAvailable: Boolean(fldaId),
     pmaConfiguration: state.pmaConfiguration,
+    initialCredits: state.initialCredits,
     detail: fldaId ? getCachedPlayerDetail(fldaId) : undefined,
   }
   const shell: Player = selected.legacy ?? {
@@ -164,13 +179,14 @@ function renderRow(state: AppState, player: FldaPlayer): string {
     assigned: isAssigned(state, player), auctionLive: state.auctionPhase === 'live',
     identityAvailable: Boolean(player.player_id),
     pmaConfiguration: state.pmaConfiguration,
+    initialCredits: state.initialCredits,
   }
   const pma = getFldaPma(player, state.pmaConfiguration)
   const iCa = fldaICa(player)
   return `<button type="button" class="players-table-row" data-player-ref="${escapePlayerHtml(fldaReference(player))}">
     <div class="players-player-cell"><span class="role-badge role-${player.role.toLowerCase()}">${escapePlayerHtml(player.role)}</span><span><span class="players-name-line"><strong>${escapePlayerHtml(player.name)}</strong>${renderPlayerBadges(view)}</span><small>${escapePlayerHtml(player.team)}</small></span></div>
-    <div data-label="iCà"><span class="players-ica" style="--ica-hue:${icaHue(iCa)}">${display(iCa, 2)}</span></div>
-    <div data-label="PMA">${typeof pma === 'number' ? `${display(pma, 1)}%` : '—'}</div>
+    <div data-label="iCà"><span class="players-ica" style="--ica-hue:${icaHue(getICaV3(player.player_id)?.rolePercentile)}">${display(iCa, 1)}</span></div>
+    <div data-label="PMA">${typeof pma === 'number' ? `${display(pma, 1)}%` : '—'}${affareChip(getICaV3(player.player_id)?.affare)}</div>
     <div data-label="xFM">${display(player.fm_exp, 2)}</div>
     <div data-label="Titolarità">${display(player.titolarita_display, 0)}${typeof player.titolarita_display === 'number' ? '%' : ''}</div>
     <div data-label="MV/FMV"><span class="players-dual-value">${display(legacy?.mv, 2)} <small>/</small> ${display(legacy?.fmv, 2)}</span></div>
@@ -217,7 +233,7 @@ export function renderPlayersPage(state: AppState): string {
     </div>
     ${dataset?.source === 'legacy' ? `<div class="players-source-warning">FLDA non raggiungibile. Fallback legacy attivo. ${escapePlayerHtml(dataset.error)}</div>` : ''}
     ${!dataset ? '<div class="players-loading">Caricamento giocatori FLDA…</div>' : `<div class="players-table-card"><div class="players-table-header"><span>Giocatore</span>${sortButton('iCà','ica')}<span>PMA</span>${sortButton('xFM','fm_exp')}${sortButton('Titolarità','titolarita_display')}${sortButton('MV/FMV','mv_fmv')}${sortButton('Stato','status')}</div><div class="players-table-body">${rows.map((player) => renderRow(state, player)).join('') || '<div class="players-empty">Nessun giocatore corrisponde ai filtri.</div>'}</div></div>`}
-    <div class="players-footer-info"><span><span data-players-count>${rows.length}</span> giocatori</span><span>${dataset?.source === 'flda' ? 'Fonte FLDA' : 'Fonte legacy'}</span></div>
+    <div class="players-footer-info"><span><span data-players-count>${rows.length}</span> giocatori</span><span>${dataset?.source !== 'flda' ? 'Fonte: vecchio listone' : isFldaLocalMode() ? 'Fonte: tabelle FantaLab' : 'Fonte: FLDA'}</span></div>
     ${renderOverlay(state, source)}
   </section>`
 }

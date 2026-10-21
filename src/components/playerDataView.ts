@@ -2,7 +2,7 @@ import type { FldaPlayer, FldaPlayerDetail, FldaRecord } from '../services/flda'
 import type { Player } from '../domain/player'
 import type { PmaConfiguration } from '../app/state'
 import { getFldaPma } from '../domain/pma'
-import { getCachedICaV2 } from '../services/playerRepository'
+import { getICaV3 } from '../data/icaV3Data'
 
 export interface PlayerViewModel {
   flda: FldaPlayer
@@ -15,6 +15,7 @@ export interface PlayerViewModel {
   auctionLive: boolean
   identityAvailable: boolean
   pmaConfiguration?: PmaConfiguration
+  initialCredits?: number
 }
 
 export function escapePlayerHtml(value: unknown): string {
@@ -90,14 +91,12 @@ export function renderPlayerBadges(view: PlayerViewModel): string {
 
 export function renderCurrentMetrics(view: PlayerViewModel, compact = false,
   historicalPrice?: string): string {
-  const iCaV2 = view.flda.player_id
-    ? getCachedICaV2(view.flda.player_id)?.score
-    : undefined
+  const iCaV3 = getICaV3(view.flda.player_id)
   const fldaPma = view.pmaConfiguration ? getFldaPma(view.flda, view.pmaConfiguration) : undefined
   const pmaValue = fldaPma ?? (!view.flda.player_id ? view.legacy?.pmaPercent : undefined)
   const pma = typeof pmaValue === 'number' ? `${display(pmaValue, 1)}%` : '—'
   const items: Array<[string, string, string, string?]> = [
-    ['iCà', display(iCaV2, 2), 'Indice MisterCanà V2', 'player-metric-ica'],
+    ['iCà', display(iCaV3?.score, 1), `fantapunti a partita ×10${typeof iCaV3?.rolePercentile === 'number' ? ` · meglio del ${Math.round(iCaV3.rolePercentile)}% del ruolo` : ''}${typeof iCaV3?.affare === 'number' ? ` · affare ${iCaV3.affare > 0 ? '+' : ''}${Math.round(iCaV3.affare)}` : ''}`, 'player-metric-ica'],
     ['PMA', pma, pma === '—' ? 'dato non disponibile' : view.pmaConfiguration ? `${view.pmaConfiguration.mode === 'classic' ? 'Classic' : 'Mantra'} · ${view.pmaConfiguration.participants} · ${view.pmaConfiguration.defenseModifier ? 'con modificatore' : 'senza modificatore'}` : 'budget iniziale'],
     ['xFM', display(view.flda.fm_exp, 2), 'FM Exp. FLDA'],
     ['Integrità', display(view.flda.integrita, 0), ''],
@@ -106,12 +105,17 @@ export function renderCurrentMetrics(view: PlayerViewModel, compact = false,
     ['Titolarità', `${display(view.flda.titolarita_display, 0)}${typeof view.flda.titolarita_display === 'number' ? '%' : ''}`, 'indicatore editoriale'],
     ['Prezzo storico A/B', historicalPrice ?? '— / —', 'stagione 2025/26', 'player-metric-history'],
   )
+  // MV/FMV della stagione più recente disponibile; il listone legacy solo come ripiego.
+  const latest = latestHistory(view.detail)
+  const latestMv = field(latest, 'mv')
+  const latestFmv = field(latest, 'fmv')
+  const seasonNote = latest ? `stagione ${String(field(latest, 'season') ?? '')}` : 'dato legacy'
   if (!compact) items.push(
-    ['MV', display(view.legacy?.mv, 2), 'dato legacy'],
-    ['FMV', display(view.legacy?.fmv, 2), 'dato legacy'],
+    ['MV', display(typeof latestMv === 'number' ? latestMv : view.legacy?.mv, 2), typeof latestMv === 'number' ? seasonNote : 'dato legacy'],
+    ['FMV', display(typeof latestFmv === 'number' ? latestFmv : view.legacy?.fmv, 2), typeof latestFmv === 'number' ? seasonNote : 'dato legacy'],
     ['Titolarità', `${display(view.flda.titolarita_display, 0)}${typeof view.flda.titolarita_display === 'number' ? '%' : ''}`, 'indicatore editoriale'],
   )
-  return `<div class="player-current-metrics${compact ? ' player-current-metrics-full' : ''}">${items.map(([label, value, note, className]) => `<div class="${className ?? ''}"${className === 'player-metric-ica' ? ` style="--ica-hue:${icaHue(iCaV2)}"` : ''}><span>${label}</span><strong>${value}</strong>${note ? `<small>${note}</small>` : ''}</div>`).join('')}</div>`
+  return `<div class="player-current-metrics${compact ? ' player-current-metrics-full' : ''}">${items.map(([label, value, note, className]) => `<div class="${className ?? ''}"${className === 'player-metric-ica' ? ` style="--ica-hue:${icaHue(iCaV3?.rolePercentile)}"` : ''}><span>${label}</span><strong>${value}</strong>${note ? `<small>${note}</small>` : ''}</div>`).join('')}</div>`
 }
 
 function chartEmpty(message: string): string {
@@ -176,4 +180,194 @@ export function renderHierarchies(detail?: FldaPlayerDetail): string {
   const rows = hierarchyRows(detail)
   if (!rows.length) return '<p class="player-data-empty">Gerarchie non disponibili.</p>'
   return `<div class="player-chip-list">${rows.map((row) => `<span><strong>${display(field(row, 'hierarchy_type') ?? field(row, 'type') ?? field(row, 'context_type'))}</strong> · posizione ${display(field(row, 'source_rank') ?? field(row, 'source_order'), 0)} <small>ordine editoriale</small></span>`).join('')}</div>`
+}
+
+// I prezzi dei Saggi sono espressi su un budget di 500 crediti.
+const SAGE_BUDGET = 500
+
+function median(values: number[]): number | undefined {
+  if (!values.length) return undefined
+  const sorted = [...values].sort((a, b) => a - b)
+  const middle = Math.floor(sorted.length / 2)
+  return sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2
+}
+
+function finiteNumber(value: unknown): number | undefined {
+  return typeof value === 'number' && Number.isFinite(value) ? value : undefined
+}
+
+// Sezione "Prezzo e Saggi" come nella Scheda Giocatore V2: prezzo medio grande,
+// striscia con i prezzi dei Saggi e tabella con fascia, affidabilità e integrità.
+export function renderSageSection(view: PlayerViewModel): string {
+  const budget = view.initialCredits && view.initialCredits > 0 ? view.initialCredits : SAGE_BUDGET
+  const scale = budget / SAGE_BUDGET
+  const rows = (view.detail?.saggi ?? []).map((row) => ({
+    name: String(field(row, 'saggio') ?? ''),
+    band: String(field(row, 'fascia') ?? ''),
+    value: finiteNumber(field(row, 'fascia_valore')),
+    reliability: finiteNumber(field(row, 'affidabilita')),
+    integrity: finiteNumber(field(row, 'integrita')),
+    price: finiteNumber(field(row, 'prezzo')) === undefined ? undefined : Math.round(Number(field(row, 'prezzo')) * scale),
+  }))
+  const prices = rows.flatMap((row) => row.price === undefined ? [] : [row.price])
+  const pmaPercent = view.pmaConfiguration ? getFldaPma(view.flda, view.pmaConfiguration) : undefined
+  const pmaCredits = pmaPercent === undefined ? undefined : Math.round(pmaPercent / 100 * budget)
+  const priceMedian = median(prices)
+  const lead = pmaCredits ?? (priceMedian === undefined ? undefined : Math.round(priceMedian))
+
+  const leadBlock = lead === undefined
+    ? '<div class="player-sage-lead"><span class="player-sage-kicker">Prezzo medio d\'asta</span><p class="player-sage-note">Prezzo non disponibile.</p></div>'
+    : `<div class="player-sage-lead">
+        <span class="player-sage-kicker">${pmaCredits !== undefined ? 'Prezzo medio d\'asta' : 'Mediana dei Saggi'}</span>
+        <div class="player-sage-big">${lead}<small>crediti</small></div>
+        <p class="player-sage-note">${pmaPercent !== undefined ? `${display(pmaPercent, 1)}% di un budget da ${budget} crediti. ` : ''}Sotto, i prezzi indicati da ciascun Saggio${scale !== 1 ? ` riportati a ${budget} crediti` : ''}.</p>
+        ${renderSageStrip(prices, priceMedian)}
+      </div>`
+
+  if (!rows.length) {
+    return `<div class="player-sage">${leadBlock}<div class="player-chart-empty">Prezzi Saggi non disponibili.</div></div>`
+  }
+
+  const dots = (value?: number) => value === undefined ? '—'
+    : `<span class="player-sage-dots" aria-label="${value} su 5">${[1, 2, 3, 4, 5].map((step) => `<i class="${step <= value ? 'on' : ''}"></i>`).join('')}</span>`
+  const cell = (value?: number) => value === undefined ? '—' : String(value)
+  const medianOf = (pick: (row: typeof rows[number]) => number | undefined) => {
+    const value = median(rows.flatMap((row) => { const item = pick(row); return item === undefined ? [] : [item] }))
+    return value === undefined ? '—' : display(value, 1)
+  }
+
+  return `<div class="player-sage">
+    ${leadBlock}
+    <div class="player-sage-table"><table>
+      <thead><tr><th>Saggio</th><th>Fascia</th><th>Valore</th><th class="n">Affid.</th><th class="n">Integr.</th><th class="n">Prezzo</th></tr></thead>
+      <tbody>${rows.map((row) => `<tr>
+        <td>${escapePlayerHtml(row.name.replace(/^Saggio\s*/i, ''))}</td>
+        <td>${escapePlayerHtml(row.band || '—')}</td>
+        <td>${dots(row.value)}</td>
+        <td class="n">${cell(row.reliability)}</td>
+        <td class="n">${cell(row.integrity)}</td>
+        <td class="n">${cell(row.price)}</td>
+      </tr>`).join('')}
+      <tr class="player-sage-median"><td>Mediana</td><td></td><td class="n">${medianOf((row) => row.value)}</td><td class="n">${medianOf((row) => row.reliability)}</td><td class="n">${medianOf((row) => row.integrity)}</td><td class="n">${medianOf((row) => row.price)}</td></tr>
+      </tbody>
+    </table></div>
+  </div>`
+}
+
+function renderSageStrip(prices: number[], priceMedian?: number): string {
+  if (!prices.length) return ''
+  const top = Math.max(50, Math.ceil(Math.max(...prices) * 1.1 / 50) * 50)
+  const x = (value: number) => 10 + (value / top) * 380
+  const ticks = [0, 1, 2, 3, 4].map((step) => Math.round(top * step / 4))
+  const low = Math.min(...prices)
+  const high = Math.max(...prices)
+  return `<svg class="player-sage-strip" viewBox="0 0 400 64" role="img" aria-label="Prezzi dei Saggi da ${low} a ${high} crediti">
+    <line x1="10" y1="34" x2="390" y2="34" class="strip-axis"/>
+    <line x1="${x(low)}" y1="34" x2="${x(high)}" y2="34" class="strip-range"/>
+    ${prices.map((price) => `<circle cx="${x(price)}" cy="34" r="4.5" class="strip-dot"><title>${price} crediti</title></circle>`).join('')}
+    ${priceMedian === undefined ? '' : `<line x1="${x(priceMedian)}" y1="22" x2="${x(priceMedian)}" y2="42" class="strip-median"/><text x="${x(priceMedian)}" y="16" text-anchor="middle" class="strip-median-label">mediana ${Math.round(priceMedian)}</text>`}
+    ${ticks.map((tick) => `<text x="${x(tick)}" y="58" text-anchor="middle">${tick}</text>`).join('')}
+  </svg>`
+}
+
+// "Contesto squadra" dello snapshot: allenatore e modulo, ruoli che l'allenatore
+// valorizza/penalizza, posto del giocatore (formazione tipo, battitore) e forma
+// recente. Sostituisce il grafico storico, poco leggibile con una sola stagione.
+export function renderTeamContext(view: PlayerViewModel): string {
+  const guide = view.guide ?? view.detail?.guide ?? undefined
+  const player = view.flda
+  const latest = latestHistory(view.detail)
+  const name = player.name.trim().toLocaleLowerCase('it')
+  const listed = (key: string) => {
+    const value = field(guide, key)
+    return Array.isArray(value) && value.some((item) => String(item).trim().toLocaleLowerCase('it') === name)
+  }
+
+  const facts: Array<[string, string, 'good' | 'bad' | 'neutral']> = []
+  if (player.is_starting_xi) facts.push(['Titolare', 'nella formazione tipo', 'good'])
+  else if (typeof player.titolarita_display === 'number') facts.push(['Riserva', `titolarità ${display(player.titolarita_display, 0)}%`, player.titolarita_display >= 50 ? 'neutral' : 'bad'])
+  const ranks: Array<[string, unknown]> = [['Rigori', player.penalty_rank], ['Punizioni', player.free_kick_rank], ['Angoli', player.corner_rank]]
+  for (const [label, rank] of ranks) {
+    if (typeof rank === 'number') facts.push([label, `${rank}° nella gerarchia`, rank === 1 ? 'good' : 'neutral'])
+  }
+  if (player.role === 'P' && typeof player.goalkeeper_rank === 'number') {
+    facts.push(['Portiere', player.goalkeeper_rank === 1 ? 'titolare' : `${player.goalkeeper_rank}° nelle gerarchie`, player.goalkeeper_rank === 1 ? 'good' : 'bad'])
+  }
+  if (listed('valorizzati')) facts.push(['Valorizzato', "dall'allenatore", 'good'])
+  if (listed('penalizzati')) facts.push(['Penalizzato', "dall'allenatore", 'bad'])
+
+  const keyRoles = (Array.isArray(field(guide, 'key_roles_text')) ? field(guide, 'key_roles_text') as FldaRecord[] : [])
+    .map((item) => ({ label: String(field(item, 'label') ?? ''), tone: String(field(item, 'tone') ?? 'neutral') }))
+    .filter((item) => item.label)
+
+  const form = (label: string, season: unknown, recent: unknown) => {
+    const a = finiteNumber(season)
+    const b = finiteNumber(recent)
+    const delta = a !== undefined && b !== undefined ? b - a : undefined
+    const trend = delta === undefined ? '' : delta > 0.15 ? 'up' : delta < -0.15 ? 'down' : 'flat'
+    return `<div class="team-context-form-item">
+      <span>${label}</span>
+      <strong>${display(a, 2)}</strong>
+      <small class="trend-${trend || 'none'}">${b === undefined ? 'ultime 5: —' : `ultime 5: ${display(b, 2)} ${trend === 'up' ? '↑' : trend === 'down' ? '↓' : '→'}`}</small>
+    </div>`
+  }
+
+  const coach = field(guide, 'coach')
+  const module = field(guide, 'module')
+  const attack = finiteNumber(field(guide, 'attack'))
+  const defense = finiteNumber(field(guide, 'defense'))
+
+  return `<div class="team-context">
+    <div class="team-context-team">
+      <span class="team-context-kicker">${escapePlayerHtml(player.team)}</span>
+      <strong>${coach ? escapePlayerHtml(coach) : 'Allenatore non disponibile'}</strong>
+      <div class="team-context-meta">
+        ${module ? `<span class="team-context-pill">${escapePlayerHtml(module)}</span>` : ''}
+        ${attack !== undefined ? `<span class="team-context-pill">attacco ${display(attack, 1)}/5</span>` : ''}
+        ${defense !== undefined ? `<span class="team-context-pill">difesa ${display(defense, 1)}/5</span>` : ''}
+      </div>
+      ${keyRoles.length ? `<div class="team-context-roles">${keyRoles.map((item) => `<span class="team-context-role tone-${escapePlayerHtml(item.tone)}">${escapePlayerHtml(item.label)}${item.tone === 'good' ? ' +' : item.tone === 'bad' ? ' −' : ''}</span>`).join('')}</div>` : ''}
+    </div>
+    <div class="team-context-player">
+      <span class="team-context-kicker">Il suo posto</span>
+      ${facts.length
+        ? `<ul>${facts.map(([label, text, tone]) => `<li class="tone-${tone}"><b>${label}</b> ${escapePlayerHtml(text)}</li>`).join('')}</ul>`
+        : '<p class="player-data-empty">Nessuna indicazione dalla Guida.</p>'}
+    </div>
+    <div class="team-context-form">
+      <span class="team-context-kicker">Forma ${latest ? escapePlayerHtml(String(field(latest, 'season') ?? '')) : ''}</span>
+      <div class="team-context-form-grid">
+        ${form('MV', field(latest, 'mv'), field(latest, 'mv_5'))}
+        ${form('FMV', field(latest, 'fmv'), field(latest, 'fmv_5'))}
+      </div>
+    </div>
+  </div>`
+}
+
+// "Perché questo iCà": come nasce l'iCà 3 del giocatore, passo per passo.
+export function renderICaV3Explanation(view: PlayerViewModel): string {
+  const result = getICaV3(view.flda.player_id)
+  if (!result) return '<p class="player-data-empty">iCà non disponibile per questo giocatore.</p>'
+  if (result.score === undefined) {
+    return `<p class="player-data-empty">iCà non calcolabile: manca ${result.missing.join(' e ') || 'un dato'}.</p>`
+  }
+  const sign = (value: number) => `${value > 0 ? '+' : value < 0 ? '−' : ''}${display(Math.abs(value), 2)}`
+  const affare = result.affare
+  const affareText = typeof affare !== 'number' ? 'prezzo non disponibile'
+    : affare >= 15 ? 'rende più di quanto costa' : affare <= -15 ? 'costa più di quanto rende' : 'prezzo in linea con il valore'
+  return `<div class="ica-explain">
+    <div class="ica-explain-score">
+      <span class="ica-explain-kicker">iCà</span>
+      <strong>${display(result.score, 1)}</strong>
+      <small>fantapunti attesi a partita ×10${typeof result.rolePercentile === 'number' ? ` · meglio del ${Math.round(result.rolePercentile)}% del ruolo` : ''}</small>
+      ${typeof affare === 'number' ? `<span class="ica-explain-affare tone-${affare >= 15 ? 'good' : affare <= -15 ? 'bad' : 'neutral'}">Affare ${affare > 0 ? '+' : ''}${Math.round(affare)}</span><small>${affareText}</small>` : ''}
+    </div>
+    <ol class="ica-explain-steps">
+      <li><b>Fantamedia attesa ${display(result.expectedFm, 2)}</b><small>stagione in corso e scorsa, frenate dalla media del ruolo</small></li>
+      ${result.contributions.map((item) => `<li class="${item.value > 0 ? 'up' : 'down'}"><b>${sign(item.value)}</b> ${item.label}</li>`).join('')}
+      <li><b>Fantamedia corretta ${display(result.adjustedFm, 2)}</b><small>fantamedia attesa più i correttivi</small></li>
+      <li><b>× presenze attese ${display((result.expectedShare ?? 0) * 100, 0)}%</b><small>titolarità Guida, ridotta dagli infortuni</small></li>
+      <li class="total"><b>= iCà ${display(result.score, 1)}</b><small>${display((result.score ?? 0) / 10, 2)} fantapunti attesi a partita, ×10</small></li>
+    </ol>
+  </div>`
 }

@@ -96,15 +96,16 @@ test('missing FLDA values remain unavailable rather than numeric zero', () => {
   assert.equal(result.C.prestazione, null)
 })
 
-test('Auction places roster cards at right and top/history below participants', () => {
+test('Auction places roster cards and Top iCà at right, history in the main column', () => {
   const page = readFileSync(new URL('../src/pages/auction.ts', import.meta.url), 'utf8')
   assert.match(page, /renderSuggestedPlayersPanel[\s\S]*renderRosterMetricsPanel/)
-  assert.match(page, /renderParticipants[\s\S]*auction-market-followup[\s\S]*renderTopICaPanel[\s\S]*renderAssignmentHistory/)
+  assert.match(page, /renderRosterMetricsPanel\(state\)\}\s*\$\{renderTopICaPanel\(state\)\}/)
+  assert.match(page, /auction-history-slot[^`]*renderAssignmentHistory/)
   assert.doesNotMatch(page, /iCà \/ CIA rosa/)
   assert.match(page, /Titolarità rosa[\s\S]*Prestazione rosa/)
 })
 
 test('Auction mobile layout stacks top players and assignment history', () => {
   const css = readFileSync(new URL('../src/styles/auction.css', import.meta.url), 'utf8')
-  assert.match(css, /@media \(max-width: 680px\)[\s\S]*\.auction-market-followup\s*\{\s*grid-template-columns: 1fr/)
+  assert.match(css, /@media \(max-width: 680px\)[\s\S]*\.auction-market-followup\s*\{\s*grid-template-columns:\s*1fr/)
 })

@@ -235,7 +235,39 @@ export function getLeagueSize(
   )
 }
 
+// Memoria degli ordinamenti per PMA: lo stesso elenco giocatori viene
+// ordinato una sola volta per ruolo e crediti, invece che per ogni candidato.
+const sortedRoleCache = new WeakMap<Player[], Map<string, { sorted: Player[]; index: Map<string, number> }>>()
+
+function sortedRoleEntry(
+  role: PlayerRole,
+  allPlayers: Player[],
+  initialCredits: number,
+): { sorted: Player[]; index: Map<string, number> } {
+  let byKey = sortedRoleCache.get(allPlayers)
+  if (!byKey) {
+    byKey = new Map()
+    sortedRoleCache.set(allPlayers, byKey)
+  }
+  const key = `${role}|${initialCredits}|${allPlayers.length}`
+  let entry = byKey.get(key)
+  if (!entry) {
+    const sorted = computeSortedRolePlayers(role, allPlayers, initialCredits)
+    entry = { sorted, index: new Map(sorted.map((player, position) => [player.id, position])) }
+    byKey.set(key, entry)
+  }
+  return entry
+}
+
 export function getSortedRolePlayers(
+  role: PlayerRole,
+  allPlayers: Player[],
+  initialCredits: number,
+): Player[] {
+  return sortedRoleEntry(role, allPlayers, initialCredits).sorted.slice()
+}
+
+function computeSortedRolePlayers(
   role: PlayerRole,
   allPlayers: Player[],
   initialCredits: number,
@@ -286,19 +318,12 @@ export function getPlayerSlot(
     return undefined
   }
 
-  const sorted =
-    getSortedRolePlayers(
+  const index =
+    sortedRoleEntry(
       player.role,
       allPlayers,
       state.initialCredits,
-    )
-
-  const index =
-    sorted.findIndex(
-      (candidate) =>
-        candidate.id ===
-        player.id,
-    )
+    ).index.get(player.id) ?? -1
 
   if (index < 0) {
     return undefined

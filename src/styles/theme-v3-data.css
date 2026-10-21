@@ -1,0 +1,434 @@
+/* =========================
+   TEMA V3 — IMPORT/EXPORT e punti chiave allenatori
+========================= */
+
+.data-source-active {
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 12.5px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.data-sources-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.data-source-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 18px;
+  border: 1px solid rgba(var(--ink-rgb), 0.07);
+  border-radius: var(--radius-md);
+  background: var(--surface-light);
+}
+
+.data-source-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.data-source-title::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 7px;
+  border-radius: 2px;
+  background: var(--accent);
+  transform: rotate(45deg) translateY(-1px);
+}
+
+.data-source-card > strong {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+}
+
+.data-source-card > small {
+  font-size: 12.5px;
+  color: var(--text-soft);
+}
+
+.data-source-card > p {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.data-source-card > p b {
+  color: var(--text-soft);
+}
+
+.data-source-card > code,
+.data-sources-section code,
+.data-sources-howto code {
+  font-size: 11px;
+  color: var(--muted-soft);
+  overflow-wrap: anywhere;
+}
+
+.data-sources-howto {
+  margin-top: 14px;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  background: var(--surface-light);
+}
+
+.data-sources-howto summary,
+.flda-optional > summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.data-sources-howto ol {
+  margin: 10px 0 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 6px;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+/* FLDA: facoltativo, chiuso di default */
+.flda-optional {
+  margin-bottom: 18px;
+  border: 1px dashed rgba(var(--ink-rgb), 0.13);
+  border-radius: var(--radius-xl);
+}
+
+.flda-optional > summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 16px 22px;
+  list-style: none;
+}
+
+.flda-optional > summary::-webkit-details-marker {
+  display: none;
+}
+
+.flda-optional > summary span {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.flda-optional > summary span small,
+.flda-optional > summary > small {
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--muted);
+}
+
+.flda-optional > summary::after {
+  content: "apri ↓";
+  font-size: 12.5px;
+  color: var(--accent);
+}
+
+.flda-optional[open] > summary::after {
+  content: "chiudi ↑";
+}
+
+.flda-optional > .data-transfer-section {
+  margin: 0;
+  border: 0;
+}
+
+/* punti chiave allenatore (Insights) */
+.coach-key-points {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.coach-key-points li {
+  position: relative;
+  padding: 7px 10px 7px 24px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-soft);
+  font-size: 12.5px;
+}
+
+.coach-key-points li::before {
+  content: "";
+  position: absolute;
+  left: 9px;
+  top: 0.9em;
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background: var(--muted);
+  transform: rotate(45deg);
+}
+
+.coach-key-points li.tone-good::before { background: var(--accent); }
+.coach-key-points li.tone-bad::before { background: var(--red); }
+
+.coach-key-points-empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+/* =========================
+   CARICA NUOVI DATI
+========================= */
+
+.csv-upload {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 16px 18px;
+  border: 1.5px dashed color-mix(in srgb, var(--accent) 45%, transparent);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--accent) 6%, var(--surface));
+}
+
+.csv-upload-copy strong {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.csv-upload-copy p {
+  margin: 4px 0 0;
+  max-width: 70ch;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.csv-upload-button {
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.csv-upload-active {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--yellow) 12%, var(--surface));
+  color: var(--text-soft);
+  font-size: 12.5px;
+}
+
+.csv-preview {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.csv-preview-item {
+  padding: 12px 14px;
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-sm);
+  background: var(--surface-light);
+}
+
+.csv-preview-item.is-error {
+  border-left-color: var(--red);
+}
+
+.csv-preview-item header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.csv-preview-item header strong {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.csv-preview-item header small {
+  color: var(--muted);
+}
+
+.csv-preview-item header span {
+  margin-left: auto;
+  padding: 2px 9px;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 11.5px;
+  font-weight: 800;
+}
+
+.csv-preview-item.is-error header span {
+  background: var(--red);
+  color: var(--on-color);
+}
+
+.csv-preview-item ul {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.csv-preview-item li.error {
+  color: var(--red);
+  font-weight: 700;
+}
+
+.csv-preview-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* aggiornamento da FantaLab */
+.csv-upload-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fantalab-sync {
+  margin-top: 10px;
+  padding: 12px 16px;
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-sm);
+  background: var(--surface-light);
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.fantalab-sync p {
+  margin: 0;
+}
+
+.fantalab-sync.sync-error,
+.fantalab-sync.sync-offline {
+  border-left-color: var(--red);
+}
+
+.fantalab-sync.sync-error p,
+.fantalab-sync.sync-offline p {
+  color: var(--red);
+  font-weight: 700;
+}
+
+.fantalab-sync-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.fantalab-sync-steps li {
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.fantalab-sync-steps li.done {
+  background: color-mix(in srgb, var(--accent) 25%, var(--surface));
+  color: var(--accent-soft);
+}
+
+.fantalab-sync-steps li.active {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.csv-upload-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* scelta dei creator dei Saggi */
+.saggi-creators {
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-light);
+}
+
+.saggi-creators summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.saggi-creators summary small {
+  margin-left: 8px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.saggi-creators-hint {
+  margin: 8px 0;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.saggi-creators-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 6px;
+  max-height: 340px;
+  overflow-y: auto;
+}
+
+.saggi-creator {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 7px 9px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.saggi-creator span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.saggi-creator b {
+  font-size: 13px;
+}
+
+.saggi-creator small {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 11.5px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

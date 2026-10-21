@@ -69,9 +69,7 @@ export function renderNavigation(
   return `
     <header class="topbar">
       <div class="topbar-brand-stack">
-        <div class="brand">
-          MisterCanà
-        </div>
+        <div class="brand"><span class="brand-mister">Mister</span><span class="brand-cana">Canà</span></div>
 
         ${
           auctionLive
@@ -143,6 +141,14 @@ export function renderNavigation(
         class="topbar-page-actions"
         aria-label="Azioni pagina"
       ></div>
+
+      <button
+        class="theme-toggle"
+        data-theme-toggle
+        type="button"
+        title="Cambia tema (chiaro / scuro)"
+        aria-label="Cambia tema"
+      ><span class="theme-toggle-icon" aria-hidden="true"></span></button>
     </header>
   `
 }

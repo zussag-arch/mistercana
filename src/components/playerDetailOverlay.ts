@@ -2,8 +2,8 @@ import type { Player } from '../domain/player'
 import type { PlayerViewModel } from './playerDataView'
 import {
   auctionStatusClass, auctionStatusLabel, displayCount, escapePlayerHtml,
-  field, latestHistory, renderCurrentMetrics, renderPerformanceChart,
-  renderPlayerBadges, renderSageChart,
+  field, latestHistory, renderCurrentMetrics,
+  renderPlayerBadges, renderSageSection, renderTeamContext, renderICaV3Explanation,
 } from './playerDataView'
 import '../styles/playerDetail.css'
 
@@ -41,16 +41,16 @@ export function renderPlayerDetailOverlay(
   return `<div id="playerDetailOverlay" class="player-detail-overlay" aria-hidden="false">
     <button type="button" class="player-detail-backdrop" data-close-player-detail aria-label="Chiudi"></button>
     <section class="player-detail-card player-quick-card" role="dialog" aria-modal="true" aria-labelledby="playerDetailTitle" tabindex="-1">
-      <header class="player-detail-header">
-        <div class="player-detail-identity"><span class="player-detail-role player-detail-role-${role.toLowerCase()}">${escapePlayerHtml(role)}</span><div><span class="player-detail-eyebrow">SNAPSHOT GIOCATORE</span><h2 id="playerDetailTitle">${escapePlayerHtml(view.flda.name)}</h2><p>${escapePlayerHtml(view.flda.team)}</p>${renderPlayerBadges(view)}</div></div>
+      <header class="player-detail-header" data-role-word="${({ P: 'Portiere', D: 'Difensore', C: 'Centrocampista', A: 'Attaccante' } as Record<string, string>)[role.toUpperCase()] ?? escapePlayerHtml(role)}">
+        <div class="player-detail-identity"><span class="player-detail-role player-detail-role-${role.toLowerCase()}">${escapePlayerHtml(role)}</span><div><span class="player-detail-eyebrow">SNAPSHOT GIOCATORE</span><h2 id="playerDetailTitle"${view.flda.name.trim().endsWith('.') ? ' class="no-dot"' : ''}>${escapePlayerHtml(view.flda.name)}</h2><p>${escapePlayerHtml(view.flda.team)}</p>${renderPlayerBadges(view)}</div></div>
         <div class="player-detail-header-actions"><span class="player-status player-status-${auctionStatusClass(view)}">${auctionStatusLabel(view)}</span><button type="button" class="player-detail-call-button" data-player-detail-call="${escapePlayerHtml(callId ?? '')}" ${canCall ? '' : 'disabled'}>${assigned ? 'ASSEGNATO' : callEnabled ? 'CHIAMA' : 'ASTA NON ATTIVA'}</button><button type="button" class="player-detail-close-button" data-close-player-detail aria-label="Chiudi">×</button></div>
       </header>
       ${renderCurrentMetrics(view)}
       ${!view.identityAvailable ? '<p class="player-data-alert">Dati FLDA non disponibili per questa identità. Sono mostrati i dati legacy disponibili.</p>' : ''}
       ${options.error ? `<p class="player-data-alert">${escapePlayerHtml(options.error)}</p>` : ''}
       ${options.loading ? '<p class="player-data-loading">Caricamento dettaglio FLDA…</p>' : `<div class="player-chart-grid">
-        <section class="player-data-section"><h3>Prezzi dei Saggi</h3>${renderSageChart(view.detail)}</section>
-        <section class="player-data-section"><h3>Storico MV / FMV</h3>${renderPerformanceChart(view.detail)}</section>
+        <section class="player-data-section player-sage-section"><h3>Prezzo e Saggi</h3>${renderSageSection(view)}</section>
+        <section class="player-data-section player-ica-section"><h3>Perché questo iCà</h3>${renderICaV3Explanation(view)}</section><section class="player-data-section player-history-section"><h3>Contesto squadra</h3>${renderTeamContext(view)}</section>
       </div><section class="player-overlay-stats"><h3>Ultima stagione</h3><div class="player-role-stats">${roleFields.map(([label, key]) => `<div><span>${label}</span><strong>${displayCount(field(latest, key))}</strong></div>`).join('')}</div></section>`}
       <footer class="player-detail-actions">
         ${options.view ? `<button type="button" class="player-detail-full-button" data-open-full-player="${escapePlayerHtml(view.flda.player_id ?? (view.legacyId ? `legacy:${view.legacyId}` : ''))}">Apri scheda completa</button>` : ''}

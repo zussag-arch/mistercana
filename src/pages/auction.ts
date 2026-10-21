@@ -1,3 +1,4 @@
+import { getICaV3 } from '../data/icaV3Data'
 import type {
   AppState,
   AuctionAssignment,
@@ -41,7 +42,6 @@ import type { CanonicalAuctionPlayer } from '../services/auctionPlayerResolver'
 import { calculateRosterMetrics } from '../domain/rosterMetrics'
 import type { RosterMetricPlayer, RosterMetrics } from '../domain/rosterMetrics'
 import { buildAuctionStrategyContext } from '../services/auctionStrategyAdapter'
-import { getCachedICaV2 } from '../services/playerRepository'
 
 const loadingHistoricalPrices = new Set<string>()
 const attemptedHistoricalPrices = new Set<string>()
@@ -68,7 +68,7 @@ interface AuctionActions {
   onStateChange: () => void
   onRender: () => void
 
-  onGoToPlayers: () => void
+  onGoToPlayers: (role: PlayerRole) => void
   onGoToObjectives: () => void
   onOpenFullPlayer: (reference: string) => void
 }
@@ -233,6 +233,19 @@ function formatPercent(
   return `${value
     .toFixed(digits)
     .replace('.', ',')}%`
+}
+
+// "PMA 1 · Saggi 92 · iCà 130": le tre fonti del valore, in crediti
+function formatReferenceSources(
+  priceAdvice: PriceAdvice,
+): string {
+  const sources = priceAdvice.referenceSources
+  const parts = [
+    ['PMA', sources?.pma ?? priceAdvice.pmaCredits],
+    ['Saggi', sources?.saggi],
+    ['iCà', sources?.ica],
+  ].filter(([, value]) => typeof value === 'number') as Array<[string, number]>
+  return parts.map(([label, value]) => `${label} ${Math.round(value)}`).join(' · ')
 }
 
 function formatMarketFactor(
@@ -546,11 +559,11 @@ function getBidSignal(
       state: 'stop',
       icon: '⛔',
       label: 'STOP',
-      color: '#E45E5E',
+      color: 'var(--red)',
       borderColor:
-        'rgba(228, 94, 94, 0.72)',
+        'color-mix(in srgb, var(--red) 72%, transparent)',
       background:
-        'rgba(228, 94, 94, 0.10)',
+        'color-mix(in srgb, var(--red) 10%, transparent)',
     }
   }
 
@@ -562,11 +575,11 @@ function getBidSignal(
       state: 'stop',
       icon: '⛔',
       label: 'STOP',
-      color: '#E45E5E',
+      color: 'var(--red)',
       borderColor:
-        'rgba(228, 94, 94, 0.72)',
+        'color-mix(in srgb, var(--red) 72%, transparent)',
       background:
-        'rgba(228, 94, 94, 0.10)',
+        'color-mix(in srgb, var(--red) 10%, transparent)',
     }
   }
 
@@ -597,11 +610,11 @@ function getBidSignal(
       state: 'go',
       icon: '↑',
       label: 'SALI',
-      color: '#46E6A1',
+      color: 'var(--accent)',
       borderColor:
-        'rgba(70, 230, 161, 0.72)',
+        'color-mix(in srgb, var(--accent) 72%, transparent)',
       background:
-        'rgba(70, 230, 161, 0.10)',
+        'color-mix(in srgb, var(--accent) 10%, transparent)',
     }
   }
 
@@ -609,11 +622,11 @@ function getBidSignal(
     state: 'attention',
     icon: '—',
     label: 'ATTENZIONE',
-    color: '#FFFFFF',
+    color: 'var(--text)',
     borderColor:
-      'rgba(255, 255, 255, 0.52)',
+      'rgba(var(--ink-rgb), 0.52)',
     background:
-      'rgba(255, 255, 255, 0.055)',
+      'rgba(var(--ink-rgb), 0.055)',
   }
 }
 
@@ -1003,7 +1016,7 @@ function getBudgetBarData(
   if (ratio > 1) {
     return {
       width,
-      color: '#5AA8FF',
+      color: 'var(--blue)',
       description:
         'Più margine del piano nel ruolo attivo',
     }
@@ -1012,7 +1025,7 @@ function getBudgetBarData(
   if (ratio > 0.55) {
     return {
       width,
-      color: '#46E6A1',
+      color: 'var(--accent)',
       description:
         'Margine alto nel ruolo attivo',
     }
@@ -1021,7 +1034,7 @@ function getBudgetBarData(
   if (ratio > 0.2) {
     return {
       width,
-      color: '#E7C94C',
+      color: 'var(--yellow)',
       description:
         'Margine ridotto nel ruolo attivo',
     }
@@ -1029,7 +1042,7 @@ function getBudgetBarData(
 
   return {
     width,
-    color: '#E45E5E',
+    color: 'var(--red)',
     description:
       'Budget del ruolo in tensione',
   }
@@ -1563,8 +1576,8 @@ function renderPlayerCard(
 
           <strong>
             ${formatNumber(
-              strategyPlayer?.iCa,
-              2,
+              getICaV3(strategyPlayer?.fantalabId)?.score,
+              1,
             )}
           </strong>
         </div>
@@ -1728,10 +1741,7 @@ function renderPlayerCard(
             </strong>
 
             <small>
-              PMA
-              ${formatCredits(
-                priceAdvice.pmaCredits,
-              )}
+              ${formatReferenceSources(priceAdvice)}
               ·
               ${formatMarketFactor(
                 priceAdvice
@@ -2506,18 +2516,13 @@ function renderSuggestedPlayersPanel(
         class="auction-panel-title"
       >
         <div>
-          <span
-            class="auction-kicker"
-          >
-            ${
-              activeRole === 'P'
-                ? 'STRATEGIA PORTIERI · AUTO'
-                : `SERVE ${targetLabel}`
-            }
-          </span>
-
           <h3>
             Chiamata consigliata
+            <small class="auction-title-note">${
+              activeRole === 'P'
+                ? 'strategia portieri'
+                : `serve ${targetLabel}`
+            }</small>
           </h3>
         </div>
       </div>
@@ -2627,8 +2632,8 @@ function renderSuggestedPlayersPanel(
                   iCà
                   <strong>
                     ${formatNumber(
-                      player.iCa,
-                      2,
+                      getICaV3(player.fantalabId)?.score,
+                      1,
                     )}
                   </strong>
                 </span>
@@ -2851,8 +2856,9 @@ function renderTopICaPanel(
 
                 <b>
                   ${formatNumber(
-                    player.iCa,
-                    2,
+                    // valore iCà V3 (come in lista e scheda); l'ordine resta per iCà
+                    getICaV3(player.fantalabId)?.score ?? player.iCa,
+                    1,
                   )}
                 </b>
 
@@ -2885,6 +2891,8 @@ function renderSidePanels(
       )}
 
       ${renderRosterMetricsPanel(state)}
+
+      ${renderTopICaPanel(state)}
     </div>
   `
 }
@@ -2899,7 +2907,7 @@ function getRosterMetrics(state: AppState): RosterMetrics {
           id: flda.player_id,
           team: flda.team,
           role: flda.role as AuctionRole,
-          iCa: getCachedICaV2(flda.player_id)?.score,
+          iCa: getICaV3(flda.player_id)?.score,
           titolarita: flda.titolarita_display,
           xFm: flda.fm_exp,
           presenze: legacy?.appearances,
@@ -2966,6 +2974,12 @@ function renderRosterMetricsPanel(state: AppState): string {
 /* =========================
    PARTICIPANTS
 ========================= */
+
+// Tessera Partecipanti: in asta live si mostra in Dashboard, non nella pagina Asta.
+export function renderAuctionParticipantsCard(state: AppState): string {
+  // l'owner è già nella tessera grande "La tua asta": qui solo gli avversari
+  return renderParticipants(state, buildParticipants(state).filter((participant) => !participant.isOwner))
+}
 
 function renderParticipants(
   state: AppState,
@@ -3100,6 +3114,19 @@ function renderParticipants(
 /* =========================
    HISTORY
 ========================= */
+
+// Stato di attesa tra una chiamata e l'altra (lo storico è subito sotto).
+function renderWaitingForCall(
+  state: AppState,
+): string {
+
+  return `
+    <section class="auction-player-card auction-no-player">
+      <h2>${state.auctionAssignments.length ? 'In attesa della prossima chiamata' : 'Nessun giocatore selezionato'}</h2>
+      <p>Cerca squadra o giocatore qui sopra, oppure chiama il consigliato a destra.</p>
+    </section>
+  `
+}
 
 function renderAssignmentHistory(
   state: AppState,
@@ -3795,29 +3822,9 @@ function renderLiveAuction(
               ? selectedPlayer.legacy
                 ? renderPlayerCard(state, selectedPlayer.legacy)
                 : renderFldaPlayerCard(state, selectedPlayer)
-              : `
-                <section
-                  class="
-                    auction-player-card
-                    auction-no-player
-                  "
-                >
-                  <span class="auction-kicker">
-                    CHIAMATA CORRENTE
-                  </span>
-
-                  <h2>
-                    Nessun giocatore
-                    selezionato
-                  </h2>
-
-                  <p>
-                    Seleziona squadra
-                    o giocatore.
-                  </p>
-                </section>
-              `
+              : renderWaitingForCall(state)
           }
+          <div class="auction-history-slot">${renderAssignmentHistory(state)}</div>
         </div>
 
         ${renderSidePanels(
@@ -3825,14 +3832,7 @@ function renderLiveAuction(
         )}
       </div>
 
-      ${renderParticipants(
-        state,
-        participants,
-      )}
-
       <div class="auction-market-followup">
-        ${renderTopICaPanel(state)}
-        ${renderAssignmentHistory(state)}
       </div>
 
       ${
@@ -4174,7 +4174,7 @@ export function bindAuctionEvents(
     )
     ?.addEventListener(
       'click',
-      actions.onGoToPlayers,
+      () => actions.onGoToPlayers(activeRole),
     )
 
   document
@@ -5027,6 +5027,12 @@ export function bindAuctionEvents(
         pendingAwardPrice =
           null
 
+        // BETA-020: chiude scheda e chiamata del giocatore aggiudicato,
+        // così limiti e consigli vengono ricalcolati sul nuovo stato.
+        state.currentAuctionPlayerId = null
+        state.currentAuctionFldaPlayerId = null
+        detailPlayerId = null
+
         auctionFeedback =
           `${player.name} aggiudicato a ${winner.name} per ${price} crediti.`
 
@@ -5361,7 +5367,7 @@ function renderFldaPlayerCard(
       <div class="auction-main-values">
         <div class="auction-main-value"><span>xFM</span><strong>${formatNumber(flda?.fm_exp ?? undefined, 2)}</strong></div>
         <div class="auction-main-value"><span>Titolarità</span><strong>${formatPercent(flda?.titolarita_display ?? undefined, 0)}</strong></div>
-        <div class="auction-main-value"><span>iCà V2</span><strong>${formatNumber(strategyPlayer?.iCa, 2)}</strong></div>
+        <div class="auction-main-value"><span>iCà</span><strong>${formatNumber(getICaV3(strategyPlayer?.fantalabId)?.score, 1)}</strong></div>
         <div class="auction-main-value auction-history-value"><span>Prezzo storico A/B</span><strong>${displayHistoricalAuctionPrices(historicalDetail)}</strong><small>${historicalDetail?.auction_prices?.length ? 'stagione 2025/26' : 'storico non disponibile'}</small></div>
       </div>
       <div class="auction-insight-row">
@@ -5383,8 +5389,8 @@ function renderFldaPlayerCard(
       ` : '<p class="muted-text">Le metriche prive di input FLDA verificabili restano non disponibili.</p>'}
       <div class="auction-live-price-row">
         <label class="auction-live-price-field"><span>Prezzo corrente</span><input id="auctionPriceInput" type="number" inputmode="numeric" min="0" step="1" placeholder="0" ${assigned ? 'disabled' : ''}></label>
-        <div class="auction-price-stepper"><button id="auctionPricePlusOneButton" type="button" ${assigned ? 'disabled' : ''}>+1</button><button id="auctionPricePlusTenButton" type="button" ${assigned ? 'disabled' : ''}>+10</button></div>
-        <button id="auctionOpenAwardButton" type="button" class="auction-primary-action" ${assigned ? 'disabled' : ''}>Aggiudicato</button>
+        <div class="auction-price-stepper"><button id="auctionPricePlusOneButton" type="button" title="+1 (Spazio)" ${assigned ? 'disabled' : ''}>+1</button><button id="auctionPricePlusTenButton" type="button" title="+10 (Maiusc+Spazio)" ${assigned ? 'disabled' : ''}>+10</button></div>
+        <button id="auctionOpenAwardButton" type="button" class="auction-primary-action" title="Aggiudicato (Invio)" ${assigned ? 'disabled' : ''}>Aggiudicato</button>
         <button id="auctionUnsoldButton" type="button" class="auction-secondary-action" ${assigned ? 'disabled' : ''}>Invenduto</button>
         <button id="auctionCancelCallButton" type="button" class="auction-secondary-action">Annulla</button>
       </div>

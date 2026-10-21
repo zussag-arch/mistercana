@@ -10,7 +10,7 @@ import { getAssignmentFldaId } from '../services/auctionPlayerResolver'
 import {
   auctionStatusClass, auctionStatusLabel, display, displayCount, escapePlayerHtml,
   field, latestHistory, renderCurrentMetrics,
-  renderPerformanceChart, renderPlayerBadges, renderSageChart,
+  renderPerformanceChart, renderPlayerBadges, renderSageSection, renderICaV3Explanation,
 } from '../components/playerDataView'
 import type { PlayerViewModel } from '../components/playerDataView'
 import { displayHistoricalAuctionPrices } from '../domain/historicalAuctionPrice'
@@ -111,13 +111,13 @@ function qualitativeGuide(view: PlayerViewModel, guide?: FldaRecord): string {
   ]
   const present = groups.filter(([, , items]) => items.length)
   if (!present.length) return ''
-  return `<section class="player-full-section player-qualitative"><div class="player-section-heading"><span>LETTURA EDITORIALE</span><h2>Indicazioni qualitative</h2></div><div class="player-qualitative-grid">${present.map(([label, tone, items]) => `<article class="qualitative-${tone}"><h3>${label}</h3><ul>${items.map((item) => `<li>${escapePlayerHtml(item)}</li>`).join('')}</ul></article>`).join('')}</div></section>`
+  return `<section class="player-full-section player-qualitative"><div class="player-section-heading"><span>Lettura editoriale</span><h2>Indicazioni qualitative</h2></div><div class="player-qualitative-grid">${present.map(([label, tone, items]) => `<article class="qualitative-${tone}"><h3>${label}</h3><ul>${items.map((item) => `<li>${escapePlayerHtml(item)}</li>`).join('')}</ul></article>`).join('')}</div></section>`
 }
 
 function guideSummary(guide?: FldaRecord): string {
   if (!guide) return ''
   const keyPoints = asTextList(field(guide, 'key_points'))
-  return `<section class="player-full-section"><div class="player-section-heading"><span>CONTESTO SQUADRA</span><h2>Guida</h2></div><div class="player-guide-summary"><div><span>Allenatore</span><strong>${display(field(guide, 'coach'))}</strong></div><div><span>Modulo</span><strong>${display(field(guide, 'module'))}</strong></div><div><span>Attacco</span><strong>${display(field(guide, 'attack'), 0)}</strong></div><div><span>Difesa</span><strong>${display(field(guide, 'defense'), 0)}</strong></div></div>${field(guide, 'comment') ? `<p>${display(field(guide, 'comment'))}</p>` : ''}${field(guide, 'sos_fanta_comment') ? `<p>${display(field(guide, 'sos_fanta_comment'))}</p>` : ''}${keyPoints.length ? `<ul>${keyPoints.map((item) => `<li>${escapePlayerHtml(item)}</li>`).join('')}</ul>` : ''}</section>`
+  return `<section class="player-full-section"><div class="player-section-heading"><span>Contesto squadra</span><h2>Guida</h2></div><div class="player-guide-summary"><div><span>Allenatore</span><strong>${display(field(guide, 'coach'))}</strong></div><div><span>Modulo</span><strong>${display(field(guide, 'module'))}</strong></div><div><span>Attacco</span><strong>${display(field(guide, 'attack'), 0)}</strong></div><div><span>Difesa</span><strong>${display(field(guide, 'defense'), 0)}</strong></div></div>${field(guide, 'comment') ? `<p>${display(field(guide, 'comment'))}</p>` : ''}${field(guide, 'sos_fanta_comment') ? `<p>${display(field(guide, 'sos_fanta_comment'))}</p>` : ''}${keyPoints.length ? `<ul>${keyPoints.map((item) => `<li>${escapePlayerHtml(item)}</li>`).join('')}</ul>` : ''}</section>`
 }
 
 const advancedLabels: Record<string, string> = {
@@ -135,6 +135,8 @@ function advancedStats(row?: FldaRecord): string {
   return `<div class="player-advanced-grid">${keys.map((key) => `<div><span>${advancedLabels[key]}</span><strong>${discrete.has(key) ? displayCount(field(row, key)) : display(field(row, key), 2)}</strong></div>`).join('')}</div>`
 }
 
+const roleNames: Record<string, string> = { P: 'Portiere', D: 'Difensore', C: 'Centrocampista', A: 'Attaccante' }
+
 export function renderFullPlayerPage(reference: string | null, state: AppState): string {
   if (!reference) return '<section class="page player-full-page"><p>Nessun giocatore selezionato.</p></section>'
   const selected = resolve(reference)
@@ -148,18 +150,26 @@ export function renderFullPlayerPage(reference: string | null, state: AppState):
   const guide = getCachedTeamGuide(flda.team)
   const role = flda.role.toUpperCase()
   const assigned = Boolean(flda.player_id && state.auctionAssignments.some((item) => getAssignmentFldaId(item) === flda.player_id))
-  const view: PlayerViewModel = { flda, legacy, legacyId, detail, guide, assigned, auctionLive: state.auctionPhase === 'live', identityAvailable: Boolean(flda.player_id), pmaConfiguration: state.pmaConfiguration }
+  const view: PlayerViewModel = { flda, legacy, legacyId, detail, guide, assigned, auctionLive: state.auctionPhase === 'live', identityAvailable: Boolean(flda.player_id), pmaConfiguration: state.pmaConfiguration, initialCredits: state.initialCredits }
   const latest = latestHistory(detail)
-  return `<section class="page player-full-page">
-    <header class="player-full-header"><button type="button" data-player-detail-back>← Giocatori</button><div class="player-full-identity"><span class="player-detail-role player-detail-role-${role.toLowerCase()}">${escapePlayerHtml(role)}</span><div><small>SCHEDA GIOCATORE</small><h1>${escapePlayerHtml(flda.name)}</h1><p>${escapePlayerHtml(flda.team)}</p>${renderPlayerBadges(view)}</div></div><div class="player-full-actions"><span class="player-status player-status-${auctionStatusClass(view)}">${auctionStatusLabel(view)}</span>${flda.player_id ? `<button type="button" data-full-player-call="${escapePlayerHtml(flda.player_id)}" ${state.auctionPhase === 'live' && !assigned ? '' : 'disabled'}>${assigned ? 'ASSEGNATO' : 'CHIAMA'}</button>` : ''}</div></header>
+  const roleName = roleNames[role] ?? role
+  const context = [flda.team, field(guide, 'coach'), field(guide, 'module')]
+    .filter((item) => typeof item === 'string' && item.trim())
+    .map((item) => escapePlayerHtml(item)).join(' · ')
+  return `<section class="page player-full-page player-full-page-v3 player-tone-${role.toLowerCase()}">
+    <header class="player-full-header" data-role-word="${escapePlayerHtml(roleName)}">
+      <div class="player-full-identity"><span class="player-detail-role player-detail-role-${role.toLowerCase()}">${escapePlayerHtml(role)}</span><div><small>${escapePlayerHtml(roleName)}</small><h1${flda.name.trim().endsWith('.') ? ' class="no-dot"' : ''}>${escapePlayerHtml(flda.name)}</h1><p>${context}</p>${renderPlayerBadges(view)}</div></div>
+      <div class="player-full-actions"><button type="button" class="player-full-back" data-player-detail-back aria-label="Torna a Giocatori">←</button><span class="player-status player-status-${auctionStatusClass(view)}">${auctionStatusLabel(view)}</span>${flda.player_id ? `<button type="button" class="player-detail-call-button" data-full-player-call="${escapePlayerHtml(flda.player_id)}" ${state.auctionPhase === 'live' && !assigned ? '' : 'disabled'}>${assigned ? 'assegnato' : 'chiama'}</button>` : ''}</div>
+    </header>
     ${!view.identityAvailable ? '<p class="player-data-alert">Dati FLDA non disponibili per questa identità.</p>' : ''}${detailError ? `<p class="player-data-alert">${escapePlayerHtml(detailError)}</p>` : ''}
-    <section class="player-full-section"><div class="player-section-heading"><span>ULTIMA STAGIONE</span><h2>Panoramica</h2></div>${latestKpis(role, latest)}</section>
-    <div class="player-chart-grid"><section class="player-full-section"><h2>Prezzi dei Saggi</h2>${renderSageChart(detail)}</section><section class="player-full-section"><h2>Storico MV / FMV</h2>${renderPerformanceChart(detail)}</section></div>
-    <section class="player-full-section"><div class="player-section-heading"><span>ASTA</span><h2>Dati correnti</h2></div>${renderCurrentMetrics(view, true, displayHistoricalAuctionPrices(detail))}</section>
-    ${qualitativeGuide(view, guide)}
-    <section class="player-full-section"><div class="player-section-heading"><span>${escapePlayerHtml(role)}</span><h2>Statistiche ruolo</h2></div>${roleStats(role, latest)}</section>
+    ${renderCurrentMetrics(view, true, displayHistoricalAuctionPrices(detail))}
+    <section class="player-full-section player-ica-section"><div class="player-section-heading"><span>Valutazione</span><h2>Perché questo iCà</h2></div>${renderICaV3Explanation(view)}</section>
+    <section class="player-full-section"><div class="player-section-heading"><span>Prestazioni</span><h2>Come sta andando</h2></div>${latestKpis(role, latest)}</section>
+    <section class="player-full-section player-sage-section"><div class="player-section-heading"><span>Asta</span><h2>Prezzo e Saggi</h2></div>${renderSageSection(view)}</section>
+    <div class="player-chart-grid"><section class="player-full-section"><div class="player-section-heading"><span>Storico</span><h2>MV / FMV</h2></div>${renderPerformanceChart(detail)}</section><section class="player-full-section"><div class="player-section-heading"><span>${escapePlayerHtml(roleName)}</span><h2>Statistiche ruolo</h2></div>${roleStats(role, latest)}</section></div>
     ${guideSummary(guide)}
-    <section class="player-full-section player-advanced"><div class="player-section-heading"><span>DETTAGLIO</span><h2>Statistiche avanzate</h2></div>${advancedStats(latest)}</section>
+    ${qualitativeGuide(view, guide)}
+    <section class="player-full-section player-advanced"><div class="player-section-heading"><span>Dettaglio</span><h2>Statistiche avanzate</h2></div>${advancedStats(latest)}</section>
   </section>`
 }
 

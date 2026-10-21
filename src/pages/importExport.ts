@@ -1,3 +1,18 @@
+import bundledPlayersCsv from '../../database/fantalab_giocatori.csv?raw'
+import bundledCoachesCsv from '../../database/fantalab_allenatori.csv?raw'
+import bundledGoalkeeperGridCsv from '../../database/griglia_portieri.csv?raw'
+import bundledAttackerGridCsv from '../../database/griglia_attaccanti.csv?raw'
+import bundledGoalkeeperCalendarCsv from '../../database/MisterCana_DB_Portieri_Calendario.csv?raw'
+import bundledGoalkeeperHierarchyCsv from '../../database/MisterCana_DB_Portieri_Gerarchie.csv?raw'
+import bundledSaggiCsv from '../../database/MisterCana_DB_Saggi.csv?raw'
+import { CSV_LABELS, clearCsvOverrides, getCsv, getCsvOverrides, saveCsvOverrides } from '../data/csvOverrides'
+import type { CsvKey, CsvOverride } from '../data/csvOverrides'
+import { analyzeCsv } from '../data/csvImport'
+import type { CsvAnalysis } from '../data/csvImport'
+import { getDataSources } from '../data/dataSources'
+import { getICaV3Results } from '../data/icaV3Data'
+import { localPlayers } from '../services/fantalabLocal'
+import { getCachedPlayersDataset } from '../services/playerRepository'
 import {
   players,
 } from '../data/players'
@@ -14,6 +29,7 @@ import {
   FldaApiError,
   getFldaHealth,
   getFldaStatus,
+  isFldaLocalMode,
   updateFlda,
 } from '../services/flda'
 
@@ -524,6 +540,382 @@ function getManagerName(
   )
 }
 
+/* =========================
+   FONTI DATI
+========================= */
+
+function renderDataSourcesPanel(): string {
+  const sources = getDataSources()
+  const active = getCachedPlayersDataset()
+  const label = active?.source === 'legacy'
+    ? 'Vecchio listone (riserva)'
+    : isFldaLocalMode() || !active
+      ? (Object.keys(getCsvOverrides()).length ? 'Tabelle FantaLab (caricate nel browser)' : 'Tabelle FantaLab (locali)')
+      : 'FLDA'
+  return `
+    <section class="data-transfer-section data-sources-section">
+      <div class="data-transfer-section-header">
+        <div>
+          <span class="data-transfer-eyebrow">Dati</span>
+          <h2>Fonti dati</h2>
+          <p>Gli archivi che l'app sta usando, con i numeri reali. Si trovano nella cartella <code>database/</code> del progetto.</p>
+        </div>
+        <span class="data-source-active">In uso: ${escapeSourceHtml(label)}</span>
+      </div>
+      <div class="data-sources-grid">
+        ${sources.map((source) => `
+          <article class="data-source-card">
+            <span class="data-source-title">${escapeSourceHtml(source.title)}</span>
+            <strong>${escapeSourceHtml(source.value)}</strong>
+            <small>${escapeSourceHtml(source.detail)}</small>
+            <p><b>Usato per:</b> ${escapeSourceHtml(source.usedBy)}</p>
+            <code>${escapeSourceHtml(source.file)}</code>
+          </article>`).join('')}
+      </div>
+      ${renderCsvUpload()}
+      <details class="data-sources-howto">
+        <summary>Come aggiornare i dati</summary>
+        <ol>
+          <li>Scarica da FantaLab i nuovi <code>fantalab_giocatori.csv</code> e <code>fantalab_allenatori.csv</code> (o le griglie).</li>
+          <li>Premi <b>Scegli file CSV</b> qui sopra, controlla l'anteprima e premi <b>Applica</b>: l'app li usa subito, solo in questo browser.</li>
+          <li>Codici storici, obiettivi e assegnazioni restano collegati tramite l'ID FantaLab.</li>
+          <li>Per renderli definitivi per tutti (anche online), sostituisci i file in <code>database/</code> e fai commit e push su GitHub.</li>
+        </ol>
+      </details>
+    </section>
+  `
+}
+
+/* =========================
+   CARICA NUOVI DATI (CSV)
+========================= */
+
+let pendingCsv: CsvAnalysis[] = []
+
+const BUNDLED_CSV: Record<CsvKey, string> = {
+  fantalab_giocatori: bundledPlayersCsv,
+  fantalab_allenatori: bundledCoachesCsv,
+  griglia_portieri: bundledGoalkeeperGridCsv,
+  griglia_attaccanti: bundledAttackerGridCsv,
+  portieri_calendario: bundledGoalkeeperCalendarCsv,
+  portieri_gerarchie: bundledGoalkeeperHierarchyCsv,
+  saggi: bundledSaggiCsv,
+}
+
+function renderCsvUpload(): string {
+  const overrides = getCsvOverrides()
+  const active = (Object.keys(overrides) as CsvKey[])
+  return `
+    <div class="csv-upload">
+      <div class="csv-upload-copy">
+        <strong>Carica nuovi dati</strong>
+        <p><b>Aggiorna da FantaLab</b> apre il login FantaLab e scarica tutto da solo (serve FLDA acceso sul computer). In alternativa scegli i CSV a mano. In entrambi i casi vedi un'anteprima prima di applicare.</p>
+      </div>
+      <div class="csv-upload-actions">
+        <button id="fantalabSyncButton" type="button" class="data-transfer-button data-transfer-button-primary" ${syncRunning ? 'disabled' : ''}>Aggiorna da FantaLab</button>
+        <label class="data-transfer-button csv-upload-button">
+          Scegli file CSV
+          <input id="csvUploadInput" type="file" accept=".csv,text/csv" multiple hidden>
+        </label>
+      </div>
+    </div>
+    <div id="fantalabSyncStatus">${renderSyncStatus()}</div>
+    <details class="saggi-creators" id="saggiCreatorsBox">
+      <summary>Saggi da scaricare <small>${escapeSourceHtml(selectedCreatorsLabel())}</small></summary>
+      <div id="saggiCreatorsList"><p class="saggi-creators-hint">Apri per scegliere i creator (serve FLDA acceso).</p></div>
+    </details>
+    ${active.length ? `
+      <div class="csv-upload-active">
+        <span>In uso dati caricati nel browser: ${active.map((key) => `<b>${escapeSourceHtml(CSV_LABELS[key])}</b> (${escapeSourceHtml(overrides[key]!.fileName)}, ${new Date(overrides[key]!.loadedAt).toLocaleDateString('it-IT')})`).join(' · ')}</span>
+        <button id="csvResetOverrides" type="button" class="data-transfer-button">Torna ai dati originali</button>
+      </div>` : ''}
+    <div id="csvUploadPreview">${renderCsvPreview()}</div>
+  `
+}
+
+function renderCsvPreview(): string {
+  if (!pendingCsv.length) return ''
+  const valid = pendingCsv.filter((item) => item.ok)
+  return `
+    <div class="csv-preview">
+      ${pendingCsv.map((item) => `
+        <article class="csv-preview-item ${item.ok ? 'is-ok' : 'is-error'}">
+          <header>
+            <strong>${escapeSourceHtml(item.key ? CSV_LABELS[item.key] : 'File non riconosciuto')}</strong>
+            <small>${escapeSourceHtml(item.fileName)}</small>
+            <span>${item.ok ? 'OK' : 'Da correggere'}</span>
+          </header>
+          <ul>
+            ${item.errors.map((error) => `<li class="error">${escapeSourceHtml(error)}</li>`).join('')}
+            ${item.summary.map((line) => `<li>${escapeSourceHtml(line)}</li>`).join('')}
+          </ul>
+        </article>`).join('')}
+      <div class="csv-preview-actions">
+        <button id="csvUploadCancel" type="button" class="data-transfer-button">Annulla</button>
+        <button id="csvUploadApply" type="button" class="data-transfer-button data-transfer-button-primary" ${valid.length ? '' : 'disabled'}>Applica ${valid.length} file e ricarica</button>
+      </div>
+    </div>`
+}
+
+function refreshCsvPreview(): void {
+  const container = document.querySelector<HTMLElement>('#csvUploadPreview')
+  if (container) container.innerHTML = renderCsvPreview()
+}
+
+async function handleCsvFiles(files: FileList): Promise<void> {
+  const current = (key: CsvKey) => getCsv(key, BUNDLED_CSV[key])
+  pendingCsv = await Promise.all([...files].map(async (file) => analyzeCsv(file.name, await file.text(), current)))
+  refreshCsvPreview()
+}
+
+function applyCsvFiles(): void {
+  const loadedAt = new Date().toISOString()
+  const files: Partial<Record<CsvKey, CsvOverride>> = {}
+  for (const item of pendingCsv) {
+    if (item.ok && item.key) files[item.key] = { fileName: item.fileName, content: item.content, loadedAt }
+  }
+  try {
+    saveCsvOverrides(files)
+  } catch {
+    window.alert('Spazio del browser insufficiente per salvare i file.')
+    return
+  }
+  window.location.reload()
+}
+
+/* =========================
+   AGGIORNA DA FANTALAB (via FLDA locale)
+========================= */
+
+// Il login apre Chrome sul computer: serve sempre il FLDA locale, mai quello online.
+const LOCAL_FLDA_URL = 'http://127.0.0.1:8765'
+const SYNC_STEPS: Record<string, string> = {
+  login: 'Login FantaLab',
+  download: 'Download da FantaLab',
+  export: 'Preparazione file',
+}
+
+interface SyncState {
+  status: 'idle' | 'running' | 'done' | 'error' | 'offline'
+  step?: string | null
+  message: string
+}
+
+let syncState: SyncState = { status: 'idle', message: '' }
+let syncRunning = false
+
+function renderSyncStatus(): string {
+  if (syncState.status === 'idle') return ''
+  const steps = Object.entries(SYNC_STEPS)
+  const current = steps.findIndex(([key]) => key === syncState.step)
+  return `
+    <div class="fantalab-sync sync-${syncState.status}">
+      ${syncState.status === 'running' ? `<ol class="fantalab-sync-steps">${steps.map(([, label], index) => `<li class="${index < current ? 'done' : index === current ? 'active' : ''}">${escapeSourceHtml(label)}</li>`).join('')}</ol>` : ''}
+      <p>${escapeSourceHtml(syncState.message)}</p>
+    </div>`
+}
+
+function refreshSyncUi(): void {
+  const status = document.querySelector<HTMLElement>('#fantalabSyncStatus')
+  if (status) status.innerHTML = renderSyncStatus()
+  const button = document.querySelector<HTMLButtonElement>('#fantalabSyncButton')
+  if (button) button.disabled = syncRunning
+}
+
+async function syncRequest(path: string, init?: RequestInit): Promise<Response> {
+  const controller = new AbortController()
+  const timer = window.setTimeout(() => controller.abort(), 8000)
+  try {
+    return await fetch(`${LOCAL_FLDA_URL}${path}`, { ...init, signal: controller.signal })
+  } finally {
+    window.clearTimeout(timer)
+  }
+}
+
+async function startFantalabSync(): Promise<void> {
+  if (syncRunning) return
+  syncRunning = true
+  syncState = { status: 'running', step: 'login', message: 'Avvio dell\'aggiornamento…' }
+  refreshSyncUi()
+  try {
+    const creators = loadSelectedCreators()
+    const response = await syncRequest('/api/fantalab/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ creators: creators.length ? creators : null }),
+    })
+    if (!response.ok) throw new Error(`FLDA ha risposto con errore ${response.status}.`)
+  } catch {
+    syncRunning = false
+    syncState = { status: 'offline', message: 'FLDA non risponde. Avvialo con run-local.ps1 (o "flda serve") e riprova.' }
+    refreshSyncUi()
+    return
+  }
+  while (syncRunning) {
+    await new Promise((resolve) => window.setTimeout(resolve, 1500))
+    let state: { status: string; step?: string | null; message?: string; warnings?: string[]; files?: Record<string, string> }
+    try {
+      state = await (await syncRequest('/api/fantalab/sync')).json()
+    } catch {
+      continue
+    }
+    if (state.status === 'running') {
+      syncState = { status: 'running', step: state.step, message: state.message ?? '' }
+      refreshSyncUi()
+      continue
+    }
+    syncRunning = false
+    if (state.status !== 'done') {
+      syncState = { status: 'error', message: state.message || 'Aggiornamento non riuscito.' }
+      refreshSyncUi()
+      return
+    }
+    try {
+      const current = (key: CsvKey) => getCsv(key, BUNDLED_CSV[key])
+      const names = Object.keys(state.files ?? {}).length ? Object.keys(state.files ?? {}) : ['fantalab_giocatori', 'fantalab_allenatori']
+      pendingCsv = await Promise.all(names.map(async (name) => {
+        const text = await (await syncRequest(`/api/fantalab/export/${name}.csv`)).text()
+        return analyzeCsv(`${name}.csv`, text, current)
+      }))
+      const warnings = state.warnings ?? []
+      syncState = {
+        status: 'done',
+        message: 'Dati scaricati da FantaLab: controlla l\'anteprima qui sotto e premi Applica.'
+          + (warnings.length ? ` Avvisi (${warnings.length}): ${warnings.slice(0, 5).join(' · ')}${warnings.length > 5 ? ' …' : ''}` : ''),
+      }
+    } catch {
+      syncState = { status: 'error', message: 'Dati scaricati ma file non leggibili da FLDA.' }
+    }
+    refreshSyncUi()
+    refreshCsvPreview()
+  }
+}
+
+/* =========================
+   SAGGI: SCELTA DEI CREATOR
+========================= */
+
+const CREATORS_KEY = 'mistercana_saggi_creators_v1'
+const DEFAULT_CREATOR_NAMES = ['CarmySpecial', 'Luca Diddi | Il Tattico', 'Recosta', 'SOS Fanta', 'Il Profeta']
+
+interface CreatorOption {
+  strategy_id: string
+  creator: string | null
+  name: string | null
+  type: string | null
+  participants: string | null
+  credits: number | null
+  season: string | null
+}
+
+function loadSelectedCreators(): string[] {
+  try {
+    const raw = window.localStorage.getItem(CREATORS_KEY)
+    return raw ? JSON.parse(raw) as string[] : []
+  } catch {
+    return []
+  }
+}
+
+function saveSelectedCreators(values: string[]): void {
+  try { window.localStorage.setItem(CREATORS_KEY, JSON.stringify(values)) } catch { /* solo comodità */ }
+}
+
+function selectedCreatorsLabel(): string {
+  const selected = loadSelectedCreators()
+  return selected.length ? `${selected.length} liste scelte` : 'i 5 di sempre: Carmy, Il Tattico, Recosta, SOS Fanta, Il Profeta'
+}
+
+async function loadCreatorOptions(): Promise<void> {
+  const list = document.querySelector<HTMLElement>('#saggiCreatorsList')
+  if (!list) return
+  let options: CreatorOption[] = []
+  try {
+    options = await (await syncRequest('/api/fantalab/creators')).json()
+  } catch {
+    list.innerHTML = '<p class="saggi-creators-hint">FLDA non risponde: avvialo per scegliere i creator.</p>'
+    return
+  }
+  const current = options.filter((item) => item.season === 's_26_27')
+  if (!current.length) {
+    list.innerHTML = '<p class="saggi-creators-hint">L’elenco dei creator compare dopo il primo “Aggiorna da FantaLab”. Fino ad allora vengono scaricati i 5 di sempre.</p>'
+    return
+  }
+  let selected = loadSelectedCreators()
+  if (!selected.length) {
+    // i 5 di sempre: la loro lista Classic più recente
+    selected = DEFAULT_CREATOR_NAMES.flatMap((name) => {
+      const found = current.filter((item) => item.creator === name && item.type === 'classic')
+      return found.length ? [found[0].strategy_id] : []
+    })
+  }
+  const sorted = [...current].sort((a, b) => String(a.creator).localeCompare(String(b.creator), 'it'))
+  list.innerHTML = `
+    <p class="saggi-creators-hint">Spunta le liste da scaricare (ogni creator può averne più di una: Classic, Mantra…).</p>
+    <div class="saggi-creators-grid">
+      ${sorted.map((item) => `
+        <label class="saggi-creator">
+          <input type="checkbox" value="${escapeSourceHtml(item.strategy_id)}" ${selected.includes(item.strategy_id) ? 'checked' : ''}>
+          <span><b>${escapeSourceHtml(item.creator ?? '—')}</b><small>${escapeSourceHtml(item.name ?? '')} · ${escapeSourceHtml(item.type ?? '')} ${escapeSourceHtml(item.participants ?? '')} · ${item.credits ?? ''} cr</small></span>
+        </label>`).join('')}
+    </div>`
+}
+
+function bindCsvUpload(): void {
+  document.addEventListener('toggle', (event) => {
+    if (event.target instanceof HTMLDetailsElement && event.target.id === 'saggiCreatorsBox' && event.target.open) void loadCreatorOptions()
+  }, true)
+  document.addEventListener('change', (event) => {
+    const box = event.target
+    if (box instanceof HTMLInputElement && box.closest('.saggi-creators-grid')) {
+      const values = [...document.querySelectorAll<HTMLInputElement>('.saggi-creators-grid input:checked')].map((item) => item.value)
+      saveSelectedCreators(values)
+      const label = document.querySelector<HTMLElement>('#saggiCreatorsBox summary small')
+      if (label) label.textContent = selectedCreatorsLabel()
+      return
+    }
+    const input = event.target
+    if (input instanceof HTMLInputElement && input.id === 'csvUploadInput' && input.files?.length) {
+      void handleCsvFiles(input.files)
+      input.value = ''
+    }
+  })
+  document.addEventListener('click', (event) => {
+    const target = event.target
+    if (!(target instanceof Element)) return
+    if (target.closest('#csvUploadCancel')) { pendingCsv = []; refreshCsvPreview() }
+    if (target.closest('#csvUploadApply')) applyCsvFiles()
+    if (target.closest('#fantalabSyncButton')) void startFantalabSync()
+    if (target.closest('#csvResetOverrides') && window.confirm('Tornare ai dati originali del progetto? I CSV caricati nel browser verranno eliminati.')) {
+      clearCsvOverrides()
+      window.location.reload()
+    }
+  })
+}
+
+function escapeSourceHtml(value: string): string {
+  return value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
+}
+
+function exportPlayerRatings(): void {
+  const roleOrder = ['P', 'D', 'C', 'A']
+  const results = getICaV3Results()
+  const csvCell = (value: unknown) => {
+    const text = typeof value === 'number' ? value.toFixed(1).replace('.', ',') : String(value ?? '')
+    return /[;"\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text
+  }
+  const rows = localPlayers().players
+    .map((player) => ({ player, ica: results.get(player.player_id ?? '') }))
+    .sort((a, b) => roleOrder.indexOf(a.player.role) - roleOrder.indexOf(b.player.role)
+      || (b.ica?.score ?? -1) - (a.ica?.score ?? -1))
+  const header = ['Ruolo', 'Giocatore', 'Squadra', 'iCà', 'Posizione nel ruolo %', 'Affare', 'PMA %', 'Titolarità %', 'FM attesa', 'FM corretta']
+  const lines = [header.join(';'), ...rows.map(({ player, ica }) => [
+    player.role, player.name, player.team, ica?.score, ica?.rolePercentile, ica?.affare,
+    player.classic_8_mod_median_value, player.titolarita_display, ica?.expectedFm, ica?.adjustedFm,
+  ].map(csvCell).join(';'))]
+  downloadTextFile(`mistercana-valutazioni-${getSafeFileStamp()}.csv`, '\uFEFF' + lines.join('\n'), 'text/csv;charset=utf-8')
+}
+
 function getSafeFileStamp():
   string {
   const now =
@@ -986,7 +1378,15 @@ export function renderImportExportPage():
         </div>
       </div>
 
-      ${renderFldaPanel()}
+      ${renderDataSourcesPanel()}
+
+      <details class="flda-optional">
+        <summary>
+          <span>Servizio FLDA <small>facoltativo</small></span>
+          <small>${isFldaLocalMode() ? 'non in uso: l\'app usa le tabelle FantaLab' : 'apri per stato e aggiornamenti'}</small>
+        </summary>
+        ${renderFldaPanel()}
+      </details>
 
       <section
         class="data-transfer-section"
@@ -1334,38 +1734,29 @@ export function renderImportExportPage():
           </article>
         </div>
       </section>
-
-      <section
-        class="data-integrity-panel"
-      >
-        <div
-          class="data-integrity-icon"
-        >
-          ✓
+      <section class="data-transfer-section">
+        <div class="data-transfer-section-header">
+          <div>
+            <span class="data-transfer-eyebrow">Export analisi</span>
+            <h2>Valutazioni giocatori</h2>
+            <p>Tutti i giocatori del listone con iCà, posizione nel ruolo, Affare, PMA e titolarità, da aprire con Excel.</p>
+          </div>
         </div>
-
-        <div>
-          <span
-            class="
-              data-transfer-eyebrow
-            "
-          >
-            VALIDAZIONE
-          </span>
-
-          <h2>
-            Prima validare, poi applicare
-          </h2>
-
-          <p>
-            Il ripristino verifica tipo,
-            versione e struttura minima
-            del backup prima di proporre
-            la conferma.
-
-            Un file non valido non modifica
-            il localStorage corrente.
-          </p>
+        <div class="data-transfer-grid data-transfer-grid-single">
+          <article class="data-transfer-card">
+            <div class="data-transfer-card-header">
+              <div class="data-transfer-icon data-transfer-icon-export">↑</div>
+              <span class="data-transfer-status status-ready">Pronto</span>
+            </div>
+            <div class="data-transfer-card-body">
+              <h3>iCà e affari</h3>
+              <p>Una riga per giocatore, ordinata per ruolo e iCà. Utile per preparare l'asta o confrontare le valutazioni.</p>
+            </div>
+            <div class="data-transfer-card-footer">
+              <div><span>Formato</span><strong>CSV · separatore ;</strong></div>
+              <button id="exportPlayerRatingsButton" type="button" class="data-transfer-button data-transfer-button-primary">Esporta valutazioni</button>
+            </div>
+          </article>
         </div>
       </section>
     </section>
@@ -1741,6 +2132,11 @@ export function bindImportExportEvents():
 
   importExportEventsBound =
     true
+
+  document.addEventListener('click', (event) => {
+    if (event.target instanceof Element && event.target.closest('#exportPlayerRatingsButton')) exportPlayerRatings()
+  })
+  bindCsvUpload()
 
   document.addEventListener(
     'click',

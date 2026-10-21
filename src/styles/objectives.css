@@ -24,21 +24,21 @@
 
   border:
     1px solid
-    rgba(255, 255, 255, 0.08);
+    rgba(var(--ink-rgb), 0.08);
 
   border-radius: 24px;
 
   background:
     linear-gradient(
       180deg,
-      rgba(255, 255, 255, 0.018),
-      rgba(255, 255, 255, 0.006)
+      rgba(var(--ink-rgb), 0.018),
+      rgba(var(--ink-rgb), 0.006)
     ),
-    #121416;
+    var(--bg);
 
   box-shadow:
     inset 0 1px 0
-    rgba(255, 255, 255, 0.025);
+    rgba(var(--ink-rgb), 0.025);
 }
 
 .objectives-eyebrow {
@@ -46,9 +46,9 @@
 
   margin-bottom: 7px;
 
-  color: #46e6a1;
+  color: var(--accent);
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 850;
 
   letter-spacing: 0.14em;
@@ -66,7 +66,7 @@
 .objectives-page-header p {
   margin: 7px 0 0;
 
-  color: #8a9195;
+  color: var(--muted);
 
   font-size: 11px;
 }
@@ -89,16 +89,16 @@
 
   border:
     1px solid
-    rgba(255, 255, 255, 0.08);
+    rgba(var(--ink-rgb), 0.08);
 
   border-radius:
     var(--radius-pill);
 
-  background: #181b1d;
+  background: var(--surface);
 
-  color: #91989c;
+  color: var(--muted);
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 750;
 }
 
@@ -119,16 +119,16 @@
 
   border:
     1px solid
-    rgba(255, 255, 255, 0.09);
+    rgba(var(--ink-rgb), 0.09);
 
   border-radius:
     var(--radius-pill);
 
-  background: #181b1d;
+  background: var(--surface);
 
-  color: #777e83;
+  color: var(--muted);
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 820;
 
   letter-spacing: 0.025em;
@@ -153,20 +153,20 @@
 
 .objectives-auction-nav-button.is-live {
   border-color:
-    rgba(70, 230, 161, 0.34);
+    color-mix(in srgb, var(--accent) 34%, transparent);
 
   background:
     linear-gradient(
       180deg,
-      rgba(70, 230, 161, 0.14),
-      rgba(47, 191, 131, 0.07)
+      color-mix(in srgb, var(--accent) 14%, transparent),
+      color-mix(in srgb, var(--accent) 7%, transparent)
     );
 
-  color: #75f0b8;
+  color: var(--accent);
 
   box-shadow:
     inset 0 1px 0
-    rgba(255, 255, 255, 0.03);
+    rgba(var(--ink-rgb), 0.03);
 
   cursor: pointer;
 }
@@ -199,7 +199,7 @@
   border-radius:
     var(--radius-pill);
 
-  background: #555b5f;
+  background: var(--muted-soft);
 
   transition:
     background
@@ -212,22 +212,22 @@
 
 .objectives-auction-nav-button.is-live
 .objectives-auction-nav-dot {
-  background: #46e6a1;
+  background: var(--accent);
 
   box-shadow:
     0 0 9px
-    rgba(70, 230, 161, 0.62);
+    color-mix(in srgb, var(--accent) 62%, transparent);
 }
 
 @media (hover: hover) {
   .objectives-auction-nav-button.is-live:hover {
     border-color:
-      rgba(70, 230, 161, 0.52);
+      color-mix(in srgb, var(--accent) 52%, transparent);
 
     background:
-      rgba(70, 230, 161, 0.13);
+      color-mix(in srgb, var(--accent) 13%, transparent);
 
-    color: #9af5cf;
+    color: var(--accent);
   }
 }
 
@@ -246,17 +246,17 @@
 
   border:
     1px solid
-    rgba(255, 255, 255, 0.08);
+    rgba(var(--ink-rgb), 0.08);
 
   border-radius: 22px;
 
   background:
     linear-gradient(
       180deg,
-      rgba(255, 255, 255, 0.014),
-      rgba(255, 255, 255, 0.004)
+      rgba(var(--ink-rgb), 0.014),
+      rgba(var(--ink-rgb), 0.004)
     ),
-    #121416;
+    var(--bg);
 }
 
 .objectives-search-row {
@@ -281,11 +281,11 @@
 
   border:
     1px solid
-    #343a3e;
+    var(--line-2);
 
   border-radius: 16px;
 
-  background: #17191b;
+  background: var(--surface);
 
   transition:
     border-color
@@ -301,16 +301,16 @@
 
 .objectives-search-box:focus-within {
   border-color:
-    rgba(70, 230, 161, 0.42);
+    color-mix(in srgb, var(--accent) 42%, transparent);
 
-  background: #1b1e20;
+  background: var(--surface-light);
 
   box-shadow:
     var(--focus-ring);
 }
 
 .objectives-search-icon {
-  color: #73797d;
+  color: var(--muted);
 
   font-size: 16px;
 
@@ -322,7 +322,7 @@
 
 .objectives-search-box:focus-within
 .objectives-search-icon {
-  color: #75f0b8;
+  color: var(--accent);
 }
 
 .objectives-search-box input {
@@ -340,7 +340,7 @@
 }
 
 .objectives-search-box input::placeholder {
-  color: #62686c;
+  color: var(--muted-soft);
 }
 
 .objective-add-priority {
@@ -350,17 +350,17 @@
 
   border:
     1px solid
-    #343a3e;
+    var(--line-2);
 
   border-radius: 16px;
 
   outline: none;
 
-  background: #17191b;
+  background: var(--surface);
 
-  color: #d9dcde;
+  color: var(--text-soft);
 
-  font-size: 10px;
+  font-size: 11px;
 
   cursor: pointer;
 
@@ -378,7 +378,7 @@
 
 .objective-add-priority:focus-visible {
   border-color:
-    rgba(70, 230, 161, 0.42);
+    color-mix(in srgb, var(--accent) 42%, transparent);
 
   box-shadow:
     var(--focus-ring);
@@ -390,18 +390,18 @@
     3px
     0;
 
-  color: #666c70;
+  color: var(--muted-soft);
 
-  font-size: 9px;
+  font-size: 11px;
 }
 
 @media (hover: hover) {
   .objectives-search-box:hover,
   .objective-add-priority:hover {
     border-color:
-      rgba(255, 255, 255, 0.15);
+      rgba(var(--ink-rgb), 0.15);
 
-    background: #1b1e20;
+    background: var(--surface-light);
   }
 }
 
@@ -422,11 +422,11 @@
 
   border:
     1px solid
-    #3c4043;
+    var(--line-2);
 
   border-radius: 22px;
 
-  background: #202326;
+  background: var(--surface-light);
 
   box-shadow:
     0 18px 50px
@@ -511,9 +511,9 @@
 }
 
 .objectives-search-player small {
-  color: #747a7e;
+  color: var(--muted);
 
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .objective-add-button {
@@ -525,16 +525,16 @@
 
   border:
     1px solid
-    rgba(70, 230, 161, 0.22);
+    color-mix(in srgb, var(--accent) 22%, transparent);
 
   border-radius: 13px;
 
   background:
-    rgba(70, 230, 161, 0.08);
+    color-mix(in srgb, var(--accent) 8%, transparent);
 
-  color: #72e3b4;
+  color: var(--accent);
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 750;
 
   cursor: pointer;
@@ -567,9 +567,9 @@
 }
 
 .objective-existing-label {
-  color: #6f7579;
+  color: var(--muted);
 
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .objectives-search-empty {
@@ -577,24 +577,24 @@
 
   border-radius: 16px;
 
-  color: #747a7e;
+  color: var(--muted);
 
-  font-size: 10px;
+  font-size: 11px;
 }
 
 @media (hover: hover) {
   .objectives-search-result:hover {
-    background: #292d30;
+    background: var(--surface-raised);
   }
 
   .objective-add-button:hover {
     border-color:
-      rgba(70, 230, 161, 0.46);
+      color-mix(in srgb, var(--accent) 46%, transparent);
 
     background:
-      rgba(70, 230, 161, 0.14);
+      color-mix(in srgb, var(--accent) 14%, transparent);
 
-    color: #9af5cf;
+    color: var(--accent);
   }
 }
 
@@ -625,21 +625,21 @@
 
   border:
     1px solid
-    rgba(255, 255, 255, 0.08);
+    rgba(var(--ink-rgb), 0.08);
 
   border-radius: 26px;
 
   background:
     linear-gradient(
       180deg,
-      rgba(255, 255, 255, 0.018),
-      rgba(255, 255, 255, 0.006)
+      rgba(var(--ink-rgb), 0.018),
+      rgba(var(--ink-rgb), 0.006)
     ),
-    #121416;
+    var(--bg);
 
   box-shadow:
     inset 0 1px 0
-    rgba(255, 255, 255, 0.025);
+    rgba(var(--ink-rgb), 0.025);
 
   transition:
     border-color
@@ -660,7 +660,7 @@
 
   border-bottom:
     1px solid
-    rgba(255, 255, 255, 0.06);
+    rgba(var(--ink-rgb), 0.06);
 }
 
 .objective-role-title {
@@ -692,11 +692,11 @@
   border-radius:
     var(--radius-pill);
 
-  background: #292d30;
+  background: var(--surface-raised);
 
-  color: #9da2a5;
+  color: var(--muted);
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 750;
 
   font-variant-numeric:
@@ -721,22 +721,22 @@
 
 .objective-role-p {
   border-color:
-    rgba(227, 199, 72, 0.2);
+    color-mix(in srgb, var(--yellow) 20%, transparent);
 }
 
 .objective-role-d {
   border-color:
-    rgba(90, 168, 255, 0.2);
+    color-mix(in srgb, var(--blue) 20%, transparent);
 }
 
 .objective-role-c {
   border-color:
-    rgba(70, 230, 161, 0.18);
+    color-mix(in srgb, var(--accent) 18%, transparent);
 }
 
 .objective-role-a {
   border-color:
-    rgba(240, 113, 113, 0.2);
+    color-mix(in srgb, var(--red) 20%, transparent);
 }
 
 .role-badge {
@@ -750,7 +750,7 @@
 
   border-radius: 11px;
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 900;
 
   transition:
@@ -768,45 +768,45 @@
 .role-badge.role-p {
   border:
     1px solid
-    rgba(242, 220, 105, 0.34);
+    color-mix(in srgb, var(--yellow) 34%, transparent);
 
   background:
-    rgba(227, 199, 72, 0.16);
+    color-mix(in srgb, var(--yellow) 16%, transparent);
 
-  color: #f2dc69;
+  color: var(--yellow);
 }
 
 .role-badge.role-d {
   border:
     1px solid
-    rgba(90, 168, 255, 0.34);
+    color-mix(in srgb, var(--blue) 34%, transparent);
 
   background:
-    rgba(90, 168, 255, 0.16);
+    color-mix(in srgb, var(--blue) 16%, transparent);
 
-  color: #75b8ff;
+  color: var(--blue);
 }
 
 .role-badge.role-c {
   border:
     1px solid
-    rgba(70, 230, 161, 0.32);
+    color-mix(in srgb, var(--accent) 32%, transparent);
 
   background:
-    rgba(70, 230, 161, 0.14);
+    color-mix(in srgb, var(--accent) 14%, transparent);
 
-  color: #75f0b8;
+  color: var(--accent);
 }
 
 .role-badge.role-a {
   border:
     1px solid
-    rgba(240, 113, 113, 0.34);
+    color-mix(in srgb, var(--red) 34%, transparent);
 
   background:
-    rgba(240, 113, 113, 0.15);
+    color-mix(in srgb, var(--red) 15%, transparent);
 
-  color: #f58c8c;
+  color: var(--red);
 }
 
 /* =========================
@@ -820,11 +820,11 @@
 
   border:
     1px solid
-    rgba(255, 255, 255, 0.06);
+    rgba(var(--ink-rgb), 0.06);
 
   border-radius: 20px;
 
-  background: #181b1d;
+  background: var(--surface);
 
   transition:
     border-color
@@ -852,11 +852,11 @@
 
   border-bottom:
     1px solid
-    rgba(255, 255, 255, 0.05);
+    rgba(var(--ink-rgb), 0.05);
 
-  color: #969c9f;
+  color: var(--muted);
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 800;
 
   text-transform: uppercase;
@@ -874,11 +874,11 @@
   border-radius:
     var(--radius-pill);
 
-  background: #25282a;
+  background: var(--surface-raised);
 
-  color: #858b8f;
+  color: var(--muted);
 
-  font-size: 8px;
+  font-size: 11px;
 
   font-variant-numeric:
     tabular-nums;
@@ -890,27 +890,27 @@
 
 .priority-primary
 .objective-priority-header {
-  color: #f0cf66;
+  color: var(--yellow);
 }
 
 .priority-secondary
 .objective-priority-header {
-  color: #c5cace;
+  color: var(--text-soft);
 }
 
 .priority-third
 .objective-priority-header {
-  color: #9da5a9;
+  color: var(--muted);
 }
 
 .priority-fourth
 .objective-priority-header {
-  color: #7f888d;
+  color: var(--muted);
 }
 
 .priority-bet
 .objective-priority-header {
-  color: #c99af4;
+  color: var(--purple);
 }
 
 /* =========================
@@ -937,11 +937,11 @@
 
   border:
     1px solid
-    rgba(255, 255, 255, 0.045);
+    rgba(var(--ink-rgb), 0.045);
 
   border-radius: 16px;
 
-  background: #1c1f21;
+  background: var(--surface-light);
 
   transition:
     border-color
@@ -964,9 +964,9 @@
 .objective-player-main strong {
   overflow: hidden;
 
-  color: #e7e9ea;
+  color: var(--text);
 
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 720;
 
   white-space: nowrap;
@@ -975,9 +975,9 @@
 }
 
 .objective-player-main small {
-  color: #6d7377;
+  color: var(--muted-soft);
 
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .objective-player-actions {
@@ -997,17 +997,17 @@
 
   border:
     1px solid
-    #34383b;
+    var(--line-2);
 
   border-radius: 12px;
 
   outline: none;
 
-  background: #202326;
+  background: var(--surface-light);
 
-  color: #9ba0a4;
+  color: var(--muted);
 
-  font-size: 8px;
+  font-size: 11px;
 
   cursor: pointer;
 
@@ -1025,7 +1025,7 @@
 
 .objective-priority-select:focus-visible {
   border-color:
-    rgba(70, 230, 161, 0.38);
+    color-mix(in srgb, var(--accent) 38%, transparent);
 
   box-shadow:
     var(--focus-ring);
@@ -1042,13 +1042,13 @@
 
   border:
     1px solid
-    #3b3f42;
+    var(--line-2);
 
   border-radius: 11px;
 
-  background: #202326;
+  background: var(--surface-light);
 
-  color: #7d8387;
+  color: var(--muted);
 
   font-size: 14px;
 
@@ -1084,26 +1084,26 @@
 @media (hover: hover) {
   .objective-player-card:hover {
     border-color:
-      rgba(255, 255, 255, 0.09);
+      rgba(var(--ink-rgb), 0.09);
 
-    background: #202326;
+    background: var(--surface-light);
   }
 
   .objective-remove-button:hover {
     border-color:
-      rgba(228, 94, 94, 0.46);
+      color-mix(in srgb, var(--red) 46%, transparent);
 
     background:
-      rgba(228, 94, 94, 0.09);
+      color-mix(in srgb, var(--red) 9%, transparent);
 
-    color: #ef8b8b;
+    color: var(--red);
   }
 
   .objective-priority-select:hover {
     border-color:
-      rgba(255, 255, 255, 0.14);
+      rgba(var(--ink-rgb), 0.14);
 
-    background: #24282a;
+    background: var(--surface-raised);
   }
 }
 
@@ -1116,9 +1116,9 @@
 
   border-radius: 14px;
 
-  color: #555b5f;
+  color: var(--muted-soft);
 
-  font-size: 8px;
+  font-size: 11px;
 }
 
 /* =========================
@@ -1130,9 +1130,9 @@
 
   padding: 0 3px;
 
-  color: #62686c;
+  color: var(--muted-soft);
 
-  font-size: 9px;
+  font-size: 11px;
 }
 
 /* =========================
@@ -1219,7 +1219,7 @@
       0
       10px;
 
-    font-size: 10px;
+    font-size: 11px;
   }
 
   .objective-remove-button {

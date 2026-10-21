@@ -1,8 +1,9 @@
-import saggiCsv from '../../database/MisterCana_DB_Saggi.csv?raw'
+import saggiCsvBundled from '../../database/MisterCana_DB_Saggi.csv?raw'
+import { getCsv } from './csvOverrides'
+import { playerKeys } from './playerAliases'
 
-import type {
-  ICaSaggioInput,
-} from '../domain/ica'
+// CSV caricato da Import/Export (o scaricato da FantaLab), altrimenti quello del progetto
+const saggiCsv = getCsv('saggi', saggiCsvBundled)
 
 export interface SaggioRecord {
   playerId: string
@@ -280,37 +281,8 @@ for (const record of saggi) {
 export function getSaggiForPlayer(
   playerId: string,
 ): SaggioRecord[] {
-  return (
-    saggiByPlayer.get(
-      playerId,
-    ) ?? []
-  )
-}
-
-/* =========================
-   iCà INPUT
-========================= */
-
-export function getICaSaggiForPlayer(
-  playerId: string,
-): ICaSaggioInput[] {
-  return getSaggiForPlayer(
-    playerId,
-  ).map(
-    (record) => ({
-      saggio:
-        record.saggio,
-
-      fasciaValore:
-        record.fasciaValore,
-
-      affidabilita:
-        record.affidabilita,
-
-      integrita:
-        record.integrita,
-    }),
-  )
+  // i file scaricati da FantaLab usano l'ID FantaLab, quelli storici il codice del listone
+  return playerKeys(playerId).flatMap((key) => saggiByPlayer.get(key) ?? [])
 }
 
 /* =========================

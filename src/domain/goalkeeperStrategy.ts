@@ -360,93 +360,59 @@ function enrichPlan(
    PLAN COMPARATOR
 ========================= */
 
+/*
+  Punteggio di un piano portieri (0-100 circa):
+  60% qualità (iCà medio dei portieri del piano, posizione nel ruolo)
+  40% calendario (giornate favorevoli su 38), meno 3 punti per buco.
+  I Saggi restano solo come spareggio, poi il costo.
+*/
+const PLAN_QUALITY_WEIGHT = 0.6
+const PLAN_CALENDAR_WEIGHT = 0.4
+const PLAN_HOLE_PENALTY = 3
+
+export function goalkeeperPlanScore(
+  plan: GoalkeeperPlanningPlan,
+): number {
+  const qualities = plan.players
+    .map((player) => player.iCa)
+    .filter((value): value is number => value !== undefined && Number.isFinite(value))
+  const quality = qualities.length
+    ? qualities.reduce((sum, value) => sum + value, 0) / qualities.length
+    : 0
+  const favorable = plan.coverage?.favorableDays ?? 0
+  const holes = plan.coverage?.holes ?? 0
+  return (
+    PLAN_QUALITY_WEIGHT * quality +
+    PLAN_CALENDAR_WEIGHT * (favorable / 38) * 100 -
+    PLAN_HOLE_PENALTY * holes
+  )
+}
+
 function comparePlans(
   first:
     GoalkeeperStrategyPlan,
   second:
     GoalkeeperStrategyPlan,
 ): number {
-  /*
-    Nessun punteggio pesato.
+  const scoreDifference =
+    goalkeeperPlanScore(second) -
+    goalkeeperPlanScore(first)
 
-    Ordine ALPHA corrente:
-
-    1. qualità Saggi dei P1
-    2. meno buchi calendario
-    3. più giornate favorevoli
-    4. minor costo stimato
-  */
+  if (Math.abs(scoreDifference) > 0.5) {
+    return scoreDifference
+  }
 
   const saggiDifference =
-    (
-      second.saggiStrength ??
-      -Infinity
-    ) -
-    (
-      first.saggiStrength ??
-      -Infinity
-    )
+    (second.saggiStrength ?? -Infinity) -
+    (first.saggiStrength ?? -Infinity)
 
-  if (
-    Math.abs(
-      saggiDifference,
-    ) >
-    0.000001
-  ) {
+  if (Math.abs(saggiDifference) > 0.000001) {
     return saggiDifference
   }
 
-  const firstHoles =
-    first.coverage
-      ?.holes ??
-    Infinity
-
-  const secondHoles =
-    second.coverage
-      ?.holes ??
-    Infinity
-
-  if (
-    firstHoles !==
-    secondHoles
-  ) {
-    return (
-      firstHoles -
-      secondHoles
-    )
-  }
-
-  const firstFavorable =
-    first.coverage
-      ?.favorableDays ??
-    -Infinity
-
-  const secondFavorable =
-    second.coverage
-      ?.favorableDays ??
-    -Infinity
-
-  if (
-    firstFavorable !==
-    secondFavorable
-  ) {
-    return (
-      secondFavorable -
-      firstFavorable
-    )
-  }
-
-  const firstCost =
-    first.projectedCost ??
-    Infinity
-
-  const secondCost =
-    second.projectedCost ??
-    Infinity
-
   return (
-    firstCost -
-    secondCost
+    (first.projectedCost ?? Infinity) -
+    (second.projectedCost ?? Infinity)
   )
 }
 
@@ -726,99 +692,57 @@ function compareCandidates(
     GoalkeeperCandidateData,
 ): number {
   /*
-    Ordine AUTO corrente:
-
-    1. più strategie ancora aperte
-    2. priorità Obiettivi
-    3. qualità miglior piano
-    4. qualità Saggi candidato
-    5. iCà tie-break
-
-    Nessuna somma di pesi
-    arbitrari per P.
+    Ordine v2:
+    1. priorità Obiettivi
+    2. 50% iCà del candidato + 50% punteggio del suo miglior piano
+    3. più strategie ancora aperte
+    4. Saggi, poi iCà del candidato
   */
-
   if (
-    first.openStrategies !==
-    second.openStrategies
+    first.candidate.objectiveFit !==
+    second.candidate.objectiveFit
   ) {
     return (
-      second.openStrategies -
-      first.openStrategies
+      second.candidate.objectiveFit -
+      first.candidate.objectiveFit
     )
   }
 
-  if (
-    first.candidate
-      .objectiveFit !==
-    second.candidate
-      .objectiveFit
-  ) {
-    return (
-      second.candidate
-        .objectiveFit -
-      first.candidate
-        .objectiveFit
-    )
-  }
-
-  if (
-    first.bestPlan &&
-    second.bestPlan
-  ) {
+  if (first.bestPlan && second.bestPlan) {
+    // metà conta il portiere che chiami, metà il piano in cui entra
+    const candidateScore = (data: GoalkeeperCandidateData) =>
+      0.5 * (data.candidate.player.iCa ?? 0) +
+      0.5 * goalkeeperPlanScore(data.bestPlan!)
+    const difference = candidateScore(second) - candidateScore(first)
+    if (Math.abs(difference) > 0.5) {
+      return difference
+    }
     const planDifference =
-      comparePlans(
-        first.bestPlan,
-        second.bestPlan,
-      )
-
-    if (
-      planDifference !== 0
-    ) {
+      comparePlans(first.bestPlan, second.bestPlan)
+    if (planDifference !== 0) {
       return planDifference
     }
-  } else if (
-    first.bestPlan
-  ) {
+  } else if (first.bestPlan) {
     return -1
-  } else if (
-    second.bestPlan
-  ) {
+  } else if (second.bestPlan) {
     return 1
   }
 
-  const saggiDifference =
-    (
-      second.saggiProfile
-        .medianFascia ??
-      -Infinity
-    ) -
-    (
-      first.saggiProfile
-        .medianFascia ??
-      -Infinity
-    )
+  if (first.openStrategies !== second.openStrategies) {
+    return second.openStrategies - first.openStrategies
+  }
 
-  if (
-    Math.abs(
-      saggiDifference,
-    ) >
-    0.000001
-  ) {
+  const saggiDifference =
+    (second.saggiProfile.medianFascia ?? -Infinity) -
+    (first.saggiProfile.medianFascia ?? -Infinity)
+
+  if (Math.abs(saggiDifference) > 0.000001) {
     return saggiDifference
   }
 
   return (
-    (
-      second.candidate
-        .player.iCa ??
-      -Infinity
-    ) -
-    (
-      first.candidate
-        .player.iCa ??
-      -Infinity
-    )
+    (second.candidate.player.iCa ?? -Infinity) -
+    (first.candidate.player.iCa ?? -Infinity)
   )
 }
 

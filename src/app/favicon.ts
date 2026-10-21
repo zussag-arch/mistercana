@@ -2,16 +2,27 @@ let blinkTimer:
   number | null = null
 
 let isLive = false
-let brightPhase = false
 
-const BLINK_INTERVAL_MS =
-  800
+/*
+  Pulsazione morbida come il pallino LIVE della dashboard:
+  un ciclo di 1,4 s in cui il verde va da pieno a 30% e torna.
+  I browser non animano la favicon, quindi si cambiano
+  fotogrammi già pronti.
+*/
+const PULSE_PERIOD_MS =
+  3000
+
+// aggiornamento ogni 4 ms (il minimo dei browser): l'opacità si calcola
+// dal tempo trascorso, quindi il ritmo resta costante anche se un passo salta
+const PULSE_STEP_MS =
+  4
+
+// quota del ciclo in cui il pallino resta acceso al 100%
+const PULSE_HOLD =
+  0.15
 
 const DOT_RED_ON =
   '#F04F4F'
-
-const DOT_GREEN_OFF =
-  '#2F6F50'
 
 const DOT_GREEN_ON =
   '#46E6A1'
@@ -44,6 +55,7 @@ function getFaviconLink():
 
 function createFaviconSvg(
   dotColor: string,
+  opacity = 1,
 ): string {
   return `
     <svg
@@ -55,6 +67,7 @@ function createFaviconSvg(
         cy="32"
         r="27"
         fill="${dotColor}"
+        fill-opacity="${opacity.toFixed(2)}"
       />
 
       <circle
@@ -69,21 +82,56 @@ function createFaviconSvg(
   `
 }
 
+function faviconHref(
+  dotColor: string,
+  opacity = 1,
+): string {
+  return `data:image/svg+xml,${encodeURIComponent(
+    createFaviconSvg(
+      dotColor,
+      opacity,
+    ),
+  )}`
+}
+
 function applyFavicon(
   dotColor: string,
 ): void {
-  const link =
-    getFaviconLink()
+  getFaviconLink().href =
+    faviconHref(dotColor)
+}
 
-  const svg =
-    createFaviconSvg(
-      dotColor,
-    )
+// acceso pieno per PULSE_HOLD del ciclo, poi discesa e risalita
+// morbide su curva coseno (1 → 0,3 → 1)
+function pulseOpacity(
+  phase: number,
+): number {
+  if (phase < PULSE_HOLD) {
+    return 1
+  }
 
-  link.href =
-    `data:image/svg+xml,${encodeURIComponent(
-      svg,
-    )}`
+  const fade =
+    (phase - PULSE_HOLD) / (1 - PULSE_HOLD)
+
+  return 0.65 + 0.35 * Math.cos(fade * Math.PI * 2)
+}
+
+// un'icona per ogni livello di opacità (passo 0,01), creata una volta sola
+const liveFrameCache =
+  new Map<number, string>()
+
+let liveStartedAt = 0
+let lastLiveLevel = -1
+
+function liveFrameHref(
+  level: number,
+): string {
+  let href = liveFrameCache.get(level)
+  if (!href) {
+    href = faviconHref(DOT_GREEN_ON, level / 100)
+    liveFrameCache.set(level, href)
+  }
+  return href
 }
 
 function stopBlinking():
@@ -98,7 +146,7 @@ function stopBlinking():
     blinkTimer = null
   }
 
-  brightPhase = false
+  lastLiveLevel = -1
 }
 
 function showInactive():
@@ -112,30 +160,34 @@ function showInactive():
 
 function showLiveFrame():
   void {
-  applyFavicon(
-    brightPhase
-      ? DOT_GREEN_ON
-      : DOT_GREEN_OFF,
-  )
+  const phase =
+    ((performance.now() - liveStartedAt) % PULSE_PERIOD_MS) / PULSE_PERIOD_MS
+
+  const level =
+    Math.round(pulseOpacity(phase) * 100)
+
+  // si cambia l'icona solo quando l'opacità cambia davvero
+  if (level === lastLiveLevel) {
+    return
+  }
+
+  lastLiveLevel = level
+  getFaviconLink().href =
+    liveFrameHref(level)
 }
 
 function startBlinking():
   void {
   stopBlinking()
 
-  brightPhase = false
+  liveStartedAt = performance.now()
 
   showLiveFrame()
 
   blinkTimer =
     window.setInterval(
-      () => {
-        brightPhase =
-          !brightPhase
-
-        showLiveFrame()
-      },
-      BLINK_INTERVAL_MS,
+      showLiveFrame,
+      PULSE_STEP_MS,
     )
 }
 

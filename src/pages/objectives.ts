@@ -1,3 +1,6 @@
+import { getFldaIdForLegacyId } from '../services/playerRepository'
+import { getAssignmentFldaId } from '../services/auctionPlayerResolver'
+
 import type {
   AppState,
 } from '../app/state'
@@ -242,86 +245,42 @@ function renderSearchResults(
   `
 }
 
+// Stato in asta dell'obiettivo: assegnato (a chi e a quanto) oppure libero.
+function objectiveAssignment(state: AppState, legacyId: string) {
+  const fldaId = getFldaIdForLegacyId(legacyId)
+  const assignment = state.auctionAssignments.find((item) =>
+    item.playerId === legacyId || (fldaId !== undefined && getAssignmentFldaId(item) === fldaId))
+  if (!assignment) return undefined
+  const manager = state.managers.find((item) => item.id === assignment.managerId)
+  return {
+    price: assignment.price,
+    manager: manager ? [manager.firstName, manager.lastName].filter(Boolean).join(' ') : '—',
+    mine: Boolean(manager?.isOwner),
+  }
+}
+
 function renderObjectiveCard(
+  state: AppState,
   objective: PlayerObjective,
 ): string {
-  const player =
-    getPlayerById(
-      objective.playerId,
-    )
-
-  if (!player) {
-    return ''
-  }
-
+  const player = getPlayerById(objective.playerId)
+  if (!player) return ''
+  const taken = state.auctionPhase === 'live' ? objectiveAssignment(state, player.id) : undefined
+  const pma = typeof player.pmaPercent === 'number' ? `${player.pmaPercent.toFixed(1).replace('.', ',')}%` : '—'
   return `
-    <article
-      class="
-        objective-player-card
-      "
-    >
-      <div
-        class="
-          objective-player-main
-        "
-      >
-        <strong>
-          ${escapeHtml(
-            player.name,
-          )}
-        </strong>
-
-        <small>
-          ${escapeHtml(
-            player.team,
-          )}
-        </small>
+    <article class="objective-player-card objective-row priority-${objective.priority}${taken ? (taken.mine ? ' is-mine' : ' is-taken') : ''}">
+      <div class="objective-player-main">
+        <strong>${escapeHtml(player.name)}</strong>
+        <small>${escapeHtml(player.team)} · PMA ${pma}</small>
       </div>
-
-      <div
-        class="
-          objective-player-actions
-        "
-      >
-        <select
-          class="
-            objective-priority-select
-          "
-          data-objective-priority="${player.id}"
-          aria-label="Cambia priorità"
-        >
-          ${PRIORITIES
-            .map(
-              (priority) => `
-                <option
-                  value="${priority.id}"
-                  ${
-                    objective.priority ===
-                    priority.id
-                      ? 'selected'
-                      : ''
-                  }
-                >
-                  ${priority.label}
-                </option>
-              `,
-            )
-            .join('')}
+      <span class="objective-status">${taken
+        ? `${taken.mine ? 'tuo' : `preso da ${escapeHtml(taken.manager)}`} · ${taken.price} cr`
+        : state.auctionPhase === 'live' ? 'libero' : ''}</span>
+      <div class="objective-player-actions">
+        <select class="objective-priority-select" data-objective-priority="${player.id}" aria-label="Cambia priorità di ${escapeHtml(player.name)}">
+          ${PRIORITIES.map((priority) => `<option value="${priority.id}" ${objective.priority === priority.id ? 'selected' : ''}>${priority.label}</option>`).join('')}
         </select>
-
-        <button
-          type="button"
-          class="
-            objective-remove-button
-          "
-          data-remove-objective="${player.id}"
-          aria-label="Rimuovi ${escapeHtml(
-            player.name,
-          )}"
-          title="Rimuovi"
-        >
-          ×
-        </button>
+        <button type="button" class="objective-remove-button" data-remove-objective="${player.id}" aria-label="Rimuovi ${escapeHtml(player.name)}">×</button>
       </div>
     </article>
   `
@@ -372,8 +331,7 @@ function renderPrioritySection(
   return `
     <section
       class="
-        objective-priority-section
-        priority-${priority.id}
+        objective-priority-section priority-${priority.id}${objectives.length ? '' : ' is-empty'}
       "
     >
       <div
@@ -402,9 +360,7 @@ function renderPrioritySection(
                   (
                     objective,
                   ) =>
-                    renderObjectiveCard(
-                      objective,
-                    ),
+                    renderObjectiveCard(state, objective),
                 )
                 .join('')
             : `

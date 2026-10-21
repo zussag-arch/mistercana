@@ -1,11 +1,12 @@
-import coachesCsv
-  from '../../database/MisterCana_DB_Allenatori.csv?raw'
+import goalkeepersCsvBundled from '../../database/griglia_portieri.csv?raw'
 
-import goalkeepersCsv
-  from '../../database/MisterCana_DB_Portieri.csv?raw'
+import attackersCsvBundled from '../../database/griglia_attaccanti.csv?raw'
 
-import setPiecesCsv
-  from '../../database/MisterCana_DB_Battitori.csv?raw'
+import fantalabCoachesCsvBundled from '../../database/fantalab_allenatori.csv?raw'
+
+import { getCachedPlayersDataset } from '../services/playerRepository'
+import { getICaV3Results } from '../data/icaV3Data'
+import { localPlayers } from '../services/fantalabLocal'
 
 import {
   runOverlayExit,
@@ -19,6 +20,12 @@ import {
 import type {
   GoalkeeperCoverage,
 } from '../data/goalkeeperCalendar'
+import { getCsv } from '../data/csvOverrides'
+
+// CSV caricati dalla pagina Import/Export, altrimenti quelli del progetto
+const goalkeepersCsv = getCsv('griglia_portieri', goalkeepersCsvBundled)
+const attackersCsv = getCsv('griglia_attaccanti', attackersCsvBundled)
+const fantalabCoachesCsv = getCsv('fantalab_allenatori', fantalabCoachesCsvBundled)
 
 /* =========================
    TYPES
@@ -46,11 +53,8 @@ interface Coach {
   team: string
   name: string
   formation: string
-
-  impacts: Record<
-    CoachRoleKey,
-    number
-  >
+  keyRoles: Array<{ label: string; tone: 'good' | 'bad' | 'neutral' }>
+  keyPoints: Array<{ label: string; tone: 'good' | 'bad' | 'neutral' }>
 }
 
 interface CoachMacroRole {
@@ -86,8 +90,10 @@ interface GoalkeeperPairResult {
 
 interface SetPieceTeam {
   team: string
+  short: string
   penalties: string[]
-  setPieces: string[]
+  freeKicks: string[]
+  corners: string[]
 }
 
 /* =========================
@@ -286,155 +292,6 @@ function parseCsv(
     .map(parseCsvRow)
 }
 
-function parseNumber(
-  value:
-    | string
-    | undefined,
-): number {
-  if (!value) {
-    return 0
-  }
-
-  const normalized =
-    value
-      .trim()
-      .replace(',', '.')
-
-  const parsed =
-    Number(normalized)
-
-  return Number.isFinite(
-    parsed,
-  )
-    ? parsed
-    : 0
-}
-
-/* =========================
-   COACH DATABASE
-========================= */
-
-function parseCoachesCsv(
-  csv: string,
-): Coach[] {
-  const rows =
-    parseCsv(csv)
-
-  if (
-    rows.length < 2
-  ) {
-    return []
-  }
-
-  return rows
-    .slice(1)
-    .map(
-      (columns) => {
-        const [
-          team,
-          name,
-          formation,
-          goalkeeper,
-          centreBack,
-          fullBack,
-          defensiveMid,
-          wideMid,
-          centralMid,
-          attackingMid,
-          winger,
-          secondStriker,
-          striker,
-        ] = columns
-
-        if (
-          !team ||
-          !name
-        ) {
-          return null
-        }
-
-        return {
-          team,
-          name,
-
-          formation:
-            formation ||
-            '—',
-
-          impacts: {
-            goalkeeper:
-              parseNumber(
-                goalkeeper,
-              ),
-
-            centreBack:
-              parseNumber(
-                centreBack,
-              ),
-
-            fullBack:
-              parseNumber(
-                fullBack,
-              ),
-
-            defensiveMid:
-              parseNumber(
-                defensiveMid,
-              ),
-
-            wideMid:
-              parseNumber(
-                wideMid,
-              ),
-
-            centralMid:
-              parseNumber(
-                centralMid,
-              ),
-
-            attackingMid:
-              parseNumber(
-                attackingMid,
-              ),
-
-            winger:
-              parseNumber(
-                winger,
-              ),
-
-            secondStriker:
-              parseNumber(
-                secondStriker,
-              ),
-
-            striker:
-              parseNumber(
-                striker,
-              ),
-          },
-        }
-      },
-    )
-    .filter(
-      (
-        coach,
-      ): coach is Coach =>
-        coach !== null,
-    )
-}
-
-/* =========================
-   LEGACY GOALKEEPER MATRIX
-
-   IMPORTANTE:
-   questo database continua
-   ad alimentare SOLO la griglia
-   nell'overlay.
-
-   Insight usa invece il nuovo
-   calendario 0/1/2.
-========================= */
-
 function parseGoalkeeperCsv(
   csv: string,
 ): GoalkeeperMatrix {
@@ -525,91 +382,61 @@ function parseGoalkeeperCsv(
    SET PIECES DATABASE
 ========================= */
 
-function parseSetPiecesCsv(
-  csv: string,
-): SetPieceTeam[] {
-  const rows =
-    parseCsv(csv)
-
-  if (
-    rows.length < 2
-  ) {
-    return []
-  }
-
-  return rows
-    .slice(1)
-    .map(
-      (columns) => {
-        const [
-          team,
-          penalty1,
-          penalty2,
-          penalty3,
-          penalty4,
-          setPiece1,
-          setPiece2,
-          setPiece3,
-        ] = columns
-
-        if (!team) {
-          return null
-        }
-
-        return {
-          team,
-
-          penalties: [
-            penalty1,
-            penalty2,
-            penalty3,
-            penalty4,
-          ].filter(
-            (
-              value,
-            ): value is string =>
-              Boolean(value),
-          ),
-
-          setPieces: [
-            setPiece1,
-            setPiece2,
-            setPiece3,
-          ].filter(
-            (
-              value,
-            ): value is string =>
-              Boolean(value),
-          ),
-        }
-      },
-    )
-    .filter(
-      (
-        item,
-      ): item is SetPieceTeam =>
-        item !== null,
-    )
-}
-
 /* =========================
    DATABASES
 ========================= */
 
-const COACHES =
-  parseCoachesCsv(
-    coachesCsv,
-  )
+/* Tabella FantaLab di oggi: allenatore, modulo, ruoli chiave e battitori. */
+const FANTALAB_TEAMS = (() => {
+  const lines = fantalabCoachesCsv.replace(/^﻿/, '').split(/\r?\n/).filter((line) => line.trim())
+  const header = lines[0].split(';')
+  return lines.slice(1).map((line) => {
+    const cells = line.split(';')
+    return Object.fromEntries(header.map((name, index) => [name.trim(), (cells[index] ?? '').trim()]))
+  })
+})()
 
+const splitNames = (value: string | undefined): string[] =>
+  (value ?? '').split(',').map((name) => name.trim()).filter(Boolean)
+
+function parseTonedList(value: string | undefined): Array<{ label: string; tone: 'good' | 'bad' | 'neutral' }> {
+  return (value ?? '').split('|').flatMap((item) => {
+    const match = item.trim().match(/^(.+?)\s*\((positivo|negativo|neutro)\)$/i)
+    if (!match) return []
+    const tone = match[2].toLowerCase() === 'positivo' ? 'good' as const
+      : match[2].toLowerCase() === 'negativo' ? 'bad' as const : 'neutral' as const
+    return [{ label: match[1], tone }]
+  })
+}
+
+const COACHES: Coach[] = FANTALAB_TEAMS.map((row) => ({
+  team: row['Squadra'],
+  name: row['Allenatore'] || '—',
+  formation: row['Modulo'] || '',
+  keyRoles: parseTonedList(row['Ruoli chiave']),
+  keyPoints: parseTonedList(row['Punti chiave']),
+}))
+
+// Griglie di abbinamento (CSV con virgole: convertite al separatore del parser).
 const GOALKEEPER_MATRIX =
   parseGoalkeeperCsv(
-    goalkeepersCsv,
+    goalkeepersCsv.replace(/,/g, ';'),
   )
 
-const SET_PIECE_TEAMS =
-  parseSetPiecesCsv(
-    setPiecesCsv,
+const ATTACKER_MATRIX =
+  parseGoalkeeperCsv(
+    attackersCsv.replace(/,/g, ';'),
   )
+
+// Gerarchie dei battitori dalla tabella FantaLab, nell'ordine della fonte.
+const SET_PIECE_TEAMS: SetPieceTeam[] =
+  FANTALAB_TEAMS.map((row) => ({
+    team: row['Squadra'],
+    short: row['Sigla'] ?? '',
+    penalties: splitNames(row['Rigoristi']).slice(0, 3),
+    freeKicks: splitNames(row['Punizioni']).slice(0, 3),
+    corners: splitNames(row["Calci d'angolo"]).slice(0, 3),
+  }))
 
 /* =========================
    GOALKEEPER CALENDAR
@@ -773,15 +600,8 @@ function renderGoalkeeperTopThree(
         goalkeeper-selection-heading
       "
     >
-      <span>
-        Migliori abbinamenti calendario
-      </span>
-
-      <strong>
-        ${escapeHtml(
-          team,
-        )}
-      </strong>
+      <span>Migliori abbinamenti calendario</span>
+        <strong>${escapeHtml(team)}${starterKeeper(team) ? ` <small>· 🧤 ${escapeHtml(starterKeeper(team) ?? "")}</small>` : ''}</strong>
     </div>
 
     <div
@@ -817,7 +637,7 @@ function renderGoalkeeperTopThree(
                   ${escapeHtml(
                     result.team,
                   )}
-                </strong>
+                </strong>${starterKeeper(result.team) ? `<span class="goalkeeper-keeper">🧤 ${escapeHtml(starterKeeper(result.team) ?? "")}</span>` : ''}
 
                 <small>
                   Favorevoli
@@ -869,6 +689,19 @@ function renderGoalkeeperTopThree(
       </small>
     </div>
   `
+}
+
+// Portiere titolare della squadra secondo i dati correnti (Guida FantaLab o FLDA).
+function starterKeeper(team: string): string | undefined {
+  const keepers = getCachedPlayersDataset()?.players
+    .filter((player) => player.team === team && player.role === 'P') ?? []
+  const starter = keepers.find((player) => player.goalkeeper_rank === 1)
+    ?? keepers.find((player) => player.is_starting_xi)
+  return starter?.name
+}
+
+function renderGoalkeeperTeamChips(): string {
+  return goalkeeperCalendarTeams.map((team) => `<button type="button" class="goalkeeper-team-chip${team === selectedGoalkeeperTeam ? ' selected' : ''}" data-goalkeeper-team="${escapeHtml(team)}" aria-pressed="${team === selectedGoalkeeperTeam}">${escapeHtml(team)}</button>`).join('')
 }
 
 function getGoalkeeperMatches(
@@ -951,41 +784,29 @@ function renderGoalkeeperSuggestions(
    LEGACY MATRIX HELPERS
 ========================= */
 
+// soglie della scala colori: ottimo, buono, medio (sotto = basso)
+interface MatrixThresholds { excellent: number; good: number; medium: number }
+const GOALKEEPER_THRESHOLDS: MatrixThresholds = { excellent: 90, good: 86, medium: 82 }
+const ATTACKER_THRESHOLDS: MatrixThresholds = { excellent: 100, good: 90, medium: 80 }
+
 function getMatrixScoreClass(
   score: number | null,
+  thresholds: MatrixThresholds = GOALKEEPER_THRESHOLDS,
 ): string {
-  if (
-    score === null
-  ) {
-    return 'matrix-empty'
-  }
-
-  if (
-    score >= 90
-  ) {
-    return 'matrix-excellent'
-  }
-
-  if (
-    score >= 86
-  ) {
-    return 'matrix-good'
-  }
-
-  if (
-    score >= 82
-  ) {
-    return 'matrix-medium'
-  }
-
+  if (score === null) return 'matrix-empty'
+  if (score >= thresholds.excellent) return 'matrix-excellent'
+  if (score >= thresholds.good) return 'matrix-good'
+  if (score >= thresholds.medium) return 'matrix-medium'
   return 'matrix-low'
 }
 
 function renderGoalkeeperMatrix(
   selectedTeam = '',
+  matrix: GoalkeeperMatrix = GOALKEEPER_MATRIX,
+  thresholds: MatrixThresholds = GOALKEEPER_THRESHOLDS,
 ): string {
   if (
-    GOALKEEPER_MATRIX
+    matrix
       .teams.length === 0
   ) {
     return `
@@ -1020,7 +841,7 @@ function renderGoalkeeperMatrix(
               Squadra
             </th>
 
-            ${GOALKEEPER_MATRIX
+            ${matrix
               .teams
               .map(
                 (team) => `
@@ -1049,7 +870,7 @@ function renderGoalkeeperMatrix(
         </thead>
 
         <tbody>
-          ${GOALKEEPER_MATRIX
+          ${matrix
             .teams
             .map(
               (rowTeam) => `
@@ -1067,14 +888,14 @@ function renderGoalkeeperMatrix(
                     )}
                   </th>
 
-                  ${GOALKEEPER_MATRIX
+                  ${matrix
                     .teams
                     .map(
                       (
                         columnTeam,
                       ) => {
                         const score =
-                          GOALKEEPER_MATRIX
+                          matrix
                             .scores[
                               rowTeam
                             ]?.[
@@ -1091,9 +912,7 @@ function renderGoalkeeperMatrix(
                         return `
                           <td
                             class="
-                              ${getMatrixScoreClass(
-                                score,
-                              )}
+                              ${getMatrixScoreClass(score, thresholds)}
                               ${
                                 selected
                                   ? 'is-selected'
@@ -1222,6 +1041,7 @@ function renderGoalkeeperSection():
               goalkeeperSearchValue,
             )}
           </div>
+          <div id="goalkeeperTeamChips" class="goalkeeper-team-chips">${renderGoalkeeperTeamChips()}</div>
         </div>
 
         <div
@@ -1252,9 +1072,7 @@ function renderGoalkeeperSection():
         "
         role="dialog"
         aria-modal="true"
-        aria-labelledby="
-          goalkeeperMatrixTitle
-        "
+        aria-labelledby="goalkeeperMatrixTitle"
       >
         <div
           class="
@@ -1271,17 +1089,13 @@ function renderGoalkeeperSection():
             </span>
 
             <h2
-              id="
-                goalkeeperMatrixTitle
-              "
+              id="goalkeeperMatrixTitle"
             >
               Griglia abbinamenti
             </h2>
 
             <p>
-              Matrice legacy di
-              compatibilità tra le
-              squadre.
+              Compatibilità tra le squadre: più alto il valore, più le due squadre si alternano bene in calendario. Scegli una squadra per evidenziarne riga e colonna.
             </p>
           </div>
 
@@ -1291,18 +1105,14 @@ function renderGoalkeeperSection():
               goalkeeper-matrix-close
             "
             data-close-goalkeeper-matrix
-            aria-label="
-              Chiudi griglia portieri
-            "
+            aria-label="Chiudi griglia portieri"
           >
             ×
           </button>
         </div>
 
         <div
-          id="
-            goalkeeperMatrixContent
-          "
+          id="goalkeeperMatrixContent"
           class="
             goalkeeper-matrix-content
           "
@@ -1362,188 +1172,247 @@ function renderGoalkeeperSection():
    SET PIECES
 ========================= */
 
-function renderSetPiecesSection():
-  string {
+function setPieceRole(team: string, name: string): string | undefined {
+  const wanted = name.trim().toLocaleLowerCase('it')
+  return getCachedPlayersDataset()?.players.find((player) =>
+    player.team === team && player.name.trim().toLocaleLowerCase('it') === wanted)?.role
+}
+
+function renderSetPieceList(team: string, label: string, players: string[]): string {
   return `
-    <section
-      class="
-        insight-section
-      "
-    >
-      <div
-        class="
-          insight-section-header
-        "
-      >
-        <div>
-          <span
-            class="
-              insight-eyebrow
-            "
-          >
-            SPECIALISTI
-          </span>
-
-          <h2>
-            Rigori / Piazzati
-          </h2>
-
-          <p>
-            Gerarchie dei battitori
-            suddivise per squadra.
-          </p>
-        </div>
-
-        <span
-          class="
-            insight-database-status
-          "
-        >
-          ${SET_PIECE_TEAMS.length}
-          squadre dal database
-        </span>
-      </div>
-
-      ${
-        SET_PIECE_TEAMS.length
-          ? `
-            <div
-              class="
-                set-pieces-grid
-              "
-            >
-              ${SET_PIECE_TEAMS
-                .map(
-                  (item) => `
-                    <article
-                      class="
-                        set-piece-card
-                      "
-                    >
-                      <div
-                        class="
-                          set-piece-team
-                        "
-                      >
-                        ${escapeHtml(
-                          item.team,
-                        )}
-                      </div>
-
-                      <div
-                        class="
-                          set-piece-columns
-                        "
-                      >
-                        <div>
-                          <span
-                            class="
-                              set-piece-label
-                            "
-                          >
-                            Rigori
-                          </span>
-
-                          <ol>
-                            ${
-                              item
-                                .penalties
-                                .length
-                                ? item
-                                    .penalties
-                                    .map(
-                                      (
-                                        player,
-                                      ) => `
-                                        <li>
-                                          ${escapeHtml(
-                                            player,
-                                          )}
-                                        </li>
-                                      `,
-                                    )
-                                    .join(
-                                      '',
-                                    )
-                                : `
-                                  <li
-                                    class="
-                                      set-piece-empty
-                                    "
-                                  >
-                                    —
-                                  </li>
-                                `
-                            }
-                          </ol>
-                        </div>
-
-                        <div>
-                          <span
-                            class="
-                              set-piece-label
-                            "
-                          >
-                            Piazzati
-                          </span>
-
-                          <ol>
-                            ${
-                              item
-                                .setPieces
-                                .length
-                                ? item
-                                    .setPieces
-                                    .map(
-                                      (
-                                        player,
-                                      ) => `
-                                        <li>
-                                          ${escapeHtml(
-                                            player,
-                                          )}
-                                        </li>
-                                      `,
-                                    )
-                                    .join(
-                                      '',
-                                    )
-                                : `
-                                  <li
-                                    class="
-                                      set-piece-empty
-                                    "
-                                  >
-                                    —
-                                  </li>
-                                `
-                            }
-                          </ol>
-                        </div>
-                      </div>
-                    </article>
-                  `,
-                )
-                .join('')}
-            </div>
-          `
-          : `
-            <div
-              class="
-                insight-database-empty
-              "
-            >
-              Database battitori vuoto.
-            </div>
-          `
-      }
-    </section>
+    <div class="set-piece-column">
+      <span class="set-piece-label">${label}</span>
+      ${players.length
+        ? `<ol>${players.map((player, index) => {
+            const role = setPieceRole(team, player)
+            return `<li class="${index === 0 ? 'is-first' : ''}">
+              <span class="set-piece-rank">${index + 1}</span>
+              ${role ? `<span class="role-badge role-${role.toLowerCase()} set-piece-role">${escapeHtml(role)}</span>` : ''}
+              <span class="set-piece-name">${escapeHtml(player)}</span>
+            </li>`
+          }).join('')}</ol>`
+        : '<p class="set-piece-empty">—</p>'}
+    </div>
   `
 }
 
+// iCà 3 per ruolo: i migliori per valore atteso (con la V2 accanto per
+// confronto) e i migliori affari (valore alto rispetto al prezzo).
+function renderICaV3Section(): string {
+  const results = getICaV3Results()
+  const roles: Array<['P' | 'D' | 'C' | 'A', string]> = [['P', 'Portieri'], ['D', 'Difensori'], ['C', 'Centrocampisti'], ['A', 'Attaccanti']]
+  const fmt = (value: number | undefined) => typeof value === 'number' ? value.toFixed(1).replace('.', ',') : '—'
+  const signed = (value: number | undefined) => typeof value === 'number' ? `${value > 0 ? '+' : ''}${Math.round(value)}` : '—'
+  const players = localPlayers().players
+  const column = (role: 'P' | 'D' | 'C' | 'A', label: string) => {
+    const rows = players.filter((player) => player.role === role && player.player_id)
+      .map((player) => ({ player, v3: results.get(player.player_id as string) }))
+      .filter((row) => typeof row.v3?.score === 'number')
+    const top = [...rows].sort((a, b) => (b.v3!.score! - a.v3!.score!)).slice(0, 6)
+    const deals = rows.filter((row) => (row.v3!.rolePercentile ?? 0) >= 40 && typeof row.v3!.affare === 'number')
+      .sort((a, b) => b.v3!.affare! - a.v3!.affare!).slice(0, 4)
+    const line = (row: typeof rows[number], deal: boolean) => `<li data-player-ref="${escapeHtml(row.player.player_id ?? '')}">
+      <span class="ica3-name">${escapeHtml(row.player.name)}<small>${escapeHtml(row.player.team)}</small></span>
+      <span class="ica3-score">${fmt(row.v3!.score)}</span>
+      ${deal || (row.v3!.affare ?? 0) >= 15 ? `<span class="ica3-affare">${signed(row.v3!.affare)}</span>` : `<span class="ica3-v2">affare ${signed(row.v3!.affare)}</span>`}
+    </li>`
+    return `<article class="ica3-role role-tone-${role.toLowerCase()}">
+      <header><span class="role-badge role-${role.toLowerCase()}">${role}</span><strong>${label}</strong></header>
+      <span class="ica3-label">Migliori per valore atteso</span>
+      <ol>${top.map((row) => line(row, false)).join('') || '<li class="ica3-empty">—</li>'}</ol>
+      <span class="ica3-label">Migliori affari</span>
+      <ol>${deals.map((row) => line(row, true)).join('') || '<li class="ica3-empty">—</li>'}</ol>
+    </article>`
+  }
+  return `
+    <section class="insight-section ica3-section">
+      <div class="insight-section-header">
+        <div>
+          <span class="insight-eyebrow">Valutazione</span>
+          <h2>iCà e affari</h2>
+          <p>iCà = fantapunti attesi a partita × 10 (fantamedia corretta × probabilità di giocare × 10). Affare = posizione nel ruolo per iCà meno posizione per prezzo: positivo se rende più di quanto costa.</p>
+        </div>
+        <span class="insight-database-status">FantaLab · ${results.size} giocatori</span>
+      </div>
+      <div class="ica3-grid">${roles.map(([role, label]) => column(role, label)).join('')}</div>
+    </section>`
+}
+
 /* =========================
-   FORMATIONS
+   ATTACCANTI: abbinamenti
 ========================= */
+
+let selectedAttackerTeam = ''
+
+function bestAttacker(team: string): { name: string; score?: number } | undefined {
+  const results = getICaV3Results()
+  return localPlayers().players
+    .filter((player) => player.team === team && player.role === 'A' && player.player_id)
+    .map((player) => ({ name: player.name, score: results.get(player.player_id as string)?.score }))
+    .filter((item) => typeof item.score === 'number')
+    .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))[0]
+}
+
+function renderAttackerTopThree(): string {
+  const team = selectedAttackerTeam
+  if (!team) {
+    return '<div class="goalkeeper-recommendations-empty"><span>Scegli una squadra</span><small>Le tre squadre i cui attaccanti si alternano meglio compariranno qui.</small></div>'
+  }
+  const row = ATTACKER_MATRIX.scores[team] ?? {}
+  // a parità di compatibilità (valori a scatti di 10) vince l'attaccante con iCà più alto
+  const ranked = Object.entries(row)
+    .filter(([other, value]) => other !== team && typeof value === 'number')
+    .map(([other, value]) => ({ other, value: value as number, best: bestAttacker(other) }))
+    .sort((a, b) => b.value - a.value || (b.best?.score ?? 0) - (a.best?.score ?? 0))
+  const partners = ranked.slice(0, 3).map((item) => [item.other, item.value] as const)
+  const topValue = ranked[0]?.value
+  const tiedOutside = ranked.slice(3).filter((item) => item.value === topValue).length
+  if (!partners.length) return '<div class="goalkeeper-recommendations-empty">Nessun abbinamento disponibile.</div>'
+  const own = bestAttacker(team)
+  return `
+    <div class="goalkeeper-selection-heading">
+      <span>Migliori abbinamenti attacco</span>
+      <strong>${escapeHtml(team)}${own ? ` <small>· ${escapeHtml(own.name)}</small>` : ''}</strong>
+    </div>
+    <div class="goalkeeper-recommendations-list">
+      ${partners.map(([other, value], index) => {
+        const best = bestAttacker(other)
+        return `<div class="goalkeeper-recommendation">
+          <span class="goalkeeper-rank">${index + 1}</span>
+          <div class="goalkeeper-recommendation-team"><strong>${escapeHtml(other)}</strong>${best ? `<span class="goalkeeper-keeper">⚽ ${escapeHtml(best.name)} · iCà ${(best.score ?? 0).toFixed(1).replace('.', ',')}</span>` : ''}<small>compatibilità dalla griglia attaccanti</small></div>
+          <span class="goalkeeper-score">${value}</span>
+        </div>`
+      }).join('')}
+    </div>
+    ${tiedOutside ? `<div class="goalkeeper-recommendations-empty" style="margin-top: 8px; min-height: 0; padding: 8px 10px;"><small>Altre ${tiedOutside} squadre hanno compatibilità ${topValue}: a parità conta l'iCà del loro miglior attaccante.</small></div>` : ''}`
+}
+
+function renderAttackerTeamChips(): string {
+  return ATTACKER_MATRIX.teams.map((team) => `<button type="button" class="goalkeeper-team-chip attacker-team-chip${team === selectedAttackerTeam ? ' selected' : ''}" data-attacker-team="${escapeHtml(team)}" aria-pressed="${team === selectedAttackerTeam}">${escapeHtml(team)}</button>`).join('')
+}
+
+function renderAttackerSection(): string {
+  return `
+    <section class="insight-section attacker-section">
+      <div class="insight-section-header">
+        <div>
+          <span class="insight-eyebrow">Attaccanti</span>
+          <h2>Abbinamenti attaccanti</h2>
+          <p>Scegli una squadra: le tre squadre con la compatibilità più alta nella griglia attaccanti, con il loro miglior attaccante per iCà.</p>
+        </div>
+        <button type="button" class="insight-database-button" data-open-attacker-matrix>Vedi griglia</button>
+      </div>
+      <div class="goalkeeper-tool">
+        <div class="goalkeeper-search-area">
+          <label class="goalkeeper-search-box">
+            <span class="goalkeeper-search-icon">⌕</span>
+            <input id="attackerSearch" type="search" autocomplete="off" placeholder="Cerca squadra...">
+          </label>
+          <div id="attackerTeamChips" class="goalkeeper-team-chips">${renderAttackerTeamChips()}</div>
+        </div>
+        <div id="attackerRecommendations" class="goalkeeper-recommendations">${renderAttackerTopThree()}</div>
+      </div>
+    </section>
+    <div id="attackerMatrixOverlay" class="goalkeeper-matrix-overlay" hidden aria-hidden="true" data-attacker-overlay>
+      <div class="goalkeeper-matrix-dialog" role="dialog" aria-modal="true" aria-labelledby="attackerMatrixTitle">
+        <div class="goalkeeper-matrix-header">
+          <div>
+            <span class="insight-eyebrow">Attaccanti</span>
+            <h2 id="attackerMatrixTitle">Griglia abbinamenti attacco</h2>
+            <p>Compatibilità tra le squadre per alternare gli attaccanti. Scegli una squadra per evidenziarne riga e colonna.</p>
+          </div>
+          <button type="button" class="goalkeeper-matrix-close" data-close-attacker-matrix aria-label="Chiudi griglia attaccanti">×</button>
+        </div>
+        <div id="attackerMatrixContent" class="goalkeeper-matrix-content">${renderGoalkeeperMatrix(selectedAttackerTeam, ATTACKER_MATRIX, ATTACKER_THRESHOLDS)}</div>
+      </div>
+    </div>
+  `
+}
+
+function filterAttackerChips(query: string): void {
+  const needle = query.trim().toLowerCase()
+  document.querySelectorAll<HTMLElement>('#attackerTeamChips [data-attacker-team]').forEach((chip) => {
+    chip.hidden = Boolean(needle) && !(chip.dataset.attackerTeam ?? '').toLowerCase().includes(needle)
+  })
+}
+
+function updateAttackerUi(): void {
+  const chips = document.querySelector<HTMLElement>('#attackerTeamChips')
+  if (chips) chips.innerHTML = renderAttackerTeamChips()
+  filterAttackerChips(document.querySelector<HTMLInputElement>('#attackerSearch')?.value ?? '')
+  const list = document.querySelector<HTMLElement>('#attackerRecommendations')
+  if (list) list.innerHTML = renderAttackerTopThree()
+  const matrix = document.querySelector<HTMLElement>('#attackerMatrixContent')
+  if (matrix) matrix.innerHTML = renderGoalkeeperMatrix(selectedAttackerTeam, ATTACKER_MATRIX, ATTACKER_THRESHOLDS)
+}
+
+function setAttackerMatrixOpen(open: boolean): void {
+  const overlay = document.querySelector<HTMLElement>('#attackerMatrixOverlay')
+  if (!overlay) return
+  overlay.hidden = !open
+  overlay.setAttribute('aria-hidden', String(!open))
+  document.body.classList.toggle('insights-overlay-open', open)
+}
+
+function bindAttackerEvents(): void {
+  document.addEventListener('click', (event) => {
+    const target = event.target
+    if (!(target instanceof Element)) return
+    const chip = target.closest<HTMLElement>('[data-attacker-team]')
+    if (chip?.dataset.attackerTeam) {
+      selectedAttackerTeam = chip.dataset.attackerTeam
+      updateAttackerUi()
+      return
+    }
+    if (target.closest('[data-open-attacker-matrix]')) { setAttackerMatrixOpen(true); return }
+    if (target.closest('[data-close-attacker-matrix]')) { setAttackerMatrixOpen(false); return }
+    const overlay = target.closest('[data-attacker-overlay]')
+    if (overlay && target === overlay) setAttackerMatrixOpen(false)
+  })
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') setAttackerMatrixOpen(false)
+    // Invio nel cerca: sceglie la prima squadra rimasta visibile
+    if (event.key === 'Enter' && event.target instanceof HTMLInputElement && event.target.id === 'attackerSearch') {
+      const first = document.querySelector<HTMLElement>('#attackerTeamChips [data-attacker-team]:not([hidden])')
+      if (first?.dataset.attackerTeam) {
+        selectedAttackerTeam = first.dataset.attackerTeam
+        updateAttackerUi()
+      }
+    }
+  })
+  // il cerca filtra le pillole delle squadre
+  document.addEventListener('input', (event) => {
+    if (!(event.target instanceof HTMLInputElement) || event.target.id !== 'attackerSearch') return
+    filterAttackerChips(event.target.value)
+  })
+}
+
+function renderSetPiecesSection():
+  string {
+  return `
+    <section class="insight-section set-pieces-section">
+      <div class="insight-section-header">
+        <div>
+          <span class="insight-eyebrow">Specialisti</span>
+          <h2>Rigori e piazzati</h2>
+          <p>Gerarchie dei battitori per squadra: il primo è il titolare del compito.</p>
+        </div>
+        <span class="insight-database-status">${SET_PIECE_TEAMS.length} squadre · FantaLab</span>
+      </div>
+      ${SET_PIECE_TEAMS.length
+        ? `<div class="set-pieces-grid">${SET_PIECE_TEAMS.map((item) => `
+            <article class="set-piece-card">
+              <header class="set-piece-team"><strong>${escapeHtml(item.team)}</strong>${item.short ? `<small>${escapeHtml(item.short)}</small>` : ''}</header>
+              <div class="set-piece-columns">
+                ${renderSetPieceList(item.team, 'Rigori', item.penalties)}
+                ${renderSetPieceList(item.team, 'Punizioni', item.freeKicks)}
+                ${renderSetPieceList(item.team, 'Angoli', item.corners)}
+              </div>
+            </article>`).join('')}</div>`
+        : '<p class="set-piece-empty">Tabella battitori non disponibile.</p>'}
+    </section>
+  `
+}
 
 function marker(
   role: CoachRoleKey,
@@ -1805,6 +1674,36 @@ function getFormationMarkers(
         ),
       ]
 
+    // 3-4-3: tre centrali, quattro di centrocampo, due ali e una punta
+    case '3-4-3':
+      return [
+        marker('goalkeeper', 'Por', 50, 91),
+        marker('centreBack', 'Dc', 27, 75),
+        marker('centreBack', 'Dc', 50, 79),
+        marker('centreBack', 'Dc', 73, 75),
+        marker('wideMid', 'E', 14, 52),
+        marker('centralMid', 'C', 38, 56),
+        marker('centralMid', 'C', 62, 56),
+        marker('wideMid', 'E', 86, 52),
+        marker('winger', 'W', 24, 26),
+        marker('striker', 'Pc', 50, 16),
+        marker('winger', 'W', 76, 26),
+      ]
+    // 3-5-1-1: come il 3-5-2 con un trequartista dietro la punta
+    case '3-5-1-1':
+      return [
+        marker('goalkeeper', 'Por', 50, 91),
+        marker('centreBack', 'Dc', 27, 75),
+        marker('centreBack', 'Dc', 50, 79),
+        marker('centreBack', 'Dc', 73, 75),
+        marker('wideMid', 'E', 14, 50),
+        marker('centralMid', 'C', 34, 54),
+        marker('defensiveMid', 'M', 50, 58),
+        marker('centralMid', 'C', 66, 54),
+        marker('wideMid', 'E', 86, 50),
+        marker('attackingMid', 'T', 50, 33),
+        marker('striker', 'Pc', 50, 15),
+      ]
     case '3-5-2':
       return [
         marker(
@@ -2107,48 +2006,6 @@ function renderCoachPitch(
    COACH IMPACT
 ========================= */
 
-function formatImpact(
-  value: number,
-): string {
-  if (
-    value > 0
-  ) {
-    return `+${value.toFixed(
-      2,
-    )}`
-  }
-
-  if (
-    value < 0
-  ) {
-    return value.toFixed(2)
-  }
-
-  return '0.00'
-}
-
-function getImpactClass(
-  value: number,
-): string {
-  if (
-    value > 0
-  ) {
-    return 'positive'
-  }
-
-  if (
-    value < 0
-  ) {
-    return 'negative'
-  }
-
-  return 'neutral'
-}
-
-/* =========================
-   COACH SECTION
-========================= */
-
 function renderCoachSection():
   string {
   return `
@@ -2172,12 +2029,11 @@ function renderCoachSection():
           </span>
 
           <h2>
-            Impatto allenatori
+            Allenatori
           </h2>
 
           <p>
-            Modulo preferito e impatto
-            sui macro-ruoli Mantra.
+            Modulo, ruoli valorizzati o penalizzati e punti chiave dalla Guida FantaLab.
           </p>
         </div>
 
@@ -2186,8 +2042,7 @@ function renderCoachSection():
             insight-database-status
           "
         >
-          ${COACHES.length}
-          allenatori dal database
+          ${COACHES.length} allenatori · FantaLab
         </span>
       </div>
 
@@ -2242,6 +2097,7 @@ function renderCoachSection():
                           )}
                         </span>
                       </div>
+                      ${coach.keyRoles.length ? `<div class="coach-key-roles">${coach.keyRoles.map((item) => `<span class="coach-key-role coach-key-${item.tone}">${escapeHtml(item.label)}${item.tone === 'good' ? ' +' : item.tone === 'bad' ? ' −' : ''}</span>`).join('')}</div>` : ''}
 
                       <div
                         class="
@@ -2252,75 +2108,7 @@ function renderCoachSection():
                           coach.formation,
                         )}
 
-                        <div
-                          class="
-                            coach-macro-role-list
-                          "
-                        >
-                          ${COACH_MACRO_ROLES
-                            .map(
-                              (role) => {
-                                const value =
-                                  coach
-                                    .impacts[
-                                      role.key
-                                    ]
-
-                                return `
-                                  <div
-                                    class="
-                                      coach-macro-role-row
-                                    "
-                                  >
-                                    <div
-                                      class="
-                                        coach-macro-role-name
-                                      "
-                                    >
-                                      <span
-                                        class="
-                                          coach-role-dot
-                                          coach-role-${role.group.toLowerCase()}
-                                        "
-                                      >
-                                        ${escapeHtml(
-                                          role.mantra,
-                                        )}
-                                      </span>
-
-                                      <div>
-                                        <strong>
-                                          ${escapeHtml(
-                                            role.label,
-                                          )}
-                                        </strong>
-
-                                        <small>
-                                          ${escapeHtml(
-                                            role.mantra,
-                                          )}
-                                        </small>
-                                      </div>
-                                    </div>
-
-                                    <span
-                                      class="
-                                        coach-impact-value
-                                        coach-impact-${getImpactClass(
-                                          value,
-                                        )}
-                                      "
-                                    >
-                                      ${formatImpact(
-                                        value,
-                                      )}
-                                    </span>
-                                  </div>
-                                `
-                              },
-                            )
-                            .join('')}
-                        </div>
+                        ${coach.keyPoints.length ? `<ul class="coach-key-points">${coach.keyPoints.map((item) => `<li class="tone-${item.tone}">${escapeHtml(item.label)}</li>`).join('')}</ul>` : '<p class="coach-key-points-empty">Nessun punto chiave nella Guida.</p>'}
                       </div>
                     </article>
                   `,
@@ -2372,7 +2160,9 @@ export function renderInsightsPage():
         </div>
       </div>
 
+      ${renderICaV3Section()}
       ${renderGoalkeeperSection()}
+      ${renderAttackerSection()}
 
       ${renderSetPiecesSection()}
 
@@ -2387,6 +2177,9 @@ export function renderInsightsPage():
 
 function updateGoalkeeperUi():
   void {
+  const chips = document.querySelector<HTMLElement>('#goalkeeperTeamChips')
+  if (chips) chips.innerHTML = renderGoalkeeperTeamChips()
+
   const recommendations =
     document.querySelector<HTMLElement>(
       '#goalkeeperRecommendations',
@@ -2523,6 +2316,7 @@ export function bindInsightsEvents():
   }
 
   insightsEventsBound = true
+  bindAttackerEvents()
 
   document.addEventListener(
     'input',

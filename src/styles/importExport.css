@@ -35,7 +35,7 @@
 .import-export-page-header p {
   margin: 7px 0 0;
 
-  color: #777e83;
+  color: var(--muted);
 
   font-size: 11px;
 }
@@ -51,21 +51,21 @@
 
   border:
     1px solid
-    rgba(255, 255, 255, 0.08);
+    rgba(var(--ink-rgb), 0.08);
 
   border-radius: 28px;
 
   background:
     linear-gradient(
       180deg,
-      rgba(255, 255, 255, 0.018),
-      rgba(255, 255, 255, 0.006)
+      rgba(var(--ink-rgb), 0.018),
+      rgba(var(--ink-rgb), 0.006)
     ),
-    #121416;
+    var(--bg);
 
   box-shadow:
     inset 0 1px 0
-    rgba(255, 255, 255, 0.025);
+    rgba(var(--ink-rgb), 0.025);
 
   transition:
     border-color
@@ -95,15 +95,15 @@
 .data-transfer-section-header p {
   margin: 6px 0 0;
 
-  color: #777e83;
+  color: var(--muted);
 
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .data-transfer-eyebrow {
-  color: #6f7579;
+  color: var(--muted);
 
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 850;
 
   letter-spacing: 0.11em;
@@ -146,15 +146,15 @@
 
   border:
     1px solid
-    rgba(255, 255, 255, 0.07);
+    rgba(var(--ink-rgb), 0.07);
 
   border-radius: 22px;
 
-  background: #181b1d;
+  background: var(--surface);
 
   box-shadow:
     inset 0 1px 0
-    rgba(255, 255, 255, 0.018);
+    rgba(var(--ink-rgb), 0.018);
 
   transition:
     border-color
@@ -184,11 +184,11 @@
 
   border:
     1px solid
-    rgba(255, 255, 255, 0.09);
+    rgba(var(--ink-rgb), 0.09);
 
   border-radius: 14px;
 
-  background: #222528;
+  background: var(--surface-light);
 
   font-size: 15px;
   font-weight: 800;
@@ -206,25 +206,25 @@
 }
 
 .data-transfer-icon-import {
-  color: #75d9ad;
+  color: var(--accent);
 
   background:
-    rgba(52, 211, 153, 0.08);
+    color-mix(in srgb, var(--accent) 8%, transparent);
 }
 
 .data-transfer-icon-export {
-  color: #78aee1;
+  color: var(--blue);
 
   background:
-    rgba(77, 145, 231, 0.08);
+    color-mix(in srgb, var(--blue) 8%, transparent);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .data-transfer-card:hover {
     border-color:
-      rgba(255, 255, 255, 0.11);
+      rgba(var(--ink-rgb), 0.11);
 
-    background: #1a1d1f;
+    background: var(--surface);
   }
 }
 
@@ -243,7 +243,7 @@
   border-radius:
     var(--radius-pill);
 
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 750;
 
   white-space: nowrap;
@@ -263,58 +263,58 @@
 .status-pending {
   border:
     1px solid
-    rgba(232, 146, 109, 0.14);
+    color-mix(in srgb, var(--orange) 14%, transparent);
 
   background:
-    rgba(232, 146, 109, 0.1);
+    color-mix(in srgb, var(--orange) 10%, transparent);
 
-  color: #d99374;
+  color: var(--orange);
 }
 
 .status-ready {
   border:
     1px solid
-    rgba(70, 230, 161, 0.18);
+    color-mix(in srgb, var(--accent) 18%, transparent);
 
   background:
-    rgba(70, 230, 161, 0.09);
+    color-mix(in srgb, var(--accent) 9%, transparent);
 
-  color: #72dfac;
+  color: var(--accent);
 }
 
 .status-neutral {
   border:
     1px solid
-    rgba(255, 255, 255, 0.08);
+    rgba(var(--ink-rgb), 0.08);
 
   background:
-    rgba(255, 255, 255, 0.035);
+    rgba(var(--ink-rgb), 0.035);
 
-  color: #7f878b;
+  color: var(--muted);
 }
 
 .flda-status-success {
-  border: 1px solid rgba(70, 230, 161, 0.18);
-  background: rgba(70, 230, 161, 0.09);
-  color: #72dfac;
+  border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
+  background: color-mix(in srgb, var(--accent) 9%, transparent);
+  color: var(--accent);
 }
 
 .flda-status-warning {
-  border: 1px solid rgba(242, 185, 90, 0.2);
-  background: rgba(242, 185, 90, 0.09);
-  color: #e2b66e;
+  border: 1px solid color-mix(in srgb, var(--orange) 20%, transparent);
+  background: color-mix(in srgb, var(--orange) 9%, transparent);
+  color: var(--orange);
 }
 
 .flda-status-failed {
-  border: 1px solid rgba(228, 94, 94, 0.22);
-  background: rgba(228, 94, 94, 0.09);
-  color: #e97777;
+  border: 1px solid color-mix(in srgb, var(--red) 22%, transparent);
+  background: color-mix(in srgb, var(--red) 9%, transparent);
+  color: var(--red);
 }
 
 .flda-status-never {
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.035);
-  color: #7f878b;
+  border: 1px solid rgba(var(--ink-rgb), 0.08);
+  background: rgba(var(--ink-rgb), 0.035);
+  color: var(--muted);
 }
 
 /* =========================
@@ -332,26 +332,26 @@
   display: inline-block;
   max-width: 100%;
   margin-top: 9px;
-  color: #8e969a;
+  color: var(--muted);
   font-family: inherit;
-  font-size: 9px;
+  font-size: 11px;
   overflow-wrap: anywhere;
 }
 
 .flda-service-meta {
   margin: -5px 0 12px;
-  color: #6f777b;
-  font-size: 9px;
+  color: var(--muted);
+  font-size: 11px;
 }
 
 .flda-connection-error {
   margin-bottom: 12px;
   padding: 10px 12px;
-  border: 1px solid rgba(228, 94, 94, 0.18);
+  border: 1px solid color-mix(in srgb, var(--red) 18%, transparent);
   border-radius: 16px;
-  background: rgba(228, 94, 94, 0.06);
-  color: #d98989;
-  font-size: 9px;
+  background: color-mix(in srgb, var(--red) 6%, transparent);
+  color: var(--red);
+  font-size: 11px;
   line-height: 1.5;
 }
 
@@ -364,9 +364,9 @@
 .flda-dataset-card {
   min-width: 0;
   padding: 13px;
-  border: 1px solid rgba(255, 255, 255, 0.065);
+  border: 1px solid rgba(var(--ink-rgb), 0.065);
   border-radius: 18px;
-  background: #181b1d;
+  background: var(--surface);
 }
 
 .flda-dataset-heading {
@@ -387,8 +387,8 @@
 
 .flda-dataset-heading p {
   margin: 5px 0 0;
-  color: #6f777b;
-  font-size: 8px;
+  color: var(--muted);
+  font-size: 11px;
   line-height: 1.4;
 }
 
@@ -403,17 +403,17 @@
   min-width: 0;
   padding: 8px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.025);
+  background: rgba(var(--ink-rgb), 0.025);
 }
 
 .flda-dataset-metrics dt {
-  color: #656d71;
-  font-size: 7px;
+  color: var(--muted-soft);
+  font-size: 11px;
 }
 
 .flda-dataset-metrics dd {
   margin: 4px 0 0;
-  color: #c7ccce;
+  color: var(--text-soft);
   font-size: 11px;
   font-weight: 750;
   font-variant-numeric: tabular-nums;
@@ -428,15 +428,15 @@
 }
 
 .flda-dataset-footer > span {
-  color: #60686c;
-  font-size: 7px;
+  color: var(--muted-soft);
+  font-size: 11px;
 }
 
 .flda-dataset-footer > strong {
   min-width: 0;
   overflow: hidden;
-  color: #949b9e;
-  font-size: 8px;
+  color: var(--muted);
+  font-size: 11px;
   font-weight: 650;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -466,9 +466,9 @@
 
   margin: 7px 0 0;
 
-  color: #7c8286;
+  color: var(--muted);
 
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.55;
 }
 
@@ -489,7 +489,7 @@
 
   border-top:
     1px solid
-    rgba(255, 255, 255, 0.055);
+    rgba(var(--ink-rgb), 0.055);
 }
 
 .data-transfer-card-footer > div {
@@ -502,17 +502,17 @@
 }
 
 .data-transfer-card-footer span {
-  color: #5f6569;
+  color: var(--muted-soft);
 
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .data-transfer-card-footer strong {
   overflow: hidden;
 
-  color: #999fa2;
+  color: var(--muted);
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 650;
 
   white-space: nowrap;
@@ -532,15 +532,15 @@
 
   border:
     1px solid
-    rgba(255, 255, 255, 0.07);
+    rgba(var(--ink-rgb), 0.07);
 
   border-radius: 14px;
 
-  background: #202326;
+  background: var(--surface-light);
 
-  color: #62686c;
+  color: var(--muted-soft);
 
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 750;
 
   cursor: default;
@@ -565,30 +565,30 @@
 
 .data-transfer-button-primary {
   border-color:
-    rgba(90, 168, 255, 0.22);
+    color-mix(in srgb, var(--blue) 22%, transparent);
 
   background:
-    rgba(90, 168, 255, 0.1);
+    color-mix(in srgb, var(--blue) 10%, transparent);
 
-  color: #82b9f5;
+  color: var(--blue);
 
   cursor: pointer;
 }
 
 .data-transfer-button-secondary {
-  color: #a3a8ab;
+  color: var(--muted);
 
   cursor: pointer;
 }
 
 .data-transfer-button-danger {
   border-color:
-    rgba(228, 94, 94, 0.25);
+    color-mix(in srgb, var(--red) 25%, transparent);
 
   background:
-    rgba(228, 94, 94, 0.11);
+    color-mix(in srgb, var(--red) 11%, transparent);
 
-  color: #eb7c7c;
+  color: var(--red);
 
   cursor: pointer;
 }
@@ -615,31 +615,31 @@
 @media (hover: hover) and (pointer: fine) {
   .data-transfer-button-primary:hover:not(:disabled) {
     border-color:
-      rgba(90, 168, 255, 0.38);
+      color-mix(in srgb, var(--blue) 38%, transparent);
 
     background:
-      rgba(90, 168, 255, 0.15);
+      color-mix(in srgb, var(--blue) 15%, transparent);
 
-    color: #9ac9fb;
+    color: var(--blue);
   }
 
   .data-transfer-button-secondary:hover:not(:disabled) {
     border-color:
-      rgba(255, 255, 255, 0.14);
+      rgba(var(--ink-rgb), 0.14);
 
-    background: #262a2d;
+    background: var(--surface-raised);
 
-    color: #d6dadd;
+    color: var(--text-soft);
   }
 
   .data-transfer-button-danger:hover:not(:disabled) {
     border-color:
-      rgba(228, 94, 94, 0.42);
+      color-mix(in srgb, var(--red) 42%, transparent);
 
     background:
-      rgba(228, 94, 94, 0.16);
+      color-mix(in srgb, var(--red) 16%, transparent);
 
-    color: #f08f8f;
+    color: var(--red);
   }
 }
 
@@ -663,7 +663,7 @@
 
   border-radius: 16px;
 
-  font-size: 9px;
+  font-size: 11px;
 
   transform-origin:
     top center;
@@ -695,11 +695,11 @@
 .data-transfer-feedback strong {
   flex: 0 0 auto;
 
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .data-transfer-feedback span {
-  color: #989fa2;
+  color: var(--muted);
 
   line-height: 1.45;
 }
@@ -707,40 +707,40 @@
 .data-transfer-feedback-success {
   border:
     1px solid
-    rgba(70, 230, 161, 0.16);
+    color-mix(in srgb, var(--accent) 16%, transparent);
 
   background:
-    rgba(70, 230, 161, 0.055);
+    color-mix(in srgb, var(--accent) 6%, transparent);
 }
 
 .data-transfer-feedback-success strong {
-  color: #72dfac;
+  color: var(--accent);
 }
 
 .data-transfer-feedback-error {
   border:
     1px solid
-    rgba(228, 94, 94, 0.18);
+    color-mix(in srgb, var(--red) 18%, transparent);
 
   background:
-    rgba(228, 94, 94, 0.06);
+    color-mix(in srgb, var(--red) 6%, transparent);
 }
 
 .data-transfer-feedback-error strong {
-  color: #e97777;
+  color: var(--red);
 }
 
 .data-transfer-feedback-info {
   border:
     1px solid
-    rgba(90, 168, 255, 0.15);
+    color-mix(in srgb, var(--blue) 15%, transparent);
 
   background:
-    rgba(90, 168, 255, 0.05);
+    color-mix(in srgb, var(--blue) 5%, transparent);
 }
 
 .data-transfer-feedback-info strong {
-  color: #7fb6f1;
+  color: var(--blue);
 }
 
 /* =========================
@@ -754,11 +754,11 @@
 
   border:
     1px solid
-    rgba(255, 255, 255, 0.08);
+    rgba(var(--ink-rgb), 0.08);
 
   border-radius: 20px;
 
-  background: #15181a;
+  background: var(--surface);
 
   transform-origin:
     top center;
@@ -814,9 +814,9 @@
 }
 
 .restore-preview-header small {
-  color: #747b7f;
+  color: var(--muted);
 
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .restore-preview-grid {
@@ -845,11 +845,11 @@
 
   border:
     1px solid
-    rgba(255, 255, 255, 0.055);
+    rgba(var(--ink-rgb), 0.055);
 
   border-radius: 14px;
 
-  background: #191c1e;
+  background: var(--surface);
 
   transition:
     border-color
@@ -861,13 +861,13 @@
 }
 
 .restore-preview-grid span {
-  color: #686f73;
+  color: var(--muted-soft);
 
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .restore-preview-grid strong {
-  font-size: 10px;
+  font-size: 11px;
 
   font-variant-numeric:
     tabular-nums;
@@ -880,16 +880,16 @@
 
   border:
     1px solid
-    rgba(242, 154, 90, 0.15);
+    color-mix(in srgb, var(--orange) 15%, transparent);
 
   border-radius: 14px;
 
   background:
-    rgba(242, 154, 90, 0.055);
+    color-mix(in srgb, var(--orange) 6%, transparent);
 
-  color: #c99470;
+  color: var(--orange);
 
-  font-size: 9px;
+  font-size: 11px;
   line-height: 1.5;
 }
 
@@ -905,9 +905,9 @@
 @media (hover: hover) and (pointer: fine) {
   .restore-preview-grid > div:hover {
     border-color:
-      rgba(255, 255, 255, 0.09);
+      rgba(var(--ink-rgb), 0.09);
 
-    background: #1b1f21;
+    background: var(--surface-light);
   }
 }
 
@@ -925,17 +925,17 @@
 
   border:
     1px solid
-    rgba(52, 211, 153, 0.16);
+    color-mix(in srgb, var(--accent) 16%, transparent);
 
   border-radius: 24px;
 
   background:
     linear-gradient(
       180deg,
-      rgba(52, 211, 153, 0.045),
-      rgba(52, 211, 153, 0.018)
+      color-mix(in srgb, var(--accent) 4%, transparent),
+      color-mix(in srgb, var(--accent) 2%, transparent)
     ),
-    #151917;
+    var(--surface);
 }
 
 .data-integrity-icon {
@@ -949,15 +949,15 @@
 
   border:
     1px solid
-    rgba(108, 203, 165, 0.28);
+    color-mix(in srgb, var(--accent) 28%, transparent);
 
   border-radius:
     var(--radius-pill);
 
   background:
-    rgba(52, 211, 153, 0.08);
+    color-mix(in srgb, var(--accent) 8%, transparent);
 
-  color: #6ccba5;
+  color: var(--accent);
 
   font-size: 12px;
   font-weight: 850;
@@ -974,9 +974,9 @@
 
   margin: 7px 0 0;
 
-  color: #7f8783;
+  color: var(--muted);
 
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.6;
 }
 
@@ -1045,7 +1045,7 @@
     width: 100%;
     min-height: 44px;
 
-    font-size: 9px;
+    font-size: 11px;
   }
 
   .data-transfer-feedback {

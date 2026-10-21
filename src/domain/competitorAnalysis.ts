@@ -5,11 +5,11 @@ import type {
 import {
   calculatePriceAdvice,
   DEFAULT_PRICE_ADVICE_PARAMETERS,
+  getReferenceCredits,
   ROSTER_SLOT_LIMITS,
 } from './priceAdvice'
 
 import {
-  getPmaCredits,
   median,
 } from './auctionContext'
 
@@ -48,6 +48,9 @@ export interface CompetitorAnalysis {
 
   estimateSource:
     CompetitorEstimateSource
+
+  /** urgenza nel ruolo: >1 se è indietro col reparto rispetto al resto della rosa */
+  urgencyFactor: number
 
   risk:
     CompetitorRisk
@@ -145,6 +148,7 @@ function getAssignmentRatio(
     AppState['auctionAssignments'][number],
   playerMap:
     Map<string, Player>,
+  allPlayers: Player[],
 ): {
   ratio: number
   role: PlayerRole
@@ -159,10 +163,12 @@ function getAssignmentRatio(
     return undefined
   }
 
+  // stesso valore di riferimento del Tetto (PMA, Saggi, iCà)
   const pmaCredits =
-    getPmaCredits(
+    getReferenceCredits(
+      state,
       assignedPlayer,
-      state.initialCredits,
+      allPlayers,
     )
 
   if (
@@ -219,6 +225,7 @@ function getEstimateFactor(
             state,
             assignment,
             playerMap,
+            allPlayers,
           ),
       )
       .filter(
@@ -498,9 +505,10 @@ export function calculateCompetitors(
     )
 
   const playerPmaCredits =
-    getPmaCredits(
+    getReferenceCredits(
+      state,
       player,
-      state.initialCredits,
+      allPlayers,
     )
 
   /*
@@ -670,13 +678,33 @@ export function calculateCompetitors(
           del manager / mercato.
         */
 
+        /*
+          Urgenza: chi è indietro in questo reparto rispetto
+          a quanto ha già riempito della rosa rilancia di più.
+          Esempio: 12/25 in rosa ma 0/3 portieri → +17% circa.
+          Chi è avanti nel reparto rilancia un po' meno.
+        */
+        const rosterProgress =
+          filledRosterSlots / TOTAL_ROSTER_SLOTS
+        const roleProgress =
+          roleFilled / roleLimit
+        const urgencyFactor =
+          Math.min(
+            1.3,
+            Math.max(
+              0.85,
+              1 + 0.35 * (rosterProgress - roleProgress),
+            ),
+          )
+
         const rawEstimatedBid =
           playerPmaCredits ===
           undefined
             ? 1
             : (
                 playerPmaCredits *
-                estimate.factor
+                estimate.factor *
+                urgencyFactor
               )
 
         /*
@@ -734,7 +762,7 @@ export function calculateCompetitors(
 
           estimateSource:
             estimate.source,
-
+          urgencyFactor,
           risk,
         }
       },
@@ -990,7 +1018,7 @@ export function renderCompetitorAnalysis(
                     ${getEstimateSourceLabel(
                       competitor
                         .estimateSource,
-                    )}
+                    )}${competitor.urgencyFactor >= 1.08 ? ' · urgente' : competitor.urgencyFactor <= 0.92 ? ' · reparto già avviato' : ''}
                   </small>
                 </div>
 

@@ -68,7 +68,12 @@ export interface PriceAdviceParameters {
 
 export const DEFAULT_PRICE_ADVICE_PARAMETERS:
   PriceAdviceParameters = {
-    reserveFactor: 0.9,
+    /*
+      Quota dei budget previsti per gli altri reparti che viene
+      tenuta da parte nel limite finanziario (prima 0,9: bloccava
+      quasi tutto). Resta sempre almeno 1 cr per ogni slot vuoto.
+    */
+    reserveFactor: 0.35,
 
     baseRoleElasticity:
       1.08,
@@ -94,6 +99,9 @@ export const DEFAULT_PRICE_ADVICE_PARAMETERS:
 
 export interface PriceAdvice {
   pmaCredits?: number
+
+  /** le tre fonti del valore di riferimento, in crediti */
+  referenceSources?: ReferenceSources
 
   auctionMarketFactor:
     number
@@ -147,8 +155,16 @@ export interface PriceAdvice {
   globalReserve?: number
 }
 
+export interface ReferenceSources {
+  pma?: number
+  saggi?: number
+  ica?: number
+}
+
 export interface BaseAuctionValueData {
   pmaCredits?: number
+
+  referenceSources?: ReferenceSources
 
   auctionMarketFactor:
     number
@@ -186,6 +202,93 @@ function clamp(
    MARKET OBSERVATION
 ========================= */
 
+/* =========================
+   VALORE DI RIFERIMENTO
+
+   Media delle fonti disponibili, un terzo ciascuna:
+   - PMA FantaLab (in crediti)
+   - prezzo mediano dei Saggi (riportato ai crediti dell'asta)
+   - prezzo "da iCà": quanto costa, per PMA, chi nel ruolo
+     ha la stessa posizione che lui ha per iCà
+========================= */
+
+const icaPriceCache =
+  new WeakMap<Player[], Map<string, { icaRank: Map<string, number>; pmaByRank: number[] }>>()
+
+function getIcaImpliedCredits(
+  state: AppState,
+  player: Player,
+  allPlayers: Player[],
+): number | undefined {
+  if (player.iCa === undefined) {
+    return undefined
+  }
+
+  let byRole = icaPriceCache.get(allPlayers)
+  if (!byRole) {
+    byRole = new Map()
+    icaPriceCache.set(allPlayers, byRole)
+  }
+
+  const key = `${player.role}|${state.initialCredits}`
+  let entry = byRole.get(key)
+  if (!entry) {
+    const rolePlayers = allPlayers.filter((item) => item.role === player.role)
+    const pmaByRank = rolePlayers
+      .map((item) => getPmaCredits(item, state.initialCredits))
+      .filter((value): value is number => value !== undefined)
+      .sort((first, second) => second - first)
+    const byIca = rolePlayers
+      .filter((item) => item.iCa !== undefined)
+      .sort((first, second) => (second.iCa ?? 0) - (first.iCa ?? 0))
+    entry = {
+      pmaByRank,
+      icaRank: new Map(byIca.map((item, index) => [item.id, index])),
+    }
+    byRole.set(key, entry)
+  }
+
+  const rank = entry.icaRank.get(player.id)
+  if (rank === undefined || !entry.pmaByRank.length) {
+    return undefined
+  }
+
+  return entry.pmaByRank[Math.min(rank, entry.pmaByRank.length - 1)]
+}
+
+export function getReferenceSources(
+  state: AppState,
+  player: Player,
+  allPlayers: Player[],
+): ReferenceSources {
+  return {
+    pma: getPmaCredits(player, state.initialCredits),
+    saggi: player.saggiPrice === undefined
+      ? undefined
+      : player.saggiPrice * state.initialCredits / 500,
+    ica: getIcaImpliedCredits(state, player, allPlayers),
+  }
+}
+
+export function getReferenceCredits(
+  state: AppState,
+  player: Player,
+  allPlayers: Player[],
+): number | undefined {
+  const { pma, saggi, ica } = getReferenceSources(state, player, allPlayers)
+  const sources = [
+    pma,
+    saggi,
+    ica,
+  ].filter((value): value is number => value !== undefined && Number.isFinite(value) && value > 0)
+
+  if (!sources.length) {
+    return undefined
+  }
+
+  return sources.reduce((sum, value) => sum + value, 0) / sources.length
+}
+
 function getMarketRatios(
   state: AppState,
   allPlayers: Player[],
@@ -213,9 +316,10 @@ function getMarketRatios(
         }
 
         const pma =
-          getPmaCredits(
+          getReferenceCredits(
+            state,
             player,
-            state.initialCredits,
+            allPlayers,
           )
 
         if (
@@ -402,16 +506,29 @@ export function calculateBaseAuctionValue(
       parameters,
     )
 
+  const referenceCredits =
+    getReferenceCredits(
+      state,
+      player,
+      allPlayers,
+    )
   const baseAuctionValue =
-    pmaCredits === undefined
+    referenceCredits === undefined
       ? undefined
       : (
-          pmaCredits *
+          referenceCredits *
           market.factor
         )
 
   return {
     pmaCredits,
+
+    referenceSources:
+      getReferenceSources(
+        state,
+        player,
+        allPlayers,
+      ),
 
     auctionMarketFactor:
       market.factor,
@@ -1258,6 +1375,9 @@ function calculateGoalkeeperPriceAdviceInternal(
     pmaCredits:
       base.pmaCredits,
 
+    referenceSources:
+      base.referenceSources,
+
     auctionMarketFactor:
       base.auctionMarketFactor,
 
@@ -1574,6 +1694,9 @@ export function calculatePriceAdvice(
   return {
     pmaCredits:
       base.pmaCredits,
+
+    referenceSources:
+      base.referenceSources,
 
     auctionMarketFactor:
       base.auctionMarketFactor,
