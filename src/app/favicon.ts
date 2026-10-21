@@ -2,7 +2,6 @@ let blinkTimer:
   number | null = null
 
 let isLive = false
-let frameIndex = 0
 
 /*
   Pulsazione morbida come il pallino LIVE della dashboard:
@@ -11,11 +10,12 @@ let frameIndex = 0
   fotogrammi già pronti.
 */
 const PULSE_PERIOD_MS =
-  2000
+  3000
 
-// fotogrammi fitti (uno ogni 40 ms) per una sfumatura senza scatti
-const PULSE_FRAMES =
-  50
+// aggiornamento ogni 4 ms (il minimo dei browser): l'opacità si calcola
+// dal tempo trascorso, quindi il ritmo resta costante anche se un passo salta
+const PULSE_STEP_MS =
+  4
 
 // quota del ciclo in cui il pallino resta acceso al 100%
 const PULSE_HOLD =
@@ -116,15 +116,23 @@ function pulseOpacity(
   return 0.65 + 0.35 * Math.cos(fade * Math.PI * 2)
 }
 
-const LIVE_FRAMES: string[] =
-  Array.from(
-    { length: PULSE_FRAMES },
-    (_, index) =>
-      faviconHref(
-        DOT_GREEN_ON,
-        pulseOpacity(index / PULSE_FRAMES),
-      ),
-  )
+// un'icona per ogni livello di opacità (passo 0,01), creata una volta sola
+const liveFrameCache =
+  new Map<number, string>()
+
+let liveStartedAt = 0
+let lastLiveLevel = -1
+
+function liveFrameHref(
+  level: number,
+): string {
+  let href = liveFrameCache.get(level)
+  if (!href) {
+    href = faviconHref(DOT_GREEN_ON, level / 100)
+    liveFrameCache.set(level, href)
+  }
+  return href
+}
 
 function stopBlinking():
   void {
@@ -138,7 +146,7 @@ function stopBlinking():
     blinkTimer = null
   }
 
-  frameIndex = 0
+  lastLiveLevel = -1
 }
 
 function showInactive():
@@ -152,25 +160,34 @@ function showInactive():
 
 function showLiveFrame():
   void {
+  const phase =
+    ((performance.now() - liveStartedAt) % PULSE_PERIOD_MS) / PULSE_PERIOD_MS
+
+  const level =
+    Math.round(pulseOpacity(phase) * 100)
+
+  // si cambia l'icona solo quando l'opacità cambia davvero
+  if (level === lastLiveLevel) {
+    return
+  }
+
+  lastLiveLevel = level
   getFaviconLink().href =
-    LIVE_FRAMES[frameIndex]
+    liveFrameHref(level)
 }
 
 function startBlinking():
   void {
   stopBlinking()
 
+  liveStartedAt = performance.now()
+
   showLiveFrame()
 
   blinkTimer =
     window.setInterval(
-      () => {
-        frameIndex =
-          (frameIndex + 1) % PULSE_FRAMES
-
-        showLiveFrame()
-      },
-      PULSE_PERIOD_MS / PULSE_FRAMES,
+      showLiveFrame,
+      PULSE_STEP_MS,
     )
 }
 
