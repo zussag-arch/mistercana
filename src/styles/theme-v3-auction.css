@@ -500,3 +500,35 @@
 .auction-top-ica-row button:last-child:hover { border-color: var(--accent); }
 /* se è la colonna sinistra la più lunga, l'ultima tessera a destra si allunga */
 .auction-side-panels > :last-child { flex: 1 1 auto; }
+
+/* storico: righe più piene, colonne proporzionate allo spazio */
+.auction-history-slot .auction-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.auction-history-slot .auction-history-row {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1.4fr) minmax(0, 1fr) minmax(70px, 0.5fr) auto;
+  align-items: center;
+  gap: 16px;
+  min-height: 62px;
+  padding: 10px 16px;
+  flex: 0 0 auto;
+}
+.auction-history-slot .auction-role-badge { width: 34px; height: 34px; border-radius: 11px; font-size: 13px; }
+.auction-history-slot .auction-history-player strong { font-size: 15px; }
+.auction-history-slot .auction-history-player small { font-size: 12px; }
+.auction-history-slot .auction-history-manager span,
+.auction-history-slot .auction-history-price span { font-size: 11px; }
+.auction-history-slot .auction-history-manager strong { font-size: 14px; }
+.auction-history-slot .auction-history-price strong {
+  font-family: var(--font-display);
+  font-size: 20px;
+}
+.auction-history-slot .auction-history-actions { display: flex; gap: 8px; }
+.auction-history-slot .auction-history-actions button {
+  min-height: 34px;
+  padding: 0 14px;
+  font-size: 12px;
+}
