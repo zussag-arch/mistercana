@@ -294,3 +294,55 @@
 .dashboard-managers-box > summary:hover .dashboard-managers-chevron { border-color: var(--accent); }
 .dashboard-managers-box[open] .dashboard-managers-chevron { transform: rotate(180deg); }
 .dashboard-managers-box[open] > summary { margin-bottom: 18px; }
+
+/* passo 3: pulsante Avvia (apre il Recap); durante l'asta diventa Live */
+.dashboard-setup-steps { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.dashboard-setup-steps li:nth-child(3):not(.dashboard-step-cta) { display: none; }
+.dashboard-setup-steps li.dashboard-step-cta { padding: 0; border: 0; background: none; }
+.dashboard-go-button {
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+}
+.dashboard-go-button > span { flex: 1; display: grid; gap: 2px; }
+.dashboard-go-button strong { font-family: var(--font-display); font-size: 15px; }
+.dashboard-go-button small { opacity: 0.8; font-size: 11px; }
+.dashboard-go-button i {
+  font-style: normal;
+  font-size: 20px;
+  font-weight: 800;
+  transition: transform 0.2s;
+}
+.dashboard-go-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+.dashboard-go-button:hover i { transform: translateX(4px); }
+
+.dashboard-go-button.is-live {
+  width: auto;
+  min-height: 0;
+  padding: 9px 16px;
+  border-radius: 999px;
+}
+.dashboard-go-button.is-live strong { font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; }
+.dashboard-go-dot {
+  flex: none !important;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: dashboard-live-pulse 1.4s ease-in-out infinite;
+}
+@keyframes dashboard-live-pulse { 50% { opacity: 0.3; } }

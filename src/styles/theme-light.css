@@ -31,10 +31,11 @@
   --muted: #7a7e80;
   --muted-soft: #9d9f9e;
 
-  --accent: #58c294;
-  --accent-strong: #3a9f74;
-  --accent-soft: #d3efe1;
-  --accent-ink: #1d4a37;
+  /* accento rosso: il contrasto bianco/rosso del tema chiaro */
+  --accent: #e07a7a;
+  --accent-strong: #c95d5d;
+  --accent-soft: #f6dada;
+  --accent-ink: #fffcf6;
 
   --green: #58c294;
   --red: #e58b8b;
@@ -56,7 +57,7 @@
 
 :root[data-theme="light"] body {
   background:
-    radial-gradient(900px 500px at 85% -10%, rgba(88, 194, 148, 0.14), transparent 60%),
+    radial-gradient(900px 500px at 85% -10%, rgba(224, 122, 122, 0.12), transparent 60%),
     radial-gradient(700px 500px at -10% 30%, rgba(125, 179, 227, 0.12), transparent 60%),
     var(--bg);
 }
@@ -132,3 +133,11 @@
 :root[data-theme="light"] .objective-priority-header span {
   color: color-mix(in srgb, var(--pc) 55%, var(--text));
 }
+
+/* con l'accento rosso, ciò che è "buono" o "centrocampo" resta verde */
+.dashboard-page .budget-field:nth-child(3)::before { background: var(--role-c); }
+.dashboard-page .budget-field:nth-child(3) > span { color: var(--role-c); }
+:root[data-theme="light"] .players-affare.affare-good { background: var(--green); color: var(--on-color); }
+:root[data-theme="light"] .players-affare.affare-bad { background: var(--surface-raised); color: var(--red); }
+:root[data-theme="light"] .dashboard-live-role.live-role-c .dashboard-live-bar span { background: var(--role-c); }
+:root[data-theme="light"] .player-status-free { background: var(--green); color: var(--on-color); }

@@ -976,6 +976,7 @@ function renderLiveSummary(state: AppState): string {
           <h2>La tua asta</h2>
         </div>
         <span class="dashboard-live-count">${state.auctionAssignments.length} assegnati in totale · ${ownerAssignments} tuoi</span>
+        <button type="button" class="dashboard-go-button is-live" data-go-auction><span class="dashboard-go-dot" aria-hidden="true"></span><strong>Live</strong><i aria-hidden="true">→</i></button>
       </header>
       <div class="dashboard-live-kpis">
         <div class="dashboard-live-kpi lead"><span>Crediti rimasti</span><strong>${credits}</strong><small>su ${state.initialCredits}</small></div>
@@ -1011,10 +1012,10 @@ function renderSetupSteps(state: AppState, activeCount: number, distributionIsVa
   const steps: Array<[string, string, boolean]> = [
     ['Allenatori', activeCount >= 2 ? `${activeCount} partecipanti` : 'aggiungi almeno un avversario', activeCount >= 2],
     ['Budget', distributionIsValid ? `${state.initialCredits} crediti · distribuzione 100%` : 'la distribuzione deve fare 100%', distributionIsValid],
-    ['Avvio', "apri il Recap e avvia l'asta", false],
   ]
   return `<ol class="dashboard-setup-steps">${steps.map(([title, text, done], index) => `
-    <li class="${done ? 'done' : ''}"><span class="dashboard-step-number">${done ? '✓' : index + 1}</span><div><strong>${title}</strong><small>${text}</small></div></li>`).join('')}</ol>`
+    <li class="${done ? 'done' : ''}"><span class="dashboard-step-number">${done ? '✓' : index + 1}</span><div><strong>${title}</strong><small>${text}</small></div></li>`).join('')}
+    <li class="dashboard-step-cta"><button id="openRecapButton" type="button" class="dashboard-go-button"><span><strong>Avvia l'asta</strong><small>controlla il Recap e parti</small></span><i aria-hidden="true">→</i></button></li></ol>`
 }
 
 export function renderDashboardPage(
@@ -1100,15 +1101,6 @@ export function renderDashboardPage(
             dashboard-hero-actions
           "
         >
-          <button
-            id="openRecapButton"
-            type="button"
-            class="
-              dashboard-cta-button
-            "
-          >
-            Recap
-          </button>
         </div>
       </div>
       ${state.auctionPhase === 'live' ? renderLiveSummary(state) : renderSetupSteps(state, activeManagers.length, distributionIsValid)}
@@ -1906,6 +1898,10 @@ export function bindDashboardEvents(
       'click',
       triggerAuctionStart,
     )
+
+  document.querySelector('[data-go-auction]')?.addEventListener('click', () => {
+    document.querySelector<HTMLElement>('.nav-item[data-page="auction"]')?.click()
+  })
 
   document
     .querySelector(
