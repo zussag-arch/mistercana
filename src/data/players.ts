@@ -2,18 +2,8 @@ import playersCsv from '../../database/MisterCana_DB_Giocatori_2026_27.csv?raw'
 import fantalabPlayersCsv from '../../database/fantalab_giocatori.csv?raw'
 
 import {
-  buildHistoricalBenchmarks,
-  calculateICa,
-} from '../domain/ica'
-
-import {
   calculateConsensus,
-  getICaSaggiForPlayer,
 } from './saggi'
-
-import {
-  getCoachInput,
-} from './coaches'
 
 import type {
   Player,
@@ -594,153 +584,19 @@ const basePlayers =
   )
 
 /* =========================
-   HISTORICAL BENCHMARKS
-========================= */
-
-const historicalBenchmarks =
-  buildHistoricalBenchmarks(
-    basePlayers.map(
-      (player) => ({
-        id: player.id,
-        name: player.name,
-        team: player.team,
-        role: player.role,
-
-        titolarita:
-          player.startingProbability,
-
-        mv: player.mv,
-        fmv: player.fmv,
-
-        presenze:
-          player.appearances,
-
-        ptTit:
-          player.startingPoints,
-
-        minuti:
-          player.minutes,
-
-        ptInf:
-          player.injuryPoints,
-
-        gol:
-          player.goals,
-
-        assist:
-          player.assists,
-
-        ammonizioni:
-          player.yellowCards,
-
-        espulsioni:
-          player.redCards,
-
-        rigSegnati:
-          player.penaltiesScored,
-
-        rigSbagliati:
-          player.penaltiesMissed,
-
-        golSubiti:
-          player.goalsConceded,
-
-        rigParati:
-          player.penaltiesSaved,
-      }),
-    ),
-  )
-
-/* =========================
    ENRICHED PLAYERS
 ========================= */
 
 export const players:
   Player[] =
   basePlayers.map(
-    (player) => {
-      const saggi =
-        getICaSaggiForPlayer(
+    (player) => ({
+      ...player,
+      // l'iCà è calcolato da data/icaV3Data (iCà 3), non sul listone
+      iCa: undefined,
+      consensus:
+        calculateConsensus(
           player.id,
-        )
-
-      const coach =
-        getCoachInput(
-          player.team,
-          player.role,
-        )
-
-      const iCaResult =
-        calculateICa(
-          {
-            id: player.id,
-            name: player.name,
-            team: player.team,
-            role: player.role,
-
-            titolarita:
-              player.startingProbability,
-
-            mv: player.mv,
-            fmv: player.fmv,
-
-            presenze:
-              player.appearances,
-
-            ptTit:
-              player.startingPoints,
-
-            minuti:
-              player.minutes,
-
-            ptInf:
-              player.injuryPoints,
-
-            gol:
-              player.goals,
-
-            assist:
-              player.assists,
-
-            ammonizioni:
-              player.yellowCards,
-
-            espulsioni:
-              player.redCards,
-
-            rigSegnati:
-              player.penaltiesScored,
-
-            rigSbagliati:
-              player.penaltiesMissed,
-
-            golSubiti:
-              player.goalsConceded,
-
-            rigParati:
-              player.penaltiesSaved,
-          },
-          {
-            benchmarks:
-              historicalBenchmarks,
-
-            saggi,
-
-            coach,
-          },
-        )
-
-      return {
-        ...player,
-
-        iCa:
-          iCaResult.score ??
-          undefined,
-
-        consensus:
-          calculateConsensus(
-            player.id,
-          ),
-      }
-    },
+        ),
+    }),
   )

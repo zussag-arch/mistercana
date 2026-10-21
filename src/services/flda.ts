@@ -328,16 +328,6 @@ export function getFldaPlayers(
   )
 }
 
-export function getFldaBulkHistory(
-  seasons = 3,
-): Promise<FldaBulkHistoryResponse> {
-  const query = new URLSearchParams({ seasons: String(seasons) })
-  return withLocal(
-    () => fldaFetch<FldaBulkHistoryResponse>(`/api/history/bulk?${query.toString()}`),
-    (source) => source.localBulkHistory(),
-  )
-}
-
 export function getFldaPlayerDetail(
   playerId: string,
 ): Promise<FldaPlayerDetail> {
@@ -371,17 +361,6 @@ export function getFldaTeamHierarchies(
   return withLocal(
     () => fldaFetch<FldaRecord[]>(`/api/teams/${encodeURIComponent(team)}/hierarchies`),
     (source) => source.localTeamHierarchies(team),
-  )
-}
-
-export function getFldaTeamFixtures(
-  team: string,
-  context: FldaFixtureContext,
-): Promise<FldaRecord[]> {
-  const query = new URLSearchParams({ context })
-  return withLocal(
-    () => fldaFetch<FldaRecord[]>(`/api/teams/${encodeURIComponent(team)}/fixtures?${query.toString()}`),
-    () => [],
   )
 }
 

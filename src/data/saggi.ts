@@ -1,9 +1,5 @@
 import saggiCsv from '../../database/MisterCana_DB_Saggi.csv?raw'
 
-import type {
-  ICaSaggioInput,
-} from '../domain/ica'
-
 export interface SaggioRecord {
   playerId: string
   saggio: string
@@ -284,32 +280,6 @@ export function getSaggiForPlayer(
     saggiByPlayer.get(
       playerId,
     ) ?? []
-  )
-}
-
-/* =========================
-   iCà INPUT
-========================= */
-
-export function getICaSaggiForPlayer(
-  playerId: string,
-): ICaSaggioInput[] {
-  return getSaggiForPlayer(
-    playerId,
-  ).map(
-    (record) => ({
-      saggio:
-        record.saggio,
-
-      fasciaValore:
-        record.fasciaValore,
-
-      affidabilita:
-        record.affidabilita,
-
-      integrita:
-        record.integrita,
-    }),
   )
 }
 

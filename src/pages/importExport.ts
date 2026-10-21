@@ -1,3 +1,7 @@
+import { getDataSources } from '../data/dataSources'
+import { getICaV3Results } from '../data/icaV3Data'
+import { localPlayers } from '../services/fantalabLocal'
+import { getCachedPlayersDataset } from '../services/playerRepository'
 import {
   players,
 } from '../data/players'
@@ -14,6 +18,7 @@ import {
   FldaApiError,
   getFldaHealth,
   getFldaStatus,
+  isFldaLocalMode,
   updateFlda,
 } from '../services/flda'
 
@@ -524,6 +529,72 @@ function getManagerName(
   )
 }
 
+/* =========================
+   FONTI DATI
+========================= */
+
+function renderDataSourcesPanel(): string {
+  const sources = getDataSources()
+  const active = getCachedPlayersDataset()
+  const label = active?.source === 'legacy'
+    ? 'Vecchio listone (riserva)'
+    : isFldaLocalMode() || !active ? 'Tabelle FantaLab (locali)' : 'FLDA'
+  return `
+    <section class="data-transfer-section data-sources-section">
+      <div class="data-transfer-section-header">
+        <div>
+          <span class="data-transfer-eyebrow">Dati</span>
+          <h2>Fonti dati</h2>
+          <p>Gli archivi che l'app sta usando, con i numeri reali. Si trovano nella cartella <code>database/</code> del progetto.</p>
+        </div>
+        <span class="data-source-active">In uso: ${escapeSourceHtml(label)}</span>
+      </div>
+      <div class="data-sources-grid">
+        ${sources.map((source) => `
+          <article class="data-source-card">
+            <span class="data-source-title">${escapeSourceHtml(source.title)}</span>
+            <strong>${escapeSourceHtml(source.value)}</strong>
+            <small>${escapeSourceHtml(source.detail)}</small>
+            <p><b>Usato per:</b> ${escapeSourceHtml(source.usedBy)}</p>
+            <code>${escapeSourceHtml(source.file)}</code>
+          </article>`).join('')}
+      </div>
+      <details class="data-sources-howto">
+        <summary>Come aggiornare i dati</summary>
+        <ol>
+          <li>Scarica da FantaLab i nuovi <code>fantalab_giocatori.csv</code> e <code>fantalab_allenatori.csv</code> (o le griglie).</li>
+          <li>Sostituisci i file con lo stesso nome nella cartella <code>database/</code> del progetto.</li>
+          <li>Ricarica la pagina: l'app rilegge i file. Codici storici, obiettivi e assegnazioni restano collegati.</li>
+          <li>Per pubblicare la versione online, fai commit e push su GitHub.</li>
+        </ol>
+      </details>
+    </section>
+  `
+}
+
+function escapeSourceHtml(value: string): string {
+  return value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
+}
+
+function exportPlayerRatings(): void {
+  const roleOrder = ['P', 'D', 'C', 'A']
+  const results = getICaV3Results()
+  const csvCell = (value: unknown) => {
+    const text = typeof value === 'number' ? value.toFixed(1).replace('.', ',') : String(value ?? '')
+    return /[;"\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text
+  }
+  const rows = localPlayers().players
+    .map((player) => ({ player, ica: results.get(player.player_id ?? '') }))
+    .sort((a, b) => roleOrder.indexOf(a.player.role) - roleOrder.indexOf(b.player.role)
+      || (b.ica?.score ?? -1) - (a.ica?.score ?? -1))
+  const header = ['Ruolo', 'Giocatore', 'Squadra', 'iCà', 'Posizione nel ruolo %', 'Affare', 'PMA %', 'Titolarità %', 'FM attesa', 'FM corretta']
+  const lines = [header.join(';'), ...rows.map(({ player, ica }) => [
+    player.role, player.name, player.team, ica?.score, ica?.rolePercentile, ica?.affare,
+    player.classic_8_mod_median_value, player.titolarita_display, ica?.expectedFm, ica?.adjustedFm,
+  ].map(csvCell).join(';'))]
+  downloadTextFile(`mistercana-valutazioni-${getSafeFileStamp()}.csv`, '\uFEFF' + lines.join('\n'), 'text/csv;charset=utf-8')
+}
+
 function getSafeFileStamp():
   string {
   const now =
@@ -986,7 +1057,15 @@ export function renderImportExportPage():
         </div>
       </div>
 
-      ${renderFldaPanel()}
+      ${renderDataSourcesPanel()}
+
+      <details class="flda-optional">
+        <summary>
+          <span>Servizio FLDA <small>facoltativo</small></span>
+          <small>${isFldaLocalMode() ? 'non in uso: l\'app usa le tabelle FantaLab' : 'apri per stato e aggiornamenti'}</small>
+        </summary>
+        ${renderFldaPanel()}
+      </details>
 
       <section
         class="data-transfer-section"
@@ -1334,38 +1413,29 @@ export function renderImportExportPage():
           </article>
         </div>
       </section>
-
-      <section
-        class="data-integrity-panel"
-      >
-        <div
-          class="data-integrity-icon"
-        >
-          ✓
+      <section class="data-transfer-section">
+        <div class="data-transfer-section-header">
+          <div>
+            <span class="data-transfer-eyebrow">Export analisi</span>
+            <h2>Valutazioni giocatori</h2>
+            <p>Tutti i giocatori del listone con iCà, posizione nel ruolo, Affare, PMA e titolarità, da aprire con Excel.</p>
+          </div>
         </div>
-
-        <div>
-          <span
-            class="
-              data-transfer-eyebrow
-            "
-          >
-            VALIDAZIONE
-          </span>
-
-          <h2>
-            Prima validare, poi applicare
-          </h2>
-
-          <p>
-            Il ripristino verifica tipo,
-            versione e struttura minima
-            del backup prima di proporre
-            la conferma.
-
-            Un file non valido non modifica
-            il localStorage corrente.
-          </p>
+        <div class="data-transfer-grid data-transfer-grid-single">
+          <article class="data-transfer-card">
+            <div class="data-transfer-card-header">
+              <div class="data-transfer-icon data-transfer-icon-export">↑</div>
+              <span class="data-transfer-status status-ready">Pronto</span>
+            </div>
+            <div class="data-transfer-card-body">
+              <h3>iCà e affari</h3>
+              <p>Una riga per giocatore, ordinata per ruolo e iCà. Utile per preparare l'asta o confrontare le valutazioni.</p>
+            </div>
+            <div class="data-transfer-card-footer">
+              <div><span>Formato</span><strong>CSV · separatore ;</strong></div>
+              <button id="exportPlayerRatingsButton" type="button" class="data-transfer-button data-transfer-button-primary">Esporta valutazioni</button>
+            </div>
+          </article>
         </div>
       </section>
     </section>
@@ -1741,6 +1811,10 @@ export function bindImportExportEvents():
 
   importExportEventsBound =
     true
+
+  document.addEventListener('click', (event) => {
+    if (event.target instanceof Element && event.target.closest('#exportPlayerRatingsButton')) exportPlayerRatings()
+  })
 
   document.addEventListener(
     'click',

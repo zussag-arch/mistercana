@@ -7,9 +7,8 @@ import {
   localTeamGuide,
   localTeamHierarchies,
 } from '../services/fantalabLocal'
-import { coachScore } from '../domain/icaV2'
-import type { ICaCoachRole } from '../domain/icaV2'
-import { calculateICaV3 } from '../domain/icaV3'
+import { calculateICaV3, coachRoleTone } from '../domain/icaV3'
+import type { ICaCoachRole } from '../domain/icaV3'
 import type { ICaV3Input, ICaV3Result, ICaV3Role } from '../domain/icaV3'
 import { players as listone } from './players'
 import goalkeeperGridCsv from '../../database/griglia_portieri.csv?raw'
@@ -71,7 +70,7 @@ function buildInputs(): ICaV3Input[] {
     const { guide, ranks } = team(player.team)
     const rankOf = (type: string) => ranks.find((row) => row.player_id === id && row.hierarchy_type === type)?.source_rank as number | undefined
     const index = role === 'P' || role === 'D' ? guide.team_defense_index : guide.team_attack_index
-    const coach = coachScore(player, (guide.key_roles ?? []) as ICaCoachRole[])
+    const coachTone = coachRoleTone(player.mantra_roles, (guide.key_roles ?? []) as ICaCoachRole[])
     const named = (key: string) => Array.isArray(guide[key])
       && (guide[key] as unknown[]).some((name) => String(name).trim().toLocaleLowerCase('it') === player.name.trim().toLocaleLowerCase('it'))
     return [{
@@ -90,7 +89,7 @@ function buildInputs(): ICaV3Input[] {
       freeKickRank: rankOf('FREE_KICK'),
       cornerRank: rankOf('CORNER'),
       teamIndex: finite(index) ? index : undefined,
-      coachTone: coach > 50 ? 'good' : coach < 50 ? 'bad' : 'neutral',
+      coachTone,
       coachPlayerTone: named('valorizzati') ? 'good' : named('penalizzati') ? 'bad' : undefined,
       ...ease(player.team, role),
       pmaPercent: finite(player.classic_8_mod_median_value) ? player.classic_8_mod_median_value : undefined,

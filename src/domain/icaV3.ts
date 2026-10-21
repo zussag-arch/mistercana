@@ -26,6 +26,41 @@
 
 export type ICaV3Role = 'P' | 'D' | 'C' | 'A'
 
+/*
+ * Giudizio dell'allenatore sul ruolo del giocatore: i ruoli Mantra del
+ * giocatore vengono tradotti nei ruoli tattici dei "ruoli chiave" della Guida.
+ * Valorizzato e penalizzato insieme = neutro.
+ */
+export interface ICaCoachRole {
+  role: string
+  tone: 'good' | 'bad' | string
+}
+
+const MANTRA_TO_COACH_ROLES: Record<string, readonly string[]> = {
+  Por: ['gk'],
+  Dc: ['def-center'],
+  Dd: ['def-fullbacks'],
+  Ds: ['def-fullbacks'],
+  E: ['def-halfbacks', 'mid-wide'],
+  M: ['mid-holding'],
+  C: ['mid-center'],
+  T: ['treq-center'],
+  W: ['treq-wings', 'att-wings'],
+  A: ['att-wings'],
+  Pc: ['att-center'],
+}
+
+export function coachRoleTone(
+  mantraRoles: readonly string[] | null | undefined,
+  coachRoles: readonly ICaCoachRole[] = [],
+): 'good' | 'bad' | 'neutral' {
+  const relevant = new Set((mantraRoles ?? []).flatMap((role) => MANTRA_TO_COACH_ROLES[role] ?? []))
+  const tones = coachRoles.filter((item) => relevant.has(item.role)).map((item) => item.tone)
+  const good = tones.includes('good')
+  const bad = tones.includes('bad')
+  return good && !bad ? 'good' : bad && !good ? 'bad' : 'neutral'
+}
+
 export const ICA_V3_PARAMETERS = {
   // l'iCà è espresso in decimi di fantapunto a partita
   displayScale: 10,

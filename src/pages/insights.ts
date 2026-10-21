@@ -1,6 +1,3 @@
-import coachesCsv
-  from '../../database/MisterCana_DB_Allenatori.csv?raw'
-
 import goalkeepersCsv
   from '../../database/griglia_portieri.csv?raw'
 
@@ -53,15 +50,8 @@ interface Coach {
   team: string
   name: string
   formation: string
-
-  impacts: Record<
-    CoachRoleKey,
-    number
-  >
-
-  // false se l'allenatore attuale (FantaLab) non è quello del CSV con gli impatti
-  impactsAvailable: boolean
   keyRoles: Array<{ label: string; tone: 'good' | 'bad' | 'neutral' }>
+  keyPoints: Array<{ label: string; tone: 'good' | 'bad' | 'neutral' }>
 }
 
 interface CoachMacroRole {
@@ -299,155 +289,6 @@ function parseCsv(
     .map(parseCsvRow)
 }
 
-function parseNumber(
-  value:
-    | string
-    | undefined,
-): number {
-  if (!value) {
-    return 0
-  }
-
-  const normalized =
-    value
-      .trim()
-      .replace(',', '.')
-
-  const parsed =
-    Number(normalized)
-
-  return Number.isFinite(
-    parsed,
-  )
-    ? parsed
-    : 0
-}
-
-/* =========================
-   COACH DATABASE
-========================= */
-
-function parseCoachesCsv(
-  csv: string,
-): Coach[] {
-  const rows =
-    parseCsv(csv)
-
-  if (
-    rows.length < 2
-  ) {
-    return []
-  }
-
-  return rows
-    .slice(1)
-    .map(
-      (columns) => {
-        const [
-          team,
-          name,
-          formation,
-          goalkeeper,
-          centreBack,
-          fullBack,
-          defensiveMid,
-          wideMid,
-          centralMid,
-          attackingMid,
-          winger,
-          secondStriker,
-          striker,
-        ] = columns
-
-        if (
-          !team ||
-          !name
-        ) {
-          return null
-        }
-
-        return {
-          team,
-          name,
-
-          formation:
-            formation ||
-            '—',
-
-          impacts: {
-            goalkeeper:
-              parseNumber(
-                goalkeeper,
-              ),
-
-            centreBack:
-              parseNumber(
-                centreBack,
-              ),
-
-            fullBack:
-              parseNumber(
-                fullBack,
-              ),
-
-            defensiveMid:
-              parseNumber(
-                defensiveMid,
-              ),
-
-            wideMid:
-              parseNumber(
-                wideMid,
-              ),
-
-            centralMid:
-              parseNumber(
-                centralMid,
-              ),
-
-            attackingMid:
-              parseNumber(
-                attackingMid,
-              ),
-
-            winger:
-              parseNumber(
-                winger,
-              ),
-
-            secondStriker:
-              parseNumber(
-                secondStriker,
-              ),
-
-            striker:
-              parseNumber(
-                striker,
-              ),
-          },
-        }
-      },
-    )
-    .filter(
-      (
-        coach,
-      ): coach is Coach =>
-        coach !== null,
-    )
-}
-
-/* =========================
-   LEGACY GOALKEEPER MATRIX
-
-   IMPORTANTE:
-   questo database continua
-   ad alimentare SOLO la griglia
-   nell'overlay.
-
-   Insight usa invece il nuovo
-   calendario 0/1/2.
-========================= */
-
 function parseGoalkeeperCsv(
   csv: string,
 ): GoalkeeperMatrix {
@@ -555,40 +396,23 @@ const FANTALAB_TEAMS = (() => {
 const splitNames = (value: string | undefined): string[] =>
   (value ?? '').split(',').map((name) => name.trim()).filter(Boolean)
 
-function surname(value: string): string {
-  return value.trim().split(/\s+/).pop()?.toLocaleLowerCase('it') ?? ''
-}
-
-function mergeCoaches(legacy: Coach[]): Coach[] {
-  if (!FANTALAB_TEAMS.length) return legacy
-  return FANTALAB_TEAMS.map((row) => {
-    const old = legacy.find((coach) => coach.team === row['Squadra'])
-    const sameCoach = Boolean(old && surname(row['Allenatore']) === surname(old.name))
-    const hasValues = Boolean(old && Object.values(old.impacts).some((value) => value !== 0))
-    const keyRoles = (row['Ruoli chiave'] ?? '').split('|').flatMap((item) => {
-      const match = item.trim().match(/^(.+?)\s*\((positivo|negativo|neutro)\)$/i)
-      if (!match) return []
-      const tone = match[2].toLowerCase() === 'positivo' ? 'good' as const
-        : match[2].toLowerCase() === 'negativo' ? 'bad' as const : 'neutral' as const
-      return [{ label: match[1], tone }]
-    })
-    return {
-      team: row['Squadra'],
-      name: row['Allenatore'] || old?.name || '—',
-      formation: row['Modulo'] || old?.formation || '',
-      impacts: old?.impacts ?? Object.fromEntries(COACH_MACRO_ROLES.map((role) => [role.key, 0])) as Coach['impacts'],
-      impactsAvailable: sameCoach && hasValues,
-      keyRoles,
-    }
+function parseTonedList(value: string | undefined): Array<{ label: string; tone: 'good' | 'bad' | 'neutral' }> {
+  return (value ?? '').split('|').flatMap((item) => {
+    const match = item.trim().match(/^(.+?)\s*\((positivo|negativo|neutro)\)$/i)
+    if (!match) return []
+    const tone = match[2].toLowerCase() === 'positivo' ? 'good' as const
+      : match[2].toLowerCase() === 'negativo' ? 'bad' as const : 'neutral' as const
+    return [{ label: match[1], tone }]
   })
 }
 
-const COACHES =
-  mergeCoaches(
-    parseCoachesCsv(
-      coachesCsv,
-    ),
-  )
+const COACHES: Coach[] = FANTALAB_TEAMS.map((row) => ({
+  team: row['Squadra'],
+  name: row['Allenatore'] || '—',
+  formation: row['Modulo'] || '',
+  keyRoles: parseTonedList(row['Ruoli chiave']),
+  keyPoints: parseTonedList(row['Punti chiave']),
+}))
 
 // Griglie di abbinamento (CSV con virgole: convertite al separatore del parser).
 const GOALKEEPER_MATRIX =
@@ -2154,48 +1978,6 @@ function renderCoachPitch(
    COACH IMPACT
 ========================= */
 
-function formatImpact(
-  value: number,
-): string {
-  if (
-    value > 0
-  ) {
-    return `+${value.toFixed(
-      2,
-    )}`
-  }
-
-  if (
-    value < 0
-  ) {
-    return value.toFixed(2)
-  }
-
-  return '0.00'
-}
-
-function getImpactClass(
-  value: number,
-): string {
-  if (
-    value > 0
-  ) {
-    return 'positive'
-  }
-
-  if (
-    value < 0
-  ) {
-    return 'negative'
-  }
-
-  return 'neutral'
-}
-
-/* =========================
-   COACH SECTION
-========================= */
-
 function renderCoachSection():
   string {
   return `
@@ -2219,12 +2001,11 @@ function renderCoachSection():
           </span>
 
           <h2>
-            Impatto allenatori
+            Allenatori
           </h2>
 
           <p>
-            Modulo preferito e impatto
-            sui macro-ruoli Mantra.
+            Modulo, ruoli valorizzati o penalizzati e punti chiave dalla Guida FantaLab.
           </p>
         </div>
 
@@ -2233,8 +2014,7 @@ function renderCoachSection():
             insight-database-status
           "
         >
-          ${COACHES.length}
-          allenatori dal database
+          ${COACHES.length} allenatori · FantaLab
         </span>
       </div>
 
@@ -2300,75 +2080,7 @@ function renderCoachSection():
                           coach.formation,
                         )}
 
-                        <div
-                          class="
-                            coach-macro-role-list
-                          "
-                        >
-                          ${COACH_MACRO_ROLES
-                            .map(
-                              (role) => {
-                                const value =
-                                  coach
-                                    .impacts[
-                                      role.key
-                                    ]
-
-                                return `
-                                  <div
-                                    class="
-                                      coach-macro-role-row
-                                    "
-                                  >
-                                    <div
-                                      class="
-                                        coach-macro-role-name
-                                      "
-                                    >
-                                      <span
-                                        class="
-                                          coach-role-dot
-                                          coach-role-${role.group.toLowerCase()}
-                                        "
-                                      >
-                                        ${escapeHtml(
-                                          role.mantra,
-                                        )}
-                                      </span>
-
-                                      <div>
-                                        <strong>
-                                          ${escapeHtml(
-                                            role.label,
-                                          )}
-                                        </strong>
-
-                                        <small>
-                                          ${escapeHtml(
-                                            role.mantra,
-                                          )}
-                                        </small>
-                                      </div>
-                                    </div>
-
-                                    <span
-                                      class="
-                                        coach-impact-value
-                                        coach-impact-${coach.impactsAvailable ? getImpactClass(
-                                          value,
-                                        ) : 'neutral'}
-                                      "
-                                    >
-                                      ${coach.impactsAvailable ? formatImpact(
-                                        value,
-                                      ) : 'n.d.'}
-                                    </span>
-                                  </div>
-                                `
-                              },
-                            )
-                            .join('')}
-                        </div>
+                        ${coach.keyPoints.length ? `<ul class="coach-key-points">${coach.keyPoints.map((item) => `<li class="tone-${item.tone}">${escapeHtml(item.label)}</li>`).join('')}</ul>` : '<p class="coach-key-points-empty">Nessun punto chiave nella Guida.</p>'}
                       </div>
                     </article>
                   `,

@@ -2,28 +2,17 @@ import { players as legacyPlayers } from '../data/players'
 import { getSaggiForPlayer } from '../data/saggi'
 import type { Player } from '../domain/player'
 import {
-  getFldaBulkHistory,
   getFldaPlayerDetail,
   getFldaHistoricalAuctionPrices,
   getFldaPlayers,
-  getFldaTeamFixtures,
   getFldaTeamGuide,
   getFldaTeamHierarchies,
 } from './flda'
 import type {
-  FldaBulkHistoryResponse,
-  FldaFixtureContext,
   FldaPlayer,
   FldaPlayerDetail,
   FldaRecord,
 } from './flda'
-import { buildFldaICaV2Input, buildICaReferences, calculateICaV2 } from '../domain/icaV2'
-import type {
-  ICaCoachRole,
-  ICaFixture,
-  ICaReferences,
-  ICaV2Result,
-} from '../domain/icaV2'
 import {
   getFldaIdFromLegacyId,
   getLegacyIdFromFldaId,
@@ -40,207 +29,9 @@ export interface PlayersDataset {
 const detailCache = new Map<string, FldaPlayerDetail>()
 const detailRequests = new Map<string, Promise<FldaPlayerDetail>>()
 const guideCache = new Map<string, FldaRecord>()
-const coachRolesCache = new Map<string, ICaCoachRole[]>()
 const guideRequests = new Map<string, Promise<FldaRecord>>()
-const fixtureCache = new Map<string, FldaRecord[]>()
-const fixtureRequests = new Map<string, Promise<FldaRecord[]>>()
 let dataset: PlayersDataset | null = null
 let datasetRequest: Promise<PlayersDataset> | null = null
-
-export type BulkHistoryStatus = 'idle' | 'loading' | 'loaded' | 'error'
-
-export interface BulkHistoryState {
-  status: BulkHistoryStatus
-  byPlayerId: ReadonlyMap<string, FldaRecord[]>
-  references?: ICaReferences
-  error?: string
-}
-
-let historyState: BulkHistoryState = { status: 'idle', byPlayerId: new Map() }
-let historyRequest: Promise<BulkHistoryState> | null = null
-let icaV2Cache = new Map<string, ICaV2Result>()
-
-function indexBulkHistory(response: FldaBulkHistoryResponse): Map<string, FldaRecord[]> {
-  const byPlayerId = new Map<string, FldaRecord[]>()
-  for (const player of response.players) {
-    if (!player.player_id || byPlayerId.has(player.player_id)) {
-      throw new Error('Storico bulk FLDA non valido: player_id mancante o duplicato.')
-    }
-    byPlayerId.set(player.player_id, player.history)
-  }
-  return byPlayerId
-}
-
-function fixtureContextForRole(
-  role: string,
-): FldaFixtureContext {
-  return role.toUpperCase() === 'P'
-    ? 'goalkeeper'
-    : 'attacker'
-}
-
-function asICaFixtures(
-  rows: FldaRecord[],
-): ICaFixture[] {
-  return rows.flatMap((row): ICaFixture[] => {
-    const day =
-      typeof row.day === 'number'
-        ? row.day
-        : undefined
-
-    const difficulty =
-      row.difficulty_category === 'easy'
-      || row.difficulty_category === 'medium'
-      || row.difficulty_category === 'difficult'
-        ? row.difficulty_category
-        : undefined
-
-    return [{
-      day,
-      difficulty_category: difficulty,
-    }]
-  })
-}
-
-async function rebuildICaV2Cache(): Promise<void> {
-  icaV2Cache = new Map()
-
-  const currentDataset = dataset
-
-  if (
-    currentDataset?.source !== 'flda'
-    || historyState.status !== 'loaded'
-  ) {
-    return
-  }
-
-  const fixtureKeys = new Map<
-    string,
-    {
-      team: string
-      context: FldaFixtureContext
-    }
-  >()
-
-  for (const player of currentDataset.players) {
-    const context =
-      fixtureContextForRole(player.role)
-
-    const key =
-      `${player.team}|${context}`
-
-    if (!fixtureKeys.has(key)) {
-      fixtureKeys.set(key, {
-        team: player.team,
-        context,
-      })
-    }
-  }
-
-  await Promise.all(
-    [...fixtureKeys.values()].map(
-      ({ team, context }) =>
-        loadTeamFixtures(
-          team,
-          context,
-        ).catch(() => []),
-    ),
-  )
-
-  const inputs =
-  currentDataset.players.flatMap((player) => {
-      if (!player.player_id) {
-        return []
-      }
-
-      const context =
-        fixtureContextForRole(
-          player.role,
-        )
-
-      const fixtures =
-        getCachedTeamFixtures(
-          player.team,
-          context,
-        ) ?? []
-
-      return [{
-        ...buildFldaICaV2Input(
-          player,
-          historyState.byPlayerId.get(
-            player.player_id,
-          ) ?? [],
-        ),
-
-        rolePlayers:
-          currentDataset.players,
-
-        coachRoles:
-          coachRolesCache.get(
-            player.team,
-          ) ?? [],
-
-        fixtures:
-          asICaFixtures(
-            fixtures,
-          ),
-
-        currentMatchday: 4,
-      }]
-    })
-
-  const references =
-    buildICaReferences(inputs)
-
-  historyState = {
-    ...historyState,
-    references,
-  }
-
-  for (const input of inputs) {
-    if (!input.player.player_id) {
-      continue
-    }
-
-    icaV2Cache.set(
-      input.player.player_id,
-      calculateICaV2(
-        input,
-        references,
-      ),
-    )
-  }
-}
-
-export function loadBulkHistory(force = false): Promise<BulkHistoryState> {
-  if (historyState.status === 'loaded' && !force) return Promise.resolve(historyState)
-  if (historyRequest) return historyRequest
-  historyState = { status: 'loading', byPlayerId: historyState.byPlayerId }
-  historyRequest = getFldaBulkHistory(3)
-  .then(async (response) => {
-    historyState = {
-      status: 'loaded',
-      byPlayerId: indexBulkHistory(response),
-    }
-
-    await rebuildICaV2Cache()
-
-    return historyState
-  })
-    .catch((error: unknown) => {
-      historyState = { status: 'error', byPlayerId: new Map(), error: readableError(error) }
-      icaV2Cache = new Map()
-      
-      return historyState
-    })
-    .finally(() => { historyRequest = null })
-  return historyRequest
-}
-
-export function getBulkHistoryState(): BulkHistoryState { return historyState }
-export function getCachedICaV2(playerId: string): ICaV2Result | undefined {
-  return historyState.status === 'loaded' ? icaV2Cache.get(playerId) : undefined
-}
 
 function legacyAsFlda(player: Player): FldaPlayer {
   return {
@@ -305,28 +96,7 @@ async function enrichPlayerSignals(players: FldaPlayer[]): Promise<FldaPlayer[]>
     signals.set(id, current)
     return current
   }
-  for (const { team, guide, hierarchies } of bundles) {
-    const keyRoles = Array.isArray(guide.key_roles)
-  ? (guide.key_roles as FldaRecord[])
-      .flatMap((row): ICaCoachRole[] => {
-        if (!row || typeof row !== 'object') return []
-        const role =
-          typeof row.role === 'string'
-            ? row.role
-            : null
-
-        const tone =
-          row.tone === 'good' || row.tone === 'bad'
-            ? row.tone
-            : null
-
-        return role && tone
-          ? [{ role, tone }]
-          : []
-      })
-  : []
-
-coachRolesCache.set(team, keyRoles)
+  for (const { guide, hierarchies } of bundles) {
     const starting = guide.starting_xi
     if (Array.isArray(starting)) {
       for (const row of starting as FldaRecord[]) {
@@ -354,15 +124,12 @@ export async function loadPlayersDataset(
   if (dataset && !force) return dataset
   if (datasetRequest && !force) return datasetRequest
 
-  const bulkHistory = loadBulkHistory(force)
   datasetRequest = getFldaPlayers()
     .then(async (page) => {
       const players = await enrichPlayerSignals(page.players)
       const byId = indexFldaPlayers(players)
       initializePlayerIdentity(legacyPlayers, players)
       dataset = { source: 'flda', players, byId }
-      await bulkHistory
-      await rebuildICaV2Cache()
       return dataset
     })
     .catch((error: unknown) => {
@@ -467,30 +234,4 @@ export async function loadTeamGuide(team: string): Promise<FldaRecord> {
 
 export function getCachedTeamGuide(team: string): FldaRecord | undefined {
   return guideCache.get(team)
-}
-
-export async function loadTeamFixtures(
-  team: string,
-  context: FldaFixtureContext,
-): Promise<FldaRecord[]> {
-  const key = `${team}|${context}`
-  const cached = fixtureCache.get(key)
-  if (cached) return cached
-  const pending = fixtureRequests.get(key)
-  if (pending) return pending
-  const request = getFldaTeamFixtures(team, context)
-    .then((value) => {
-      fixtureCache.set(key, value)
-      return value
-    })
-    .finally(() => fixtureRequests.delete(key))
-  fixtureRequests.set(key, request)
-  return request
-}
-
-export function getCachedTeamFixtures(
-  team: string,
-  context: FldaFixtureContext,
-): FldaRecord[] | undefined {
-  return fixtureCache.get(`${team}|${context}`)
 }

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { ICA_V3_PARAMETERS, calculateICaV3, expectedFm, expectedShare, fmAdjustments } from '../src/domain/icaV3.ts'
+import { ICA_V3_PARAMETERS, calculateICaV3, coachRoleTone, expectedFm, expectedShare, fmAdjustments } from '../src/domain/icaV3.ts'
 
 const K = ICA_V3_PARAMETERS.adjustmentScale
 import type { ICaV3Input } from '../src/domain/icaV3.ts'
@@ -40,6 +40,14 @@ test('grid ease adds or removes FM by role weight', () => {
   assert.equal(hard[0].value.toFixed(3), (-0.6 * K).toFixed(3))
   // squadra nella media: nessun correttivo
   assert.equal(fmAdjustments({ ...attacker('z'), easeIndex: 0 }).length, 0)
+})
+
+test('coach key roles are matched through Mantra roles', () => {
+  const roles = [{ role: 'att-center', tone: 'good' }, { role: 'def-fullbacks', tone: 'bad' }]
+  assert.equal(coachRoleTone(['Pc'], roles), 'good')
+  assert.equal(coachRoleTone(['Dd'], roles), 'bad')
+  assert.equal(coachRoleTone(['C'], roles), 'neutral')
+  assert.equal(coachRoleTone(['Pc', 'Dd'], roles), 'neutral')
 })
 
 test('injuries reduce expected appearances up to the configured cap', () => {
