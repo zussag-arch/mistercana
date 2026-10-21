@@ -116,20 +116,26 @@ function percentileRank(sorted: number[], value: number): number {
 }
 
 function roleMeanFm(inputs: ICaV3Input[]): number | undefined {
-  const values = inputs.filter((input) => finite(input.fm) && (input.appearances ?? 0) >= 3).map((input) => input.fm as number)
+  const values = inputs.filter((input) => validFm(input.fm) && (input.appearances ?? 0) >= 3).map((input) => input.fm as number)
   if (!values.length) return undefined
   return values.reduce((sum, value) => sum + value, 0) / values.length
+}
+
+// Una fantamedia pari a 0 non è un voto: nei listoni significa "dato mancante"
+// (es. stagione in Serie B senza voti). Va ignorata, non contata come 0.
+function validFm(value: unknown): value is number {
+  return finite(value) && value > 0
 }
 
 export function expectedFm(input: ICaV3Input, prior: number | undefined): number | undefined {
   const p = ICA_V3_PARAMETERS
   let weight = 0
   let total = 0
-  if (finite(input.fm) && finite(input.appearances) && input.appearances > 0) {
+  if (validFm(input.fm) && finite(input.appearances) && input.appearances > 0) {
     weight += input.appearances
     total += input.fm * input.appearances
   }
-  if (finite(input.previousFm) && finite(input.previousAppearances) && input.previousAppearances > 0) {
+  if (validFm(input.previousFm) && finite(input.previousAppearances) && input.previousAppearances > 0) {
     const w = Math.min(input.previousAppearances, p.previousSeasonMaxMatches) * p.previousSeasonWeight
     weight += w
     total += input.previousFm * w
