@@ -23,7 +23,7 @@
   flex-direction: column;
   gap: 4px;
   padding: 16px 18px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(var(--ink-rgb), 0.07);
   border-radius: var(--radius-md);
   background: var(--surface-light);
 }
@@ -100,7 +100,7 @@
 /* FLDA: facoltativo, chiuso di default */
 .flda-optional {
   margin-bottom: 18px;
-  border: 1px dashed rgba(255, 255, 255, 0.13);
+  border: 1px dashed rgba(var(--ink-rgb), 0.13);
   border-radius: var(--radius-xl);
 }
 
@@ -285,7 +285,7 @@
 
 .csv-preview-item.is-error header span {
   background: var(--red);
-  color: #2b0a0a;
+  color: var(--on-color);
 }
 
 .csv-preview-item ul {

@@ -13,6 +13,10 @@ import './styles/theme-v3-auction.css'
 import './styles/theme-v3-dashboard.css'
 import './styles/theme-v3-objectives.css'
 import './styles/theme-v3-data.css'
+import './styles/theme-light.css'
+import { initTheme } from './theme'
+
+initTheme()
 
 import {
   renderNavigation,

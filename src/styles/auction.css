@@ -10,7 +10,7 @@
 .auction-kicker {
   display: block;
 
-  color: #777e82;
+  color: var(--muted);
 
   font-size: 10px;
   font-weight: 850;
@@ -20,7 +20,7 @@
 
 .auction-demo-label,
 .auction-real-label {
-  color: #6e7579;
+  color: var(--muted);
 
   font-size: 10px;
   font-weight: 800;
@@ -33,15 +33,15 @@
 
   border:
     1px solid
-    rgba(70, 230, 161, 0.28);
+    color-mix(in srgb, var(--accent) 28%, transparent);
 
   border-radius:
     var(--radius-pill);
 
   background:
-    rgba(70, 230, 161, 0.1);
+    color-mix(in srgb, var(--accent) 10%, transparent);
 
-  color: #75f0b8;
+  color: var(--accent);
 }
 
 /* =========================
@@ -67,7 +67,7 @@
 
   border-bottom:
     1px solid
-    #2d3134;
+    var(--line-2);
 }
 
 .auction-live-title {
@@ -94,7 +94,7 @@
 
 .auction-role-switcher > span,
 .auction-toolbar-stat span {
-  color: #7d8488;
+  color: var(--muted);
 
   font-size: 11px;
 }
@@ -106,11 +106,11 @@
 
   border:
     1px solid
-    rgba(255, 255, 255, 0.09);
+    rgba(var(--ink-rgb), 0.09);
 
   border-radius: 16px;
 
-  background: #191b1d;
+  background: var(--surface);
 }
 
 .auction-role-tab {
@@ -123,7 +123,7 @@
 
   background: transparent;
 
-  color: #858b8f;
+  color: var(--muted);
 
   font-size: 10px;
   font-weight: 850;
@@ -132,9 +132,9 @@
 }
 
 .auction-role-tab.active {
-  background: #35393c;
+  background: var(--surface-raised);
 
-  color: #ffffff;
+  color: var(--text);
 }
 
 .auction-toolbar-stat {
@@ -145,7 +145,7 @@
 }
 
 .auction-toolbar-stat strong {
-  color: #ffffff;
+  color: var(--text);
 
   font-size: 19px;
 }
@@ -164,13 +164,13 @@
 
   border:
     1px solid
-    #3b4043;
+    var(--line-2);
 
   border-radius: 14px;
 
-  background: #202325;
+  background: var(--surface-light);
 
-  color: #d2d5d7;
+  color: var(--text-soft);
 
   font-size: 11px;
   font-weight: 750;
@@ -186,12 +186,12 @@
 
 .auction-quick-nav {
   border-color:
-    rgba(90, 168, 255, 0.25);
+    color-mix(in srgb, var(--blue) 25%, transparent);
 
   background:
-    rgba(90, 168, 255, 0.07);
+    color-mix(in srgb, var(--blue) 7%, transparent);
 
-  color: #83bcff;
+  color: var(--blue);
 }
 
 .live-badge {
@@ -204,15 +204,15 @@
 
   border:
     1px solid
-    rgba(70, 230, 161, 0.32);
+    color-mix(in srgb, var(--accent) 32%, transparent);
 
   border-radius:
     var(--radius-pill);
 
   background:
-    rgba(70, 230, 161, 0.12);
+    color-mix(in srgb, var(--accent) 12%, transparent);
 
-  color: #82f2c0;
+  color: var(--accent);
 
   font-size: 10px;
   font-weight: 900;
@@ -220,12 +220,12 @@
 
 .live-badge.finalizing-badge {
   border-color:
-    rgba(231, 201, 76, 0.32);
+    color-mix(in srgb, var(--yellow) 32%, transparent);
 
   background:
-    rgba(231, 201, 76, 0.12);
+    color-mix(in srgb, var(--yellow) 12%, transparent);
 
-  color: #f0d96a;
+  color: var(--yellow);
 }
 
 /* =========================
@@ -249,21 +249,21 @@
 
   border:
     1px solid
-    rgba(255, 255, 255, 0.08);
+    rgba(var(--ink-rgb), 0.08);
 
   border-radius: 22px;
 
   background:
     linear-gradient(
       180deg,
-      rgba(255, 255, 255, 0.016),
-      rgba(255, 255, 255, 0.005)
+      rgba(var(--ink-rgb), 0.016),
+      rgba(var(--ink-rgb), 0.005)
     ),
-    #121416;
+    var(--bg);
 
   box-shadow:
     inset 0 1px 0
-    rgba(255, 255, 255, 0.025);
+    rgba(var(--ink-rgb), 0.025);
 }
 
 .auction-search-copy {
@@ -301,13 +301,13 @@
 
   border:
     1px solid
-    #3a3f42;
+    var(--line-2);
 
   border-radius: 15px;
 
-  background: #191c1e;
+  background: var(--surface);
 
-  color: #d9dcde;
+  color: var(--text-soft);
 
   text-align: left;
 
@@ -316,10 +316,10 @@
 
 .auction-call-selector.primary {
   border-color:
-    rgba(70, 230, 161, 0.3);
+    color-mix(in srgb, var(--accent) 30%, transparent);
 
   background:
-    rgba(70, 230, 161, 0.08);
+    color-mix(in srgb, var(--accent) 8%, transparent);
 }
 
 .auction-call-selector > span {
@@ -333,7 +333,7 @@
 
   border-radius: 10px;
 
-  background: #292d2f;
+  background: var(--surface-raised);
 }
 
 .auction-call-selector > div {
@@ -346,7 +346,7 @@
 }
 
 .auction-call-selector small {
-  color: #737a7e;
+  color: var(--muted);
 
   font-size: 9px;
 }
@@ -398,13 +398,13 @@
 
   border:
     1px solid
-    #363b3e;
+    var(--line-2);
 
   border-radius: 12px;
 
-  background: #191c1e;
+  background: var(--surface);
 
-  color: #bfc4c7;
+  color: var(--text-soft);
 
   font-size: 10px;
   font-weight: 750;
@@ -413,11 +413,11 @@
 }
 
 .auction-team-choice.selected {
-  border-color: #646b6f;
+  border-color: var(--line-1);
 
-  background: #292d30;
+  background: var(--surface-raised);
 
-  color: #ffffff;
+  color: var(--text);
 }
 
 .auction-selector-search {
@@ -432,15 +432,15 @@
 
   border:
     1px solid
-    #3a3f42;
+    var(--line-2);
 
   border-radius: 14px;
 
   outline: none;
 
-  background: #17191b;
+  background: var(--surface);
 
-  color: #ffffff;
+  color: var(--text);
 }
 
 .auction-selected-team {
@@ -455,11 +455,11 @@
 
   border:
     1px solid
-    #34393c;
+    var(--line-2);
 
   border-radius: 13px;
 
-  background: #1b1e20;
+  background: var(--surface-light);
 
   font-size: 10px;
 }
@@ -471,7 +471,7 @@
 
   background: transparent;
 
-  color: #82f2c0;
+  color: var(--accent);
 
   font-size: 10px;
 
@@ -512,9 +512,9 @@
 
   border-radius: 13px;
 
-  background: #191c1e;
+  background: var(--surface);
 
-  color: #ffffff;
+  color: var(--text);
 
   text-align: left;
 
@@ -546,13 +546,13 @@
 }
 
 .auction-selector-player small {
-  color: #747b7f;
+  color: var(--muted);
 
   font-size: 9px;
 }
 
 .auction-selector-player em {
-  color: #75f0b8;
+  color: var(--accent);
 
   font-size: 10px;
   font-style: normal;
@@ -574,7 +574,7 @@
 
   border-radius: 9px;
 
-  color: #111111;
+  color: var(--on-color);
 
   font-size: 10px;
   font-weight: 900;
@@ -593,8 +593,8 @@
   background:
     linear-gradient(
       135deg,
-      #e3c748,
-      #f2dc69
+      var(--yellow),
+      var(--yellow)
     );
 }
 
@@ -602,8 +602,8 @@
   background:
     linear-gradient(
       135deg,
-      #397ed5,
-      #61a8ff
+      var(--blue),
+      var(--blue)
     );
 }
 
@@ -611,8 +611,8 @@
   background:
     linear-gradient(
       135deg,
-      #32a967,
-      #55d88a
+      var(--accent),
+      var(--accent)
     );
 }
 
@@ -620,8 +620,8 @@
   background:
     linear-gradient(
       135deg,
-      #cc4d4d,
-      #f07171
+      var(--red),
+      var(--red)
     );
 }
 
@@ -667,17 +667,17 @@
 
   border:
     1px solid
-    rgba(70, 230, 161, 0.13);
+    color-mix(in srgb, var(--accent) 13%, transparent);
 
   border-radius: 17px;
 
   background:
     linear-gradient(
       180deg,
-      rgba(255, 255, 255, 0.014),
-      rgba(255, 255, 255, 0.004)
+      rgba(var(--ink-rgb), 0.014),
+      rgba(var(--ink-rgb), 0.004)
     ),
-    #151819;
+    var(--surface);
 }
 
 .auction-roster-metric-card h3 {
@@ -707,20 +707,20 @@
 
   border-radius: 10px;
 
-  background: #1b1e20;
+  background: var(--surface-light);
 
   text-align: center;
 }
 
 .auction-roster-metric-values span {
-  color: #777f83;
+  color: var(--muted);
 
   font-size: 10px;
   font-weight: 850;
 }
 
 .auction-roster-metric-values strong {
-  color: #dfe5e2;
+  color: var(--text);
 
   font-size: 13px;
 
@@ -738,21 +738,21 @@
 
   border:
     1px solid
-    rgba(255, 255, 255, 0.08);
+    rgba(var(--ink-rgb), 0.08);
 
   border-radius: 24px;
 
   background:
     linear-gradient(
       180deg,
-      rgba(255, 255, 255, 0.018),
-      rgba(255, 255, 255, 0.005)
+      rgba(var(--ink-rgb), 0.018),
+      rgba(var(--ink-rgb), 0.005)
     ),
-    #121416;
+    var(--bg);
 
   box-shadow:
     inset 0 1px 0
-    rgba(255, 255, 255, 0.025);
+    rgba(var(--ink-rgb), 0.025);
 }
 
 .auction-player-header {
@@ -766,7 +766,7 @@
 
   border-bottom:
     1px solid
-    #303538;
+    var(--line-2);
 }
 
 .auction-player-identity {
@@ -786,7 +786,7 @@
 .auction-player-identity p {
   margin: 5px 0 0;
 
-  color: #898f93;
+  color: var(--muted);
 
   font-size: 11px;
 }
@@ -802,15 +802,15 @@
 
   border:
     1px solid
-    rgba(70, 230, 161, 0.38);
+    color-mix(in srgb, var(--accent) 38%, transparent);
 
   border-radius:
     var(--radius-pill);
 
   background:
-    rgba(70, 230, 161, 0.15);
+    color-mix(in srgb, var(--accent) 15%, transparent);
 
-  color: #8df4c7;
+  color: var(--accent);
 
   font-size: 9px;
   font-weight: 850;
@@ -818,12 +818,12 @@
 
 .auction-availability.assigned {
   border-color:
-    rgba(242, 154, 90, 0.42);
+    color-mix(in srgb, var(--orange) 42%, transparent);
 
   background:
-    rgba(242, 154, 90, 0.16);
+    color-mix(in srgb, var(--orange) 16%, transparent);
 
-  color: #f5ad79;
+  color: var(--orange);
 }
 
 /* =========================
@@ -848,11 +848,11 @@
 
   border:
     1px solid
-    #313639;
+    var(--line-2);
 
   border-radius: 19px;
 
-  background: #151719;
+  background: var(--surface);
 }
 
 .auction-main-value {
@@ -868,23 +868,23 @@
 
   border:
     1px solid
-    rgba(255, 255, 255, 0.045);
+    rgba(var(--ink-rgb), 0.045);
 
   border-radius: 15px;
 
-  background: #191c1e;
+  background: var(--surface);
 }
 
 .auction-main-value.featured {
   border-color:
-    rgba(70, 230, 161, 0.16);
+    color-mix(in srgb, var(--accent) 16%, transparent);
 
   background:
-    rgba(70, 230, 161, 0.04);
+    color-mix(in srgb, var(--accent) 4%, transparent);
 }
 
 .auction-main-value span {
-  color: #82898d;
+  color: var(--muted);
 
   font-size: 10px;
 }
@@ -895,23 +895,23 @@
 }
 
 .auction-main-value.featured strong {
-  color: #46e6a1;
+  color: var(--accent);
 }
 
 .auction-main-value.auction-history-value {
   border-color:
-    rgba(231, 201, 76, 0.16);
+    color-mix(in srgb, var(--yellow) 16%, transparent);
 
   background:
-    rgba(231, 201, 76, 0.035);
+    color-mix(in srgb, var(--yellow) 4%, transparent);
 }
 
 .auction-main-value.auction-history-value strong {
-  color: #e7c94c;
+  color: var(--yellow);
 }
 
 .auction-main-value.auction-history-value small {
-  color: #77745f;
+  color: var(--muted-soft);
 
   font-size: 9px;
 }
@@ -945,13 +945,13 @@
 }
 
 .auction-insight-row span {
-  color: #838a8e;
+  color: var(--muted);
 
   font-size: 10px;
 }
 
 .auction-insight-row strong {
-  color: #dfe3e5;
+  color: var(--text);
 
   font-size: 11px;
 
@@ -976,7 +976,7 @@
 .auction-starting-insight > strong {
   min-width: 34px;
 
-  color: #75f0b8;
+  color: var(--accent);
 
   font-weight: 900;
 
@@ -992,7 +992,7 @@
   border-radius:
     var(--radius-pill);
 
-  background: #303538;
+  background: var(--surface-raised);
 }
 
 .auction-insight-progress > span {
@@ -1006,8 +1006,8 @@
   background:
     linear-gradient(
       90deg,
-      #2fbf83,
-      #46e6a1
+      var(--accent),
+      var(--accent)
     );
 
   transform-origin: left center;
@@ -1027,11 +1027,11 @@
 
   border:
     1px solid
-    #34393c;
+    var(--line-2);
 
   border-radius: 20px;
 
-  background: #151719;
+  background: var(--surface);
 }
 
 .auction-price-summary {
@@ -1060,15 +1060,15 @@
 
   border:
     1px solid
-    rgba(255, 255, 255, 0.045);
+    rgba(var(--ink-rgb), 0.045);
 
   border-radius: 16px;
 
-  background: #191c1e;
+  background: var(--surface);
 }
 
 .auction-recommendation-primary span {
-  color: #858c90;
+  color: var(--muted);
 
   font-size: 11px;
   font-weight: 800;
@@ -1077,7 +1077,7 @@
 }
 
 .auction-recommendation-primary strong {
-  color: #ffffff;
+  color: var(--text);
 
   font-size: 22px;
 
@@ -1086,7 +1086,7 @@
 }
 
 .auction-recommendation-primary small {
-  color: #747b7f;
+  color: var(--muted);
 
   font-size: 9px;
 }
@@ -1118,15 +1118,15 @@
 
   border:
     1px solid
-    rgba(255, 255, 255, 0.045);
+    rgba(var(--ink-rgb), 0.045);
 
   border-radius: 15px;
 
-  background: #191c1e;
+  background: var(--surface);
 }
 
 .auction-price-limit span {
-  color: #7b8286;
+  color: var(--muted);
 
   font-size: 10px;
   font-weight: 800;
@@ -1143,7 +1143,7 @@
 }
 
 .auction-price-limit small {
-  color: #6f767a;
+  color: var(--muted);
 
   font-size: 9px;
   line-height: 1.25;
@@ -1151,29 +1151,29 @@
 
 .auction-price-limit.value {
   border-color:
-    rgba(70, 230, 161, 0.35);
+    color-mix(in srgb, var(--accent) 35%, transparent);
 }
 
 .auction-price-limit.value strong {
-  color: #46e6a1;
+  color: var(--accent);
 }
 
 .auction-price-limit.role {
   border-color:
-    rgba(231, 201, 76, 0.4);
+    color-mix(in srgb, var(--yellow) 40%, transparent);
 }
 
 .auction-price-limit.role strong {
-  color: #e7c94c;
+  color: var(--yellow);
 }
 
 .auction-price-limit.financial {
   border-color:
-    rgba(228, 94, 94, 0.4);
+    color-mix(in srgb, var(--red) 40%, transparent);
 }
 
 .auction-price-limit.financial strong {
-  color: #e45e5e;
+  color: var(--red);
 }
 
 /* =========================
@@ -1205,7 +1205,7 @@
 }
 
 .auction-live-price-field > span {
-  color: #7c8387;
+  color: var(--muted);
 
   font-size: 10px;
 }
@@ -1218,15 +1218,15 @@
 
   border:
     1px solid
-    #3b4043;
+    var(--line-2);
 
   border-radius: 13px;
 
   outline: none;
 
-  background: #17191b;
+  background: var(--surface);
 
-  color: #ffffff;
+  color: var(--text);
 
   font-size: 16px;
   font-weight: 800;
@@ -1251,14 +1251,14 @@
 
   border:
     1px solid
-    rgba(90, 168, 255, 0.3);
+    color-mix(in srgb, var(--blue) 30%, transparent);
 
   border-radius: 13px;
 
   background:
-    rgba(90, 168, 255, 0.08);
+    color-mix(in srgb, var(--blue) 8%, transparent);
 
-  color: #95c6ff;
+  color: var(--blue);
 
   font-size: 11px;
   font-weight: 900;
@@ -1287,26 +1287,26 @@
 .auction-primary-action {
   border:
     1px solid
-    rgba(70, 230, 161, 0.5);
+    color-mix(in srgb, var(--accent) 50%, transparent);
 
   background:
     linear-gradient(
       180deg,
-      #46e6a1,
-      #2fbf83
+      var(--accent),
+      var(--accent)
     );
 
-  color: #0c1712;
+  color: var(--on-color);
 }
 
 .auction-secondary-action {
   border:
     1px solid
-    #3a3f42;
+    var(--line-2);
 
-  background: #222527;
+  background: var(--surface-light);
 
-  color: #d3d6d8;
+  color: var(--text-soft);
 }
 
 /* =========================
@@ -1320,14 +1320,14 @@
 
   border:
     1px solid
-    rgba(90, 168, 255, 0.12);
+    color-mix(in srgb, var(--blue) 12%, transparent);
 
   border-radius: 14px;
 
   background:
-    rgba(90, 168, 255, 0.055);
+    color-mix(in srgb, var(--blue) 6%, transparent);
 
-  color: #c2d9ef;
+  color: var(--blue);
 
   font-size: 11px;
 
@@ -1366,14 +1366,14 @@
 
   border:
     1px solid
-    rgba(242, 154, 90, 0.25);
+    color-mix(in srgb, var(--orange) 25%, transparent);
 
   border-radius: 14px;
 
   background:
-    rgba(242, 154, 90, 0.08);
+    color-mix(in srgb, var(--orange) 8%, transparent);
 
-  color: #9ca1a4;
+  color: var(--muted);
 
   font-size: 10px;
 }
@@ -1385,13 +1385,13 @@
 
   border:
     1px solid
-    #3a3f42;
+    var(--line-2);
 
   border-radius: 10px;
 
-  background: #25292b;
+  background: var(--surface-raised);
 
-  color: #cbd0d2;
+  color: var(--text-soft);
 
   font-size: 9px;
 
@@ -1456,21 +1456,21 @@
 
   border:
     1px solid
-    rgba(255, 255, 255, 0.08);
+    rgba(var(--ink-rgb), 0.08);
 
   border-radius: 22px;
 
   background:
     linear-gradient(
       180deg,
-      rgba(255, 255, 255, 0.016),
-      rgba(255, 255, 255, 0.004)
+      rgba(var(--ink-rgb), 0.016),
+      rgba(var(--ink-rgb), 0.004)
     ),
-    #121416;
+    var(--bg);
 
   box-shadow:
     inset 0 1px 0
-    rgba(255, 255, 255, 0.025);
+    rgba(var(--ink-rgb), 0.025);
 }
 
 .auction-panel-title {
@@ -1484,7 +1484,7 @@
 
   border-bottom:
     1px solid
-    #303538;
+    var(--line-2);
 }
 
 .auction-panel-title h3 {
@@ -1495,7 +1495,7 @@
 
 .auction-suggested-panel {
   border-color:
-    rgba(70, 230, 161, 0.22);
+    color-mix(in srgb, var(--accent) 22%, transparent);
 }
 
 /* =========================
@@ -1509,12 +1509,12 @@
 
   border:
     1px solid
-    rgba(70, 230, 161, 0.28);
+    color-mix(in srgb, var(--accent) 28%, transparent);
 
   border-radius: 17px;
 
   background:
-    rgba(70, 230, 161, 0.045);
+    color-mix(in srgb, var(--accent) 4%, transparent);
 }
 
 .auction-recommendation-name-button {
@@ -1528,7 +1528,7 @@
 
   background: transparent;
 
-  color: #eef3f0;
+  color: var(--text);
 
   font: inherit;
 
@@ -1550,7 +1550,7 @@
 }
 
 .auction-recommendation-name-button:hover {
-  color: #67edb2;
+  color: var(--accent);
 }
 
 .auction-recommendation-name-button:focus-visible {
@@ -1558,7 +1558,7 @@
 
   outline:
     2px solid
-    rgba(70, 230, 161, 0.72);
+    color-mix(in srgb, var(--accent) 72%, transparent);
 
   outline-offset: 3px;
 }
@@ -1575,15 +1575,15 @@
 
   border:
     1px solid
-    rgba(70, 230, 161, 0.28);
+    color-mix(in srgb, var(--accent) 28%, transparent);
 
   border-radius:
     var(--radius-pill);
 
   background:
-    rgba(70, 230, 161, 0.08);
+    color-mix(in srgb, var(--accent) 8%, transparent);
 
-  color: #9cf4ca;
+  color: var(--accent);
 
   font: inherit;
 
@@ -1615,7 +1615,7 @@
 .auction-call-recommendation-head strong {
   overflow: hidden;
 
-  color: #f5f8f7;
+  color: var(--text);
 
   font-size: 16px;
   font-weight: 900;
@@ -1625,7 +1625,7 @@
 
 .auction-call-recommendation-head
 span:not(.auction-role-badge) {
-  color: #858d89;
+  color: var(--muted);
 
   font-size: 10px;
 }
@@ -1641,7 +1641,7 @@ span:not(.auction-role-badge) {
 
   border-top:
     1px solid
-    rgba(255, 255, 255, 0.06);
+    rgba(var(--ink-rgb), 0.06);
 }
 
 .auction-call-reason {
@@ -1664,9 +1664,9 @@ span:not(.auction-role-badge) {
   border-radius: 50%;
 
   background:
-    rgba(70, 230, 161, 0.12);
+    color-mix(in srgb, var(--accent) 12%, transparent);
 
-  color: #46e6a1;
+  color: var(--accent);
 
   font-size: 10px;
 }
@@ -1674,7 +1674,7 @@ span:not(.auction-role-badge) {
 .auction-call-reason p {
   margin: 1px 0 0;
 
-  color: #b8c0bc;
+  color: var(--text-soft);
 
   font-size: 10px;
   line-height: 1.35;
@@ -1704,11 +1704,11 @@ span:not(.auction-role-badge) {
 
   border:
     1px solid
-    rgba(255, 255, 255, 0.055);
+    rgba(var(--ink-rgb), 0.055);
 
   border-radius: 11px;
 
-  color: #737b77;
+  color: var(--muted);
 
   font-size: 10px;
 
@@ -1716,7 +1716,7 @@ span:not(.auction-role-badge) {
 }
 
 .auction-call-meta strong {
-  color: #eef3f0;
+  color: var(--text);
 
   font-size: 10px;
 
@@ -1750,16 +1750,16 @@ span:not(.auction-role-badge) {
 .auction-call-primary-button {
   border:
     1px solid
-    rgba(70, 230, 161, 0.55);
+    color-mix(in srgb, var(--accent) 55%, transparent);
 
   background:
     linear-gradient(
       180deg,
-      #46e6a1,
-      #30c68a
+      var(--accent),
+      var(--accent)
     );
 
-  color: #0c1712;
+  color: var(--on-color);
 }
 
 .auction-call-discard-button {
@@ -1767,12 +1767,12 @@ span:not(.auction-role-badge) {
 
   border:
     1px solid
-    rgba(228, 94, 94, 0.28);
+    color-mix(in srgb, var(--red) 28%, transparent);
 
   background:
-    rgba(228, 94, 94, 0.065);
+    color-mix(in srgb, var(--red) 6%, transparent);
 
-  color: #df8585;
+  color: var(--red);
 }
 
 .auction-call-alternatives {
@@ -1784,7 +1784,7 @@ span:not(.auction-role-badge) {
 }
 
 .auction-call-alternatives-title {
-  color: #747b7f;
+  color: var(--muted);
 
   font-size: 9px;
   font-weight: 800;
@@ -1813,11 +1813,11 @@ span:not(.auction-role-badge) {
 
   border:
     1px solid
-    #303538;
+    var(--line-2);
 
   border-radius: 12px;
 
-  background: #181b1d;
+  background: var(--surface);
 }
 
 .auction-call-alternative > div {
@@ -1830,7 +1830,7 @@ span:not(.auction-role-badge) {
 .auction-call-alternative strong {
   overflow: hidden;
 
-  color: #d8ddda;
+  color: var(--text-soft);
 
   font-size: 11px;
 
@@ -1840,7 +1840,7 @@ span:not(.auction-role-badge) {
 }
 
 .auction-call-alternative span {
-  color: #6f7673;
+  color: var(--muted-soft);
 
   font-size: 9px;
 }
@@ -1852,14 +1852,14 @@ span:not(.auction-role-badge) {
 
   border:
     1px solid
-    rgba(70, 230, 161, 0.2);
+    color-mix(in srgb, var(--accent) 20%, transparent);
 
   border-radius: 10px;
 
   background:
-    rgba(70, 230, 161, 0.06);
+    color-mix(in srgb, var(--accent) 6%, transparent);
 
-  color: #82f2c0;
+  color: var(--accent);
 
   font-size: 9px;
 
@@ -1877,7 +1877,7 @@ span:not(.auction-role-badge) {
 
   border-top:
     1px solid
-    rgba(255, 255, 255, 0.055);
+    rgba(var(--ink-rgb), 0.055);
 }
 
 .auction-discarded-toggle {
@@ -1893,14 +1893,14 @@ span:not(.auction-role-badge) {
 
   border:
     1px solid
-    rgba(228, 94, 94, 0.14);
+    color-mix(in srgb, var(--red) 14%, transparent);
 
   border-radius: 11px;
 
   background:
-    rgba(228, 94, 94, 0.035);
+    color-mix(in srgb, var(--red) 4%, transparent);
 
-  color: #9b8585;
+  color: var(--muted);
 
   font-size: 9px;
   font-weight: 800;
@@ -1937,11 +1937,11 @@ span:not(.auction-role-badge) {
 
   border:
     1px solid
-    rgba(255, 255, 255, 0.055);
+    rgba(var(--ink-rgb), 0.055);
 
   border-radius: 11px;
 
-  background: #181a1c;
+  background: var(--surface);
 }
 
 .auction-discarded-row > div {
@@ -1954,7 +1954,7 @@ span:not(.auction-role-badge) {
 .auction-discarded-row strong {
   overflow: hidden;
 
-  color: #b8bdbb;
+  color: var(--text-soft);
 
   font-size: 10px;
 
@@ -1964,7 +1964,7 @@ span:not(.auction-role-badge) {
 }
 
 .auction-discarded-row span {
-  color: #686f72;
+  color: var(--muted-soft);
 
   font-size: 9px;
 }
@@ -1977,14 +1977,14 @@ span:not(.auction-role-badge) {
 
   border:
     1px solid
-    rgba(90, 168, 255, 0.2);
+    color-mix(in srgb, var(--blue) 20%, transparent);
 
   border-radius: 9px;
 
   background:
-    rgba(90, 168, 255, 0.055);
+    color-mix(in srgb, var(--blue) 6%, transparent);
 
-  color: #8ebef5;
+  color: var(--blue);
 
   font-size: 9px;
 
@@ -2004,11 +2004,11 @@ span:not(.auction-role-badge) {
 
   border:
     1px dashed
-    rgba(255, 255, 255, 0.1);
+    rgba(var(--ink-rgb), 0.1);
 
   border-radius: 14px;
 
-  color: #747b7f;
+  color: var(--muted);
 
   font-size: 10px;
 }
@@ -2047,17 +2047,17 @@ span:not(.auction-role-badge) {
 
   border:
     1px solid
-    rgba(255, 255, 255, 0.055);
+    rgba(var(--ink-rgb), 0.055);
 
   border-radius: 11px;
 
-  background: #181b1d;
+  background: var(--surface);
 }
 
 .auction-top-ica-row strong {
   overflow: hidden;
 
-  color: #d6dbd9;
+  color: var(--text-soft);
 
   font-size: 11px;
 
@@ -2067,7 +2067,7 @@ span:not(.auction-role-badge) {
 }
 
 .auction-top-ica-row b {
-  color: #8b9390;
+  color: var(--muted);
 
   font-size: 11px;
 
@@ -2081,13 +2081,13 @@ span:not(.auction-role-badge) {
 
   border:
     1px solid
-    #353b3e;
+    var(--line-2);
 
   border-radius: 9px;
 
-  background: #232729;
+  background: var(--surface-light);
 
-  color: #aeb5b2;
+  color: var(--muted);
 
   font-size: 9px;
   font-weight: 800;
@@ -2123,7 +2123,7 @@ span:not(.auction-role-badge) {
 .overlay-header p {
   margin: 4px 0 0;
 
-  color: #7d8488;
+  color: var(--muted);
 
   font-size: 11px;
 }
@@ -2137,18 +2137,18 @@ span:not(.auction-role-badge) {
 .auction-award-winner-section {
   border:
     1px solid
-    rgba(70, 230, 161, 0.34);
+    color-mix(in srgb, var(--accent) 34%, transparent);
 
   background:
     linear-gradient(
       180deg,
-      rgba(70, 230, 161, 0.085),
-      rgba(70, 230, 161, 0.035)
+      color-mix(in srgb, var(--accent) 8%, transparent),
+      color-mix(in srgb, var(--accent) 4%, transparent)
     );
 
   box-shadow:
     inset 0 1px 0
-    rgba(255, 255, 255, 0.025);
+    rgba(var(--ink-rgb), 0.025);
 }
 
 .auction-award-rival-section {
@@ -2156,9 +2156,9 @@ span:not(.auction-role-badge) {
 
   border:
     1px solid
-    rgba(255, 255, 255, 0.07);
+    rgba(var(--ink-rgb), 0.07);
 
-  background: #181b1d;
+  background: var(--surface);
 }
 
 .auction-award-section-heading {
@@ -2179,7 +2179,7 @@ span:not(.auction-role-badge) {
 }
 
 .auction-award-section-kicker {
-  color: #46e6a1;
+  color: var(--accent);
 
   font-size: 10px;
   font-weight: 950;
@@ -2189,18 +2189,18 @@ span:not(.auction-role-badge) {
 
 .auction-award-rival-section
 .auction-award-section-kicker {
-  color: #838b8f;
+  color: var(--muted);
 }
 
 .auction-award-section-heading strong {
-  color: #e5e9e7;
+  color: var(--text);
 
   font-size: 11px;
 }
 
 .auction-award-rival-section
 .auction-award-section-heading strong {
-  color: #9da3a6;
+  color: var(--muted);
 
   font-size: 11px;
   font-weight: 700;
@@ -2218,9 +2218,9 @@ span:not(.auction-role-badge) {
   border-radius: 50%;
 
   background:
-    rgba(70, 230, 161, 0.14);
+    color-mix(in srgb, var(--accent) 14%, transparent);
 
-  color: #46e6a1;
+  color: var(--accent);
 
   font-size: 15px;
   font-weight: 950;
@@ -2239,15 +2239,15 @@ span:not(.auction-role-badge) {
 
   border:
     1px solid
-    rgba(255, 255, 255, 0.08);
+    rgba(var(--ink-rgb), 0.08);
 
   border-radius:
     var(--radius-pill);
 
   background:
-    rgba(255, 255, 255, 0.035);
+    rgba(var(--ink-rgb), 0.035);
 
-  color: #697175;
+  color: var(--muted-soft);
 
   font-size: 10px;
   font-weight: 850;
@@ -2282,7 +2282,7 @@ span:not(.auction-role-badge) {
 }
 
 .auction-award-field > span {
-  color: #858d90;
+  color: var(--muted);
 
   font-size: 10px;
   font-weight: 750;
@@ -2290,7 +2290,7 @@ span:not(.auction-role-badge) {
 
 .auction-award-winner-section
 .auction-award-field > span {
-  color: #9bb9aa;
+  color: var(--muted);
 }
 
 .auction-award-field input,
@@ -2302,15 +2302,15 @@ span:not(.auction-role-badge) {
 
   border:
     1px solid
-    #3b4043;
+    var(--line-2);
 
   border-radius: 13px;
 
   outline: none;
 
-  background: #141719;
+  background: var(--surface);
 
-  color: #ffffff;
+  color: var(--text);
 
   font-size: 10px;
 }
@@ -2320,7 +2320,7 @@ span:not(.auction-role-badge) {
 .auction-award-winner-section
 .auction-award-field select {
   border-color:
-    rgba(70, 230, 161, 0.21);
+    color-mix(in srgb, var(--accent) 21%, transparent);
 
   background:
     rgba(12, 22, 17, 0.58);
@@ -2348,7 +2348,7 @@ span:not(.auction-role-badge) {
 
   pointer-events: none;
 
-  color: #6f7874;
+  color: var(--muted);
 
   font-size: 10px;
   font-weight: 800;
@@ -2356,11 +2356,11 @@ span:not(.auction-role-badge) {
 
 .auction-award-winner-section
 .auction-award-price-input-wrap input {
-  color: #75f0b8;
+  color: var(--accent);
 }
 
 .auction-award-rival-price-wrap input {
-  color: #c7ccce;
+  color: var(--text-soft);
 }
 
 .auction-award-note {
@@ -2375,22 +2375,22 @@ span:not(.auction-role-badge) {
 
   border:
     1px solid
-    rgba(90, 168, 255, 0.09);
+    color-mix(in srgb, var(--blue) 9%, transparent);
 
   border-radius: 13px;
 
   background:
-    rgba(90, 168, 255, 0.045);
+    color-mix(in srgb, var(--blue) 4%, transparent);
 }
 
 .auction-award-note strong {
-  color: #c6d2d9;
+  color: var(--text-soft);
 
   font-size: 10px;
 }
 
 .auction-award-note span {
-  color: #707c83;
+  color: var(--muted);
 
   font-size: 9px;
   line-height: 1.4;
@@ -2427,7 +2427,7 @@ span:not(.auction-role-badge) {
 
 .auction-award-grid
 label > span {
-  color: #7d8488;
+  color: var(--muted);
 
   font-size: 10px;
 }
@@ -2441,15 +2441,15 @@ label > span {
 
   border:
     1px solid
-    #3b4043;
+    var(--line-2);
 
   border-radius: 14px;
 
   outline: none;
 
-  background: #17191b;
+  background: var(--surface);
 
-  color: #ffffff;
+  color: var(--text);
 
   font-size: 10px;
 }
@@ -2466,21 +2466,21 @@ label > span {
 
   border:
     1px solid
-    rgba(255, 255, 255, 0.08);
+    rgba(var(--ink-rgb), 0.08);
 
   border-radius: 22px;
 
   background:
     linear-gradient(
       180deg,
-      rgba(255, 255, 255, 0.016),
-      rgba(255, 255, 255, 0.004)
+      rgba(var(--ink-rgb), 0.016),
+      rgba(var(--ink-rgb), 0.004)
     ),
-    #121416;
+    var(--bg);
 
   box-shadow:
     inset 0 1px 0
-    rgba(255, 255, 255, 0.025);
+    rgba(var(--ink-rgb), 0.025);
 }
 
 .auction-market-followup {
@@ -2540,19 +2540,19 @@ label > span {
 
   border:
     1px solid
-    #32373a;
+    var(--line-2);
 
   border-radius: 16px;
 
-  background: #191c1e;
+  background: var(--surface);
 }
 
 .auction-participant-card.owner {
   border-color:
-    rgba(70, 230, 161, 0.2);
+    color-mix(in srgb, var(--accent) 20%, transparent);
 
   background:
-    rgba(70, 230, 161, 0.035);
+    color-mix(in srgb, var(--accent) 4%, transparent);
 }
 
 .auction-participant-top {
@@ -2586,7 +2586,7 @@ label > span {
   border-radius:
     var(--radius-pill);
 
-  background: #303538;
+  background: var(--surface-raised);
 }
 
 .auction-budget-track > span {
@@ -2616,23 +2616,23 @@ label > span {
 }
 
 .auction-slot.role-p {
-  color: #f2dc69;
+  color: var(--yellow);
 }
 
 .auction-slot.role-d {
-  color: #61a8ff;
+  color: var(--blue);
 }
 
 .auction-slot.role-c {
-  color: #55d88a;
+  color: var(--accent);
 }
 
 .auction-slot.role-a {
-  color: #f07171;
+  color: var(--red);
 }
 
 .auction-slot.active {
-  background: #2b2f32;
+  background: var(--surface-raised);
 }
 
 /* =========================
@@ -2645,9 +2645,9 @@ label > span {
   border-radius:
     var(--radius-pill);
 
-  background: #25292b;
+  background: var(--surface-raised);
 
-  color: #7c8387;
+  color: var(--muted);
 
   font-size: 10px;
 }
@@ -2657,11 +2657,11 @@ label > span {
 
   border:
     1px dashed
-    #34393c;
+    var(--line-2);
 
   border-radius: 15px;
 
-  color: #70777b;
+  color: var(--muted);
 
   font-size: 11px;
 
@@ -2692,11 +2692,11 @@ label > span {
 
   border:
     1px solid
-    #303538;
+    var(--line-2);
 
   border-radius: 15px;
 
-  background: #191c1e;
+  background: var(--surface);
 }
 
 .auction-history-player,
@@ -2716,24 +2716,24 @@ label > span {
 .auction-history-manager span,
 .auction-history-manager small,
 .auction-history-price span {
-  color: #72797d;
+  color: var(--muted);
 
   font-size: 9px;
 }
 
 .auction-history-manager strong,
 .auction-history-price strong {
-  color: #d8dddf;
+  color: var(--text-soft);
 
   font-size: 11px;
 }
 
 .auction-history-manager small {
-  color: #60686c;
+  color: var(--muted-soft);
 }
 
 .auction-history-price strong {
-  color: #f2d46d;
+  color: var(--yellow);
 }
 
 .auction-history-actions {
@@ -2749,13 +2749,13 @@ label > span {
 
   border:
     1px solid
-    #3a3f42;
+    var(--line-2);
 
   border-radius: 10px;
 
-  background: #25292b;
+  background: var(--surface-raised);
 
-  color: #cbd0d2;
+  color: var(--text-soft);
 
   font-size: 9px;
 
@@ -2765,9 +2765,9 @@ label > span {
 .auction-history-actions
 button.danger {
   border-color:
-    rgba(228, 94, 94, 0.3);
+    color-mix(in srgb, var(--red) 30%, transparent);
 
-  color: #ef8b8b;
+  color: var(--red);
 }
 
 /* =========================
@@ -2801,17 +2801,17 @@ button.danger {
 
   border:
     1px solid
-    rgba(255, 255, 255, 0.06);
+    rgba(var(--ink-rgb), 0.06);
 
   border-radius: 15px;
 
-  background: #1b1e20;
+  background: var(--surface-light);
 }
 
 .auction-finalization-summary p {
   margin: 0;
 
-  color: #92999d;
+  color: var(--muted);
 
   font-size: 11px;
   line-height: 1.45;
@@ -2839,7 +2839,7 @@ button.danger {
 .auction-no-player p {
   margin: 0;
 
-  color: #7d8488;
+  color: var(--muted);
 
   font-size: 10px;
 }
@@ -2936,40 +2936,40 @@ button.danger {
 
 @media (hover: hover) {
   .auction-role-tab:hover:not(.active) {
-    background: #262a2c;
+    background: var(--surface-raised);
 
-    color: #d9dddf;
+    color: var(--text-soft);
   }
 
   .auction-toolbar-button:hover:not(:disabled) {
-    border-color: #50565a;
+    border-color: var(--line-2);
 
-    background: #292d2f;
+    background: var(--surface-raised);
 
-    color: #ffffff;
+    color: var(--text);
   }
 
   .auction-call-selector:hover:not(:disabled) {
     border-color:
-      rgba(255, 255, 255, 0.16);
+      rgba(var(--ink-rgb), 0.16);
 
-    background: #202426;
+    background: var(--surface-light);
   }
 
   .auction-call-selector.primary:hover:not(:disabled) {
     border-color:
-      rgba(70, 230, 161, 0.48);
+      color-mix(in srgb, var(--accent) 48%, transparent);
 
     background:
-      rgba(70, 230, 161, 0.12);
+      color-mix(in srgb, var(--accent) 12%, transparent);
   }
 
   .auction-team-choice:hover:not(:disabled),
   .auction-selector-player:hover:not(:disabled) {
     border-color:
-      rgba(255, 255, 255, 0.12);
+      rgba(var(--ink-rgb), 0.12);
 
-    background: #222527;
+    background: var(--surface-light);
   }
 
   .auction-primary-action:hover:not(:disabled),
@@ -2979,61 +2979,61 @@ button.danger {
   }
 
   .auction-secondary-action:hover:not(:disabled) {
-    border-color: #50565a;
+    border-color: var(--line-2);
 
-    background: #292d2f;
+    background: var(--surface-raised);
   }
 
   .auction-price-stepper button:hover:not(:disabled) {
     background:
-      rgba(90, 168, 255, 0.15);
+      color-mix(in srgb, var(--blue) 15%, transparent);
   }
 
   .auction-call-discard-button:hover:not(:disabled) {
     border-color:
-      rgba(228, 94, 94, 0.5);
+      color-mix(in srgb, var(--red) 50%, transparent);
 
     background:
-      rgba(228, 94, 94, 0.11);
+      color-mix(in srgb, var(--red) 11%, transparent);
 
-    color: #f09a9a;
+    color: var(--red);
   }
 
   .auction-call-alternative button:hover:not(:disabled),
   .auction-discarded-row button:hover:not(:disabled),
   .auction-restore-all:hover:not(:disabled) {
     border-color:
-      rgba(90, 168, 255, 0.38);
+      color-mix(in srgb, var(--blue) 38%, transparent);
 
     background:
-      rgba(90, 168, 255, 0.11);
+      color-mix(in srgb, var(--blue) 11%, transparent);
   }
 
   .auction-top-ica-row button:hover:not(:disabled),
   .auction-history-actions button:hover:not(:disabled),
   .auction-current-assignment button:hover:not(:disabled) {
-    border-color: #4b5154;
+    border-color: var(--line-2);
 
-    background: #2b2f31;
+    background: var(--surface-raised);
 
-    color: #ffffff;
+    color: var(--text);
   }
 
   .auction-history-row:hover {
     border-color:
-      rgba(255, 255, 255, 0.1);
+      rgba(var(--ink-rgb), 0.1);
 
-    background: #1c1f21;
+    background: var(--surface-light);
   }
 
   .auction-player-detail-trigger:hover {
     border-color:
-      rgba(70, 230, 161, 0.55);
+      color-mix(in srgb, var(--accent) 55%, transparent);
 
     background:
-      rgba(70, 230, 161, 0.14);
+      color-mix(in srgb, var(--accent) 14%, transparent);
 
-    color: #eafff5;
+    color: var(--text);
   }
 }
 

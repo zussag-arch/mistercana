@@ -23,6 +23,6 @@ test('auction FLDA-only flow uses UUID history and canonical strategy context', 
 
 test('auction strategic controls have explicit readable theme styles', () => {
   const css = readFileSync(new URL('../src/styles/auction.css', import.meta.url), 'utf8')
-  assert.match(css, /\.auction-recommendation-name-button\s*\{[\s\S]*background:\s*transparent;[\s\S]*color:\s*#eef3f0;/)
-  assert.match(css, /\.auction-player-detail-trigger\s*\{[\s\S]*background:\s*rgba\(70, 230, 161, 0\.08\);[\s\S]*font-size:\s*10px;/)
+  assert.match(css, /\.auction-recommendation-name-button\s*\{[\s\S]*background:\s*transparent;[\s\S]*color:\s*var\(--text\);/)
+  assert.match(css, /\.auction-player-detail-trigger\s*\{[\s\S]*background:\s*color-mix\(in srgb, var\(--accent\) 8%, transparent\);[\s\S]*font-size:\s*10px;/)
 })

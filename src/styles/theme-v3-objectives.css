@@ -27,7 +27,7 @@
 
 .objective-role-column {
   --rc: var(--accent);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(var(--ink-rgb), 0.07);
   border-radius: var(--radius-xl);
   background: var(--surface);
   box-shadow: none;
@@ -60,7 +60,7 @@
   height: 28px;
   border-radius: var(--radius-pill);
   background: var(--rc);
-  color: #0f1214;
+  color: var(--on-color);
   font-family: var(--font-display);
   font-weight: 800;
 }
@@ -221,7 +221,7 @@
 .objective-priority-select {
   height: 28px;
   padding: 0 24px 0 10px;
-  border: 1px solid rgba(255, 255, 255, 0.13);
+  border: 1px solid rgba(var(--ink-rgb), 0.13);
   border-radius: var(--radius-pill);
   background-color: var(--surface);
   font-family: var(--font-ui);
@@ -242,7 +242,7 @@
 
 .objective-remove-button:hover {
   background: var(--red);
-  color: #2b0a0a;
+  color: var(--on-color);
 }
 
 .objectives-footer-note {

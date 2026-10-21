@@ -1587,17 +1587,11 @@ export function renderDashboardPage(
           </div>
         </section>
 
-        <section
-          class="
-            panel
-            dashboard-panel
-          "
+        <details
+          class="panel dashboard-panel dashboard-managers-box"
+          ${loadManagersOpen() ? 'open' : ''}
         >
-          <div
-            class="
-              dashboard-manager-header
-            "
-          >
+          <summary class="dashboard-manager-header">
             <div>
               <h2>
                 Allenatori
@@ -1620,7 +1614,8 @@ export function renderDashboardPage(
               ${activeManagers.length}
               partecipanti attivi
             </div>
-          </div>
+            <span class="dashboard-managers-chevron" aria-hidden="true"></span>
+          </summary>
 
           <div
             class="
@@ -1668,7 +1663,7 @@ export function renderDashboardPage(
               </span>
             </button>
           </div>
-        </section>
+        </details>
       </div>
 
       ${renderManagerOverlay()}
@@ -1682,6 +1677,13 @@ export function renderDashboardPage(
   `
 }
 
+const MANAGERS_OPEN_KEY = 'mistercana_dashboard_managers_open_v1'
+
+// La scheda Allenatori è chiusa di default: si apre a richiesta e ricorda la scelta.
+function loadManagersOpen(): boolean {
+  try { return window.localStorage.getItem(MANAGERS_OPEN_KEY) === '1' } catch { return false }
+}
+
 export function bindDashboardEvents(
   state: AppState,
   actions: DashboardActions,
@@ -1691,6 +1693,11 @@ export function bindDashboardEvents(
   if (state.auctionPhase === 'live' && !getCachedPlayersDataset()) {
     void loadPlayersDataset().then(() => actions.onStateChange())
   }
+
+  document.querySelector<HTMLDetailsElement>('.dashboard-managers-box')?.addEventListener('toggle', (event) => {
+    const open = (event.currentTarget as HTMLDetailsElement).open
+    try { window.localStorage.setItem(MANAGERS_OPEN_KEY, open ? '1' : '0') } catch { /* solo comodità */ }
+  })
 
   const locked =
     isDashboardLocked(

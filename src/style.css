@@ -7,8 +7,8 @@
     "Segoe UI",
     sans-serif;
 
-  color: #f1f3f4;
-  background: #141719;
+  color: var(--text);
+  background: var(--surface);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -259,9 +259,9 @@ button:disabled {
     );
 
   border-bottom:
-    1px solid #292d30;
+    1px solid var(--line-2);
 
-  background: #191b1d;
+  background: var(--surface);
 }
 
 .topbar-brand-stack {
@@ -292,7 +292,7 @@ button:disabled {
 
   gap: 5px;
 
-  color: #61e9ad;
+  color: var(--accent);
 
   font-size: 7px;
   font-weight: 900;
@@ -309,16 +309,11 @@ button:disabled {
   border-radius:
     var(--radius-pill);
 
-  background: #46e6a1;
+  background: var(--accent);
 
   box-shadow:
     0 0 8px
-    rgba(
-      70,
-      230,
-      161,
-      0.72
-    );
+    color-mix(in srgb, var(--accent) 72%, transparent);
 
   animation:
     liveDotBreath
@@ -334,12 +329,7 @@ button:disabled {
 
     box-shadow:
       0 0 6px
-      rgba(
-        70,
-        230,
-        161,
-        0.48
-      );
+      color-mix(in srgb, var(--accent) 48%, transparent);
   }
 
   50% {
@@ -347,12 +337,7 @@ button:disabled {
 
     box-shadow:
       0 0 11px
-      rgba(
-        70,
-        230,
-        161,
-        0.78
-      );
+      color-mix(in srgb, var(--accent) 78%, transparent);
   }
 }
 
@@ -397,7 +382,7 @@ button:disabled {
 
   background: transparent;
 
-  color: #7f8589;
+  color: var(--muted);
 
   font-size: 10px;
   font-weight: 750;
@@ -420,19 +405,19 @@ button:disabled {
 
 @media (hover: hover) {
   .nav-item:hover:not(:disabled) {
-    color: #d7dadd;
+    color: var(--text-soft);
   }
 }
 
 .nav-item:active:not(:disabled) {
-  color: #ffffff;
+  color: var(--text);
 }
 
 .nav-item.active {
-  color: #ffffff;
+  color: var(--text);
 
   border-bottom-color:
-    #ffffff;
+    var(--line-1);
 }
 
 .nav-item.disabled {
@@ -711,7 +696,7 @@ button:disabled {
 
   background:
     var(--surface-gradient),
-    #121416;
+    var(--bg);
 
   box-shadow:
     var(--surface-inset);
@@ -800,12 +785,7 @@ button:disabled {
 .field input:focus,
 .field select:focus {
   border-color:
-    rgba(
-      70,
-      230,
-      161,
-      0.46
-    );
+    color-mix(in srgb, var(--accent) 46%, transparent);
 
   background:
     var(--surface-light);
@@ -877,14 +857,14 @@ button:disabled {
   border:
     1px solid var(--border);
 
-  background: #191b1d;
+  background: var(--surface);
   color: var(--muted);
 }
 
 .profile-button.selected {
-  border-color: #73787b;
+  border-color: var(--line-1);
 
-  background: #292c2f;
+  background: var(--surface-raised);
   color: white;
 }
 
@@ -903,36 +883,36 @@ button:disabled {
 
   .primary-button:hover:not(:disabled) {
   border-color:
-    #43c795;
+    var(--accent);
 
   background:
-    #43c795;
+    var(--accent);
 }
 
   .danger-button:hover:not(:disabled) {
     border-color:
-      #a95353;
+      var(--red);
 
     background:
-      #603030;
+      var(--red);
   }
 
   .archive-button:hover:not(:disabled) {
     border-color:
-      #aa7547;
+      var(--orange);
 
     background:
-      #63452e;
+      var(--orange);
   }
 
   .profile-button:hover:not(:disabled) {
     border-color:
-      #4a5053;
+      var(--line-2);
 
     background:
-      #202325;
+      var(--surface-light);
 
-    color: #d9dcde;
+    color: var(--text-soft);
   }
 }
 
@@ -993,7 +973,7 @@ button:disabled {
 }
 
 .budget-field small {
-  color: #71777b;
+  color: var(--muted);
 }
 
 .budget-total {
@@ -1099,9 +1079,9 @@ button:disabled {
   border-radius:
     var(--radius-pill);
 
-  background: #34383b;
+  background: var(--surface-raised);
 
-  color: #c8ccce;
+  color: var(--text-soft);
 
   font-size: 8px;
 }
@@ -1115,7 +1095,7 @@ button:disabled {
 }
 
 .manager-participation-label {
-  color: #71777b;
+  color: var(--muted);
 
   font-size: 9px;
 }
@@ -1144,7 +1124,7 @@ button:disabled {
     var(--radius-sm);
 
   background: transparent;
-  color: #8f9599;
+  color: var(--muted);
 
   font-size: 18px;
   line-height: 1;
@@ -1170,7 +1150,7 @@ button:disabled {
   border-color:
     var(--border);
 
-  background: #222527;
+  background: var(--surface-light);
   color: white;
 }
 
@@ -1197,7 +1177,7 @@ button:disabled {
   border-radius:
     var(--radius-md);
 
-  background: #242729;
+  background: var(--surface-raised);
 
   box-shadow:
     0 10px 30px
@@ -1245,7 +1225,7 @@ button:disabled {
   padding: 8px 10px;
 
   background: transparent;
-  color: #d4d7d9;
+  color: var(--text-soft);
 
   text-align: left;
 
@@ -1263,12 +1243,12 @@ button:disabled {
 }
 
 .manager-menu button:hover {
-  background: #303437;
+  background: var(--surface-raised);
 }
 
 .manager-menu
 .archive-menu-action {
-  color: #eca681;
+  color: var(--orange);
 }
 
 /* =========================
@@ -1303,7 +1283,7 @@ button:disabled {
 .add-manager-card:hover {
   color: white;
 
-  border-color: #62676a;
+  border-color: var(--line-1);
 }
 
 .add-manager-card:active {
@@ -1343,7 +1323,7 @@ button:disabled {
   border-radius:
     var(--radius-pill);
 
-  background: #44494c;
+  background: var(--surface-raised);
 
   cursor: pointer;
 
@@ -1446,7 +1426,7 @@ input:disabled
     var(--accent);
 
   color:
-    #0e1713;
+    var(--on-color);
 }
 
 .primary-button:disabled {
@@ -1457,18 +1437,18 @@ input:disabled
 
 .danger-button {
   border:
-    1px solid #8b4444;
+    1px solid var(--red);
 
-  background: #502a2a;
-  color: #ffb4b4;
+  background: color-mix(in srgb, var(--red) 14%, var(--surface));
+  color: var(--red);
 }
 
 .archive-button {
   border:
-    1px solid #8e653f;
+    1px solid var(--orange);
 
-  background: #543b28;
-  color: #ffc291;
+  background: var(--orange);
+  color: var(--orange);
 }
 
 /* =========================
@@ -1502,28 +1482,18 @@ input:disabled
 .auction-state-badge,
 .finalizing-badge,
 .discarded-badge {
-  color: #ff9d91;
+  color: var(--red);
 
   background:
-    rgba(
-      239,
-      106,
-      106,
-      0.12
-    );
+    color-mix(in srgb, var(--red) 12%, transparent);
 }
 
 .live-badge,
 .archived-badge {
-  color: #78e8b7;
+  color: var(--accent);
 
   background:
-    rgba(
-      52,
-      211,
-      153,
-      0.12
-    );
+    color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
 /* =========================
@@ -1547,13 +1517,13 @@ input:disabled
   place-items: center;
 
   border:
-    1px solid #805a3c;
+    1px solid var(--orange);
 
   border-radius:
     var(--radius-pill);
 
-  background: #3c2d22;
-  color: #f0a46d;
+  background: color-mix(in srgb, var(--orange) 14%, var(--surface));
+  color: var(--orange);
 
   font-weight: 900;
 }
@@ -1635,19 +1605,14 @@ input:disabled
 
   border:
     1px solid
-    rgba(
-      255,
-      255,
-      255,
-      0.10
-    );
+    rgba(var(--ink-rgb), 0.1);
 
   border-radius:
     var(--radius-xl);
 
   background:
     var(--surface-gradient),
-    #121416;
+    var(--bg);
 
   box-shadow:
     var(--shadow-overlay),
@@ -1793,7 +1758,7 @@ input:disabled
   border-radius:
     var(--radius-sm);
 
-  background: #191b1d;
+  background: var(--surface);
   color: white;
 
   cursor: pointer;
@@ -1816,10 +1781,10 @@ input:disabled
 @media (hover: hover) {
   .icon-button:hover:not(:disabled) {
     border-color:
-      #50565a;
+      var(--line-2);
 
     background:
-      #242729;
+      var(--surface-raised);
   }
 }
 
@@ -1846,7 +1811,7 @@ input:disabled
   border-radius:
     var(--radius-sm);
 
-  background: #191b1d;
+  background: var(--surface);
 
   font-size: 11px;
 }
@@ -1929,35 +1894,25 @@ input:disabled
 
 .warning-panel {
   border:
-    1px solid #735038;
+    1px solid var(--orange);
 
   background:
-    rgba(
-      130,
-      82,
-      45,
-      0.14
-    );
+    color-mix(in srgb, var(--orange) 14%, transparent);
 }
 
 .danger-panel {
   border:
-    1px solid #743f3f;
+    1px solid var(--red);
 
   background:
-    rgba(
-      132,
-      57,
-      57,
-      0.14
-    );
+    color-mix(in srgb, var(--red) 14%, transparent);
 }
 
 .warning-panel p,
 .danger-panel p {
   margin: 8px 0 0;
 
-  color: #b9bdc0;
+  color: var(--text-soft);
 }
 
 /* =========================

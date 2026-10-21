@@ -546,11 +546,11 @@ function getBidSignal(
       state: 'stop',
       icon: '⛔',
       label: 'STOP',
-      color: '#E45E5E',
+      color: 'var(--red)',
       borderColor:
-        'rgba(228, 94, 94, 0.72)',
+        'color-mix(in srgb, var(--red) 72%, transparent)',
       background:
-        'rgba(228, 94, 94, 0.10)',
+        'color-mix(in srgb, var(--red) 10%, transparent)',
     }
   }
 
@@ -562,11 +562,11 @@ function getBidSignal(
       state: 'stop',
       icon: '⛔',
       label: 'STOP',
-      color: '#E45E5E',
+      color: 'var(--red)',
       borderColor:
-        'rgba(228, 94, 94, 0.72)',
+        'color-mix(in srgb, var(--red) 72%, transparent)',
       background:
-        'rgba(228, 94, 94, 0.10)',
+        'color-mix(in srgb, var(--red) 10%, transparent)',
     }
   }
 
@@ -597,11 +597,11 @@ function getBidSignal(
       state: 'go',
       icon: '↑',
       label: 'SALI',
-      color: '#46E6A1',
+      color: 'var(--accent)',
       borderColor:
-        'rgba(70, 230, 161, 0.72)',
+        'color-mix(in srgb, var(--accent) 72%, transparent)',
       background:
-        'rgba(70, 230, 161, 0.10)',
+        'color-mix(in srgb, var(--accent) 10%, transparent)',
     }
   }
 
@@ -609,11 +609,11 @@ function getBidSignal(
     state: 'attention',
     icon: '—',
     label: 'ATTENZIONE',
-    color: '#FFFFFF',
+    color: 'var(--text)',
     borderColor:
-      'rgba(255, 255, 255, 0.52)',
+      'rgba(var(--ink-rgb), 0.52)',
     background:
-      'rgba(255, 255, 255, 0.055)',
+      'rgba(var(--ink-rgb), 0.055)',
   }
 }
 
@@ -1003,7 +1003,7 @@ function getBudgetBarData(
   if (ratio > 1) {
     return {
       width,
-      color: '#5AA8FF',
+      color: 'var(--blue)',
       description:
         'Più margine del piano nel ruolo attivo',
     }
@@ -1012,7 +1012,7 @@ function getBudgetBarData(
   if (ratio > 0.55) {
     return {
       width,
-      color: '#46E6A1',
+      color: 'var(--accent)',
       description:
         'Margine alto nel ruolo attivo',
     }
@@ -1021,7 +1021,7 @@ function getBudgetBarData(
   if (ratio > 0.2) {
     return {
       width,
-      color: '#E7C94C',
+      color: 'var(--yellow)',
       description:
         'Margine ridotto nel ruolo attivo',
     }
@@ -1029,7 +1029,7 @@ function getBudgetBarData(
 
   return {
     width,
-    color: '#E45E5E',
+    color: 'var(--red)',
     description:
       'Budget del ruolo in tensione',
   }

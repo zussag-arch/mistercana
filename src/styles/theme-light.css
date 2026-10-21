@@ -1,0 +1,134 @@
+/* =========================
+   TEMI
+   Scuro (predefinito) e chiaro "bianco caldo": pastelli rosso,
+   giallo, verde e azzurro, scritte in grigio antracite.
+   Tutti i fogli di stile usano questi colori "a ruolo".
+========================= */
+
+:root {
+  --ink-rgb: 255, 255, 255;          /* velature e linee sottili */
+  --line-1: rgba(255, 255, 255, 0.12);
+  --line-2: rgba(255, 255, 255, 0.06);
+  --on-color: #101315;               /* scritte sopra i badge colorati */
+  --orange: #e98a55;
+  --shadow-strength: 1;
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  background: #f6f1e8;
+
+  --bg: #f6f1e8;
+  --surface: #fffcf6;
+  --surface-soft: #fbf7ef;
+  --surface-light: #f2ece2;
+  --surface-control: #efe8dc;
+  --surface-raised: #e7dfd1;
+
+  --text: #34383c;
+  --text-soft: #4a4f54;
+  --muted: #7a7e80;
+  --muted-soft: #9d9f9e;
+
+  --accent: #58c294;
+  --accent-strong: #3a9f74;
+  --accent-soft: #d3efe1;
+  --accent-ink: #1d4a37;
+
+  --green: #58c294;
+  --red: #e58b8b;
+  --orange: #eba27a;
+  --yellow: #e6c35c;
+  --blue: #7db3e3;
+  --purple: #b49fdb;
+
+  --role-p: #f0d77c;
+  --role-d: #8fbde9;
+  --role-c: #8ad3a8;
+  --role-a: #ef9f9f;
+
+  --ink-rgb: 52, 56, 60;
+  --line-1: rgba(52, 56, 60, 0.16);
+  --line-2: rgba(52, 56, 60, 0.09);
+  --on-color: #2e3236;
+}
+
+:root[data-theme="light"] body {
+  background:
+    radial-gradient(900px 500px at 85% -10%, rgba(88, 194, 148, 0.14), transparent 60%),
+    radial-gradient(700px 500px at -10% 30%, rgba(125, 179, 227, 0.12), transparent 60%),
+    var(--bg);
+}
+
+/* ombre più leggere su fondo chiaro */
+:root[data-theme="light"] .card,
+:root[data-theme="light"] [class*="card"],
+:root[data-theme="light"] [class*="panel"] {
+  box-shadow: 0 1px 2px rgba(52, 56, 60, 0.05), 0 6px 18px rgba(52, 56, 60, 0.06);
+}
+
+/* ---------- pulsante tema ---------- */
+
+.theme-toggle {
+  flex: none;
+  width: 38px;
+  height: 38px;
+  margin-left: 8px;
+  border-radius: 999px;
+  border: 1px solid var(--line-1);
+  background: var(--surface-light);
+  color: var(--text);
+  cursor: pointer;
+  display: inline-grid;
+  place-items: center;
+  transition: background 0.2s, transform 0.2s, border-color 0.2s;
+}
+.theme-toggle:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+/* luna nel tema scuro, sole in quello chiaro */
+.theme-toggle-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  box-shadow: inset -5px -3px 0 0 var(--yellow);
+  transform: rotate(-20deg);
+}
+:root[data-theme="light"] .theme-toggle-icon {
+  background: var(--yellow);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--yellow) 35%, transparent);
+  transform: none;
+  width: 12px;
+  height: 12px;
+}
+
+/* il pulsante tema sta in fondo alla topbar */
+@media (min-width: 901px) {
+  .topbar {
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+  }
+}
+@media (max-width: 900px) {
+  .topbar {
+    position: relative;
+  }
+  .theme-toggle {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+  }
+}
+
+/* numeri iCà: colori più profondi per restare leggibili sul bianco */
+:root[data-theme="light"] .players-ica {
+  color: hsl(var(--ica-hue), 52%, 42%);
+}
+
+/* etichette pastello usate come testo: più scure sul bianco */
+:root[data-theme="light"] .objective-priority-header span {
+  color: color-mix(in srgb, var(--pc) 55%, var(--text));
+}

@@ -15,7 +15,7 @@
   --font-ui: "Lexend", system-ui, -apple-system, "Segoe UI", sans-serif;
 
   font-family: var(--font-ui);
-  background: #121517;
+  background: var(--bg);
 
   --bg: #121517;
   --surface: #191d20;
@@ -51,8 +51,8 @@ body {
   font-family: var(--font-ui);
   letter-spacing: 0.01em;
   background:
-    radial-gradient(900px 500px at 85% -10%, rgba(70, 230, 161, 0.1), transparent 60%),
-    radial-gradient(700px 500px at -10% 30%, rgba(97, 168, 255, 0.06), transparent 60%),
+    radial-gradient(900px 500px at 85% -10%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 60%),
+    radial-gradient(700px 500px at -10% 30%, color-mix(in srgb, var(--blue) 6%, transparent), transparent 60%),
     var(--bg);
   background-attachment: fixed;
 }
@@ -150,14 +150,14 @@ td.n {
 .overlay-card,
 .panel {
   border-radius: var(--radius-xl);
-  border-color: rgba(255, 255, 255, 0.07);
+  border-color: rgba(var(--ink-rgb), 0.07);
   background: var(--surface);
   box-shadow: none;
 }
 
 .auction-roster-metric-card {
   border-radius: var(--radius-md);
-  border-color: rgba(255, 255, 255, 0.07);
+  border-color: rgba(var(--ink-rgb), 0.07);
   background: var(--surface);
 }
 
@@ -173,8 +173,8 @@ td.n {
 .secondary-button,
 .auction-team-choice {
   border-radius: var(--radius-pill);
-  border-color: rgba(255, 255, 255, 0.13);
-  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(var(--ink-rgb), 0.13);
+  background: rgba(var(--ink-rgb), 0.04);
   font-weight: 700;
   transition: transform var(--motion-fast), background var(--motion-fast);
 }
@@ -241,7 +241,7 @@ input[type="search"]:focus,
   border-radius: 10px;
   font-family: var(--font-display);
   font-weight: 800;
-  color: #0f1214;
+  color: var(--on-color);
 }
 
 .auction-role-badge.role-p { background: var(--role-p); }
@@ -423,7 +423,7 @@ input[type="search"]:focus,
 .dashboard-stat-card,
 .dashboard-recap-kpi {
   padding: 16px 18px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(var(--ink-rgb), 0.07);
   border-radius: var(--radius-md);
   background: var(--surface);
 }
@@ -462,7 +462,7 @@ input[type="search"]:focus,
 .coach-card,
 .set-piece-card,
 .objective-player-card {
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(var(--ink-rgb), 0.07);
   border-radius: var(--radius-xl);
   background: var(--surface);
   box-shadow: none;
@@ -478,7 +478,7 @@ input[type="search"]:focus,
 
 .dashboard-add-manager-card,
 .add-manager-card {
-  border: 1.5px dashed rgba(255, 255, 255, 0.13);
+  border: 1.5px dashed rgba(var(--ink-rgb), 0.13);
   border-radius: var(--radius-md);
   background: transparent;
 }
@@ -491,7 +491,7 @@ input[type="search"]:focus,
   position: relative;
   overflow: hidden;
   background:
-    radial-gradient(520px 260px at 100% 0%, rgba(70, 230, 161, 0.18), transparent 70%),
+    radial-gradient(520px 260px at 100% 0%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 70%),
     linear-gradient(135deg, var(--surface-light), var(--surface));
 }
 
@@ -504,7 +504,7 @@ input[type="search"]:focus,
   width: 520px;
   height: 520px;
   transform: translateY(-50%);
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 600'%3E%3Cg fill='none' stroke='rgba(255,255,255,0.13)' stroke-width='2' stroke-dasharray='6 14' stroke-linecap='round'%3E%3Ccircle cx='300' cy='300' r='120'/%3E%3Ccircle cx='300' cy='300' r='190'/%3E%3Ccircle cx='300' cy='300' r='260'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 600'%3E%3Cg fill='none' stroke='rgba(var(--ink-rgb), 0.13)' stroke-width='2' stroke-dasharray='6 14' stroke-linecap='round'%3E%3Ccircle cx='300' cy='300' r='120'/%3E%3Ccircle cx='300' cy='300' r='190'/%3E%3Ccircle cx='300' cy='300' r='260'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat;
   pointer-events: none;
 }
 
@@ -520,7 +520,7 @@ input[type="text"],
 input:not([type]),
 select,
 textarea {
-  border: 1px solid rgba(255, 255, 255, 0.13);
+  border: 1px solid rgba(var(--ink-rgb), 0.13);
   border-radius: var(--radius-sm);
   background: var(--surface);
   color: var(--text);
@@ -634,7 +634,7 @@ input:focus {
   flex: 0 0 auto;
   border: 0;
   border-radius: 10px;
-  color: #0f1214;
+  color: var(--on-color);
   font-family: var(--font-display);
   font-size: 13px;
   font-weight: 800;
@@ -652,10 +652,10 @@ input:focus {
   font-size: 12px;
 }
 
-.players-filter-button[data-player-role="P"].selected { background: var(--role-p); border-color: var(--role-p); color: #0f1214; }
-.players-filter-button[data-player-role="D"].selected { background: var(--role-d); border-color: var(--role-d); color: #0f1214; }
-.players-filter-button[data-player-role="C"].selected { background: var(--role-c); border-color: var(--role-c); color: #0f1214; }
-.players-filter-button[data-player-role="A"].selected { background: var(--role-a); border-color: var(--role-a); color: #0f1214; }
+.players-filter-button[data-player-role="P"].selected { background: var(--role-p); border-color: var(--role-p); color: var(--on-color); }
+.players-filter-button[data-player-role="D"].selected { background: var(--role-d); border-color: var(--role-d); color: var(--on-color); }
+.players-filter-button[data-player-role="C"].selected { background: var(--role-c); border-color: var(--role-c); color: var(--on-color); }
+.players-filter-button[data-player-role="A"].selected { background: var(--role-a); border-color: var(--role-a); color: var(--on-color); }
 
 .players-toolbar input,
 .players-team-filter summary {
@@ -754,7 +754,7 @@ input:focus {
   position: relative;
   overflow: hidden;
   padding: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(var(--ink-rgb), 0.07);
   border-radius: var(--radius-xl);
   background:
     radial-gradient(520px 260px at 100% 0%, color-mix(in srgb, var(--rc) 26%, transparent), transparent 70%),
@@ -774,7 +774,7 @@ input:focus {
   width: 520px;
   height: 520px;
   transform: translateY(-50%);
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 600'%3E%3Cg fill='none' stroke='rgba(255,255,255,0.13)' stroke-width='2' stroke-dasharray='6 14' stroke-linecap='round'%3E%3Ccircle cx='300' cy='300' r='120'/%3E%3Ccircle cx='300' cy='300' r='190'/%3E%3Ccircle cx='300' cy='300' r='260'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 600'%3E%3Cg fill='none' stroke='rgba(var(--ink-rgb), 0.13)' stroke-width='2' stroke-dasharray='6 14' stroke-linecap='round'%3E%3Ccircle cx='300' cy='300' r='120'/%3E%3Ccircle cx='300' cy='300' r='190'/%3E%3Ccircle cx='300' cy='300' r='260'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat;
   pointer-events: none;
 }
 
@@ -798,7 +798,7 @@ input:focus {
   border: 0;
   border-radius: 20px;
   background: var(--rc, var(--accent));
-  color: #0f1214;
+  color: var(--on-color);
   font-family: var(--font-display);
   font-size: 30px;
   font-weight: 800;
@@ -855,7 +855,7 @@ input:focus {
 /* card dei numeri: grandi, la prima verde piena */
 .player-current-metrics > div {
   padding: 16px 18px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(var(--ink-rgb), 0.07);
   border-radius: var(--radius-md);
   background: var(--surface);
 }
@@ -914,7 +914,7 @@ input:focus {
 /* sezioni grafico e ultima stagione */
 .player-chart-grid > *,
 .player-overlay-stats {
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(var(--ink-rgb), 0.07);
   border-radius: var(--radius-xl);
   background: var(--surface);
 }
@@ -979,7 +979,7 @@ input:focus {
 .role-badge.role-d,
 .role-badge.role-c,
 .role-badge.role-a {
-  color: #0f1214;
+  color: var(--on-color);
 }
 
 /* =========================
@@ -1080,7 +1080,7 @@ input:focus {
 .player-sage-table th,
 .player-sage-table td {
   padding: 9px 7px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  border-bottom: 1px solid rgba(var(--ink-rgb), 0.07);
   text-align: left;
   white-space: nowrap;
 }
@@ -1172,7 +1172,7 @@ input:focus {
   align-items: center;
   gap: 20px;
   padding: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(var(--ink-rgb), 0.07);
   border-radius: var(--radius-xl);
   background:
     radial-gradient(520px 260px at 100% 0%, color-mix(in srgb, var(--rc) 26%, transparent), transparent 70%),
@@ -1257,7 +1257,7 @@ input:focus {
   height: 44px;
   border: 0;
   border-radius: var(--radius-pill);
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(var(--ink-rgb), 0.08);
   font-size: 17px;
   cursor: pointer;
   transition: background var(--motion-fast), color var(--motion-fast);
@@ -1442,7 +1442,7 @@ input:focus {
 
 .coach-key-role {
   padding: 3px 10px;
-  border: 1px solid rgba(255, 255, 255, 0.13);
+  border: 1px solid rgba(var(--ink-rgb), 0.13);
   border-radius: var(--radius-pill);
   font-size: 11.5px;
   font-weight: 700;
@@ -1450,7 +1450,7 @@ input:focus {
 }
 
 .coach-key-good { border-color: var(--good, var(--accent)); background: var(--accent); color: var(--accent-ink); }
-.coach-key-bad { border-color: var(--red); background: var(--red); color: #2b0a0a; }
+.coach-key-bad { border-color: var(--red); background: var(--red); color: var(--on-color); }
 
 .coach-card-body {
   display: grid;
@@ -1558,7 +1558,7 @@ input:focus {
   flex-direction: column;
   gap: 12px;
   padding: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(var(--ink-rgb), 0.07);
   border-radius: var(--radius-lg);
   background: var(--surface-light);
 }
@@ -1740,9 +1740,9 @@ input:focus {
 
 .goalkeeper-team-chip {
   padding: 6px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.13);
+  border: 1px solid rgba(var(--ink-rgb), 0.13);
   border-radius: var(--radius-pill);
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(var(--ink-rgb), 0.04);
   color: var(--text-soft);
   font-size: 12.5px;
   font-weight: 700;
@@ -1757,12 +1757,12 @@ input:focus {
 .goalkeeper-team-chip.selected {
   border-color: var(--role-p);
   background: var(--role-p);
-  color: #0f1214;
+  color: var(--on-color);
 }
 
 .goalkeeper-recommendations {
   padding: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(var(--ink-rgb), 0.07);
   border-radius: var(--radius-lg);
   background: var(--surface-light);
 }
@@ -1822,7 +1822,7 @@ input:focus {
   place-items: center;
   border-radius: 11px;
   background: var(--role-p);
-  color: #0f1214;
+  color: var(--on-color);
   font-family: var(--font-display);
   font-size: 15px;
   font-weight: 800;
@@ -1886,7 +1886,7 @@ input:focus {
 
 .goalkeeper-matrix-dialog {
   width: min(1400px, calc(100vw - 32px));
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(var(--ink-rgb), 0.07);
   border-radius: var(--radius-xl);
   background: var(--bg);
 }
@@ -1907,7 +1907,7 @@ input:focus {
   height: 44px;
   border: 0;
   border-radius: var(--radius-pill);
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(var(--ink-rgb), 0.08);
   font-size: 18px;
 }
 
@@ -1972,8 +1972,8 @@ input:focus {
 }
 
 /* scala di colore leggibile: rosso → giallo → verde */
-.goalkeeper-matrix-table td.matrix-low { background: color-mix(in srgb, var(--red) 22%, var(--surface)); color: #ffc2c2; }
-.goalkeeper-matrix-table td.matrix-medium { background: color-mix(in srgb, var(--yellow) 18%, var(--surface)); color: #f6e7a6; }
+.goalkeeper-matrix-table td.matrix-low { background: color-mix(in srgb, var(--red) 22%, var(--surface)); color: var(--red); }
+.goalkeeper-matrix-table td.matrix-medium { background: color-mix(in srgb, var(--yellow) 18%, var(--surface)); color: var(--yellow); }
 .goalkeeper-matrix-table td.matrix-good { background: color-mix(in srgb, var(--accent) 22%, var(--surface)); color: var(--accent-soft); }
 .goalkeeper-matrix-table td.matrix-excellent { background: var(--accent); color: var(--accent-ink); }
 .goalkeeper-matrix-table td.matrix-empty { background: transparent; color: var(--muted-soft); }
@@ -1992,7 +1992,7 @@ input:focus {
 .goalkeeper-matrix-table th.is-selected,
 .goalkeeper-matrix-table tr.is-selected th {
   background: var(--role-p);
-  color: #0f1214;
+  color: var(--on-color);
 }
 
 .goalkeeper-matrix-table td:hover {
@@ -2096,7 +2096,7 @@ input:focus {
 
 .player-history-section .chart-grid-line,
 .player-history-section .chart-axis {
-  stroke: rgba(255, 255, 255, 0.16);
+  stroke: rgba(var(--ink-rgb), 0.16);
 }
 
 .player-history-section .chart-tick,
@@ -2122,9 +2122,9 @@ input:focus {
 }
 
 .player-chart-grid > .player-history-section {
-  border-color: rgba(255, 255, 255, 0.12);
+  border-color: rgba(var(--ink-rgb), 0.12);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02)),
+    linear-gradient(180deg, rgba(var(--ink-rgb), 0.05), rgba(var(--ink-rgb), 0.02)),
     var(--surface-raised);
 }
 
@@ -2140,7 +2140,7 @@ input:focus {
 
 .player-chart-grid > .player-history-section {
   background: var(--surface);
-  border-color: rgba(255, 255, 255, 0.07);
+  border-color: rgba(var(--ink-rgb), 0.07);
 }
 
 .team-context {
@@ -2203,7 +2203,7 @@ input:focus {
 
 .team-context-role {
   padding: 3px 10px;
-  border: 1px solid rgba(255, 255, 255, 0.13);
+  border: 1px solid rgba(var(--ink-rgb), 0.13);
   border-radius: var(--radius-pill);
   color: var(--text-soft);
   font-size: 11.5px;
@@ -2211,7 +2211,7 @@ input:focus {
 }
 
 .team-context-role.tone-good { border-color: var(--accent); background: var(--accent); color: var(--accent-ink); }
-.team-context-role.tone-bad { border-color: var(--red); background: var(--red); color: #2b0a0a; }
+.team-context-role.tone-bad { border-color: var(--red); background: var(--red); color: var(--on-color); }
 
 .team-context-player ul {
   display: grid;
@@ -2334,7 +2334,7 @@ input:focus {
 }
 
 .players-affare.affare-good { background: var(--accent); color: var(--accent-ink); }
-.players-affare.affare-bad { background: var(--red); color: #2b0a0a; }
+.players-affare.affare-bad { background: var(--red); color: var(--on-color); }
 .players-affare.affare-neutral { background: var(--surface-raised); color: var(--text-soft); }
 
 /* =========================
@@ -2459,7 +2459,7 @@ input:focus {
   flex-direction: column;
   gap: 8px;
   padding: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(var(--ink-rgb), 0.07);
   border-radius: var(--radius-lg);
   background: var(--surface-light);
 }
@@ -2562,7 +2562,7 @@ input:focus {
 .attacker-team-chip.selected {
   border-color: var(--role-a);
   background: var(--role-a);
-  color: #0f1214;
+  color: var(--on-color);
 }
 
 .attacker-section .goalkeeper-recommendation:not(:first-child) .goalkeeper-rank {
