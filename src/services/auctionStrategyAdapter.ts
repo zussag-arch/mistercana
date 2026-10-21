@@ -38,6 +38,7 @@ export function adaptFldaPlayer(
     xFmv: typeof flda.fm_exp === 'number' ? flda.fm_exp : undefined,
     // agli algoritmi serve una qualità 0-100: la posizione nel ruolo
     iCa: getICaV3(flda.player_id)?.rolePercentile,
+    affare: getICaV3(flda.player_id)?.affare,
     fantalabId: flda.player_id,
     penaltyTaker: legacy?.penaltyTaker ?? flda.penalty_rank === 1,
     status: 'free',

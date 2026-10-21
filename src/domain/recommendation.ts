@@ -3,6 +3,7 @@ import type {
 } from '../app/state'
 
 import {
+  getLeagueSize,
   getOwnerAssignments,
   getOwnerManagerId,
   getOwnerRemainingStrategicSlots,
@@ -34,6 +35,8 @@ import type {
 
 export interface RecommendationParameters {
   qualityWeight: number
+
+  affareWeight: number
 
   needFitWeight: number
 
@@ -104,20 +107,29 @@ export const DEFAULT_RECOMMENDATION_PARAMETERS:
       osservazioni reali d'asta.
     */
 
+    /*
+      Consigliato v2 (ottobre 2026):
+      Valore 35% · Affare 25% · Bisogno 20% · Obiettivi 20%.
+      Sostenibilità e mercato non sono più voci a parte:
+      il prezzo entra nell'Affare e nel filtro finanziario.
+    */
     qualityWeight:
-      0.30,
+      0.35,
+
+    affareWeight:
+      0.25,
 
     needFitWeight:
-      0.25,
+      0.20,
 
     sustainabilityWeight:
-      0.10,
+      0,
 
     opportunityWeight:
-      0.10,
+      0,
 
     objectiveWeight:
-      0.25,
+      0.20,
 
     betterSlotDecay:
       0.45,
@@ -176,6 +188,9 @@ export interface RecommendationCandidate {
   score: number
 
   quality?: number
+
+  /** Affare normalizzato 0-1 (0,5 = prezzo in linea con l'iCà) */
+  affare?: number
 
   needFit?: number
 
@@ -268,13 +283,17 @@ function calculateNeedFit(
   if (
     playerSlot < targetSlot
   ) {
-    return Math.exp(
-      -parameters
-        .betterSlotDecay *
-      (
-        targetSlot -
-        playerSlot
-      ),
+    // più forte del necessario: va bene, appena sotto il pieno
+    return Math.max(
+      0.85,
+      1 -
+        parameters
+          .betterSlotDecay *
+        0.1 *
+        (
+          targetSlot -
+          playerSlot
+        ),
     )
   }
 
@@ -709,6 +728,45 @@ function isFinanciallyEligible(
    EXPLANATIONS
 ========================= */
 
+/* =========================
+   LIVELLO PER iCà
+========================= */
+
+const icaRankCache =
+  new WeakMap<Player[], Map<string, Map<string, number>>>()
+
+function getIcaSlot(
+  state: AppState,
+  player: Player,
+  allPlayers: Player[],
+): number | undefined {
+  if (player.iCa === undefined) {
+    return undefined
+  }
+
+  let byRole = icaRankCache.get(allPlayers)
+  if (!byRole) {
+    byRole = new Map()
+    icaRankCache.set(allPlayers, byRole)
+  }
+
+  let ranks = byRole.get(player.role)
+  if (!ranks) {
+    const sorted = allPlayers
+      .filter((item) => item.role === player.role && item.iCa !== undefined)
+      .sort((first, second) => (second.iCa ?? 0) - (first.iCa ?? 0))
+    ranks = new Map(sorted.map((item, index) => [item.id, index]))
+    byRole.set(player.role, ranks)
+  }
+
+  const index = ranks.get(player.id)
+  if (index === undefined) {
+    return undefined
+  }
+
+  return Math.floor(index / getLeagueSize(state)) + 1
+}
+
 function buildReasons(
   candidate:
     RecommendationCandidate,
@@ -756,25 +814,22 @@ function buildReasons(
     }
   }
 
-  if (
-    candidate.sustainability !==
-      undefined &&
-    candidate.sustainability >=
-      0.75
-  ) {
-    reasons.push(
-      'costo coerente con il margine disponibile',
-    )
-  }
+  const affare =
+    candidate.player.affare
 
   if (
-    candidate.opportunity !==
-      undefined &&
-    candidate.opportunity >=
-      0.60
+    affare !== undefined &&
+    affare >= 15
   ) {
     reasons.push(
-      'pressione di mercato alta sulla sua fascia',
+      `affare +${Math.round(affare)}: rende più di quanto costa`,
+    )
+  } else if (
+    candidate.quality !== undefined &&
+    candidate.quality >= 0.9
+  ) {
+    reasons.push(
+      `tra i migliori ${candidate.player.role} per iCà`,
     )
   }
 
@@ -825,8 +880,24 @@ function calculateCandidate(
       precomputedGoalkeeperReserve,
     )
 
+  // livello nel ruolo per iCà (non per PMA): "C1" = tra i più forti
   const playerSlot =
+    getIcaSlot(
+      state,
+      candidate,
+      allPlayers,
+    ) ??
     priceAdvice.playerSlot
+
+  // +50 di affare (o più) = 1, in linea col prezzo = 0,5
+  const affare =
+    candidate.affare === undefined
+      ? undefined
+      : clamp(
+          0.5 + candidate.affare / 100,
+          0,
+          1,
+        )
 
   /*
     iCà è già 0-100.
@@ -894,8 +965,14 @@ function calculateCandidate(
       },
       {
         value:
+          affare,
+        weight:
+          parameters
+            .affareWeight,
+      },
+      {
+        value:
           needFit,
-
         weight:
           parameters
             .needFitWeight,
@@ -949,9 +1026,8 @@ function calculateCandidate(
         candidate,
 
       score,
-
       quality,
-
+      affare,
       needFit,
 
       sustainability,
