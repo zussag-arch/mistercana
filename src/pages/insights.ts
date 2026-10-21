@@ -1304,6 +1304,10 @@ function renderAttackerSection(): string {
       </div>
       <div class="goalkeeper-tool">
         <div class="goalkeeper-search-area">
+          <label class="goalkeeper-search-box">
+            <span class="goalkeeper-search-icon">⌕</span>
+            <input id="attackerSearch" type="search" autocomplete="off" placeholder="Cerca squadra...">
+          </label>
           <div id="attackerTeamChips" class="goalkeeper-team-chips">${renderAttackerTeamChips()}</div>
         </div>
         <div id="attackerRecommendations" class="goalkeeper-recommendations">${renderAttackerTopThree()}</div>
@@ -1325,9 +1329,17 @@ function renderAttackerSection(): string {
   `
 }
 
+function filterAttackerChips(query: string): void {
+  const needle = query.trim().toLowerCase()
+  document.querySelectorAll<HTMLElement>('#attackerTeamChips [data-attacker-team]').forEach((chip) => {
+    chip.hidden = Boolean(needle) && !(chip.dataset.attackerTeam ?? '').toLowerCase().includes(needle)
+  })
+}
+
 function updateAttackerUi(): void {
   const chips = document.querySelector<HTMLElement>('#attackerTeamChips')
   if (chips) chips.innerHTML = renderAttackerTeamChips()
+  filterAttackerChips(document.querySelector<HTMLInputElement>('#attackerSearch')?.value ?? '')
   const list = document.querySelector<HTMLElement>('#attackerRecommendations')
   if (list) list.innerHTML = renderAttackerTopThree()
   const matrix = document.querySelector<HTMLElement>('#attackerMatrixContent')
@@ -1359,6 +1371,19 @@ function bindAttackerEvents(): void {
   })
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') setAttackerMatrixOpen(false)
+    // Invio nel cerca: sceglie la prima squadra rimasta visibile
+    if (event.key === 'Enter' && event.target instanceof HTMLInputElement && event.target.id === 'attackerSearch') {
+      const first = document.querySelector<HTMLElement>('#attackerTeamChips [data-attacker-team]:not([hidden])')
+      if (first?.dataset.attackerTeam) {
+        selectedAttackerTeam = first.dataset.attackerTeam
+        updateAttackerUi()
+      }
+    }
+  })
+  // il cerca filtra le pillole delle squadre
+  document.addEventListener('input', (event) => {
+    if (!(event.target instanceof HTMLInputElement) || event.target.id !== 'attackerSearch') return
+    filterAttackerChips(event.target.value)
   })
 }
 

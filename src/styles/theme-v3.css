@@ -2584,3 +2584,85 @@ input:focus {
   transform: translate(-2px, -2px);
   box-shadow: 4px 4px 0 var(--accent-soft);
 }
+
+/* griglia in ordine: la finestra sta dentro lo schermo, celle regolari */
+.goalkeeper-matrix-overlay {
+  display: grid;
+  place-items: start center;
+  padding: 24px 16px;
+}
+.goalkeeper-matrix-dialog {
+  width: min(1240px, 100%);
+  display: flex;
+  flex-direction: column;
+}
+.goalkeeper-matrix-header {
+  padding: 22px 26px 16px;
+  border-bottom: 1px solid var(--line-2);
+}
+.goalkeeper-matrix-content {
+  max-height: calc(100vh - 200px);
+  padding: 10px 16px 18px;
+}
+.goalkeeper-matrix-scroll {
+  width: 100%;
+  min-width: 0;
+}
+.goalkeeper-matrix-table {
+  min-width: 960px;
+  padding: 0;
+}
+.goalkeeper-matrix-table th,
+.goalkeeper-matrix-table td {
+  min-width: 0;
+  height: 32px;
+}
+.goalkeeper-matrix-table thead th {
+  height: 30px;
+  letter-spacing: 0.02em;
+}
+.goalkeeper-matrix-table tbody th,
+.goalkeeper-matrix-corner {
+  width: 108px;
+}
+/* stessa squadra (diagonale): cella neutra con trattino */
+.goalkeeper-matrix-table td.matrix-empty {
+  background: rgba(var(--ink-rgb), 0.04);
+}
+.goalkeeper-matrix-table td.matrix-empty:empty::after {
+  content: "—";
+  color: var(--muted-soft);
+}
+/* scala sempre verde per le compatibilità alte, anche col tema rosso */
+.goalkeeper-matrix-table td.matrix-good { background: color-mix(in srgb, var(--green) 22%, var(--surface)); color: color-mix(in srgb, var(--green) 60%, var(--text)); }
+.goalkeeper-matrix-table td.matrix-excellent { background: var(--green); color: var(--on-color); }
+.goalkeeper-matrix-scroll { display: block; width: 100% !important; }
+.goalkeeper-matrix-table { width: 100% !important; }
+.goalkeeper-matrix-legend .legend-low { background: var(--red); }
+.goalkeeper-matrix-legend .legend-medium { background: var(--yellow); }
+.goalkeeper-matrix-legend .legend-good { background: color-mix(in srgb, var(--green) 45%, var(--surface)); }
+.goalkeeper-matrix-legend .legend-excellent { background: var(--green); }
+
+/* abbinamenti: pillole squadra grandi, a griglia, alte quanto i consigliati */
+.goalkeeper-tool { align-items: stretch; }
+.goalkeeper-search-area { height: 100%; }
+.goalkeeper-team-chips {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: minmax(44px, 1fr);
+  gap: 8px;
+}
+.goalkeeper-team-chip {
+  min-height: 44px;
+  padding: 0 8px;
+  border-radius: var(--radius-pill);
+  font-size: 13.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.goalkeeper-team-chip[hidden] { display: none; }
+@media (max-width: 700px) {
+  .goalkeeper-team-chips { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
