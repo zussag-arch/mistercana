@@ -2967,6 +2967,11 @@ function renderRosterMetricsPanel(state: AppState): string {
    PARTICIPANTS
 ========================= */
 
+// Tessera Partecipanti: in asta live si mostra in Dashboard, non nella pagina Asta.
+export function renderAuctionParticipantsCard(state: AppState): string {
+  return renderParticipants(state, buildParticipants(state))
+}
+
 function renderParticipants(
   state: AppState,
   participants:
@@ -3842,11 +3847,6 @@ function renderLiveAuction(
           state,
         )}
       </div>
-
-      ${renderParticipants(
-        state,
-        participants,
-      )}
 
       <div class="auction-market-followup">
         ${renderTopICaPanel(state)}

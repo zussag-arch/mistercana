@@ -1,3 +1,4 @@
+import { renderAuctionParticipantsCard } from './auction'
 import { getCachedPlayersDataset, loadPlayersDataset } from '../services/playerRepository'
 import { summarizeManagerAssignments } from '../services/auctionPlayerResolver'
 import { ROSTER_SLOT_LIMITS } from '../domain/auctionContext'
@@ -1103,7 +1104,7 @@ export function renderDashboardPage(
         >
         </div>
       </div>
-      ${state.auctionPhase === 'live' ? renderLiveSummary(state) : renderSetupSteps(state, activeManagers.length, distributionIsValid)}
+      ${state.auctionPhase === 'live' ? renderLiveSummary(state) + `<div class="dashboard-participants">${renderAuctionParticipantsCard(state)}</div>` : renderSetupSteps(state, activeManagers.length, distributionIsValid)}
 
       <section
         class="
