@@ -2,16 +2,22 @@ let blinkTimer:
   number | null = null
 
 let isLive = false
-let brightPhase = false
+let frameIndex = 0
 
-const BLINK_INTERVAL_MS =
-  800
+/*
+  Pulsazione morbida come il pallino LIVE della dashboard:
+  un ciclo di 1,4 s in cui il verde va da pieno a 30% e torna.
+  I browser non animano la favicon, quindi si cambiano
+  fotogrammi già pronti.
+*/
+const PULSE_PERIOD_MS =
+  1400
+
+const PULSE_FRAMES =
+  16
 
 const DOT_RED_ON =
   '#F04F4F'
-
-const DOT_GREEN_OFF =
-  '#2F6F50'
 
 const DOT_GREEN_ON =
   '#46E6A1'
@@ -44,6 +50,7 @@ function getFaviconLink():
 
 function createFaviconSvg(
   dotColor: string,
+  opacity = 1,
 ): string {
   return `
     <svg
@@ -55,6 +62,7 @@ function createFaviconSvg(
         cy="32"
         r="27"
         fill="${dotColor}"
+        fill-opacity="${opacity.toFixed(2)}"
       />
 
       <circle
@@ -69,22 +77,37 @@ function createFaviconSvg(
   `
 }
 
+function faviconHref(
+  dotColor: string,
+  opacity = 1,
+): string {
+  return `data:image/svg+xml,${encodeURIComponent(
+    createFaviconSvg(
+      dotColor,
+      opacity,
+    ),
+  )}`
+}
+
 function applyFavicon(
   dotColor: string,
 ): void {
-  const link =
-    getFaviconLink()
-
-  const svg =
-    createFaviconSvg(
-      dotColor,
-    )
-
-  link.href =
-    `data:image/svg+xml,${encodeURIComponent(
-      svg,
-    )}`
+  getFaviconLink().href =
+    faviconHref(dotColor)
 }
+
+// opacità su curva coseno: 1 → 0,3 → 1, senza scatti
+const LIVE_FRAMES: string[] =
+  Array.from(
+    { length: PULSE_FRAMES },
+    (_, index) =>
+      faviconHref(
+        DOT_GREEN_ON,
+        0.65 + 0.35 * Math.cos(
+          (index / PULSE_FRAMES) * Math.PI * 2,
+        ),
+      ),
+  )
 
 function stopBlinking():
   void {
@@ -98,7 +121,7 @@ function stopBlinking():
     blinkTimer = null
   }
 
-  brightPhase = false
+  frameIndex = 0
 }
 
 function showInactive():
@@ -112,30 +135,25 @@ function showInactive():
 
 function showLiveFrame():
   void {
-  applyFavicon(
-    brightPhase
-      ? DOT_GREEN_ON
-      : DOT_GREEN_OFF,
-  )
+  getFaviconLink().href =
+    LIVE_FRAMES[frameIndex]
 }
 
 function startBlinking():
   void {
   stopBlinking()
 
-  brightPhase = false
-
   showLiveFrame()
 
   blinkTimer =
     window.setInterval(
       () => {
-        brightPhase =
-          !brightPhase
+        frameIndex =
+          (frameIndex + 1) % PULSE_FRAMES
 
         showLiveFrame()
       },
-      BLINK_INTERVAL_MS,
+      PULSE_PERIOD_MS / PULSE_FRAMES,
     )
 }
 
