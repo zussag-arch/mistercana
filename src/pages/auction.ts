@@ -2969,7 +2969,8 @@ function renderRosterMetricsPanel(state: AppState): string {
 
 // Tessera Partecipanti: in asta live si mostra in Dashboard, non nella pagina Asta.
 export function renderAuctionParticipantsCard(state: AppState): string {
-  return renderParticipants(state, buildParticipants(state))
+  // l'owner è già nella tessera grande "La tua asta": qui solo gli avversari
+  return renderParticipants(state, buildParticipants(state).filter((participant) => !participant.isOwner))
 }
 
 function renderParticipants(
