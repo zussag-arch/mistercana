@@ -1073,3 +1073,10 @@ function render():
 }
 
 render()
+
+// PWA: registra il service worker solo nella versione pubblicata
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch(() => { /* senza copia offline l'app funziona lo stesso */ })
+  })
+}

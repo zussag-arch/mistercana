@@ -121,3 +121,33 @@ h1, h2, h3,
 :root[data-theme="light"] .auction-call-discard-button {
   color: color-mix(in srgb, var(--red) 55%, var(--text)) !important;
 }
+
+/* PWA su iPhone: spazio per notch e barra di stato */
+body {
+  padding-top: env(safe-area-inset-top);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* telefono */
+@media (max-width: 700px) {
+  .dashboard-setup-steps { grid-template-columns: 1fr !important; }
+  .dashboard-setup-steps li.dashboard-step-cta .dashboard-go-button { min-height: 64px; }
+
+  /* azioni della pagina su una riga propria, scorrevole */
+  .topbar { grid-template-columns: minmax(0, 1fr) auto !important; row-gap: 8px; }
+  .topbar-page-actions {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    order: 3;
+    justify-content: flex-start;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+  .topbar-page-actions::-webkit-scrollbar { display: none; }
+  .topbar-page-actions > * { flex: 0 0 auto; }
+  .main-nav { grid-column: 1 / -1; grid-row: 2; overflow-x: auto; scrollbar-width: none; }
+  .theme-toggle { grid-column: 2; grid-row: 1; position: static; }
+}
