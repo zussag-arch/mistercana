@@ -48,7 +48,7 @@
 
   color: var(--accent);
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 850;
 
   letter-spacing: 0.14em;
@@ -98,7 +98,7 @@
 
   color: var(--muted);
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 750;
 }
 
@@ -128,7 +128,7 @@
 
   color: var(--muted);
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 820;
 
   letter-spacing: 0.025em;
@@ -360,7 +360,7 @@
 
   color: var(--text-soft);
 
-  font-size: 10px;
+  font-size: 11px;
 
   cursor: pointer;
 
@@ -392,7 +392,7 @@
 
   color: var(--muted-soft);
 
-  font-size: 9px;
+  font-size: 11px;
 }
 
 @media (hover: hover) {
@@ -513,7 +513,7 @@
 .objectives-search-player small {
   color: var(--muted);
 
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .objective-add-button {
@@ -534,7 +534,7 @@
 
   color: var(--accent);
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 750;
 
   cursor: pointer;
@@ -569,7 +569,7 @@
 .objective-existing-label {
   color: var(--muted);
 
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .objectives-search-empty {
@@ -579,7 +579,7 @@
 
   color: var(--muted);
 
-  font-size: 10px;
+  font-size: 11px;
 }
 
 @media (hover: hover) {
@@ -696,7 +696,7 @@
 
   color: var(--muted);
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 750;
 
   font-variant-numeric:
@@ -750,7 +750,7 @@
 
   border-radius: 11px;
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 900;
 
   transition:
@@ -856,7 +856,7 @@
 
   color: var(--muted);
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 800;
 
   text-transform: uppercase;
@@ -878,7 +878,7 @@
 
   color: var(--muted);
 
-  font-size: 8px;
+  font-size: 11px;
 
   font-variant-numeric:
     tabular-nums;
@@ -966,7 +966,7 @@
 
   color: var(--text);
 
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 720;
 
   white-space: nowrap;
@@ -977,7 +977,7 @@
 .objective-player-main small {
   color: var(--muted-soft);
 
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .objective-player-actions {
@@ -1007,7 +1007,7 @@
 
   color: var(--muted);
 
-  font-size: 8px;
+  font-size: 11px;
 
   cursor: pointer;
 
@@ -1118,7 +1118,7 @@
 
   color: var(--muted-soft);
 
-  font-size: 8px;
+  font-size: 11px;
 }
 
 /* =========================
@@ -1132,7 +1132,7 @@
 
   color: var(--muted-soft);
 
-  font-size: 9px;
+  font-size: 11px;
 }
 
 /* =========================
@@ -1219,7 +1219,7 @@
       0
       10px;
 
-    font-size: 10px;
+    font-size: 11px;
   }
 
   .objective-remove-button {

@@ -14,11 +14,14 @@ import './styles/theme-v3-dashboard.css'
 import './styles/theme-v3-objectives.css'
 import './styles/theme-v3-data.css'
 import './styles/theme-light.css'
+import './styles/theme-refine.css'
 import { initTheme } from './theme'
 import { initRoundSelects } from './components/roundSelect'
+import { initAuctionShortcuts } from './components/auctionShortcuts'
 
 initTheme()
 initRoundSelects()
+initAuctionShortcuts()
 
 import {
   renderNavigation,

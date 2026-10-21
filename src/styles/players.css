@@ -65,7 +65,7 @@
 
   color: var(--accent);
 
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
 
   letter-spacing: 0.14em;
@@ -91,7 +91,7 @@
 
   color: var(--accent);
 
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
 
   cursor: pointer;
@@ -553,7 +553,7 @@ input[type="search"] {
 
   color: var(--muted);
 
-  font-size: 10px;
+  font-size: 11px;
 
   text-transform: uppercase;
 
@@ -701,7 +701,7 @@ input[type="search"] {
 
   background: var(--surface-raised);
 
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 900;
 }
 
@@ -781,7 +781,7 @@ input[type="search"] {
   border-radius:
     var(--radius-pill);
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 800;
 
   letter-spacing: 0.04em;
@@ -844,7 +844,7 @@ input[type="search"] {
 
   color: var(--text-soft);
 
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 800;
   line-height: 1;
 }
@@ -897,7 +897,7 @@ input[type="search"] {
 .player-signal {
   padding: 2px 5px;
 
-  font-size: 8px;
+  font-size: 11px;
 
   white-space: nowrap;
 }
@@ -1059,7 +1059,7 @@ input[type="search"] {
 
     color: var(--muted);
 
-    font-size: 9px;
+    font-size: 11px;
 
     text-transform: uppercase;
   }
@@ -1157,7 +1157,7 @@ input[type="search"] {
   .players-player-cell small {
     margin-top: 0;
 
-    font-size: 10px;
+    font-size: 11px;
   }
 
   .role-badge {
@@ -1185,7 +1185,7 @@ input[type="search"] {
 
     margin: 0 5px 0 0;
 
-    font-size: 7px;
+    font-size: 11px;
     line-height: 1;
 
     color: var(--muted);
@@ -1204,7 +1204,7 @@ input[type="search"] {
   .player-status {
     padding: 3px 5px;
 
-    font-size: 7px;
+    font-size: 11px;
 
     white-space: nowrap;
   }
@@ -1212,7 +1212,7 @@ input[type="search"] {
   .player-signal {
     padding: 2px 4px;
 
-    font-size: 7px;
+    font-size: 11px;
   }
 
   .players-name-line .player-signals {

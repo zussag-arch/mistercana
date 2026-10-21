@@ -294,7 +294,7 @@ button:disabled {
 
   color: var(--accent);
 
-  font-size: 7px;
+  font-size: 11px;
   font-weight: 900;
 
   letter-spacing: 0.12em;
@@ -384,7 +384,7 @@ button:disabled {
 
   color: var(--muted);
 
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 750;
 
   white-space: nowrap;
@@ -481,7 +481,7 @@ button:disabled {
 
   border-radius: 12px;
 
-  font-size: 9px;
+  font-size: 11px;
 
   box-shadow: none;
 }
@@ -537,7 +537,7 @@ button:disabled {
 .topbar
 .topbar-page-actions
 .auction-toolbar-stat span {
-  font-size: 7px;
+  font-size: 11px;
 }
 
 .topbar
@@ -568,7 +568,7 @@ button:disabled {
 
   border-radius: 11px;
 
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .topbar
@@ -582,7 +582,7 @@ button:disabled {
 
   border-radius: 11px;
 
-  font-size: 8px;
+  font-size: 11px;
 }
 
 /*
@@ -1066,7 +1066,7 @@ button:disabled {
 
   color: var(--muted);
 
-  font-size: 10px;
+  font-size: 11px;
 
   white-space: nowrap;
   overflow: hidden;
@@ -1083,7 +1083,7 @@ button:disabled {
 
   color: var(--text-soft);
 
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .manager-card-bottom {
@@ -1097,7 +1097,7 @@ button:disabled {
 .manager-participation-label {
   color: var(--muted);
 
-  font-size: 9px;
+  font-size: 11px;
 }
 
 /* =========================
@@ -1229,7 +1229,7 @@ button:disabled {
 
   text-align: left;
 
-  font-size: 10px;
+  font-size: 11px;
 
   cursor: pointer;
 
@@ -1475,7 +1475,7 @@ input:disabled
   border-radius:
     var(--radius-sm);
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 800;
 }
 
@@ -1742,7 +1742,7 @@ input:disabled
 .eyebrow {
   color: var(--muted);
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 800;
 
   letter-spacing: 0.12em;
@@ -1943,7 +1943,7 @@ input:disabled
       0
       7px;
 
-    font-size: 7px;
+    font-size: 11px;
   }
 
   .topbar
@@ -2148,7 +2148,7 @@ input:disabled
       0
       8px;
 
-    font-size: 7px;
+    font-size: 11px;
   }
 
   .main-nav {

@@ -2516,18 +2516,13 @@ function renderSuggestedPlayersPanel(
         class="auction-panel-title"
       >
         <div>
-          <span
-            class="auction-kicker"
-          >
-            ${
-              activeRole === 'P'
-                ? 'STRATEGIA PORTIERI · AUTO'
-                : `SERVE ${targetLabel}`
-            }
-          </span>
-
           <h3>
             Chiamata consigliata
+            <small class="auction-title-note">${
+              activeRole === 'P'
+                ? 'strategia portieri'
+                : `serve ${targetLabel}`
+            }</small>
           </h3>
         </div>
       </div>
@@ -3120,41 +3115,15 @@ function renderParticipants(
    HISTORY
 ========================= */
 
-// Stato di attesa tra una chiamata e l'altra, con recap degli ultimi assegnati.
-const WAITING_RECAP_SIZE = 5
-
+// Stato di attesa tra una chiamata e l'altra (lo storico è subito sotto).
 function renderWaitingForCall(
   state: AppState,
 ): string {
-  const recent = state.auctionAssignments
-    .slice(-WAITING_RECAP_SIZE)
-    .reverse()
-    .map((assignment) => {
-      const player = resolveAssignmentPlayer(assignment, getCachedPlayersDataset())
-      if (!player) return ''
-      const manager = getManagerById(state, assignment.managerId)
-      return `
-        <li class="auction-waiting-row">
-          <span class="auction-role-badge role-${player.role.toLowerCase()}">${player.role}</span>
-          <span class="auction-waiting-name">${escapeHtml(player.name)}</span>
-          <span class="auction-waiting-manager">${manager ? escapeHtml(managerDisplayName(manager)) : '—'}</span>
-          <strong>${assignment.price}</strong>
-        </li>
-      `
-    })
-    .join('')
 
   return `
     <section class="auction-player-card auction-no-player">
-      <span class="auction-kicker">CHIAMATA CORRENTE</span>
       <h2>${state.auctionAssignments.length ? 'In attesa della prossima chiamata' : 'Nessun giocatore selezionato'}</h2>
-      <p>Seleziona squadra o giocatore.</p>
-      ${recent
-        ? `<div class="auction-waiting-recap">
-            <span class="auction-kicker">ULTIMI ASSEGNATI</span>
-            <ol>${recent}</ol>
-          </div>`
-        : ''}
+      <p>Cerca squadra o giocatore qui sopra, oppure chiama il consigliato a destra.</p>
     </section>
   `
 }
@@ -5420,8 +5389,8 @@ function renderFldaPlayerCard(
       ` : '<p class="muted-text">Le metriche prive di input FLDA verificabili restano non disponibili.</p>'}
       <div class="auction-live-price-row">
         <label class="auction-live-price-field"><span>Prezzo corrente</span><input id="auctionPriceInput" type="number" inputmode="numeric" min="0" step="1" placeholder="0" ${assigned ? 'disabled' : ''}></label>
-        <div class="auction-price-stepper"><button id="auctionPricePlusOneButton" type="button" ${assigned ? 'disabled' : ''}>+1</button><button id="auctionPricePlusTenButton" type="button" ${assigned ? 'disabled' : ''}>+10</button></div>
-        <button id="auctionOpenAwardButton" type="button" class="auction-primary-action" ${assigned ? 'disabled' : ''}>Aggiudicato</button>
+        <div class="auction-price-stepper"><button id="auctionPricePlusOneButton" type="button" title="+1 (Spazio)" ${assigned ? 'disabled' : ''}>+1</button><button id="auctionPricePlusTenButton" type="button" title="+10 (Maiusc+Spazio)" ${assigned ? 'disabled' : ''}>+10</button></div>
+        <button id="auctionOpenAwardButton" type="button" class="auction-primary-action" title="Aggiudicato (Invio)" ${assigned ? 'disabled' : ''}>Aggiudicato</button>
         <button id="auctionUnsoldButton" type="button" class="auction-secondary-action" ${assigned ? 'disabled' : ''}>Invenduto</button>
         <button id="auctionCancelCallButton" type="button" class="auction-secondary-action">Annulla</button>
       </div>

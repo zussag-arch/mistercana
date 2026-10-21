@@ -87,13 +87,13 @@
 
   color: var(--muted);
 
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .insight-eyebrow {
   color: var(--muted);
 
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 850;
 
   letter-spacing: 0.11em;
@@ -122,7 +122,7 @@
 
   color: var(--muted);
 
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 750;
 }
 
@@ -347,7 +347,7 @@
 
   color: var(--text-soft);
 
-  font-size: 10px;
+  font-size: 11px;
 
   text-align: left;
 
@@ -394,7 +394,7 @@
 
   color: var(--muted);
 
-  font-size: 9px;
+  font-size: 11px;
 }
 
 /* =========================
@@ -441,12 +441,12 @@
 .goalkeeper-recommendations-empty span {
   color: var(--muted);
 
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 750;
 }
 
 .goalkeeper-recommendations-empty small {
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .goalkeeper-selection-heading {
@@ -462,7 +462,7 @@
 .goalkeeper-selection-heading span {
   color: var(--muted);
 
-  font-size: 8px;
+  font-size: 11px;
 
   text-transform: uppercase;
 
@@ -472,7 +472,7 @@
 .goalkeeper-selection-heading strong {
   color: var(--text-soft);
 
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .goalkeeper-recommendations-list {
@@ -537,7 +537,7 @@
 
   color: var(--yellow);
 
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 900;
 }
 
@@ -552,7 +552,7 @@
 
   color: var(--text-soft);
 
-  font-size: 10px;
+  font-size: 11px;
 
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -565,7 +565,7 @@
 
   color: var(--muted-soft);
 
-  font-size: 7px;
+  font-size: 11px;
 }
 
 .goalkeeper-score {
@@ -589,7 +589,7 @@
 
   color: var(--accent);
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 850;
 
   font-variant-numeric:
@@ -765,7 +765,7 @@
 
   color: var(--muted);
 
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .goalkeeper-matrix-close {
@@ -873,7 +873,7 @@
 
   text-align: center;
 
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .goalkeeper-matrix-table thead th {
@@ -980,7 +980,7 @@
 
   color: var(--muted);
 
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .goalkeeper-matrix-legend span {
@@ -1026,7 +1026,7 @@
 
   text-align: center;
 
-  font-size: 10px;
+  font-size: 11px;
 }
 
 /* =========================
@@ -1104,7 +1104,7 @@
 .set-piece-label {
   color: var(--muted);
 
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 850;
 
   text-transform: uppercase;
@@ -1121,7 +1121,7 @@
 
   color: var(--text-soft);
 
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .set-piece-empty {
@@ -1207,7 +1207,7 @@
 
   color: var(--muted);
 
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .coach-formation {
@@ -1224,7 +1224,7 @@
 
   color: var(--text-soft);
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 800;
 }
 
@@ -1381,7 +1381,7 @@
 
   border-radius: 50%;
 
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 950;
 
   transform:
@@ -1510,7 +1510,7 @@
 
   color: var(--text-soft);
 
-  font-size: 8px;
+  font-size: 11px;
 
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -1523,7 +1523,7 @@
 
   color: var(--muted-soft);
 
-  font-size: 7px;
+  font-size: 11px;
 }
 
 .coach-role-dot {
@@ -1539,7 +1539,7 @@
 
   border-radius: 50%;
 
-  font-size: 6px;
+  font-size: 11px;
   font-weight: 900;
 }
 
@@ -1553,7 +1553,7 @@
 
   text-align: center;
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 800;
 
   font-variant-numeric:
@@ -1621,7 +1621,7 @@
 
   color: var(--muted);
 
-  font-size: 10px;
+  font-size: 11px;
 }
 
 /* =========================

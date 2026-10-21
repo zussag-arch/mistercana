@@ -1,0 +1,123 @@
+/* =========================
+   RIFINITURA (regole "Impeccable", modalità Operate)
+   - niente etichette sopra i titoli: il titolo parla da solo
+   - un livello di riquadri in meno
+   - carattere dei titoli solo per titoli e numeri principali;
+     dati e pulsanti in Lexend con cifre allineate
+========================= */
+
+/* 1. etichette sopra i titoli */
+.auction-kicker,
+.dashboard-eyebrow,
+.insight-eyebrow,
+.data-transfer-eyebrow,
+.players-eyebrow,
+.eyebrow,
+.auction-award-section-kicker {
+  display: none !important;
+}
+
+/* nota accanto al titolo (es. "serve A2") */
+.auction-title-note {
+  margin-left: 6px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--accent);
+  text-transform: none;
+}
+
+/* 2. consigliato: niente riquadro dentro il riquadro */
+.auction-call-recommendation {
+  padding: 4px 0 0;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+.auction-call-meta > * {
+  border: 0 !important;
+  background: rgba(var(--ink-rgb), 0.04) !important;
+}
+.auction-call-alternative {
+  border: 0 !important;
+  border-top: 1px solid var(--line-2) !important;
+  border-radius: 0 !important;
+  background: none !important;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* attesa: compatta, senza vuoto */
+.auction-player-card.auction-no-player {
+  min-height: 0 !important;
+  padding: 28px 32px !important;
+  text-align: left;
+  align-items: flex-start;
+  justify-content: center;
+}
+.auction-player-card.auction-no-player h2 { font-size: 24px; margin: 0 0 6px; }
+.auction-player-card.auction-no-player p { margin: 0; color: var(--muted); font-size: 14px; }
+
+/* 3. caratteri: Lexend con cifre allineate per pulsanti e dati */
+button,
+.auction-primary-action,
+.auction-history-price strong,
+.auction-top-ica-row > b,
+.auction-competitor-card strong,
+.auction-call-meta strong,
+.players-table-body,
+.goalkeeper-matrix-table td {
+  font-family: var(--font-ui) !important;
+  font-variant-numeric: tabular-nums;
+}
+.auction-primary-action {
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+/* restano in Unbounded solo titoli e numeri "eroe" */
+h1, h2, h3,
+.brand,
+.auction-ceiling-value,
+.dashboard-live-kpi strong,
+.auction-main-value strong {
+  font-family: var(--font-display);
+}
+
+/* promemoria delle scorciatoie sotto i pulsanti di prezzo */
+.auction-live-price-row::after {
+  content: "Tastiera:  Spazio +1  ·  Maiusc+Spazio +10  ·  Invio Aggiudicato";
+  grid-column: 1 / -1;
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--muted);
+  white-space: pre;
+}
+@media (hover: none) {
+  .auction-live-price-row::after { display: none; }
+}
+
+/* barra in alto: con i testi a 11 px servono pulsanti più asciutti */
+.topbar-page-actions { gap: 6px; }
+.topbar-page-actions button,
+.topbar-page-actions .auction-toolbar-button {
+  min-height: 32px;
+  padding: 0 10px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.topbar-page-actions .auction-toolbar-stat span { display: none; }
+.topbar-page-actions .auction-role-tab { width: 30px; }
+.main-nav { gap: 2px; }
+.main-nav .nav-item { padding-inline: 9px; white-space: nowrap; }
+
+/* attesa: non si allunga a riempire la colonna */
+.auction-workspace-main > .auction-no-player { flex: 0 0 auto !important; height: auto !important; }
+.main-nav .nav-item { padding-inline: 6px; font-size: 13px; }
+
+/* tema chiaro: testi rossi dei pulsanti più scuri, per il contrasto */
+:root[data-theme="light"] .auction-history-actions button:last-child,
+:root[data-theme="light"] .danger-button,
+:root[data-theme="light"] .auction-call-discard-button {
+  color: color-mix(in srgb, var(--red) 55%, var(--text)) !important;
+}
