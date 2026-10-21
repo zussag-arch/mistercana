@@ -681,8 +681,7 @@ function applyCsvFiles(): void {
 const LOCAL_FLDA_URL = 'http://127.0.0.1:8765'
 const SYNC_STEPS: Record<string, string> = {
   login: 'Login FantaLab',
-  update: 'Download dati',
-  season: 'Stagione in corso',
+  download: 'Download da FantaLab',
   export: 'Preparazione file',
 }
 
@@ -739,7 +738,7 @@ async function startFantalabSync(): Promise<void> {
   }
   while (syncRunning) {
     await new Promise((resolve) => window.setTimeout(resolve, 1500))
-    let state: { status: string; step?: string | null; message?: string }
+    let state: { status: string; step?: string | null; message?: string; warnings?: string[] }
     try {
       state = await (await syncRequest('/api/fantalab/sync')).json()
     } catch {
@@ -762,7 +761,12 @@ async function startFantalabSync(): Promise<void> {
         const text = await (await syncRequest(`/api/fantalab/export/${name}.csv`)).text()
         return analyzeCsv(`${name}.csv`, text, current)
       }))
-      syncState = { status: 'done', message: 'Dati scaricati da FantaLab: controlla l\'anteprima qui sotto e premi Applica.' }
+      const warnings = state.warnings ?? []
+      syncState = {
+        status: 'done',
+        message: 'Dati scaricati da FantaLab: controlla l\'anteprima qui sotto e premi Applica.'
+          + (warnings.length ? ` Avvisi (${warnings.length}): ${warnings.slice(0, 5).join(' · ')}${warnings.length > 5 ? ' …' : ''}` : ''),
+      }
     } catch {
       syncState = { status: 'error', message: 'Dati scaricati ma file non leggibili da FLDA.' }
     }
