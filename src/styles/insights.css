@@ -614,7 +614,7 @@
   padding: 28px;
 
   background:
-    rgba(5, 7, 8, 0.82);
+    color-mix(in srgb, var(--bg) 82%, transparent);
 
   backdrop-filter:
     blur(8px);

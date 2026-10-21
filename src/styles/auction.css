@@ -2323,7 +2323,7 @@ span:not(.auction-role-badge) {
     color-mix(in srgb, var(--accent) 21%, transparent);
 
   background:
-    rgba(12, 22, 17, 0.58);
+    color-mix(in srgb, var(--bg) 58%, transparent);
 }
 
 .auction-award-price-input-wrap {
@@ -2776,7 +2776,7 @@ button.danger {
 
 .auction-finalization-backdrop {
   background:
-    rgba(4, 6, 7, 0.78);
+    color-mix(in srgb, var(--bg) 78%, transparent);
 
   backdrop-filter:
     blur(5px);

@@ -50,8 +50,8 @@
   --role-a: #ef9f9f;
 
   --ink-rgb: 52, 56, 60;
-  --line-1: rgba(52, 56, 60, 0.16);
-  --line-2: rgba(52, 56, 60, 0.09);
+  --line-1: color-mix(in srgb, var(--bg) 16%, transparent);
+  --line-2: color-mix(in srgb, var(--bg) 9%, transparent);
   --on-color: #2e3236;
 }
 
@@ -148,3 +148,41 @@
   border-color: var(--text);
   color: var(--surface);
 }
+
+/* overlay aggiudicazione: tutti i campi con bordo e fondo chiaro */
+:root[data-theme="light"] .auction-award-field select,
+:root[data-theme="light"] .auction-award-field input {
+  border: 1px solid var(--line-1);
+  background-color: var(--surface);
+}
+
+/* tendina arrotondata (sostituisce quella del sistema) */
+.round-select-menu {
+  position: fixed;
+  z-index: 5000;
+  max-height: 320px;
+  overflow: auto;
+  padding: 6px;
+  display: grid;
+  gap: 2px;
+  border: 1px solid var(--line-1);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.28);
+  scrollbar-width: thin;
+}
+.round-select-option {
+  padding: 9px 14px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text-soft);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.round-select-option:hover { background: rgba(var(--ink-rgb), 0.07); color: var(--text); }
+.round-select-option.selected { background: var(--accent); color: var(--accent-ink); font-weight: 700; }
+.round-select-option:disabled { opacity: 0.4; cursor: default; }

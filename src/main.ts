@@ -15,8 +15,10 @@ import './styles/theme-v3-objectives.css'
 import './styles/theme-v3-data.css'
 import './styles/theme-light.css'
 import { initTheme } from './theme'
+import { initRoundSelects } from './components/roundSelect'
 
 initTheme()
+initRoundSelects()
 
 import {
   renderNavigation,

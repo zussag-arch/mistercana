@@ -79,7 +79,7 @@
     var(--radius-pill);
 
   background:
-    rgba(10, 46, 35, 0.95);
+    color-mix(in srgb, var(--bg) 95%, transparent);
 
   color: var(--accent);
 
@@ -206,7 +206,7 @@
     linear-gradient(
       180deg,
       color-mix(in srgb, var(--accent) 70%, transparent),
-      rgba(8, 36, 28, 0.85)
+      color-mix(in srgb, var(--bg) 85%, transparent)
     ),
     var(--bg);
 }

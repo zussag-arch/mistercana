@@ -865,7 +865,7 @@ button:disabled {
   border-color: var(--line-1);
 
   background: var(--surface-raised);
-  color: white;
+  color: var(--text);
 }
 
 .profile-button:disabled {
@@ -952,7 +952,7 @@ button:disabled {
 }
 
 .budget-field > span {
-  color: white;
+  color: var(--text);
 
   font-weight: 800;
 }
@@ -1151,7 +1151,7 @@ button:disabled {
     var(--border);
 
   background: var(--surface-light);
-  color: white;
+  color: var(--text);
 }
 
 .manager-menu-button:active {
@@ -1281,7 +1281,7 @@ button:disabled {
 }
 
 .add-manager-card:hover {
-  color: white;
+  color: var(--text);
 
   border-color: var(--line-1);
 }
@@ -1759,7 +1759,7 @@ input:disabled
     var(--radius-sm);
 
   background: var(--surface);
-  color: white;
+  color: var(--text);
 
   cursor: pointer;
 
