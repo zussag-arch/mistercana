@@ -11,8 +11,13 @@ import { calculateICaV3, coachRoleTone } from '../domain/icaV3'
 import type { ICaCoachRole } from '../domain/icaV3'
 import type { ICaV3Input, ICaV3Result, ICaV3Role } from '../domain/icaV3'
 import { players as listone } from './players'
-import goalkeeperGridCsv from '../../database/griglia_portieri.csv?raw'
-import attackerGridCsv from '../../database/griglia_attaccanti.csv?raw'
+import goalkeeperGridCsvBundled from '../../database/griglia_portieri.csv?raw'
+import attackerGridCsvBundled from '../../database/griglia_attaccanti.csv?raw'
+import { getCsv } from './csvOverrides'
+
+// CSV caricati dalla pagina Import/Export, altrimenti quelli del progetto
+const goalkeeperGridCsv = getCsv('griglia_portieri', goalkeeperGridCsvBundled)
+const attackerGridCsv = getCsv('griglia_attaccanti', attackerGridCsvBundled)
 
 function finite(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value)

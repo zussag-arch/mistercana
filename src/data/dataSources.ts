@@ -1,11 +1,16 @@
 // Riepilogo delle fonti dati effettivamente usate dall'app, con i numeri veri
 // (per la pagina Import/Export). Nessuna richiesta di rete: legge i file in database/.
-import goalkeeperGridCsv from '../../database/griglia_portieri.csv?raw'
-import attackerGridCsv from '../../database/griglia_attaccanti.csv?raw'
+import goalkeeperGridCsvBundled from '../../database/griglia_portieri.csv?raw'
+import attackerGridCsvBundled from '../../database/griglia_attaccanti.csv?raw'
 import { localPlayers, localTeamGuide } from '../services/fantalabLocal'
 import { players as listone } from './players'
 import { getSaggiForPlayer } from './saggi'
 import { goalkeeperCalendarTeams } from './goalkeeperCalendar'
+import { getCsv } from './csvOverrides'
+
+// CSV caricati dalla pagina Import/Export, altrimenti quelli del progetto
+const goalkeeperGridCsv = getCsv('griglia_portieri', goalkeeperGridCsvBundled)
+const attackerGridCsv = getCsv('griglia_attaccanti', attackerGridCsvBundled)
 
 export interface DataSourceSummary {
   key: string

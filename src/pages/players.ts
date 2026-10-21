@@ -1,3 +1,4 @@
+import { isFldaLocalMode } from '../services/flda'
 import { getICaV3 } from '../data/icaV3Data'
 import type { AppState } from '../app/state'
 import { runOverlayExit } from '../app/motion'
@@ -232,7 +233,7 @@ export function renderPlayersPage(state: AppState): string {
     </div>
     ${dataset?.source === 'legacy' ? `<div class="players-source-warning">FLDA non raggiungibile. Fallback legacy attivo. ${escapePlayerHtml(dataset.error)}</div>` : ''}
     ${!dataset ? '<div class="players-loading">Caricamento giocatori FLDA…</div>' : `<div class="players-table-card"><div class="players-table-header"><span>Giocatore</span>${sortButton('iCà','ica')}<span>PMA</span>${sortButton('xFM','fm_exp')}${sortButton('Titolarità','titolarita_display')}${sortButton('MV/FMV','mv_fmv')}${sortButton('Stato','status')}</div><div class="players-table-body">${rows.map((player) => renderRow(state, player)).join('') || '<div class="players-empty">Nessun giocatore corrisponde ai filtri.</div>'}</div></div>`}
-    <div class="players-footer-info"><span><span data-players-count>${rows.length}</span> giocatori</span><span>${dataset?.source === 'flda' ? 'Fonte FLDA' : 'Fonte legacy'}</span></div>
+    <div class="players-footer-info"><span><span data-players-count>${rows.length}</span> giocatori</span><span>${dataset?.source !== 'flda' ? 'Fonte: vecchio listone' : isFldaLocalMode() ? 'Fonte: tabelle FantaLab' : 'Fonte: FLDA'}</span></div>
     ${renderOverlay(state, source)}
   </section>`
 }

@@ -187,3 +187,121 @@
   color: var(--muted);
   font-size: 12.5px;
 }
+
+/* =========================
+   CARICA NUOVI DATI
+========================= */
+
+.csv-upload {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 16px 18px;
+  border: 1.5px dashed color-mix(in srgb, var(--accent) 45%, transparent);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--accent) 6%, var(--surface));
+}
+
+.csv-upload-copy strong {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.csv-upload-copy p {
+  margin: 4px 0 0;
+  max-width: 70ch;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.csv-upload-button {
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.csv-upload-active {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--yellow) 12%, var(--surface));
+  color: var(--text-soft);
+  font-size: 12.5px;
+}
+
+.csv-preview {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.csv-preview-item {
+  padding: 12px 14px;
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-sm);
+  background: var(--surface-light);
+}
+
+.csv-preview-item.is-error {
+  border-left-color: var(--red);
+}
+
+.csv-preview-item header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.csv-preview-item header strong {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.csv-preview-item header small {
+  color: var(--muted);
+}
+
+.csv-preview-item header span {
+  margin-left: auto;
+  padding: 2px 9px;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 11.5px;
+  font-weight: 800;
+}
+
+.csv-preview-item.is-error header span {
+  background: var(--red);
+  color: #2b0a0a;
+}
+
+.csv-preview-item ul {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.csv-preview-item li.error {
+  color: var(--red);
+  font-weight: 700;
+}
+
+.csv-preview-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

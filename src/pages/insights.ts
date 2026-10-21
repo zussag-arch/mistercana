@@ -1,11 +1,8 @@
-import goalkeepersCsv
-  from '../../database/griglia_portieri.csv?raw'
+import goalkeepersCsvBundled from '../../database/griglia_portieri.csv?raw'
 
-import attackersCsv
-  from '../../database/griglia_attaccanti.csv?raw'
+import attackersCsvBundled from '../../database/griglia_attaccanti.csv?raw'
 
-import fantalabCoachesCsv
-  from '../../database/fantalab_allenatori.csv?raw'
+import fantalabCoachesCsvBundled from '../../database/fantalab_allenatori.csv?raw'
 
 import { getCachedPlayersDataset } from '../services/playerRepository'
 import { getICaV3Results } from '../data/icaV3Data'
@@ -23,6 +20,12 @@ import {
 import type {
   GoalkeeperCoverage,
 } from '../data/goalkeeperCalendar'
+import { getCsv } from '../data/csvOverrides'
+
+// CSV caricati dalla pagina Import/Export, altrimenti quelli del progetto
+const goalkeepersCsv = getCsv('griglia_portieri', goalkeepersCsvBundled)
+const attackersCsv = getCsv('griglia_attaccanti', attackersCsvBundled)
+const fantalabCoachesCsv = getCsv('fantalab_allenatori', fantalabCoachesCsvBundled)
 
 /* =========================
    TYPES

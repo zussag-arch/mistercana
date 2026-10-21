@@ -1,5 +1,5 @@
 import playersCsv from '../../database/MisterCana_DB_Giocatori_2026_27.csv?raw'
-import fantalabPlayersCsv from '../../database/fantalab_giocatori.csv?raw'
+import fantalabPlayersCsvBundled from '../../database/fantalab_giocatori.csv?raw'
 
 import {
   calculateConsensus,
@@ -9,6 +9,10 @@ import type {
   Player,
   PlayerRole,
 } from '../domain/player'
+import { getCsv } from './csvOverrides'
+
+// CSV caricati dalla pagina Import/Export, altrimenti quelli del progetto
+const fantalabPlayersCsv = getCsv('fantalab_giocatori', fantalabPlayersCsvBundled)
 
 /* =========================
    CSV

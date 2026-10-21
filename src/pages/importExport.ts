@@ -1,3 +1,11 @@
+import bundledPlayersCsv from '../../database/fantalab_giocatori.csv?raw'
+import bundledCoachesCsv from '../../database/fantalab_allenatori.csv?raw'
+import bundledGoalkeeperGridCsv from '../../database/griglia_portieri.csv?raw'
+import bundledAttackerGridCsv from '../../database/griglia_attaccanti.csv?raw'
+import { CSV_LABELS, clearCsvOverrides, getCsv, getCsvOverrides, saveCsvOverrides } from '../data/csvOverrides'
+import type { CsvKey, CsvOverride } from '../data/csvOverrides'
+import { analyzeCsv } from '../data/csvImport'
+import type { CsvAnalysis } from '../data/csvImport'
 import { getDataSources } from '../data/dataSources'
 import { getICaV3Results } from '../data/icaV3Data'
 import { localPlayers } from '../services/fantalabLocal'
@@ -538,7 +546,9 @@ function renderDataSourcesPanel(): string {
   const active = getCachedPlayersDataset()
   const label = active?.source === 'legacy'
     ? 'Vecchio listone (riserva)'
-    : isFldaLocalMode() || !active ? 'Tabelle FantaLab (locali)' : 'FLDA'
+    : isFldaLocalMode() || !active
+      ? (Object.keys(getCsvOverrides()).length ? 'Tabelle FantaLab (caricate nel browser)' : 'Tabelle FantaLab (locali)')
+      : 'FLDA'
   return `
     <section class="data-transfer-section data-sources-section">
       <div class="data-transfer-section-header">
@@ -559,17 +569,124 @@ function renderDataSourcesPanel(): string {
             <code>${escapeSourceHtml(source.file)}</code>
           </article>`).join('')}
       </div>
+      ${renderCsvUpload()}
       <details class="data-sources-howto">
         <summary>Come aggiornare i dati</summary>
         <ol>
           <li>Scarica da FantaLab i nuovi <code>fantalab_giocatori.csv</code> e <code>fantalab_allenatori.csv</code> (o le griglie).</li>
-          <li>Sostituisci i file con lo stesso nome nella cartella <code>database/</code> del progetto.</li>
-          <li>Ricarica la pagina: l'app rilegge i file. Codici storici, obiettivi e assegnazioni restano collegati.</li>
-          <li>Per pubblicare la versione online, fai commit e push su GitHub.</li>
+          <li>Premi <b>Scegli file CSV</b> qui sopra, controlla l'anteprima e premi <b>Applica</b>: l'app li usa subito, solo in questo browser.</li>
+          <li>Codici storici, obiettivi e assegnazioni restano collegati tramite l'ID FantaLab.</li>
+          <li>Per renderli definitivi per tutti (anche online), sostituisci i file in <code>database/</code> e fai commit e push su GitHub.</li>
         </ol>
       </details>
     </section>
   `
+}
+
+/* =========================
+   CARICA NUOVI DATI (CSV)
+========================= */
+
+let pendingCsv: CsvAnalysis[] = []
+
+const BUNDLED_CSV: Record<CsvKey, string> = {
+  fantalab_giocatori: bundledPlayersCsv,
+  fantalab_allenatori: bundledCoachesCsv,
+  griglia_portieri: bundledGoalkeeperGridCsv,
+  griglia_attaccanti: bundledAttackerGridCsv,
+}
+
+function renderCsvUpload(): string {
+  const overrides = getCsvOverrides()
+  const active = (Object.keys(overrides) as CsvKey[])
+  return `
+    <div class="csv-upload">
+      <div class="csv-upload-copy">
+        <strong>Carica nuovi dati</strong>
+        <p>Scegli uno o più CSV appena scaricati (listone giocatori, allenatori, griglie). Prima di applicarli vedi un'anteprima delle differenze.</p>
+      </div>
+      <label class="data-transfer-button data-transfer-button-primary csv-upload-button">
+        Scegli file CSV
+        <input id="csvUploadInput" type="file" accept=".csv,text/csv" multiple hidden>
+      </label>
+    </div>
+    ${active.length ? `
+      <div class="csv-upload-active">
+        <span>In uso dati caricati nel browser: ${active.map((key) => `<b>${escapeSourceHtml(CSV_LABELS[key])}</b> (${escapeSourceHtml(overrides[key]!.fileName)}, ${new Date(overrides[key]!.loadedAt).toLocaleDateString('it-IT')})`).join(' · ')}</span>
+        <button id="csvResetOverrides" type="button" class="data-transfer-button">Torna ai dati originali</button>
+      </div>` : ''}
+    <div id="csvUploadPreview">${renderCsvPreview()}</div>
+  `
+}
+
+function renderCsvPreview(): string {
+  if (!pendingCsv.length) return ''
+  const valid = pendingCsv.filter((item) => item.ok)
+  return `
+    <div class="csv-preview">
+      ${pendingCsv.map((item) => `
+        <article class="csv-preview-item ${item.ok ? 'is-ok' : 'is-error'}">
+          <header>
+            <strong>${escapeSourceHtml(item.key ? CSV_LABELS[item.key] : 'File non riconosciuto')}</strong>
+            <small>${escapeSourceHtml(item.fileName)}</small>
+            <span>${item.ok ? 'OK' : 'Da correggere'}</span>
+          </header>
+          <ul>
+            ${item.errors.map((error) => `<li class="error">${escapeSourceHtml(error)}</li>`).join('')}
+            ${item.summary.map((line) => `<li>${escapeSourceHtml(line)}</li>`).join('')}
+          </ul>
+        </article>`).join('')}
+      <div class="csv-preview-actions">
+        <button id="csvUploadCancel" type="button" class="data-transfer-button">Annulla</button>
+        <button id="csvUploadApply" type="button" class="data-transfer-button data-transfer-button-primary" ${valid.length ? '' : 'disabled'}>Applica ${valid.length} file e ricarica</button>
+      </div>
+    </div>`
+}
+
+function refreshCsvPreview(): void {
+  const container = document.querySelector<HTMLElement>('#csvUploadPreview')
+  if (container) container.innerHTML = renderCsvPreview()
+}
+
+async function handleCsvFiles(files: FileList): Promise<void> {
+  const current = (key: CsvKey) => getCsv(key, BUNDLED_CSV[key])
+  pendingCsv = await Promise.all([...files].map(async (file) => analyzeCsv(file.name, await file.text(), current)))
+  refreshCsvPreview()
+}
+
+function applyCsvFiles(): void {
+  const loadedAt = new Date().toISOString()
+  const files: Partial<Record<CsvKey, CsvOverride>> = {}
+  for (const item of pendingCsv) {
+    if (item.ok && item.key) files[item.key] = { fileName: item.fileName, content: item.content, loadedAt }
+  }
+  try {
+    saveCsvOverrides(files)
+  } catch {
+    window.alert('Spazio del browser insufficiente per salvare i file.')
+    return
+  }
+  window.location.reload()
+}
+
+function bindCsvUpload(): void {
+  document.addEventListener('change', (event) => {
+    const input = event.target
+    if (input instanceof HTMLInputElement && input.id === 'csvUploadInput' && input.files?.length) {
+      void handleCsvFiles(input.files)
+      input.value = ''
+    }
+  })
+  document.addEventListener('click', (event) => {
+    const target = event.target
+    if (!(target instanceof Element)) return
+    if (target.closest('#csvUploadCancel')) { pendingCsv = []; refreshCsvPreview() }
+    if (target.closest('#csvUploadApply')) applyCsvFiles()
+    if (target.closest('#csvResetOverrides') && window.confirm('Tornare ai dati originali del progetto? I CSV caricati nel browser verranno eliminati.')) {
+      clearCsvOverrides()
+      window.location.reload()
+    }
+  })
 }
 
 function escapeSourceHtml(value: string): string {
@@ -1815,6 +1932,7 @@ export function bindImportExportEvents():
   document.addEventListener('click', (event) => {
     if (event.target instanceof Element && event.target.closest('#exportPlayerRatingsButton')) exportPlayerRatings()
   })
+  bindCsvUpload()
 
   document.addEventListener(
     'click',

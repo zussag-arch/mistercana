@@ -2,8 +2,8 @@
 // fantalab_allenatori.csv). Restituisce gli stessi formati del client FLDA,
 // così il resto dell'app non distingue le due sorgenti. Usata quando FLDA
 // non è raggiungibile.
-import giocatoriCsv from '../../database/fantalab_giocatori.csv?raw'
-import allenatoriCsv from '../../database/fantalab_allenatori.csv?raw'
+import giocatoriCsvBundled from '../../database/fantalab_giocatori.csv?raw'
+import allenatoriCsvBundled from '../../database/fantalab_allenatori.csv?raw'
 import type {
   FldaBulkHistoryResponse,
   FldaHistoryRecord,
@@ -12,6 +12,11 @@ import type {
   FldaPlayersPage,
   FldaRecord,
 } from './flda'
+import { getCsv } from '../data/csvOverrides'
+
+// CSV caricati dalla pagina Import/Export, altrimenti quelli del progetto
+const giocatoriCsv = getCsv('fantalab_giocatori', giocatoriCsvBundled)
+const allenatoriCsv = getCsv('fantalab_allenatori', allenatoriCsvBundled)
 
 type Row = Record<string, string>
 
