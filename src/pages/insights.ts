@@ -1374,7 +1374,7 @@ function renderSetPieceList(team: string, label: string, players: string[]): str
 function renderICaV3Section(): string {
   const results = getICaV3Results()
   const roles: Array<['P' | 'D' | 'C' | 'A', string]> = [['P', 'Portieri'], ['D', 'Difensori'], ['C', 'Centrocampisti'], ['A', 'Attaccanti']]
-  const fmt = (value: number | undefined) => typeof value === 'number' ? String(Math.round(value)) : '—'
+  const fmt = (value: number | undefined) => typeof value === 'number' ? value.toFixed(1).replace('.', ',') : '—'
   const signed = (value: number | undefined) => typeof value === 'number' ? `${value > 0 ? '+' : ''}${Math.round(value)}` : '—'
   const players = localPlayers().players
   const column = (role: 'P' | 'D' | 'C' | 'A', label: string) => {
@@ -1452,7 +1452,7 @@ function renderAttackerTopThree(): string {
         const best = bestAttacker(other)
         return `<div class="goalkeeper-recommendation">
           <span class="goalkeeper-rank">${index + 1}</span>
-          <div class="goalkeeper-recommendation-team"><strong>${escapeHtml(other)}</strong>${best ? `<span class="goalkeeper-keeper">⚽ ${escapeHtml(best.name)} · iCà ${Math.round(best.score ?? 0)}</span>` : ''}<small>compatibilità dalla griglia attaccanti</small></div>
+          <div class="goalkeeper-recommendation-team"><strong>${escapeHtml(other)}</strong>${best ? `<span class="goalkeeper-keeper">⚽ ${escapeHtml(best.name)} · iCà ${(best.score ?? 0).toFixed(1).replace('.', ',')}</span>` : ''}<small>compatibilità dalla griglia attaccanti</small></div>
           <span class="goalkeeper-score">${value}</span>
         </div>`
       }).join('')}

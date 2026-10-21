@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { calculateICaV3, expectedFm, expectedShare, fmAdjustments } from '../src/domain/icaV3.ts'
+import { ICA_V3_PARAMETERS, calculateICaV3, expectedFm, expectedShare, fmAdjustments } from '../src/domain/icaV3.ts'
+
+const K = ICA_V3_PARAMETERS.adjustmentScale
 import type { ICaV3Input } from '../src/domain/icaV3.ts'
 
 function attacker(id: string, extra: Partial<ICaV3Input> = {}): ICaV3Input {
@@ -19,20 +21,20 @@ test('expected FM shrinks short current seasons toward last season and the role 
 test('set pieces, team index and coach become explicit FM adjustments', () => {
   const items = fmAdjustments(attacker('x', { penaltyRank: 1, teamIndex: 4, coachTone: 'good' }))
   assert.deepEqual(items.map((item) => item.label), ['Rigorista n.1', 'Squadra in attacco 4/5', 'Ruolo valorizzato dall\'allenatore'])
-  assert.equal(items.reduce((sum, item) => sum + item.value, 0).toFixed(2), '0.43')
+  assert.equal(items.reduce((sum, item) => sum + item.value, 0).toFixed(2), (0.43 * K).toFixed(2))
   const named = fmAdjustments(attacker('x', { coachPlayerTone: 'bad' }))
-  assert.deepEqual(named.map((item) => [item.label, item.value]), [['Penalizzato dall\'allenatore', -0.15]])
+  assert.deepEqual(named.map((item) => [item.label, item.value]), [['Penalizzato dall\'allenatore', -0.15 * K]])
   // il portiere sente di più la difesa della squadra
   const keeper = fmAdjustments({ ...attacker('p'), role: 'P', teamIndex: 2 })
-  assert.equal(keeper[0].value, -0.15)
+  assert.equal(keeper[0].value.toFixed(3), (-0.15 * K).toFixed(3))
 })
 
 test('grid ease adds or removes FM by role weight', () => {
   const easy = fmAdjustments({ ...attacker('x'), role: 'D', easeIndex: 0.5, easeGridValue: 87.4, easeGridName: 'portieri' })
   const hard = fmAdjustments({ ...attacker('y'), role: 'P', easeIndex: -1 })
   assert.equal(easy[0].label, 'Partite favorevoli: griglia portieri (media 87,4)')
-  assert.equal(easy[0].value, 0.2)
-  assert.equal(hard[0].value, -0.6)
+  assert.equal(easy[0].value.toFixed(3), (0.2 * K).toFixed(3))
+  assert.equal(hard[0].value.toFixed(3), (-0.6 * K).toFixed(3))
   // squadra nella media: nessun correttivo
   assert.equal(fmAdjustments({ ...attacker('z'), easeIndex: 0 }).length, 0)
 })

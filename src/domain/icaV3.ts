@@ -29,6 +29,8 @@ export type ICaV3Role = 'P' | 'D' | 'C' | 'A'
 export const ICA_V3_PARAMETERS = {
   // l'iCà è espresso in decimi di fantapunto a partita
   displayScale: 10,
+  // moltiplicatore di tutti i correttivi di FM (piazzati, squadra, allenatore, partite)
+  adjustmentScale: 5,
   priorMatches: 8,
   previousSeasonWeight: 0.5,
   previousSeasonMaxMatches: 20,
@@ -169,7 +171,7 @@ export function fmAdjustments(input: ICaV3Input): ICaV3Contribution[] {
       items.push({ label: `Partite ${delta > 0 ? 'favorevoli' : 'sfavorevoli'}: ${grid}${mean}`, value: delta, unit: 'fm' })
     }
   }
-  return items
+  return items.map((item) => ({ ...item, value: item.value * p.adjustmentScale }))
 }
 
 export function expectedShare(input: ICaV3Input): number | undefined {
