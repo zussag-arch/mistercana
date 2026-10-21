@@ -2851,7 +2851,8 @@ function renderTopICaPanel(
 
                 <b>
                   ${formatNumber(
-                    player.iCa,
+                    // valore iCà V3 (come in lista e scheda); l'ordine resta per iCà
+                    getICaV3(player.fantalabId)?.score ?? player.iCa,
                     1,
                   )}
                 </b>

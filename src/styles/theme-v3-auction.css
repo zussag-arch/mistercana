@@ -410,3 +410,40 @@
 .auction-side-panels > .auction-top-ica-panel,
 .auction-side-panels > [class*="top-ica"] { margin: 0; }
 .auction-market-followup:empty { display: none; }
+
+/* interspazi uniformi tra le tessere */
+.auction-workspace { gap: 16px; }
+.auction-workspace-main,
+.auction-side-panels { display: flex; flex-direction: column; gap: 16px; }
+.auction-workspace-main > *,
+.auction-side-panels > *,
+.auction-roster-metrics > * { margin-top: 0 !important; margin-bottom: 0 !important; }
+.auction-roster-metrics { gap: 16px; }
+
+/* Top iCà: pillole più grandi */
+.auction-top-ica-list { display: grid; gap: 10px; }
+.auction-top-ica-row {
+  min-height: 56px;
+  padding: 8px 10px 8px 8px;
+  border-radius: 999px;
+  gap: 12px;
+}
+.auction-top-ica-name-button {
+  min-height: 40px;
+  padding: 0 18px;
+  border-radius: 999px;
+  font-size: 14px;
+}
+.auction-top-ica-row > span,
+.auction-top-ica-row strong { font-size: 15px; }
+.auction-top-ica-row button:last-child {
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+.auction-top-ica-row > b {
+  font-family: var(--font-display);
+  font-size: 17px;
+  color: var(--accent);
+}
