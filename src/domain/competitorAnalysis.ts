@@ -5,11 +5,11 @@ import type {
 import {
   calculatePriceAdvice,
   DEFAULT_PRICE_ADVICE_PARAMETERS,
+  getReferenceCredits,
   ROSTER_SLOT_LIMITS,
 } from './priceAdvice'
 
 import {
-  getPmaCredits,
   median,
 } from './auctionContext'
 
@@ -145,6 +145,7 @@ function getAssignmentRatio(
     AppState['auctionAssignments'][number],
   playerMap:
     Map<string, Player>,
+  allPlayers: Player[],
 ): {
   ratio: number
   role: PlayerRole
@@ -159,10 +160,12 @@ function getAssignmentRatio(
     return undefined
   }
 
+  // stesso valore di riferimento del Tetto (PMA, Saggi, iCà)
   const pmaCredits =
-    getPmaCredits(
+    getReferenceCredits(
+      state,
       assignedPlayer,
-      state.initialCredits,
+      allPlayers,
     )
 
   if (
@@ -219,6 +222,7 @@ function getEstimateFactor(
             state,
             assignment,
             playerMap,
+            allPlayers,
           ),
       )
       .filter(
@@ -498,9 +502,10 @@ export function calculateCompetitors(
     )
 
   const playerPmaCredits =
-    getPmaCredits(
+    getReferenceCredits(
+      state,
       player,
-      state.initialCredits,
+      allPlayers,
     )
 
   /*

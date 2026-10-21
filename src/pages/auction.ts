@@ -235,6 +235,19 @@ function formatPercent(
     .replace('.', ',')}%`
 }
 
+// "PMA 1 · Saggi 92 · iCà 130": le tre fonti del valore, in crediti
+function formatReferenceSources(
+  priceAdvice: PriceAdvice,
+): string {
+  const sources = priceAdvice.referenceSources
+  const parts = [
+    ['PMA', sources?.pma ?? priceAdvice.pmaCredits],
+    ['Saggi', sources?.saggi],
+    ['iCà', sources?.ica],
+  ].filter(([, value]) => typeof value === 'number') as Array<[string, number]>
+  return parts.map(([label, value]) => `${label} ${Math.round(value)}`).join(' · ')
+}
+
 function formatMarketFactor(
   value: number,
 ): string {
@@ -1728,10 +1741,7 @@ function renderPlayerCard(
             </strong>
 
             <small>
-              PMA
-              ${formatCredits(
-                priceAdvice.pmaCredits,
-              )}
+              ${formatReferenceSources(priceAdvice)}
               ·
               ${formatMarketFactor(
                 priceAdvice

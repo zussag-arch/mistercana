@@ -117,7 +117,8 @@ export interface Player {
   iCa?: number
   /** Affare iCà 3: posizione per iCà − posizione per PMA nel ruolo (−100…+100) */
   affare?: number
-
+  /** prezzo mediano dei Saggi FantaLab, in crediti su base 500 */
+  saggiPrice?: number
   /*
     Campo legacy del prototipo.
 

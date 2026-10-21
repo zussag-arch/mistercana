@@ -1,3 +1,4 @@
+import { getSaggiForPlayer } from '../data/saggi'
 import { getICaV3 } from '../data/icaV3Data'
 import type { AppState, AuctionAssignment } from '../app/state'
 import { players as legacyPlayers } from '../data/players'
@@ -13,6 +14,17 @@ export interface AuctionStrategyContext {
   players: Player[]
   byFldaId: ReadonlyMap<string, Player>
   currentPlayer?: Player
+}
+
+// mediana dei prezzi dei Saggi (base 500 crediti) per un giocatore
+function medianSaggiPrice(playerId: string): number | undefined {
+  const prices = getSaggiForPlayer(playerId)
+    .map((record) => record.prezzo)
+    .filter((value): value is number => typeof value === 'number' && value > 0)
+    .sort((first, second) => first - second)
+  if (!prices.length) return undefined
+  const middle = Math.floor(prices.length / 2)
+  return prices.length % 2 ? prices[middle] : (prices[middle - 1] + prices[middle]) / 2
 }
 
 function validRole(value: string): value is PlayerRole {
@@ -39,6 +51,7 @@ export function adaptFldaPlayer(
     // agli algoritmi serve una qualità 0-100: la posizione nel ruolo
     iCa: getICaV3(flda.player_id)?.rolePercentile,
     affare: getICaV3(flda.player_id)?.affare,
+    saggiPrice: medianSaggiPrice(flda.player_id),
     fantalabId: flda.player_id,
     penaltyTaker: legacy?.penaltyTaker ?? flda.penalty_rank === 1,
     status: 'free',
