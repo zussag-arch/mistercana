@@ -186,3 +186,18 @@
 .round-select-option:hover { background: rgba(var(--ink-rgb), 0.07); color: var(--text); }
 .round-select-option.selected { background: var(--accent); color: var(--accent-ink); font-weight: 700; }
 .round-select-option:disabled { opacity: 0.4; cursor: default; }
+
+/* tutti i bottoni a pillola (lati destro e sinistro tondi);
+   restano esclusi i bottoni che sono tessere o righe di elenco */
+button:not([class*="card"]):not([class*="tile"]):not([class*="row"]):not(.round-select-option):not(.dashboard-go-button):not(.auction-selector-player):not(.auction-call-selector):not(.players-filter-toggle):not([class*="chip"]):not(.nav-item):not(.auction-role-tab),
+.primary-button,
+.secondary-button,
+.danger-button,
+.archive-button,
+.icon-button,
+.profile-button,
+.auction-toolbar-button,
+.auction-primary-action,
+.insight-database-button {
+  border-radius: 999px !important;
+}

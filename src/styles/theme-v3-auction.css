@@ -447,3 +447,56 @@
   font-size: 17px;
   color: var(--accent);
 }
+
+/* fondi allineati: lo storico si allunga fino alla fine della colonna destra
+   (contain:size fa sì che non sia lui a decidere l'altezza) */
+.auction-workspace { align-items: stretch; }
+.auction-history-slot {
+  flex: 1 1 0;
+  min-height: 360px;
+  contain: size;
+  display: flex;
+}
+.auction-history-slot > .auction-history-section {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.auction-history-slot .auction-history-list {
+  flex: 1;
+  min-height: 0;
+  max-height: none;
+}
+
+/* Top iCà: il nome ha la stessa forma del tasto Chiama */
+.auction-top-ica-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+}
+.auction-top-ica-row .auction-top-ica-name-button,
+.auction-top-ica-row button:last-child {
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--line-1);
+  border-radius: 999px;
+  background: var(--surface-light);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.auction-top-ica-row .auction-top-ica-name-button {
+  justify-content: flex-start;
+  text-align: left;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.auction-top-ica-row .auction-top-ica-name-button strong { font-size: 13px; font-weight: 700; }
+.auction-top-ica-row button:last-child { color: var(--text-soft); }
+.auction-top-ica-row .auction-top-ica-name-button:hover,
+.auction-top-ica-row button:last-child:hover { border-color: var(--accent); }
+/* se è la colonna sinistra la più lunga, l'ultima tessera a destra si allunga */
+.auction-side-panels > :last-child { flex: 1 1 auto; }
