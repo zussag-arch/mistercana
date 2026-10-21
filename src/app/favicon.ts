@@ -11,10 +11,15 @@ let frameIndex = 0
   fotogrammi già pronti.
 */
 const PULSE_PERIOD_MS =
-  1400
+  2000
 
+// fotogrammi fitti (uno ogni 40 ms) per una sfumatura senza scatti
 const PULSE_FRAMES =
-  16
+  50
+
+// quota del ciclo in cui il pallino resta acceso al 100%
+const PULSE_HOLD =
+  0.45
 
 const DOT_RED_ON =
   '#F04F4F'
@@ -96,16 +101,28 @@ function applyFavicon(
     faviconHref(dotColor)
 }
 
-// opacità su curva coseno: 1 → 0,3 → 1, senza scatti
+// acceso pieno per PULSE_HOLD del ciclo, poi discesa e risalita
+// morbide su curva coseno (1 → 0,3 → 1)
+function pulseOpacity(
+  phase: number,
+): number {
+  if (phase < PULSE_HOLD) {
+    return 1
+  }
+
+  const fade =
+    (phase - PULSE_HOLD) / (1 - PULSE_HOLD)
+
+  return 0.65 + 0.35 * Math.cos(fade * Math.PI * 2)
+}
+
 const LIVE_FRAMES: string[] =
   Array.from(
     { length: PULSE_FRAMES },
     (_, index) =>
       faviconHref(
         DOT_GREEN_ON,
-        0.65 + 0.35 * Math.cos(
-          (index / PULSE_FRAMES) * Math.PI * 2,
-        ),
+        pulseOpacity(index / PULSE_FRAMES),
       ),
   )
 
