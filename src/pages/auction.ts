@@ -2885,6 +2885,8 @@ function renderSidePanels(
       )}
 
       ${renderRosterMetricsPanel(state)}
+
+      ${renderTopICaPanel(state)}
     </div>
   `
 }
@@ -3842,6 +3844,7 @@ function renderLiveAuction(
                 : renderFldaPlayerCard(state, selectedPlayer)
               : renderWaitingForCall(state)
           }
+          <div class="auction-history-slot">${renderAssignmentHistory(state)}</div>
         </div>
 
         ${renderSidePanels(
@@ -3850,8 +3853,6 @@ function renderLiveAuction(
       </div>
 
       <div class="auction-market-followup">
-        ${renderTopICaPanel(state)}
-        ${renderAssignmentHistory(state)}
       </div>
 
       ${

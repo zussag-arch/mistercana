@@ -585,10 +585,17 @@ function mountAuctionCompetitors(
     return
   }
 
-  workspaceMain.insertAdjacentHTML(
-    'beforeend',
-    markup,
-  )
+  // sopra lo storico assegnazioni, se presente
+  const historySlot =
+    workspaceMain.querySelector<HTMLElement>(
+      '.auction-history-slot',
+    )
+
+  if (historySlot) {
+    historySlot.insertAdjacentHTML('beforebegin', markup)
+  } else {
+    workspaceMain.insertAdjacentHTML('beforeend', markup)
+  }
 }
 
 /* =========================

@@ -402,3 +402,11 @@
   width: min(460px, 100%);
   margin-inline: auto;
 }
+
+/* pagina Asta riordinata: storico sotto la concorrenza, Top iCà nella colonna destra */
+.auction-workspace-main { display: flex; flex-direction: column; gap: 12px; }
+.auction-history-slot { order: 10; }
+.auction-history-slot > * { margin: 0; }
+.auction-side-panels > .auction-top-ica-panel,
+.auction-side-panels > [class*="top-ica"] { margin: 0; }
+.auction-market-followup:empty { display: none; }
