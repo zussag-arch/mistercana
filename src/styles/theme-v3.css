@@ -2568,3 +2568,19 @@ input:focus {
 .attacker-section .goalkeeper-recommendation:not(:first-child) .goalkeeper-rank {
   background: var(--role-a);
 }
+
+/* pulsanti principali: arrotondati come gli altri, con l'effetto
+   "spostamento + ombra" al passaggio del mouse */
+.primary-button,
+.dashboard-cta-button,
+.player-detail-call-button,
+.player-detail-full-button {
+  border-radius: var(--radius-md);
+  transition: transform var(--motion-fast), box-shadow var(--motion-fast);
+}
+
+.dashboard-cta-button:hover:not(:disabled),
+.player-detail-full-button:hover:not(:disabled) {
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 var(--accent-soft);
+}
