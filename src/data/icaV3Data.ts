@@ -1,3 +1,5 @@
+import { loadState } from '../app/storage'
+import { getFldaPma } from '../domain/pma'
 // Ingressi dell'iCà 3 dalle tabelle FantaLab (stagione in corso, Guida,
 // allenatori) e dal vecchio listone (stagione precedente). Non dipende da
 // FLDA né dal calendario: è sempre calcolabile con i dati in database/.
@@ -66,6 +68,8 @@ function buildInputs(): ICaV3Input[] {
       : {}
   }
 
+  const pmaConfiguration = loadState().pmaConfiguration
+
   return page.players.flatMap((player): ICaV3Input[] => {
     const id = player.player_id
     const role = player.role as ICaV3Role
@@ -97,7 +101,8 @@ function buildInputs(): ICaV3Input[] {
       coachTone,
       coachPlayerTone: named('valorizzati') ? 'good' : named('penalizzati') ? 'bad' : undefined,
       ...ease(player.team, role),
-      pmaPercent: finite(player.classic_8_mod_median_value) ? player.classic_8_mod_median_value : undefined,
+      // PMA della configurazione di lega scelta in Dashboard (Classic/Mantra, partecipanti, modificatore)
+      pmaPercent: getFldaPma(player, pmaConfiguration) ?? (finite(player.classic_8_mod_median_value) ? player.classic_8_mod_median_value : undefined),
     }]
   })
 }

@@ -603,13 +603,17 @@ function renderCsvUpload(): string {
     <div class="csv-upload">
       <div class="csv-upload-copy">
         <strong>Carica nuovi dati</strong>
-        <p>Scegli uno o più CSV appena scaricati (listone giocatori, allenatori, griglie). Prima di applicarli vedi un'anteprima delle differenze.</p>
+        <p><b>Aggiorna da FantaLab</b> apre il login FantaLab e scarica tutto da solo (serve FLDA acceso sul computer). In alternativa scegli i CSV a mano. In entrambi i casi vedi un'anteprima prima di applicare.</p>
       </div>
-      <label class="data-transfer-button data-transfer-button-primary csv-upload-button">
-        Scegli file CSV
-        <input id="csvUploadInput" type="file" accept=".csv,text/csv" multiple hidden>
-      </label>
+      <div class="csv-upload-actions">
+        <button id="fantalabSyncButton" type="button" class="data-transfer-button data-transfer-button-primary" ${syncRunning ? 'disabled' : ''}>Aggiorna da FantaLab</button>
+        <label class="data-transfer-button csv-upload-button">
+          Scegli file CSV
+          <input id="csvUploadInput" type="file" accept=".csv,text/csv" multiple hidden>
+        </label>
+      </div>
     </div>
+    <div id="fantalabSyncStatus">${renderSyncStatus()}</div>
     ${active.length ? `
       <div class="csv-upload-active">
         <span>In uso dati caricati nel browser: ${active.map((key) => `<b>${escapeSourceHtml(CSV_LABELS[key])}</b> (${escapeSourceHtml(overrides[key]!.fileName)}, ${new Date(overrides[key]!.loadedAt).toLocaleDateString('it-IT')})`).join(' · ')}</span>
@@ -669,6 +673,104 @@ function applyCsvFiles(): void {
   window.location.reload()
 }
 
+/* =========================
+   AGGIORNA DA FANTALAB (via FLDA locale)
+========================= */
+
+// Il login apre Chrome sul computer: serve sempre il FLDA locale, mai quello online.
+const LOCAL_FLDA_URL = 'http://127.0.0.1:8765'
+const SYNC_STEPS: Record<string, string> = {
+  login: 'Login FantaLab',
+  update: 'Download dati',
+  season: 'Stagione in corso',
+  export: 'Preparazione file',
+}
+
+interface SyncState {
+  status: 'idle' | 'running' | 'done' | 'error' | 'offline'
+  step?: string | null
+  message: string
+}
+
+let syncState: SyncState = { status: 'idle', message: '' }
+let syncRunning = false
+
+function renderSyncStatus(): string {
+  if (syncState.status === 'idle') return ''
+  const steps = Object.entries(SYNC_STEPS)
+  const current = steps.findIndex(([key]) => key === syncState.step)
+  return `
+    <div class="fantalab-sync sync-${syncState.status}">
+      ${syncState.status === 'running' ? `<ol class="fantalab-sync-steps">${steps.map(([, label], index) => `<li class="${index < current ? 'done' : index === current ? 'active' : ''}">${escapeSourceHtml(label)}</li>`).join('')}</ol>` : ''}
+      <p>${escapeSourceHtml(syncState.message)}</p>
+    </div>`
+}
+
+function refreshSyncUi(): void {
+  const status = document.querySelector<HTMLElement>('#fantalabSyncStatus')
+  if (status) status.innerHTML = renderSyncStatus()
+  const button = document.querySelector<HTMLButtonElement>('#fantalabSyncButton')
+  if (button) button.disabled = syncRunning
+}
+
+async function syncRequest(path: string, init?: RequestInit): Promise<Response> {
+  const controller = new AbortController()
+  const timer = window.setTimeout(() => controller.abort(), 8000)
+  try {
+    return await fetch(`${LOCAL_FLDA_URL}${path}`, { ...init, signal: controller.signal })
+  } finally {
+    window.clearTimeout(timer)
+  }
+}
+
+async function startFantalabSync(): Promise<void> {
+  if (syncRunning) return
+  syncRunning = true
+  syncState = { status: 'running', step: 'login', message: 'Avvio dell\'aggiornamento…' }
+  refreshSyncUi()
+  try {
+    const response = await syncRequest('/api/fantalab/sync', { method: 'POST' })
+    if (!response.ok) throw new Error(`FLDA ha risposto con errore ${response.status}.`)
+  } catch {
+    syncRunning = false
+    syncState = { status: 'offline', message: 'FLDA non risponde. Avvialo con run-local.ps1 (o "flda serve") e riprova.' }
+    refreshSyncUi()
+    return
+  }
+  while (syncRunning) {
+    await new Promise((resolve) => window.setTimeout(resolve, 1500))
+    let state: { status: string; step?: string | null; message?: string }
+    try {
+      state = await (await syncRequest('/api/fantalab/sync')).json()
+    } catch {
+      continue
+    }
+    if (state.status === 'running') {
+      syncState = { status: 'running', step: state.step, message: state.message ?? '' }
+      refreshSyncUi()
+      continue
+    }
+    syncRunning = false
+    if (state.status !== 'done') {
+      syncState = { status: 'error', message: state.message || 'Aggiornamento non riuscito.' }
+      refreshSyncUi()
+      return
+    }
+    try {
+      const current = (key: CsvKey) => getCsv(key, BUNDLED_CSV[key])
+      pendingCsv = await Promise.all(['fantalab_giocatori', 'fantalab_allenatori'].map(async (name) => {
+        const text = await (await syncRequest(`/api/fantalab/export/${name}.csv`)).text()
+        return analyzeCsv(`${name}.csv`, text, current)
+      }))
+      syncState = { status: 'done', message: 'Dati scaricati da FantaLab: controlla l\'anteprima qui sotto e premi Applica.' }
+    } catch {
+      syncState = { status: 'error', message: 'Dati scaricati ma file non leggibili da FLDA.' }
+    }
+    refreshSyncUi()
+    refreshCsvPreview()
+  }
+}
+
 function bindCsvUpload(): void {
   document.addEventListener('change', (event) => {
     const input = event.target
@@ -682,6 +784,7 @@ function bindCsvUpload(): void {
     if (!(target instanceof Element)) return
     if (target.closest('#csvUploadCancel')) { pendingCsv = []; refreshCsvPreview() }
     if (target.closest('#csvUploadApply')) applyCsvFiles()
+    if (target.closest('#fantalabSyncButton')) void startFantalabSync()
     if (target.closest('#csvResetOverrides') && window.confirm('Tornare ai dati originali del progetto? I CSV caricati nel browser verranno eliminati.')) {
       clearCsvOverrides()
       window.location.reload()

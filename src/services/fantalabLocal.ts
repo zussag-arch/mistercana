@@ -103,7 +103,8 @@ function load(): LocalData {
       titolarita_display: num(row['Titolarità % (Guida)']),
       is_starting_xi: row['Titolare (Guida)'] === 'Sì',
     }
-    for (const key of PMA_KEYS) player[`${key}_median_value`] = pma
+    // PMA per configurazione di lega se il CSV lo fornisce (export FLDA), altrimenti quello della Guida
+    for (const key of PMA_KEYS) player[`${key}_median_value`] = num(row[`PMA ${key} %`]) ?? pma
     players.push(player)
   }
 
