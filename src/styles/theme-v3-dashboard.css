@@ -346,3 +346,10 @@
   animation: dashboard-live-pulse 1.4s ease-in-out infinite;
 }
 @keyframes dashboard-live-pulse { 50% { opacity: 0.3; } }
+
+/* sottotitolo del pulsante Avvia: stesso colore del titolo, ben leggibile */
+.dashboard-setup-steps .dashboard-go-button small,
+.dashboard-setup-steps .dashboard-go-button strong {
+  color: var(--accent-ink);
+  opacity: 1;
+}
