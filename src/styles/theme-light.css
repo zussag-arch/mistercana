@@ -141,3 +141,10 @@
 :root[data-theme="light"] .players-affare.affare-bad { background: var(--surface-raised); color: var(--red); }
 :root[data-theme="light"] .dashboard-live-role.live-role-c .dashboard-live-bar span { background: var(--role-c); }
 :root[data-theme="light"] .player-status-free { background: var(--green); color: var(--on-color); }
+
+/* profilo budget selezionato: pillola antracite con scritta chiara */
+:root[data-theme="light"] .profile-button.selected {
+  background: var(--text);
+  border-color: var(--text);
+  color: var(--surface);
+}
