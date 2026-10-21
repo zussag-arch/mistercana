@@ -89,9 +89,12 @@ function buildInputs(): ICaV3Input[] {
       role,
       fm: finite(season?.fmv) ? season.fmv : undefined,
       appearances: finite(season?.presenze) ? season.presenze : undefined,
-      // nel vecchio listone FMV 0 = voti assenti (es. Serie B): non è uno storico
-      previousFm: old?.fmv && old.fmv > 0 ? old.fmv : undefined,
-      previousAppearances: old?.fmv && old.fmv > 0 ? old.appearances : undefined,
+      // stagione scorsa: prima quella scaricata da FantaLab, poi il vecchio listone
+      // (nel vecchio listone FMV 0 = voti assenti, es. Serie B: non è uno storico)
+      previousFm: finite(player.previous_fmv) && player.previous_fmv > 0 ? player.previous_fmv
+        : old?.fmv && old.fmv > 0 ? old.fmv : undefined,
+      previousAppearances: finite(player.previous_fmv) && player.previous_fmv > 0 && finite(player.previous_presenze) ? player.previous_presenze
+        : old?.fmv && old.fmv > 0 ? old.appearances : undefined,
       titolarita: player.titolarita_display ?? undefined,
       injuryGamesMissed: finite(season?.injury_games_missed) ? season.injury_games_missed : undefined,
       penaltyRank: rankOf('PENALTY'),

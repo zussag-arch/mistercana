@@ -7,12 +7,18 @@ export type CsvKey =
   | 'fantalab_allenatori'
   | 'griglia_portieri'
   | 'griglia_attaccanti'
+  | 'portieri_calendario'
+  | 'portieri_gerarchie'
+  | 'saggi'
 
 export const CSV_LABELS: Record<CsvKey, string> = {
   fantalab_giocatori: 'Listone giocatori',
   fantalab_allenatori: 'Allenatori e Guida',
   griglia_portieri: 'Griglia portieri',
   griglia_attaccanti: 'Griglia attaccanti',
+  portieri_calendario: 'Calendario portieri',
+  portieri_gerarchie: 'Gerarchie portieri',
+  saggi: 'Saggi',
 }
 
 export interface CsvOverride {

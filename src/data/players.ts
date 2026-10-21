@@ -1,3 +1,4 @@
+import { registerPlayerAlias } from './playerAliases'
 import playersCsv from '../../database/MisterCana_DB_Giocatori_2026_27.csv?raw'
 import fantalabPlayersCsvBundled from '../../database/fantalab_giocatori.csv?raw'
 
@@ -586,6 +587,8 @@ const basePlayers =
       playersCsv,
     ),
   )
+
+for (const player of basePlayers) registerPlayerAlias(player.id, player.fantalabId)
 
 /* =========================
    ENRICHED PLAYERS

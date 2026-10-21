@@ -2,6 +2,9 @@ import bundledPlayersCsv from '../../database/fantalab_giocatori.csv?raw'
 import bundledCoachesCsv from '../../database/fantalab_allenatori.csv?raw'
 import bundledGoalkeeperGridCsv from '../../database/griglia_portieri.csv?raw'
 import bundledAttackerGridCsv from '../../database/griglia_attaccanti.csv?raw'
+import bundledGoalkeeperCalendarCsv from '../../database/MisterCana_DB_Portieri_Calendario.csv?raw'
+import bundledGoalkeeperHierarchyCsv from '../../database/MisterCana_DB_Portieri_Gerarchie.csv?raw'
+import bundledSaggiCsv from '../../database/MisterCana_DB_Saggi.csv?raw'
 import { CSV_LABELS, clearCsvOverrides, getCsv, getCsvOverrides, saveCsvOverrides } from '../data/csvOverrides'
 import type { CsvKey, CsvOverride } from '../data/csvOverrides'
 import { analyzeCsv } from '../data/csvImport'
@@ -594,6 +597,9 @@ const BUNDLED_CSV: Record<CsvKey, string> = {
   fantalab_allenatori: bundledCoachesCsv,
   griglia_portieri: bundledGoalkeeperGridCsv,
   griglia_attaccanti: bundledAttackerGridCsv,
+  portieri_calendario: bundledGoalkeeperCalendarCsv,
+  portieri_gerarchie: bundledGoalkeeperHierarchyCsv,
+  saggi: bundledSaggiCsv,
 }
 
 function renderCsvUpload(): string {
@@ -614,6 +620,10 @@ function renderCsvUpload(): string {
       </div>
     </div>
     <div id="fantalabSyncStatus">${renderSyncStatus()}</div>
+    <details class="saggi-creators" id="saggiCreatorsBox">
+      <summary>Saggi da scaricare <small>${escapeSourceHtml(selectedCreatorsLabel())}</small></summary>
+      <div id="saggiCreatorsList"><p class="saggi-creators-hint">Apri per scegliere i creator (serve FLDA acceso).</p></div>
+    </details>
     ${active.length ? `
       <div class="csv-upload-active">
         <span>In uso dati caricati nel browser: ${active.map((key) => `<b>${escapeSourceHtml(CSV_LABELS[key])}</b> (${escapeSourceHtml(overrides[key]!.fileName)}, ${new Date(overrides[key]!.loadedAt).toLocaleDateString('it-IT')})`).join(' · ')}</span>
@@ -728,7 +738,12 @@ async function startFantalabSync(): Promise<void> {
   syncState = { status: 'running', step: 'login', message: 'Avvio dell\'aggiornamento…' }
   refreshSyncUi()
   try {
-    const response = await syncRequest('/api/fantalab/sync', { method: 'POST' })
+    const creators = loadSelectedCreators()
+    const response = await syncRequest('/api/fantalab/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ creators: creators.length ? creators : null }),
+    })
     if (!response.ok) throw new Error(`FLDA ha risposto con errore ${response.status}.`)
   } catch {
     syncRunning = false
@@ -738,7 +753,7 @@ async function startFantalabSync(): Promise<void> {
   }
   while (syncRunning) {
     await new Promise((resolve) => window.setTimeout(resolve, 1500))
-    let state: { status: string; step?: string | null; message?: string; warnings?: string[] }
+    let state: { status: string; step?: string | null; message?: string; warnings?: string[]; files?: Record<string, string> }
     try {
       state = await (await syncRequest('/api/fantalab/sync')).json()
     } catch {
@@ -757,7 +772,8 @@ async function startFantalabSync(): Promise<void> {
     }
     try {
       const current = (key: CsvKey) => getCsv(key, BUNDLED_CSV[key])
-      pendingCsv = await Promise.all(['fantalab_giocatori', 'fantalab_allenatori'].map(async (name) => {
+      const names = Object.keys(state.files ?? {}).length ? Object.keys(state.files ?? {}) : ['fantalab_giocatori', 'fantalab_allenatori']
+      pendingCsv = await Promise.all(names.map(async (name) => {
         const text = await (await syncRequest(`/api/fantalab/export/${name}.csv`)).text()
         return analyzeCsv(`${name}.csv`, text, current)
       }))
@@ -775,8 +791,89 @@ async function startFantalabSync(): Promise<void> {
   }
 }
 
+/* =========================
+   SAGGI: SCELTA DEI CREATOR
+========================= */
+
+const CREATORS_KEY = 'mistercana_saggi_creators_v1'
+const DEFAULT_CREATOR_NAMES = ['CarmySpecial', 'Luca Diddi | Il Tattico', 'Recosta', 'SOS Fanta', 'Il Profeta']
+
+interface CreatorOption {
+  strategy_id: string
+  creator: string | null
+  name: string | null
+  type: string | null
+  participants: string | null
+  credits: number | null
+  season: string | null
+}
+
+function loadSelectedCreators(): string[] {
+  try {
+    const raw = window.localStorage.getItem(CREATORS_KEY)
+    return raw ? JSON.parse(raw) as string[] : []
+  } catch {
+    return []
+  }
+}
+
+function saveSelectedCreators(values: string[]): void {
+  try { window.localStorage.setItem(CREATORS_KEY, JSON.stringify(values)) } catch { /* solo comodità */ }
+}
+
+function selectedCreatorsLabel(): string {
+  const selected = loadSelectedCreators()
+  return selected.length ? `${selected.length} liste scelte` : 'i 5 di sempre: Carmy, Il Tattico, Recosta, SOS Fanta, Il Profeta'
+}
+
+async function loadCreatorOptions(): Promise<void> {
+  const list = document.querySelector<HTMLElement>('#saggiCreatorsList')
+  if (!list) return
+  let options: CreatorOption[] = []
+  try {
+    options = await (await syncRequest('/api/fantalab/creators')).json()
+  } catch {
+    list.innerHTML = '<p class="saggi-creators-hint">FLDA non risponde: avvialo per scegliere i creator.</p>'
+    return
+  }
+  const current = options.filter((item) => item.season === 's_26_27')
+  if (!current.length) {
+    list.innerHTML = '<p class="saggi-creators-hint">L’elenco dei creator compare dopo il primo “Aggiorna da FantaLab”. Fino ad allora vengono scaricati i 5 di sempre.</p>'
+    return
+  }
+  let selected = loadSelectedCreators()
+  if (!selected.length) {
+    // i 5 di sempre: la loro lista Classic più recente
+    selected = DEFAULT_CREATOR_NAMES.flatMap((name) => {
+      const found = current.filter((item) => item.creator === name && item.type === 'classic')
+      return found.length ? [found[0].strategy_id] : []
+    })
+  }
+  const sorted = [...current].sort((a, b) => String(a.creator).localeCompare(String(b.creator), 'it'))
+  list.innerHTML = `
+    <p class="saggi-creators-hint">Spunta le liste da scaricare (ogni creator può averne più di una: Classic, Mantra…).</p>
+    <div class="saggi-creators-grid">
+      ${sorted.map((item) => `
+        <label class="saggi-creator">
+          <input type="checkbox" value="${escapeSourceHtml(item.strategy_id)}" ${selected.includes(item.strategy_id) ? 'checked' : ''}>
+          <span><b>${escapeSourceHtml(item.creator ?? '—')}</b><small>${escapeSourceHtml(item.name ?? '')} · ${escapeSourceHtml(item.type ?? '')} ${escapeSourceHtml(item.participants ?? '')} · ${item.credits ?? ''} cr</small></span>
+        </label>`).join('')}
+    </div>`
+}
+
 function bindCsvUpload(): void {
+  document.addEventListener('toggle', (event) => {
+    if (event.target instanceof HTMLDetailsElement && event.target.id === 'saggiCreatorsBox' && event.target.open) void loadCreatorOptions()
+  }, true)
   document.addEventListener('change', (event) => {
+    const box = event.target
+    if (box instanceof HTMLInputElement && box.closest('.saggi-creators-grid')) {
+      const values = [...document.querySelectorAll<HTMLInputElement>('.saggi-creators-grid input:checked')].map((item) => item.value)
+      saveSelectedCreators(values)
+      const label = document.querySelector<HTMLElement>('#saggiCreatorsBox summary small')
+      if (label) label.textContent = selectedCreatorsLabel()
+      return
+    }
     const input = event.target
     if (input instanceof HTMLInputElement && input.id === 'csvUploadInput' && input.files?.length) {
       void handleCsvFiles(input.files)

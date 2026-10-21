@@ -96,12 +96,16 @@ function load(): LocalData {
       team: row['Squadra'],
       role: row['Ruolo'].toUpperCase(),
       mantra_roles: row['Ruoli Mantra'] ? row['Ruoli Mantra'].split('/') : [],
-      // FantaLab non fornisce l'xFM di FLDA: si usa la fantamedia della stagione.
-      fm_exp: num(row['Fantamedia']),
-      integrita: null,
+      // xFM e integrità di FantaLab se il CSV le contiene (download automatico),
+      // altrimenti la fantamedia della stagione
+      fm_exp: num(row['FM Attesa (xFM)']) ?? num(row['Fantamedia']),
+      integrita: num(row['Integrità']),
       tit_index_raw: null,
       titolarita_display: num(row['Titolarità % (Guida)']),
       is_starting_xi: row['Titolare (Guida)'] === 'Sì',
+      // stagione precedente (presente nei CSV scaricati da FantaLab)
+      previous_fmv: num(row['FM stagione precedente']),
+      previous_presenze: num(row['Presenze stagione precedente']),
     }
     // PMA per configurazione di lega se il CSV lo fornisce (export FLDA), altrimenti quello della Guida
     for (const key of PMA_KEYS) player[`${key}_median_value`] = num(row[`PMA ${key} %`]) ?? pma

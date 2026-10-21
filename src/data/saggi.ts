@@ -1,4 +1,9 @@
-import saggiCsv from '../../database/MisterCana_DB_Saggi.csv?raw'
+import saggiCsvBundled from '../../database/MisterCana_DB_Saggi.csv?raw'
+import { getCsv } from './csvOverrides'
+import { playerKeys } from './playerAliases'
+
+// CSV caricato da Import/Export (o scaricato da FantaLab), altrimenti quello del progetto
+const saggiCsv = getCsv('saggi', saggiCsvBundled)
 
 export interface SaggioRecord {
   playerId: string
@@ -276,11 +281,8 @@ for (const record of saggi) {
 export function getSaggiForPlayer(
   playerId: string,
 ): SaggioRecord[] {
-  return (
-    saggiByPlayer.get(
-      playerId,
-    ) ?? []
-  )
+  // i file scaricati da FantaLab usano l'ID FantaLab, quelli storici il codice del listone
+  return playerKeys(playerId).flatMap((key) => saggiByPlayer.get(key) ?? [])
 }
 
 /* =========================

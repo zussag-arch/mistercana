@@ -1,5 +1,8 @@
-import goalkeeperCalendarCsv
-  from '../../database/MisterCana_DB_Portieri_Calendario.csv?raw'
+import goalkeeperCalendarCsvBundled from '../../database/MisterCana_DB_Portieri_Calendario.csv?raw'
+import { getCsv } from './csvOverrides'
+
+// CSV caricato da Import/Export (o scaricato da FantaLab), altrimenti quello del progetto
+const goalkeeperCalendarCsv = getCsv('portieri_calendario', goalkeeperCalendarCsvBundled)
 
 export type GoalkeeperMatchupValue =
   | 0

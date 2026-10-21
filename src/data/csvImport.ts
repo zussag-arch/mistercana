@@ -42,6 +42,9 @@ function detectKey(fileName: string, header: string[]): CsvKey | undefined {
   const name = fileName.toLowerCase()
   if (header.includes('ID FantaLab')) return 'fantalab_giocatori'
   if (header.includes('Allenatore') && header.includes('Ruoli chiave')) return 'fantalab_allenatori'
+  if (header.includes('Saggio') && header.includes('Prezzo')) return 'saggi'
+  if (header.includes('Gerarchia') && header.includes('Giocatore')) return 'portieri_gerarchie'
+  if (header[0] === 'Squadra' && header.includes('G1') && header.includes('G38')) return 'portieri_calendario'
   if (header[0] === 'Squadra' && header.length > 10) {
     if (name.includes('portier')) return 'griglia_portieri'
     if (name.includes('attacc')) return 'griglia_attaccanti'
@@ -104,16 +107,45 @@ function analyzeGrid(header: string[], rows: Row[]): { errors: string[]; summary
   return { errors, summary: [`${teams.length} × ${rows.length} squadre`, values.length ? `valori da ${Math.min(...values)} a ${Math.max(...values)}` : ''].filter(Boolean) }
 }
 
+function analyzeSaggi(rows: Row[], current: Row[]): { errors: string[]; summary: string[] } {
+  const errors: string[] = []
+  const names = (list: Row[]) => [...new Set(list.map((row) => row['Saggio']))]
+  const now = names(rows)
+  if (!rows.length) errors.push('Nessuna riga nei Saggi.')
+  const priced = rows.filter((row) => row['Prezzo']).length
+  return {
+    errors,
+    summary: [
+      `${now.length} Saggi: ${now.join(', ')}`,
+      `${rows.length} righe, ${priced} con prezzo (prima: ${names(current).join(', ') || '—'})`,
+    ],
+  }
+}
+
+function analyzeGoalkeepers(key: CsvKey, rows: Row[]): { errors: string[]; summary: string[] } {
+  if (key === 'portieri_calendario') {
+    const errors = rows.length < 18 ? [`Solo ${rows.length} squadre nel calendario.`] : []
+    return { errors, summary: [`${rows.length} squadre × 38 giornate`] }
+  }
+  const teams = new Set(rows.map((row) => row['Squadra']))
+  const errors = rows.length < 40 ? [`Solo ${rows.length} portieri: gerarchie incomplete.`] : []
+  return { errors, summary: [`${rows.length} portieri di ${teams.size} squadre`] }
+}
+
 export function analyzeCsv(fileName: string, content: string, current: (key: CsvKey) => string): CsvAnalysis {
   const { header, rows } = parseRows(content)
   const key = detectKey(fileName, header)
   if (!key) {
     return {
       fileName, content, ok: false, summary: [],
-      errors: ['Tipo di file non riconosciuto. Servono: listone giocatori FantaLab, tabella allenatori FantaLab, oppure una griglia con "portieri" o "attaccanti" nel nome del file.'],
+      errors: ['Tipo di file non riconosciuto. Servono: listone giocatori, allenatori, Saggi, calendario o gerarchie portieri FantaLab, oppure una griglia con "portieri" o "attaccanti" nel nome del file.'],
     }
   }
-  const required = key === 'fantalab_giocatori' ? PLAYER_COLUMNS : key === 'fantalab_allenatori' ? COACH_COLUMNS : ['Squadra']
+  const required = key === 'fantalab_giocatori' ? PLAYER_COLUMNS
+    : key === 'fantalab_allenatori' ? COACH_COLUMNS
+      : key === 'saggi' ? ['id_giocatore', 'Saggio', 'Fascia_Originale', 'Prezzo']
+        : key === 'portieri_gerarchie' ? ['id_giocatore', 'Giocatore', 'Squadra', 'Gerarchia']
+          : ['Squadra']
   const missing = missingColumns(header, required)
   if (missing.length) {
     return { fileName, key, content, ok: false, summary: [], errors: [`Colonne mancanti: ${missing.join(', ')}.`] }
@@ -121,6 +153,8 @@ export function analyzeCsv(fileName: string, content: string, current: (key: Csv
   const currentRows = parseRows(current(key)).rows
   const result = key === 'fantalab_giocatori' ? analyzePlayers(rows, currentRows)
     : key === 'fantalab_allenatori' ? analyzeCoaches(rows, currentRows)
-      : analyzeGrid(header, rows)
+      : key === 'saggi' ? analyzeSaggi(rows, currentRows)
+        : key === 'portieri_calendario' || key === 'portieri_gerarchie' ? analyzeGoalkeepers(key, rows)
+          : analyzeGrid(header, rows)
   return { fileName, key, content, ok: result.errors.length === 0, ...result }
 }

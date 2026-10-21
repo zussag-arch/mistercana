@@ -1,5 +1,9 @@
-import goalkeeperHierarchyCsv
-  from '../../database/MisterCana_DB_Portieri_Gerarchie.csv?raw'
+import goalkeeperHierarchyCsvBundled from '../../database/MisterCana_DB_Portieri_Gerarchie.csv?raw'
+import { getCsv } from './csvOverrides'
+import { playerKeys } from './playerAliases'
+
+// CSV caricato da Import/Export (o scaricato da FantaLab), altrimenti quello del progetto
+const goalkeeperHierarchyCsv = getCsv('portieri_gerarchie', goalkeeperHierarchyCsvBundled)
 
 export type GoalkeeperHierarchy =
   | 1
@@ -248,9 +252,11 @@ export function getGoalkeeperHierarchy(
 ):
   | GoalkeeperHierarchyRecord
   | undefined {
-  return hierarchyByPlayer.get(
-    playerId,
-  )
+  for (const key of playerKeys(playerId)) {
+    const record = hierarchyByPlayer.get(key)
+    if (record) return record
+  }
+  return undefined
 }
 
 export function getGoalkeeperHierarchyValue(

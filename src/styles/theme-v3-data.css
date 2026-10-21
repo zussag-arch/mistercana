@@ -371,3 +371,64 @@
   align-items: center;
   justify-content: center;
 }
+
+/* scelta dei creator dei Saggi */
+.saggi-creators {
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-light);
+}
+
+.saggi-creators summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.saggi-creators summary small {
+  margin-left: 8px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.saggi-creators-hint {
+  margin: 8px 0;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.saggi-creators-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 6px;
+  max-height: 340px;
+  overflow-y: auto;
+}
+
+.saggi-creator {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 7px 9px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.saggi-creator span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.saggi-creator b {
+  font-size: 13px;
+}
+
+.saggi-creator small {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 11.5px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

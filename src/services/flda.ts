@@ -266,26 +266,17 @@ async function fldaFetch<T>(
 // Fallback sulle tabelle FantaLab in database/ quando FLDA non risponde.
 // Dopo il primo fallimento di rete resta in modalità locale per la sessione,
 // così le richieste successive non attendono il timeout.
-let localMode = false
-
+// I dati dell'app vengono sempre dalle tabelle (database/ del progetto o quelle
+// aggiornate con "Aggiorna da FantaLab"). FLDA serve solo a scaricarle: il suo
+// vecchio database non viene più letto, anche quando FLDA è acceso.
 export function isFldaLocalMode(): boolean {
-  return localMode
+  return true
 }
 
 async function withLocal<T>(
-  remote: () => Promise<T>,
+  _remote: () => Promise<T>,
   local: (source: typeof import('./fantalabLocal')) => T,
 ): Promise<T> {
-  if (!localMode) {
-    try {
-      return await remote()
-    } catch (error) {
-      const offline = error instanceof FldaApiError
-        && (error.kind === 'unreachable' || error.kind === 'timeout')
-      if (!offline) throw error
-      localMode = true
-    }
-  }
   return local(await import('./fantalabLocal'))
 }
 
