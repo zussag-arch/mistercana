@@ -560,6 +560,7 @@ function renderDataSourcesPanel(): string {
           <span class="data-transfer-eyebrow">Dati</span>
           <h2>Fonti dati</h2>
           <p>Gli archivi che l'app sta usando, con i numeri reali. Si trovano nella cartella <code>database/</code> del progetto.</p>
+          <p class="install-link-row">Link per installare l'app su Android: <code>zussag-arch.github.io/mistercana/?installa</code> <button type="button" class="install-open-button" data-install-open>Installa l'app</button></p>
           <p class="data-last-update">Ultimo aggiornamento dati: <strong>${escapeSourceHtml(lastUpdate.date)}</strong> · ${escapeSourceHtml(lastUpdate.source)}</p>
         </div>
         <span class="data-source-active">In uso: ${escapeSourceHtml(label)}</span>
