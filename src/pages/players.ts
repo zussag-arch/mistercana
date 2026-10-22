@@ -215,7 +215,7 @@ export function renderPlayersPage(state: AppState): string {
   const activeFilters = [viewState.freeOnly, viewState.startingXi, viewState.goalkeeperOne, viewState.penalty, viewState.freeKick, viewState.corner].filter(Boolean).length
 
   return `<section class="page players-page">
-    <div class="players-page-header"><div><span class="players-eyebrow">DATABASE FLDA</span><h1>Giocatori</h1><p><span data-players-count>${rows.length}</span> di ${source.length}</p></div><button id="playersGoToAuctionButton" class="players-auction-nav-button" ${state.auctionPhase === 'live' ? '' : 'disabled'}>Asta</button></div>
+    <div class="players-page-header"><div><span class="players-eyebrow">DATABASE FLDA</span><h1>Giocatori</h1><p><span data-players-count>${rows.length}</span> di ${source.length}</p></div></div>
     <div class="players-toolbar">
       <div class="players-role-filter">${(['ALL','P','D','C','A'] as RoleFilter[]).map((role) => `<button type="button" data-player-role="${role}" class="players-filter-button ${viewState.role === role ? 'selected' : ''}">${role === 'ALL' ? 'Tutti' : role}</button>`).join('')}</div>
       <details class="players-team-filter"><summary aria-label="Seleziona squadra">${viewState.team === 'ALL' ? 'Tutte' : escapePlayerHtml(viewState.team)}</summary><div class="auction-team-selector" role="group" aria-label="Filtra per squadra"><button type="button" class="auction-team-choice ${viewState.team === 'ALL' ? 'selected' : ''}" data-player-team="ALL">Tutte</button>${teams.map((team) => `<button type="button" class="auction-team-choice ${viewState.team === team ? 'selected' : ''}" data-player-team="${escapePlayerHtml(team)}">${escapePlayerHtml(team)}</button>`).join('')}</div></details>

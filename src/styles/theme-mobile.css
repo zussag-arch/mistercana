@@ -706,3 +706,66 @@
   /* scheda completa: "Indietro" prende il posto del logo, stesso punto della scheda rapida */
   body:has(.sheet-back-portal) .topbar-brand-stack { visibility: hidden; }
 }
+
+/* niente zoom col doppio tocco */
+html, body { touch-action: manipulation; }
+
+/* =========================
+   CHIUSURA SCHEDE (sostituisce "Indietro")
+   Una sola × tonda, uguale nelle due schede, in alto a destra nella testata.
+========================= */
+.player-quick-card .player-detail-close-button,
+.player-full-back.sheet-close {
+  display: inline-grid !important;
+  place-items: center;
+  width: 40px !important;
+  height: 40px !important;
+  padding: 0 !important;
+  border: 1px solid var(--line-1) !important;
+  border-radius: 50% !important;
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  font-size: 22px !important;
+  line-height: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+.sheet-back-portal { display: none !important; }
+
+@media (max-width: 700px) {
+  /* stessa partenza per scheda rapida e completa */
+  .player-quick-card { padding-top: 12px !important; }
+  .player-full-page-v3 { padding-top: 0 !important; }
+  body:has(.player-full-page-v3) .topbar { display: none !important; }
+  body:has(.player-full-page-v3) .page { padding-top: calc(env(safe-area-inset-top) + 12px); }
+  .player-detail-overlay { padding-top: calc(env(safe-area-inset-top) + 12px) !important; }
+
+  /* azioni in alto a destra nella testata */
+  .player-detail-header-actions,
+  .player-full-page-v3 .player-full-actions {
+    position: absolute !important;
+    top: 14px;
+    right: 14px;
+    width: auto !important;
+    display: flex !important;
+    align-items: center;
+    gap: 8px;
+    margin: 0 !important;
+  }
+  .player-detail-header,
+  .player-full-page-v3 .player-full-header { position: relative; padding-top: 64px !important; }
+  .player-detail-header-actions .player-detail-full-button { display: inline-flex !important; min-height: 40px; padding: 0 14px; }
+}
+@media (max-width: 700px) {
+  .player-detail-overlay { padding: 0 !important; }
+  .player-quick-card {
+    padding: calc(env(safe-area-inset-top) + 12px) 14px 90px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: var(--bg) !important;
+    max-height: 100dvh !important;
+    height: 100dvh;
+    width: 100% !important;
+  }
+  body:has(.player-full-page-v3) .page { padding-left: 0; padding-right: 0; }
+}
