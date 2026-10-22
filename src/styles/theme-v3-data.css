@@ -432,3 +432,16 @@
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+
+/* data dell'ultimo aggiornamento dei dati */
+.data-last-update {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--text-soft);
+  font-size: 13px;
+}
+.data-last-update strong { color: var(--accent); margin-left: 4px; }
+.data-source-updated { color: var(--muted); font-size: 12px; }

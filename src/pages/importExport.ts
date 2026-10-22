@@ -9,7 +9,7 @@ import { CSV_LABELS, clearCsvOverrides, getCsv, getCsvOverrides, saveCsvOverride
 import type { CsvKey, CsvOverride } from '../data/csvOverrides'
 import { analyzeCsv } from '../data/csvImport'
 import type { CsvAnalysis } from '../data/csvImport'
-import { getDataSources } from '../data/dataSources'
+import { getDataSources, getLastDataUpdate } from '../data/dataSources'
 import { getICaV3Results } from '../data/icaV3Data'
 import { localPlayers } from '../services/fantalabLocal'
 import { getCachedPlayersDataset } from '../services/playerRepository'
@@ -546,6 +546,7 @@ function getManagerName(
 
 function renderDataSourcesPanel(): string {
   const sources = getDataSources()
+  const lastUpdate = getLastDataUpdate()
   const active = getCachedPlayersDataset()
   const label = active?.source === 'legacy'
     ? 'Vecchio listone (riserva)'
@@ -559,6 +560,7 @@ function renderDataSourcesPanel(): string {
           <span class="data-transfer-eyebrow">Dati</span>
           <h2>Fonti dati</h2>
           <p>Gli archivi che l'app sta usando, con i numeri reali. Si trovano nella cartella <code>database/</code> del progetto.</p>
+          <p class="data-last-update">Ultimo aggiornamento dati: <strong>${escapeSourceHtml(lastUpdate.date)}</strong> · ${escapeSourceHtml(lastUpdate.source)}</p>
         </div>
         <span class="data-source-active">In uso: ${escapeSourceHtml(label)}</span>
       </div>
@@ -570,6 +572,7 @@ function renderDataSourcesPanel(): string {
             <small>${escapeSourceHtml(source.detail)}</small>
             <p><b>Usato per:</b> ${escapeSourceHtml(source.usedBy)}</p>
             <code>${escapeSourceHtml(source.file)}</code>
+            <small class="data-source-updated">${escapeSourceHtml(source.updated)}</small>
           </article>`).join('')}
       </div>
       ${renderCsvUpload()}

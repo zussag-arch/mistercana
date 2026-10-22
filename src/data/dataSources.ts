@@ -6,7 +6,8 @@ import { localPlayers, localTeamGuide } from '../services/fantalabLocal'
 import { players as listone } from './players'
 import { getSaggiForPlayer } from './saggi'
 import { goalkeeperCalendarTeams } from './goalkeeperCalendar'
-import { getCsv } from './csvOverrides'
+import { getCsv, getCsvOverrides } from './csvOverrides'
+import type { CsvKey } from './csvOverrides'
 
 // CSV caricati dalla pagina Import/Export, altrimenti quelli del progetto
 const goalkeeperGridCsv = getCsv('griglia_portieri', goalkeeperGridCsvBundled)
@@ -19,6 +20,8 @@ export interface DataSourceSummary {
   value: string
   detail: string
   usedBy: string
+  /** da dove arrivano i dati e quando: "caricati il 21/10/2026" o "inclusi nell'app" */
+  updated: string
 }
 
 function gridTeams(csv: string): number {
@@ -29,6 +32,50 @@ function formatDate(value: string | undefined): string {
   if (!value) return '—'
   const date = new Date(value)
   return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString('it-IT')
+}
+
+const SOURCE_CSV: Record<string, CsvKey[]> = {
+  players: ['fantalab_giocatori'],
+  coaches: ['fantalab_allenatori'],
+  grids: ['griglia_portieri', 'griglia_attaccanti'],
+  saggi: ['saggi'],
+  history: [],
+  goalkeepers: ['portieri_calendario', 'portieri_gerarchie'],
+}
+
+// data di pubblicazione dell'app (inserita da Vite al momento della build)
+const BUILD_DATE = typeof __BUILD_DATE__ === 'string' ? __BUILD_DATE__ : ''
+
+function updatedLabel(key: string): string {
+  const overrides = getCsvOverrides()
+  const dates = (SOURCE_CSV[key] ?? [])
+    .map((csvKey) => overrides[csvKey]?.loadedAt)
+    .filter((value): value is string => Boolean(value))
+    .sort()
+  return dates.length
+    ? `caricati nel browser il ${formatDate(dates[dates.length - 1])}`
+    : "inclusi nell'app"
+}
+
+/** Ultimo aggiornamento dei dati in uso: il più recente tra CSV caricati, Guida FantaLab e pubblicazione. */
+export function getLastDataUpdate(): { date: string; source: string } {
+  const overrides = Object.values(getCsvOverrides())
+    .map((item) => item?.loadedAt)
+    .filter((value): value is string => Boolean(value))
+    .sort()
+  if (overrides.length) {
+    return { date: formatDate(overrides[overrides.length - 1]), source: 'CSV caricati nel browser' }
+  }
+  const fantalab = localPlayers().players
+  const teams = [...new Set(fantalab.map((player) => player.team))]
+  const guide = teams
+    .map((team) => String(localTeamGuide(team).updated_at ?? ''))
+    .filter(Boolean)
+    .sort()
+  if (guide.length) {
+    return { date: formatDate(guide[guide.length - 1]), source: "dati FantaLab inclusi nell'app" }
+  }
+  return { date: BUILD_DATE ? formatDate(BUILD_DATE) : '—', source: "pubblicazione dell'app" }
 }
 
 export function getDataSources(): DataSourceSummary[] {
@@ -48,6 +95,7 @@ export function getDataSources(): DataSourceSummary[] {
       value: `${fantalab.length} giocatori`,
       detail: `${kept} con codice storico conservato, ${added} nuovi`,
       usedBy: 'tutta l\'app: lista, schede, Asta, Obiettivi, iCà',
+      updated: updatedLabel('players'),
     },
     {
       key: 'coaches',
@@ -56,6 +104,7 @@ export function getDataSources(): DataSourceSummary[] {
       value: `${teams.length} squadre`,
       detail: updates.length ? `aggiornata dal ${formatDate(updates[0])} al ${formatDate(updates[updates.length - 1])}` : 'data aggiornamento non indicata',
       usedBy: 'formazione tipo, rigoristi e piazzati, ruoli chiave, indici squadra',
+      updated: updatedLabel('coaches'),
     },
     {
       key: 'grids',
@@ -64,6 +113,7 @@ export function getDataSources(): DataSourceSummary[] {
       value: `${gridTeams(goalkeeperGridCsv)} + ${gridTeams(attackerGridCsv)} squadre`,
       detail: 'portieri per P e D, attaccanti per C e A',
       usedBy: 'abbinamenti in Insights e facilità partite nell\'iCà',
+      updated: updatedLabel('grids'),
     },
     {
       key: 'saggi',
@@ -72,6 +122,7 @@ export function getDataSources(): DataSourceSummary[] {
       value: `${withSaggi} giocatori`,
       detail: 'agganciati tramite il codice storico del giocatore',
       usedBy: 'Prezzo e Saggi, consenso, strategia portieri',
+      updated: updatedLabel('saggi'),
     },
     {
       key: 'history',
@@ -80,6 +131,7 @@ export function getDataSources(): DataSourceSummary[] {
       value: `${kept} giocatori`,
       detail: 'codici storici e statistiche della stagione precedente',
       usedBy: 'collegamento di obiettivi e Saggi, fantamedia storica nell\'iCà',
+      updated: updatedLabel('history'),
     },
     {
       key: 'goalkeepers',
@@ -88,6 +140,7 @@ export function getDataSources(): DataSourceSummary[] {
       value: `${goalkeeperCalendarTeams.length} squadre`,
       detail: '38 giornate, valori favorevole / medio / difficile',
       usedBy: 'abbinamenti portieri e strategia portieri in Asta',
+      updated: updatedLabel('goalkeepers'),
     },
   ]
 }
