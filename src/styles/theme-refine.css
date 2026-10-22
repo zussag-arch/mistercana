@@ -286,3 +286,38 @@ body {
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
 }
 .save-warning strong { font-size: 15px; }
+
+/* ricerca in Asta: due pillole uguali, compatte, allineate a destra */
+.auction-call-selectors {
+  display: flex !important;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.auction-call-selector,
+.auction-call-selector.primary {
+  flex: 0 1 240px;
+  min-height: 46px;
+  padding: 5px 18px 5px 6px !important;
+  border: 1px solid var(--line-1) !important;
+  border-radius: 999px !important;
+  background: var(--surface-light) !important;
+  color: var(--text) !important;
+}
+.auction-call-selector:hover { border-color: var(--accent) !important; }
+.auction-call-selector > span {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 50% !important;
+  background: var(--surface) !important;
+  color: var(--text-soft);
+}
+.auction-call-selector small { color: var(--muted) !important; font-size: 11px; }
+.auction-call-selector strong { color: var(--text) !important; font-size: 13px; }
+@media (max-width: 700px) {
+  .auction-call-selectors { justify-content: stretch; }
+  .auction-call-selector, .auction-call-selector.primary { flex: 1 1 0; min-width: 0; }
+}
+@media (min-width: 701px) {
+  .main-nav .nav-item { padding-inline: 5px; }
+  .topbar { column-gap: 14px; }
+}

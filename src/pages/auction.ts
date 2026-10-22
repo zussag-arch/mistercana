@@ -1396,7 +1396,9 @@ function renderPlayerSearchStrip():
             role-${activeRole.toLowerCase()}
           "
         >
-          <span>⌕</span>
+          <span>
+            <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18"/><path d="M6 21V10l6-6 6 6v11"/><path d="M10 21v-5h4v5"/></svg>
+          </span>
           <div>
             <small>
               Ruolo ${activeRole}

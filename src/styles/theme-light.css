@@ -276,3 +276,9 @@ button:not([class*="card"]):not([class*="tile"]):not([class*="row"]):not(.round-
   stroke-width: 2.2;
   stroke-linecap: round;
 }
+
+/* interruttore un po' più grande */
+.theme-switch { width: 64px; height: 34px; padding: 0 9px; }
+.theme-switch-knob { top: 3px; left: 3px; width: 26px; height: 26px; }
+:root:not([data-theme="light"]) .theme-switch-knob { transform: translateX(30px); }
+.theme-switch svg { width: 15px; height: 15px; }
