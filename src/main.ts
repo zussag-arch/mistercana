@@ -20,11 +20,13 @@ import { initTheme } from './theme'
 import { initRoundSelects } from './components/roundSelect'
 import { initAuctionShortcuts } from './components/auctionShortcuts'
 import { initMobileApp } from './components/mobileApp'
+import { initInstallPrompt } from './components/installPrompt'
 
 initTheme()
 initRoundSelects()
 initAuctionShortcuts()
 initMobileApp()
+initInstallPrompt()
 
 import {
   renderNavigation,

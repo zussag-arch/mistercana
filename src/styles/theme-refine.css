@@ -211,3 +211,58 @@ body {
 :root[data-theme="light"] .dashboard-stat-card:first-child .dashboard-stat-value {
   color: var(--accent) !important;
 }
+
+/* finestra "Installa MisterCanà" */
+.install-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  display: grid;
+  align-items: end;
+  justify-items: center;
+  padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+  background: rgba(0, 0, 0, 0.55);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+@media (min-width: 701px) { .install-sheet { align-items: center; } }
+.install-card {
+  width: min(420px, 100%);
+  padding: 26px 22px 18px;
+  border: 1px solid var(--line-1);
+  border-radius: 24px;
+  background: var(--surface);
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+.install-card img { border-radius: 18px; }
+.install-card h2 { margin: 14px 0 6px; font-size: 22px; }
+.install-card p { margin: 0 0 18px; color: var(--text-soft); font-size: 15px; line-height: 1.45; }
+.install-actions { display: grid; gap: 8px; }
+.install-go {
+  min-height: 50px;
+  border: 0;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 16px;
+  font-weight: 800;
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+.install-later {
+  min-height: 44px;
+  border: 1px solid var(--line-1);
+  background: var(--surface-light);
+  color: var(--text-soft);
+  font-size: 14px;
+}
+.install-link-row { font-size: 13px; color: var(--muted); }
+.install-link-row code { color: var(--text-soft); }
+.install-open-button {
+  margin-left: 6px;
+  min-height: 30px;
+  padding: 0 12px;
+  border: 1px solid var(--line-1);
+  background: var(--surface-light);
+  color: var(--text);
+  font-size: 12px;
+}
