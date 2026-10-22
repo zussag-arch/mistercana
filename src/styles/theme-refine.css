@@ -209,5 +209,5 @@ body {
   box-shadow: 0 6px 18px color-mix(in srgb, var(--accent) 35%, transparent);
 }
 :root[data-theme="light"] .dashboard-stat-card:first-child .dashboard-stat-value {
-  color: color-mix(in srgb, var(--accent) 70%, var(--text)) !important;
+  color: var(--accent) !important;
 }
