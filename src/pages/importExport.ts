@@ -8,6 +8,7 @@ import bundledSaggiCsv from '../../database/MisterCana_DB_Saggi.csv?raw'
 import bundledPreviousSeasonCsv from '../../database/fantalab_stagione_precedente.csv?raw'
 import bundledMatchdayVotesCsv from '../../database/voti_giornate.csv?raw'
 import bundledSeasonHistoryCsv from '../../database/storico_stagioni.csv?raw'
+import bundledAuctionsCsv from '../../database/aste.csv?raw'
 import { CSV_LABELS, clearCsvOverrides, getCsv, getCsvOverrides, saveCsvOverrides } from '../data/csvOverrides'
 import type { CsvKey, CsvOverride } from '../data/csvOverrides'
 import { analyzeCsv } from '../data/csvImport'
@@ -610,6 +611,7 @@ const BUNDLED_CSV: Record<CsvKey, string> = {
   stagione_precedente: bundledPreviousSeasonCsv,
   voti_giornate: bundledMatchdayVotesCsv,
   storico_stagioni: bundledSeasonHistoryCsv,
+  aste: bundledAuctionsCsv,
 }
 
 function renderCsvUpload(): string {

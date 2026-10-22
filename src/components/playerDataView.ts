@@ -1,3 +1,4 @@
+import { latestAuctionSeason } from '../domain/historicalAuctionPrice'
 import type { FldaPlayer, FldaPlayerDetail, FldaRecord } from '../services/flda'
 import type { Player } from '../domain/player'
 import type { PmaConfiguration } from '../app/state'
@@ -105,7 +106,7 @@ export function renderCurrentMetrics(view: PlayerViewModel, compact = false,
   ]
   if (compact) items.push(
     ['Titolarità', `${display(view.flda.titolarita_display, 0)}${typeof view.flda.titolarita_display === 'number' ? '%' : ''}`, 'indicatore editoriale'],
-    ['Prezzo storico A/B', historicalPrice ?? '— / —', 'stagione 2025/26', 'player-metric-history'],
+    ["Prezzo d'asta A/B", historicalPrice ?? '— / —', latestAuctionSeason(view.detail) ? `asta ${latestAuctionSeason(view.detail)}` : 'nessuna asta registrata', 'player-metric-history'],
   )
   // MV/FMV della stagione più recente disponibile; il listone legacy solo come ripiego.
   const latest = latestHistory(view.detail)

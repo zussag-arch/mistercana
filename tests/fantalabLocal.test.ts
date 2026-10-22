@@ -12,7 +12,7 @@ function localSource() {
   runInNewContext(compiled, { exports, require: (name: string) => {
     if (name.endsWith('fantalab_giocatori.csv?raw')) return { __esModule: true, default: readFileSync(new URL('../database/fantalab_giocatori.csv', import.meta.url), 'utf8') }
     if (name.endsWith('fantalab_allenatori.csv?raw')) return { __esModule: true, default: readFileSync(new URL('../database/fantalab_allenatori.csv', import.meta.url), 'utf8') }
-    for (const file of ['fantalab_stagione_precedente', 'voti_giornate', 'storico_stagioni']) {
+    for (const file of ['fantalab_stagione_precedente', 'voti_giornate', 'storico_stagioni', 'aste']) {
       if (name.endsWith(`${file}.csv?raw`)) return { __esModule: true, default: readFileSync(new URL(`../database/${file}.csv`, import.meta.url), 'utf8') }
     }
     if (name === '../data/csvOverrides') return { getCsv: (_key: string, bundled: string) => bundled }

@@ -40,6 +40,7 @@ const COACH_COLUMNS = ['Squadra', 'Allenatore', 'Modulo', 'Ruoli chiave', 'Rigor
 
 function detectKey(fileName: string, header: string[]): CsvKey | undefined {
   const name = fileName.toLowerCase()
+  if (header.includes('Lega') && header.includes('Prezzo') && header.includes('ID Fantacalcio')) return 'aste'
   if (header.includes('Giornata') && header.includes('Fantavoto')) return 'voti_giornate'
   if (header.includes('Stagione') && header.includes('FMV') && header.includes('ID Fantacalcio')) return 'storico_stagioni'
   if (header.includes('ID FantaLab') && !header.includes('PMA % budget (Guida)') && header.includes('Fantamedia')) return 'stagione_precedente'

@@ -13,6 +13,7 @@ export type CsvKey =
   | 'stagione_precedente'
   | 'voti_giornate'
   | 'storico_stagioni'
+  | 'aste'
 
 export const CSV_LABELS: Record<CsvKey, string> = {
   fantalab_giocatori: 'Listone giocatori',
@@ -25,6 +26,7 @@ export const CSV_LABELS: Record<CsvKey, string> = {
   stagione_precedente: 'Stagione precedente',
   voti_giornate: 'Voti per giornata',
   storico_stagioni: 'Storico MV/FMV',
+  aste: 'Aste di lega',
 }
 
 export interface CsvOverride {

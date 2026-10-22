@@ -7,6 +7,7 @@ import allenatoriCsvBundled from '../../database/fantalab_allenatori.csv?raw'
 import stagionePrecedenteCsvBundled from '../../database/fantalab_stagione_precedente.csv?raw'
 import votiGiornateCsvBundled from '../../database/voti_giornate.csv?raw'
 import storicoStagioniCsvBundled from '../../database/storico_stagioni.csv?raw'
+import asteCsvBundled from '../../database/aste.csv?raw'
 import type {
   FldaBulkHistoryResponse,
   FldaHistoryRecord,
@@ -23,6 +24,7 @@ const allenatoriCsv = getCsv('fantalab_allenatori', allenatoriCsvBundled)
 const stagionePrecedenteCsv = getCsv('stagione_precedente', stagionePrecedenteCsvBundled)
 const votiGiornateCsv = getCsv('voti_giornate', votiGiornateCsvBundled)
 const storicoStagioniCsv = getCsv('storico_stagioni', storicoStagioniCsvBundled)
+const asteCsv = getCsv('aste', asteCsvBundled)
 
 const CURRENT_SEASON = '2026/27'
 const PREVIOUS_SEASON = '2025/26'
@@ -32,6 +34,7 @@ let extras: {
   previous: Map<string, Row>
   votes: Map<string, Array<{ matchday: number; mv: number | null; fmv: number | null }>>
   seasons: Map<string, Row[]>
+  auctions: Map<string, FldaPlayerDetail['auction_prices']>
 } | null = null
 
 function loadExtras() {
@@ -49,7 +52,16 @@ function loadExtras() {
     list.push(row)
     seasons.set(row['ID Fantacalcio'], list)
   }
-  extras = { previous, votes, seasons }
+  // aste delle nostre leghe (A e B), collegate con l'ID FantaLab
+  const auctions = new Map<string, FldaPlayerDetail['auction_prices']>()
+  for (const row of parseCsv(asteCsv)) {
+    const price = num(row['Prezzo'])
+    if (price === null || !row['ID FantaLab']) continue
+    const list = auctions.get(row['ID FantaLab']) ?? []
+    list.push({ season: row['Stagione'], division: row['Lega'] === 'SERIE_B' ? 'SERIE_B' : 'SERIE_A', coach_name: row['Squadra'], price })
+    auctions.set(row['ID FantaLab'], list)
+  }
+  extras = { previous, votes, seasons, auctions }
   return extras
 }
 
@@ -359,6 +371,6 @@ export function localPlayerDetail(playerId: string): FldaPlayerDetail {
     hierarchies: localTeamHierarchies(current.team)
       .filter((item) => item.player_id === playerId),
     saggi: [],
-    auction_prices: [],
+    auction_prices: loadExtras().auctions.get(playerId) ?? [],
   }
 }
