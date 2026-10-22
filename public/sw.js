@@ -1,6 +1,6 @@
 // Service worker di MisterCanà: tiene una copia dell'app per aprirla anche senza rete.
 // Prima prova la rete (così gli aggiornamenti arrivano subito), se manca usa la copia.
-const CACHE = 'mistercana-v1'
+const CACHE = 'mistercana-v2'
 
 self.addEventListener('install', () => self.skipWaiting())
 

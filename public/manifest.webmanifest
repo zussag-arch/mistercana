@@ -3,15 +3,15 @@
   "short_name": "MisterCanà",
   "description": "Strumento d'asta per il fantacalcio: iCà, prezzi, strategie e asta live.",
   "lang": "it",
-  "start_url": "./",
-  "scope": "./",
+  "id": "/mistercana/",
+  "start_url": "/mistercana/",
+  "scope": "/mistercana/",
   "display": "standalone",
-  "orientation": "any",
   "background_color": "#121517",
   "theme_color": "#121517",
   "icons": [
-    { "src": "icons/ma-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icons/ma-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icons/ma-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    { "src": "/mistercana/icons/mistercana-180.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "/mistercana/icons/mistercana-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/mistercana/icons/mistercana-512.png", "sizes": "512x512", "type": "image/png" }
   ]
 }
