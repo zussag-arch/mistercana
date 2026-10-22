@@ -63,13 +63,22 @@ function latestKpis(role: string, row?: FldaRecord): string {
 
 function roleStats(role: string, row?: FldaRecord): string {
   if (!row) return '<p class="player-data-empty">Statistiche non disponibili.</p>'
+  // 12 indicatori per ruolo, stagione in corso
   const fields: Array<[string, string, 'count' | 'decimal']> = role === 'P'
-    ? [['Rigori parati', 'rigori_parati', 'count'], ['Parate', 'saves', 'count'], ['Parate/partita', 'saves_per_match', 'decimal'], ['Rating', 'rating', 'decimal']]
+    ? [['Gol subiti', 'gol_subiti', 'count'], ['Gol subiti/partita', 'goals_conceded_per_match', 'decimal'], ['Clean sheet', 'clean_sheet', 'count'], ['% clean sheet', 'clean_sheet_pct', 'decimal'],
+       ['Parate', 'saves', 'count'], ['Parate/partita', 'saves_per_match', 'decimal'], ['% parate', 'saves_pct', 'decimal'], ['Parate in area', 'saves_inside_box', 'count'],
+       ['Parate fuori area', 'saves_outside_box', 'count'], ['Rigori parati', 'rigori_parati', 'count'], ['Errori da gol', 'errors_to_goal', 'count'], ['Rating', 'rating', 'decimal']]
     : role === 'D'
-      ? [['Recuperi/partita', 'recuperi_per_match', 'decimal'], ['Tackle', 'tackles', 'count'], ['Duelli vinti', 'duels_won', 'count'], ['Falli', 'fouls', 'count']]
+      ? [['Gol', 'goals', 'count'], ['Assist', 'assist', 'count'], ['Contrasti/partita', 'tackles_per_match', 'decimal'], ['Intercetti/partita', 'interceptions_per_match', 'decimal'],
+         ['Spazzate/partita', 'clearances_per_match', 'decimal'], ['Recuperi/partita', 'recuperi_per_match', 'decimal'], ['Duelli vinti/partita', 'duels_won_per_match', 'decimal'], ['Duelli aerei/partita', 'aerial_duels_per_match', 'decimal'],
+         ['Tiri bloccati', 'blocked_shots', 'count'], ['Precisione passaggi %', 'accurate_passes_percentage', 'decimal'], ['Errori da gol', 'errors_to_goal', 'count'], ['Cartellini', 'cards', 'count']]
       : role === 'C'
-        ? [['Passaggi chiave', 'key_passes', 'count'], ['Passaggi precisi', 'accurate_passes', 'count'], ['Tiri', 'total_shots', 'count'], ['xA', 'xa', 'decimal']]
-        : [['Tiri', 'total_shots', 'count'], ['Tiri in porta', 'shots_on_target', 'count'], ['xG', 'xg', 'decimal'], ['xA', 'xa', 'decimal']]
+        ? [['Gol', 'goals', 'count'], ['Assist', 'assist', 'count'], ['xG', 'xg', 'decimal'], ['xA', 'xa', 'decimal'],
+           ['Passaggi chiave/partita', 'key_passes_per_match', 'decimal'], ['Occasioni create', 'big_chances_created', 'count'], ['Tiri/partita', 'shots_per_match', 'decimal'], ['Precisione passaggi %', 'accurate_passes_percentage', 'decimal'],
+           ['% dribbling riusciti', 'dribbles_pct', 'decimal'], ['Palloni giocati/partita', 'touches_per_match', 'decimal'], ['Recuperi/partita', 'recuperi_per_match', 'decimal'], ['Cartellini', 'cards', 'count']]
+        : [['Gol', 'goals', 'count'], ['Assist', 'assist', 'count'], ['xG', 'xg', 'decimal'], ['xG/partita', 'xg_per_match', 'decimal'],
+           ['Tiri/partita', 'shots_per_match', 'decimal'], ['Tiri in porta/partita', 'shots_on_target_per_match', 'decimal'], ['% gol su tiri', 'goals_per_shot', 'decimal'], ['Occasioni mancate', 'big_chances_missed', 'count'],
+           ['Gol di testa', 'headed_goals', 'count'], ['Rigori segnati', 'rigori_fatti', 'count'], ['Rigori guadagnati', 'penalties_won', 'count'], ['xA', 'xa', 'decimal']]
   return statGrid(fields.map(([label, key, format]) => [label, field(row, key), format]))
 }
 
