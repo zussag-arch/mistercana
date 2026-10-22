@@ -4137,6 +4137,14 @@ export function bindAuctionEvents(
       },
     )
 
+  // scheda rapida → scheda completa
+  document.querySelector<HTMLElement>('#playerDetailOverlay [data-open-full-player]')?.addEventListener('click', (event) => {
+    const reference = (event.currentTarget as HTMLElement).dataset.openFullPlayer
+    if (!reference) return
+    detailPlayerId = null
+    actions.onOpenFullPlayer(reference)
+  })
+
   document
     .querySelectorAll<HTMLButtonElement>(
       '[data-close-player-detail]',

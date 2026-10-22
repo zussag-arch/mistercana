@@ -114,6 +114,8 @@ export interface FldaPlayerDetail {
   hierarchies: FldaRecord[]
   saggi: FldaRecord[]
   auction_prices: FldaHistoricalAuctionPrice[]
+  /** voti della stagione in corso, giornata per giornata (null = senza voto) */
+  matchdays?: Array<{ matchday: number; mv: number | null; fmv: number | null }>
 }
 
 export type FldaFixtureContext =

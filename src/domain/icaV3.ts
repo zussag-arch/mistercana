@@ -97,6 +97,8 @@ export interface ICaV3Input {
   /** stagione precedente (vecchio listone) */
   previousFm?: number
   previousAppearances?: number
+  /** fantamedia attesa di FantaLab: usata solo se mancano entrambe le stagioni */
+  fantalabXfm?: number
   /** titolarità Guida 0-100 */
   titolarita?: number
   injuryGamesMissed?: number
@@ -175,7 +177,16 @@ export function expectedFm(input: ICaV3Input, prior: number | undefined): number
     weight += w
     total += input.previousFm * w
   }
-  if (weight === 0) return undefined
+  if (weight === 0) {
+    // nessun voto né quest'anno né l'anno scorso (nuovi arrivi, promossi, giovani):
+    // stima prudente = xFM di FantaLab pesata come 4 partite + media del ruolo,
+    // altrimenti media del ruolo ridotta del 5%
+    if (validFm(input.fantalabXfm) && finite(prior)) {
+      return (input.fantalabXfm * 4 + prior * p.priorMatches) / (4 + p.priorMatches)
+    }
+    if (validFm(input.fantalabXfm)) return input.fantalabXfm
+    return finite(prior) ? prior * 0.95 : undefined
+  }
   if (finite(prior)) {
     weight += p.priorMatches
     total += prior * p.priorMatches

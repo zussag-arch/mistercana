@@ -4,6 +4,9 @@
 // non è raggiungibile.
 import giocatoriCsvBundled from '../../database/fantalab_giocatori.csv?raw'
 import allenatoriCsvBundled from '../../database/fantalab_allenatori.csv?raw'
+import stagionePrecedenteCsvBundled from '../../database/fantalab_stagione_precedente.csv?raw'
+import votiGiornateCsvBundled from '../../database/voti_giornate.csv?raw'
+import storicoStagioniCsvBundled from '../../database/storico_stagioni.csv?raw'
 import type {
   FldaBulkHistoryResponse,
   FldaHistoryRecord,
@@ -17,6 +20,38 @@ import { getCsv } from '../data/csvOverrides'
 // CSV caricati dalla pagina Import/Export, altrimenti quelli del progetto
 const giocatoriCsv = getCsv('fantalab_giocatori', giocatoriCsvBundled)
 const allenatoriCsv = getCsv('fantalab_allenatori', allenatoriCsvBundled)
+const stagionePrecedenteCsv = getCsv('stagione_precedente', stagionePrecedenteCsvBundled)
+const votiGiornateCsv = getCsv('voti_giornate', votiGiornateCsvBundled)
+const storicoStagioniCsv = getCsv('storico_stagioni', storicoStagioniCsvBundled)
+
+const CURRENT_SEASON = '2026/27'
+const PREVIOUS_SEASON = '2025/26'
+
+// letti una volta sola, al primo uso
+let extras: {
+  previous: Map<string, Row>
+  votes: Map<string, Array<{ matchday: number; mv: number | null; fmv: number | null }>>
+  seasons: Map<string, Row[]>
+} | null = null
+
+function loadExtras() {
+  if (extras) return extras
+  const previous = new Map(parseCsv(stagionePrecedenteCsv).map((row) => [row['ID FantaLab'], row]))
+  const votes = new Map<string, Array<{ matchday: number; mv: number | null; fmv: number | null }>>()
+  for (const row of parseCsv(votiGiornateCsv)) {
+    const list = votes.get(row['ID Fantacalcio']) ?? []
+    list.push({ matchday: Number(row['Giornata']), mv: num(row['Voto']), fmv: num(row['Fantavoto']) })
+    votes.set(row['ID Fantacalcio'], list)
+  }
+  const seasons = new Map<string, Row[]>()
+  for (const row of parseCsv(storicoStagioniCsv)) {
+    const list = seasons.get(row['ID Fantacalcio']) ?? []
+    list.push(row)
+    seasons.set(row['ID Fantacalcio'], list)
+  }
+  extras = { previous, votes, seasons }
+  return extras
+}
 
 type Row = Record<string, string>
 
@@ -130,9 +165,9 @@ function idsByNames(team: string, names: string[]): string[] {
   })
 }
 
-function historyRecord(row: Row): FldaHistoryRecord {
+function historyRecord(row: Row, season = CURRENT_SEASON): FldaHistoryRecord {
   return {
-    season: '2026/27',
+    season,
     presenze: num(row['Presenze']),
     starts_eleven: num(row['Titolarità']),
     min_playing_time: num(row['Minuti Giocati']),
@@ -254,6 +289,31 @@ export function localTeamHierarchies(team: string): FldaRecord[] {
   return hierarchies
 }
 
+// stagione in corso, stagione scorsa con tutte le statistiche (FantaLab),
+// poi le stagioni più vecchie solo con MV/FMV/presenze (fantacalcio.it)
+function playerHistory(playerId: string, row: Row): FldaHistoryRecord[] {
+  const { previous, seasons } = loadExtras()
+  const history = [historyRecord(row)]
+  const previousRow = previous.get(playerId)
+  if (previousRow && num(previousRow['Presenze'])) history.push(historyRecord(previousRow, PREVIOUS_SEASON))
+  const known = new Set(history.map((item) => item.season))
+  const older = (seasons.get(row['ID Fantacalcio']) ?? [])
+    .filter((item) => !known.has(item['Stagione']))
+    .sort((a, b) => b['Stagione'].localeCompare(a['Stagione']))
+  for (const item of older) {
+    history.push({ season: item['Stagione'], presenze: num(item['Presenze']), mv: num(item['MV']), fmv: num(item['FMV']) })
+  }
+  return history
+}
+
+function playerMatchdays(row: Row): FldaPlayerDetail['matchdays'] {
+  const list = loadExtras().votes.get(row['ID Fantacalcio']) ?? []
+  const last = Math.max(0, ...[...loadExtras().votes.values()].flat().map((item) => item.matchday))
+  const byDay = new Map(list.map((item) => [item.matchday, item]))
+  // tutte le giornate giocate dalla Serie A, anche quelle in cui il giocatore non c'era
+  return Array.from({ length: last }, (_, index) => byDay.get(index + 1) ?? { matchday: index + 1, mv: null, fmv: null })
+}
+
 export function localPlayerDetail(playerId: string): FldaPlayerDetail {
   const { players, rows } = load()
   const current = players.find((player) => player.player_id === playerId)
@@ -261,7 +321,8 @@ export function localPlayerDetail(playerId: string): FldaPlayerDetail {
   if (!current || !row) throw new Error('Giocatore non presente nelle tabelle FantaLab.')
   return {
     current,
-    history: [historyRecord(row)],
+    history: playerHistory(playerId, row),
+    matchdays: playerMatchdays(row),
     guide: localTeamGuide(current.team),
     hierarchies: localTeamHierarchies(current.team)
       .filter((item) => item.player_id === playerId),

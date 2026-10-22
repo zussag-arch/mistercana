@@ -95,6 +95,7 @@ function buildInputs(): ICaV3Input[] {
         : old?.fmv && old.fmv > 0 ? old.fmv : undefined,
       previousAppearances: finite(player.previous_fmv) && player.previous_fmv > 0 && finite(player.previous_presenze) ? player.previous_presenze
         : old?.fmv && old.fmv > 0 ? old.appearances : undefined,
+      fantalabXfm: finite(player.fm_exp) && player.fm_exp > 0 ? player.fm_exp : undefined,
       titolarita: player.titolarita_display ?? undefined,
       injuryGamesMissed: finite(season?.injury_games_missed) ? season.injury_games_missed : undefined,
       penaltyRank: rankOf('PENALTY'),

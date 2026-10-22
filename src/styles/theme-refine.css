@@ -349,3 +349,31 @@ html:has(.install-sheet) body {
 .overlay {
   touch-action: pan-y;
 }
+
+/* grafico voti per giornata */
+.md-chart svg { width: 100%; height: auto; overflow: visible; }
+.md-area { fill: url(#mdArea); }
+.md-stop-top { stop-color: color-mix(in srgb, var(--green) 55%, var(--surface)); stop-opacity: 0.9; }
+.md-stop-bottom { stop-color: color-mix(in srgb, var(--green) 10%, var(--surface)); stop-opacity: 0.4; }
+.md-line { fill: none; stroke-width: 3; stroke-linecap: round; }
+.md-line-fmv { stroke: var(--green); }
+.md-line-mv { stroke: var(--blue); }
+.md-dot { stroke-width: 2.5; fill: var(--surface); }
+.md-dot-fmv { stroke: var(--green); }
+.md-dot-mv { stroke: var(--blue); }
+.md-dot-text { font: 700 11px var(--font-ui); fill: var(--text); }
+.md-sv { fill: var(--surface-light); stroke: var(--muted-soft); stroke-width: 2; }
+.md-sv-text { font: 700 10px var(--font-ui); fill: var(--muted); }
+.md-day { font: 700 13px var(--font-ui); fill: var(--muted); }
+.md-legend-mv { fill: var(--blue); }
+.md-legend-fmv { fill: var(--green); }
+
+/* scheda completa su computer: "Indietro" come pillola normale */
+@media (min-width: 701px) {
+  .player-full-back.sheet-back { width: auto !important; height: 38px !important; padding: 0 14px 0 8px !important; }
+}
+/* grafico giornate: misura contenuta, area ben visibile */
+.md-chart { max-width: 760px; margin: 0 auto; }
+.md-stop-top { stop-color: var(--green); stop-opacity: 0.55; }
+.md-stop-bottom { stop-color: var(--green); stop-opacity: 0.06; }
+.md-chart .chart-legend text { font-size: 12px; fill: var(--muted); }

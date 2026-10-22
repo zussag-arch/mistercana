@@ -15,7 +15,10 @@ test('expected FM shrinks short current seasons toward last season and the role 
   // pesi: 7 (corrente) + 10 (scorsa: min(30,20)*0,5) + 8 (ruolo)
   assert.equal(Math.round(value * 1000) / 1000, Math.round(((10 * 7 + 6.5 * 10 + 7 * 8) / 25) * 1000) / 1000)
   assert.ok(value < 8, 'sette partite non bastano per valere 10')
-  assert.equal(expectedFm({ ...attacker('y'), fm: undefined, appearances: 0 }, 7), undefined)
+  // nessun voto in nessuna stagione: xFM di FantaLab mescolata alla media del ruolo,
+  // oppure media del ruolo ridotta del 5%
+  assert.equal(expectedFm({ ...attacker('y'), fm: undefined, appearances: 0, previousFm: undefined, fantalabXfm: undefined }, 7), 7 * 0.95)
+  assert.equal(expectedFm({ ...attacker('y'), fm: undefined, appearances: 0, previousFm: undefined, fantalabXfm: 8 }, 7), (8 * 4 + 7 * 8) / 12)
   // FM 0 della stagione scorsa (es. Serie B senza voti) è un dato mancante, non uno zero
   const promoted = expectedFm({ ...attacker('r'), fm: 9.57, appearances: 7, previousFm: 0, previousAppearances: 36 }, 6.8)!
   assert.equal(promoted.toFixed(3), ((9.57 * 7 + 6.8 * 8) / 15).toFixed(3))
