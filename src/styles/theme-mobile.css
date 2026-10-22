@@ -385,3 +385,126 @@
     font-size: 13px !important;
   }
 }
+
+@media (max-width: 700px) {
+  /* azioni dell'asta visibili: vanno a capo invece di scorrere nascoste */
+  .topbar-page-actions {
+    flex-wrap: wrap !important;
+    overflow: visible !important;
+    row-gap: 8px;
+  }
+  .topbar-page-actions .auction-toolbar-actions {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 6px;
+    width: auto;
+  }
+  /* Giocatori e Obiettivi sono già nella barra in basso */
+  #goToPlayersButton,
+  #goToObjectivesButton {
+    display: none !important;
+  }
+  #undoLastAssignmentButton,
+  #endAuctionButton {
+    display: inline-flex !important;
+    min-height: 34px;
+    padding: 0 14px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 700px) {
+  .topbar .topbar-page-actions #undoLastAssignmentButton,
+  .topbar .topbar-page-actions #endAuctionButton {
+    width: auto !important;
+    height: 34px !important;
+    padding: 0 14px !important;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    font-size: 13px !important;
+    white-space: nowrap;
+  }
+  .topbar .topbar-page-actions #undoLastAssignmentButton::after {
+    content: none !important;
+  }
+}
+
+/* --- Giocatori su telefono: una scheda ordinata per giocatore --- */
+@media (max-width: 700px) {
+  .players-table-header {
+    display: none !important;
+  }
+  .players-table-card {
+    padding: 4px 14px !important;
+  }
+  .players-table-body {
+    display: block !important;
+  }
+  .players-table-row {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    grid-template-areas:
+      "player player ica"
+      "pma xfm tit"
+      "mv mv status" !important;
+    gap: 10px 12px !important;
+    width: 100%;
+    padding: 14px 2px !important;
+    border: 0 !important;
+    border-bottom: 1px solid var(--line-2) !important;
+    border-radius: 0 !important;
+    background: none !important;
+    text-align: left;
+  }
+  .players-table-row:last-child {
+    border-bottom: 0 !important;
+  }
+  .players-table-row > div {
+    display: flex !important;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    min-width: 0;
+    font-size: 15px;
+  }
+  .players-table-row > div::before {
+    content: attr(data-label);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .players-table-row > .players-player-cell::before {
+    content: none;
+  }
+  .players-table-row > .players-player-cell {
+    grid-area: player;
+    flex-direction: row !important;
+    align-items: center;
+    gap: 10px;
+  }
+  .players-table-row > [data-label="iCà"] { grid-area: ica; align-items: flex-end; }
+  .players-table-row > [data-label="PMA"] { grid-area: pma; }
+  .players-table-row > [data-label="xFM"] { grid-area: xfm; }
+  .players-table-row > [data-label="Titolarità"] { grid-area: tit; }
+  .players-table-row > [data-label="MV/FMV"] { grid-area: mv; }
+  .players-table-row > [data-label="Stato"] { grid-area: status; align-items: flex-end; }
+  .players-table-row > [data-label="Stato"]::before { content: none; }
+  .players-table-row .players-ica { font-size: 26px !important; line-height: 1; }
+  .players-table-row > [data-label="PMA"] { flex-direction: row !important; flex-wrap: wrap; align-items: baseline; column-gap: 6px; }
+  .players-table-row > [data-label="PMA"]::before { flex-basis: 100%; }
+  .players-table-row .player-status { font-size: 12px; padding: 4px 10px; }
+
+  /* filtri: ruoli su una riga, ricerca a tutta larghezza */
+  .players-toolbar,
+  .players-filters {
+    gap: 8px !important;
+  }
+  .players-search,
+  .players-toolbar input[type="search"] {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+  }
+}
