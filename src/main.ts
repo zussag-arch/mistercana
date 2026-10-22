@@ -63,6 +63,8 @@ import {
   renderInsightsPage,
   bindInsightsEvents,
 } from './pages/insights'
+import { bindRosterEvents, renderRosterPage } from './pages/roster'
+import './styles/roster.css'
 
 import {
   renderImportExportPage,
@@ -71,7 +73,7 @@ import {
 import {
   players,
 } from './data/players'
-import { getCachedPlayersDataset } from './services/playerRepository'
+import { getCachedPlayersDataset, loadPlayersDataset } from './services/playerRepository'
 import { isFldaPlayerAssigned } from './services/auctionPlayerResolver'
 import { buildAuctionStrategyContext } from './services/auctionStrategyAdapter'
 
@@ -184,6 +186,9 @@ function getPageContent(
       return renderObjectivesPage(
         state,
       )
+
+    case 'roster':
+      return renderRosterPage()
 
     case 'insights':
       return renderInsightsPage()
@@ -967,6 +972,20 @@ function bindPageEvents(
             },
         },
       )
+
+      break
+
+    case 'roster':
+      bindRosterEvents({
+        onRender: render,
+        onOpenPlayer: (reference) => {
+          selectedPlayerReference = reference
+          navigateAndRender('playerDetail')
+        },
+      })
+      if (!getCachedPlayersDataset()) {
+        void loadPlayersDataset().then(() => render())
+      }
 
       break
 

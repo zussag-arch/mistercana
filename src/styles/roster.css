@@ -1,0 +1,93 @@
+/* =========================
+   LA MIA ROSA
+========================= */
+.roster-page { width: 100%; max-width: 1280px; margin-inline: auto; display: grid; gap: 16px; }
+.roster-header h1 { margin: 0; font-size: 34px; }
+.roster-header p { margin: 4px 0 0; color: var(--muted); }
+
+.roster-picker { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.roster-league { display: inline-flex; padding: 4px; border-radius: 999px; background: var(--surface-light); }
+.roster-league button {
+  min-height: 36px; padding: 0 16px; border: 0; border-radius: 999px !important;
+  background: none; color: var(--muted); font-weight: 700; cursor: pointer;
+}
+.roster-league button[aria-selected="true"] { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,.18); }
+.roster-team {
+  min-height: 44px; min-width: 240px; padding: 0 16px; border: 1px solid var(--line-1);
+  border-radius: 999px; background: var(--surface); color: var(--text); font: inherit; font-weight: 600;
+}
+
+.roster-section { padding: 22px; border: 1px solid var(--line-2); border-radius: var(--radius-xl); background: var(--surface); }
+.roster-section-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+.roster-section-head h2 { margin: 0; font-size: 24px; display: flex; }
+.roster-section-head h2::after { content: "."; color: var(--accent); }
+.roster-section-head span { color: var(--muted); font-size: 13px; }
+.roster-bench-title { margin: 18px 0 8px; font-size: 15px; color: var(--muted); }
+.roster-note { margin: 14px 0 0; color: var(--muted); font-size: 12px; }
+.roster-list { display: grid; }
+.roster-list + .roster-list { margin-top: 14px; }
+
+.roster-row {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1.6fr) minmax(0, 1.4fr) 110px 56px 60px minmax(0, 1.3fr);
+  align-items: center; gap: 12px;
+  width: 100%; padding: 10px 6px;
+  border: 0 !important; border-bottom: 1px solid var(--line-2) !important; border-radius: 0 !important;
+  background: none; color: var(--text); text-align: left; font: inherit; cursor: pointer;
+}
+.roster-row:hover { background: rgba(var(--ink-rgb), .03); }
+.roster-row.starter .roster-name strong::before { content: "●"; margin-right: 6px; color: var(--accent); font-size: 10px; vertical-align: 2px; }
+.roster-row.out { opacity: .55; }
+.roster-name { display: grid; min-width: 0; }
+.roster-name strong { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.roster-name small { color: var(--muted); font-size: 12px; }
+.roster-opponent { color: var(--text-soft); font-weight: 600; }
+.roster-muted { color: var(--muted); }
+
+.roster-form { display: inline-flex; gap: 3px; }
+.roster-form i {
+  display: inline-grid; place-items: center; width: 30px; height: 22px; border-radius: 6px;
+  font-style: normal; font-size: 11px; font-weight: 700; color: var(--on-color);
+}
+.roster-form i.great { background: var(--green); }
+.roster-form i.good { background: color-mix(in srgb, var(--green) 55%, var(--surface)); color: var(--text); }
+.roster-form i.ok { background: color-mix(in srgb, var(--yellow) 45%, var(--surface)); color: var(--text); }
+.roster-form i.bad { background: color-mix(in srgb, var(--red) 55%, var(--surface)); color: var(--text); }
+.roster-form i.sv { background: var(--surface-light); color: var(--muted); }
+
+.roster-prob { position: relative; display: block; height: 22px; border-radius: 999px; background: var(--surface-light); overflow: hidden; }
+.roster-prob b { position: absolute; inset: 0 auto 0 0; border-radius: 999px; }
+.roster-prob.high b { background: color-mix(in srgb, var(--green) 70%, transparent); }
+.roster-prob.mid b { background: color-mix(in srgb, var(--yellow) 70%, transparent); }
+.roster-prob.low b, .roster-prob.out b { background: color-mix(in srgb, var(--red) 60%, transparent); }
+.roster-prob em { position: relative; display: block; text-align: center; font-style: normal; font-size: 11px; font-weight: 700; line-height: 22px; color: var(--text); }
+.roster-ica, .roster-expected { font-family: var(--font-display); font-size: 16px; }
+.roster-expected { color: var(--accent); }
+.roster-status { display: flex; flex-wrap: wrap; gap: 4px; }
+.roster-chip, .roster-reason { padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+.roster-chip.bad { background: color-mix(in srgb, var(--red) 20%, transparent); color: var(--red); }
+.roster-chip.warn { background: color-mix(in srgb, var(--yellow) 22%, transparent); color: color-mix(in srgb, var(--yellow) 60%, var(--text)); }
+.roster-reason { background: var(--surface-light); color: var(--text-soft); font-weight: 600; }
+
+@media (max-width: 700px) {
+  .roster-section { padding: 16px 14px; }
+  .roster-team { flex: 1 1 100%; min-width: 0; }
+  .roster-row {
+    grid-template-columns: 30px minmax(0, 1fr) auto;
+    grid-template-areas:
+      "badge name expected"
+      "badge form prob"
+      "badge status status";
+    row-gap: 6px;
+  }
+  .roster-row > .role-badge { grid-area: badge; align-self: start; }
+  .roster-name { grid-area: name; }
+  .roster-row > [data-label="Forma"] { grid-area: form; }
+  .roster-row > [data-label="Titolare"] { grid-area: prob; width: 90px; }
+  .roster-row > .roster-ica { display: none; }
+  .roster-row > .roster-expected { grid-area: expected; }
+  .roster-status { grid-area: status; }
+  .roster-form i { width: 26px; }
+}
+.roster-section-head h2 { display: block; }
+.roster-section-head h2::after { display: inline; }
