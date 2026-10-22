@@ -1066,10 +1066,10 @@ function render():
     return
   }
 
-  // la pagina attiva decide se il contenuto è fisso (Dashboard, Asta, Rosa) o scorre
-  document.documentElement.dataset.page = activePage
-
-  app.innerHTML = `
+  // la pagina attiva (data-view) decide se il contenuto è fisso (Dashboard, Asta, Rosa) o scorre.
+  // L'attributo sta su un contenitore ricreato a ogni disegno: cambiarlo sul documento
+  // rallentava progressivamente il browser a ogni cambio pagina.
+  app.innerHTML = `<div class="app-shell" data-view="${activePage}">
     ${renderNavigation(
       activePage,
       state.auctionPhase,
@@ -1080,7 +1080,7 @@ function render():
         activePage,
       )}
     </main>
-  `
+  </div>`
 
   /*
     ORDINE IMPORTANTE

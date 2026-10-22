@@ -18,14 +18,15 @@ body {
   padding-bottom: 0 !important;
 }
 
-#app {
+#app,
+.app-shell {
   height: 100dvh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
-#app > .topbar {
+.app-shell > .topbar {
   flex: none;
   position: relative !important;
   top: auto !important;
@@ -61,17 +62,17 @@ body {
    PAGINE FISSE (computer)
 ========================= */
 @media (min-width: 1001px) {
-  :root[data-page="dashboard"] .app-main,
-  :root[data-page="auction"] .app-main,
-  :root[data-page="roster"] .app-main {
+  .app-shell[data-view="dashboard"] .app-main,
+  .app-shell[data-view="auction"] .app-main,
+  .app-shell[data-view="roster"] .app-main {
     overflow: hidden;
     display: flex;
     flex-direction: column;
   }
 
-  :root[data-page="dashboard"] .app-main > .page,
-  :root[data-page="auction"] .app-main > .page,
-  :root[data-page="roster"] .app-main > .page {
+  .app-shell[data-view="dashboard"] .app-main > .page,
+  .app-shell[data-view="auction"] .app-main > .page,
+  .app-shell[data-view="roster"] .app-main > .page {
     flex: 1;
     min-height: 0;
   }
@@ -141,12 +142,12 @@ body {
 
 @media (min-width: 1001px) {
   /* pagine fisse: niente fascia vuota in basso */
-  :root[data-page="dashboard"] .app-main,
-  :root[data-page="auction"] .app-main,
-  :root[data-page="roster"] .app-main { padding-bottom: 20px !important; }
-  :root[data-page="dashboard"] .app-main > .page,
-  :root[data-page="auction"] .app-main > .page,
-  :root[data-page="roster"] .app-main > .page { padding-bottom: 0 !important; }
+  .app-shell[data-view="dashboard"] .app-main,
+  .app-shell[data-view="auction"] .app-main,
+  .app-shell[data-view="roster"] .app-main { padding-bottom: 20px !important; }
+  .app-shell[data-view="dashboard"] .app-main > .page,
+  .app-shell[data-view="auction"] .app-main > .page,
+  .app-shell[data-view="roster"] .app-main > .page { padding-bottom: 0 !important; }
 
   /* le tessere dentro le colonne non si schiacciano: è la colonna che scorre */
   .auction-workspace-main > *,
@@ -165,3 +166,6 @@ body {
   .dashboard-page:has(.dashboard-live-summary) .budget-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
   .dashboard-page:has(.dashboard-live-summary) .dashboard-live-role-head { flex-wrap: wrap; }
 }
+
+/* lo sfondo non ha bisogno di restare "fisso": la finestra non scorre più */
+body { background-attachment: scroll !important; }

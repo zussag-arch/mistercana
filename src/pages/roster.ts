@@ -32,6 +32,8 @@ function saveChoice(choice: Choice): void {
 let league: League = loadChoice()?.league ?? 'SERIE_A'
 // dati dei pallini per il riquadro, ricostruiti a ogni disegno della pagina
 let picksById = new Map<string, MatchdayPick>()
+let hidePopOnScroll: () => void = () => {}
+let scrollListenerReady = false
 
 /* ---------- pezzi del riquadro ---------- */
 
@@ -200,6 +202,10 @@ export function bindRosterEvents(actions: RosterActions): void {
     actions.onRender()
   })
 
+  if (!scrollListenerReady) {
+    document.addEventListener('scroll', () => hidePopOnScroll(), { passive: true, capture: true })
+    scrollListenerReady = true
+  }
   const pop = document.querySelector<HTMLElement>('.roster-pop')
   const page = document.querySelector<HTMLElement>('.roster-page')
   if (!pop || !page) return
@@ -237,6 +243,7 @@ export function bindRosterEvents(actions: RosterActions): void {
     }
     if (!pop.contains(target)) hide()
   })
-  // lo scorrimento avviene dentro l'app (non nella finestra): ascolto in cattura
-  document.addEventListener('scroll', () => { if (!pop.hidden) hide() }, { passive: true, capture: true })
+  // lo scorrimento avviene dentro l'app (non nella finestra): un solo ascoltatore in cattura,
+  // sostituito a ogni ridisegno invece di accumularsi
+  hidePopOnScroll = () => { if (!pop.hidden) hide() }
 }

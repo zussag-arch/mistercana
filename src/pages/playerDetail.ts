@@ -197,11 +197,18 @@ async function load(reference: string, actions: PlayerDetailActions): Promise<vo
   finally { loadingReference = null; actions.onRender() }
 }
 
+let detailLoadListening = false
+let latestDetailLoad: () => void = () => {}
+
 export function bindFullPlayerPage(reference: string | null, actions: PlayerDetailActions): void {
   document.querySelector('[data-player-detail-back]')?.addEventListener('click', actions.onBack)
   document.querySelector<HTMLElement>('[data-full-player-call]')?.addEventListener('click', (event) => { const id = (event.currentTarget as HTMLElement).dataset.fullPlayerCall; if (id) actions.onCallPlayer(id) })
   const selected = reference ? resolve(reference) : undefined
   if (reference && !getCachedPlayersDataset()) void load(reference, actions)
   else if (reference && selected?.flda.player_id && (!getCachedPlayerDetail(selected.flda.player_id) || !getCachedTeamGuide(selected.flda.team))) void load(reference, actions)
-  document.addEventListener('mistercana:player-detail-load', () => { if (reference) void load(reference, actions) }, { once: true })
+  latestDetailLoad = () => { if (reference) void load(reference, actions) }
+  if (!detailLoadListening) {
+    detailLoadListening = true
+    document.addEventListener('mistercana:player-detail-load', () => { detailLoadListening = false; latestDetailLoad() }, { once: true })
+  }
 }

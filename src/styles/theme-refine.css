@@ -322,20 +322,7 @@ body {
   .topbar { column-gap: 14px; }
 }
 
-/* con una finestra aperta scorre solo lei: la pagina sotto resta ferma */
-html:has(.player-detail-overlay),
-html:has(.overlay:not(.hidden):not([hidden])[aria-hidden="false"]),
-html:has(.goalkeeper-matrix-overlay:not([hidden])),
-html:has(.install-sheet),
-html:has(.round-select-menu) {
-  overflow: hidden;
-}
-html:has(.player-detail-overlay) body,
-html:has(.overlay:not(.hidden):not([hidden])[aria-hidden="false"]) body,
-html:has(.goalkeeper-matrix-overlay:not([hidden])) body,
-html:has(.install-sheet) body {
-  overflow: hidden;
-}
+/* con una finestra aperta scorre solo lei (il documento non scorre mai: vedi app-shell.css) */
 .player-detail-card,
 .player-detail-overlay,
 .overlay-card,
@@ -415,8 +402,7 @@ html:has(.install-sheet) body {
   background:
     linear-gradient(160deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.02) 40%),
     var(--glass-strong) !important;
-  -webkit-backdrop-filter: blur(28px) saturate(170%);
-  backdrop-filter: blur(28px) saturate(170%);
+  /* niente seconda sfocatura: lo sfondo della finestra è già sfocato (pesante per la scheda grafica) */
   border: 1px solid var(--glass-border) !important;
   box-shadow: inset 0 1px 0 var(--glass-shine), 0 24px 70px rgba(0, 0, 0, 0.38) !important;
 }

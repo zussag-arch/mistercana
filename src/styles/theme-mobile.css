@@ -704,7 +704,7 @@
 }
 @media (max-width: 700px) {
   /* scheda completa: "Indietro" prende il posto del logo, stesso punto della scheda rapida */
-  body:has(.sheet-back-portal) .topbar-brand-stack { visibility: hidden; }
+  .app-shell[data-view="playerDetail"] .topbar-brand-stack { visibility: hidden; }
 }
 
 /* niente zoom col doppio tocco */
@@ -734,8 +734,8 @@ html, body { touch-action: manipulation; }
 @media (max-width: 700px) {
   /* stessa partenza per scheda rapida e completa */
   /* stessa partenza: la scheda completa senza logo sopra, alla stessa distanza dall'alto */
-  body:has(.player-full-page-v3) .topbar { display: none !important; }
-  body:has(.player-full-page-v3) .page { padding-top: calc(env(safe-area-inset-top) + 28px); }
+  .app-shell[data-view="playerDetail"] .topbar { display: none !important; }
+  .app-shell[data-view="playerDetail"] .page { padding-top: calc(env(safe-area-inset-top) + 28px); }
   .player-detail-overlay { padding-top: calc(env(safe-area-inset-top) + 16px) !important; }
   .player-quick-card { padding-top: 12px !important; }
   .player-full-page-v3 { padding-top: 0 !important; }
@@ -767,6 +767,6 @@ html, body { touch-action: manipulation; }
 @media (max-width: 700px) {
   /* tutto un po' più in basso: il logo esce dalla fascia della barra di stato */
   .topbar { padding-top: calc(env(safe-area-inset-top) + 24px) !important; }
-  body:has(.player-full-page-v3) .page { padding-top: calc(env(safe-area-inset-top) + 40px); }
+  .app-shell[data-view="playerDetail"] .page { padding-top: calc(env(safe-area-inset-top) + 40px); }
   .player-detail-overlay { padding-top: calc(env(safe-area-inset-top) + 28px) !important; }
 }
