@@ -426,3 +426,71 @@ html:has(.install-sheet) body {
   background: rgba(var(--ink-rgb), 0.06) !important;
   border-color: var(--glass-border) !important;
 }
+
+/* =========================
+   SCHEDA SINTETICA: stesse linee del riquadro della Rosa
+   vetro, × piccola a cavallo dell'angolo in alto a destra (fuori dallo scorrimento)
+========================= */
+.player-detail-shell {
+  position: relative;
+  width: min(1080px, 100%);
+  max-height: calc(100vh - 36px);
+  display: flex;
+}
+.player-detail-shell > .player-detail-card { width: 100% !important; max-height: inherit; }
+.player-detail-close-button.sheet-x,
+.roster-pop-close {
+  position: absolute;
+  top: -9px !important;
+  right: -9px !important;
+  z-index: 3;
+  display: grid !important;
+  place-items: center;
+  width: 28px !important;
+  height: 28px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  font-size: 15px !important;
+  line-height: 1;
+  color: var(--text) !important;
+  background:
+    linear-gradient(140deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.02) 45%, rgba(255, 255, 255, 0.06)),
+    var(--glass-bg) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  backdrop-filter: blur(22px) saturate(180%);
+  border: 1px solid var(--glass-border) !important;
+  box-shadow: inset 0 1px 0 var(--glass-shine), 0 6px 16px rgba(0, 0, 0, 0.25) !important;
+  cursor: pointer;
+}
+/* vetro come il riquadro della Rosa (più leggero del precedente) */
+.player-quick-card {
+  background:
+    linear-gradient(140deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.02) 45%, rgba(255, 255, 255, 0.06)),
+    var(--glass-strong) !important;
+}
+.player-quick-card .player-current-metrics > :not(.player-metric-ica),
+.player-quick-card .player-data-section,
+.player-quick-card .player-overlay-stats {
+  background: rgba(var(--ink-rgb), 0.05) !important;
+  border-color: var(--glass-border) !important;
+}
+@media (max-width: 700px) {
+  .player-detail-shell { width: 100%; max-height: 94vh; }
+}
+/* niente barra di scorrimento visibile nelle schede (si scorre lo stesso) */
+.player-detail-card,
+.overlay-card,
+.roster-pop,
+.round-select-menu {
+  scrollbar-width: none;
+}
+.player-detail-card::-webkit-scrollbar,
+.overlay-card::-webkit-scrollbar,
+.roster-pop::-webkit-scrollbar,
+.round-select-menu::-webkit-scrollbar {
+  display: none;
+}
+@media (max-width: 700px) {
+  /* scheda a tutta larghezza: la × resta dentro lo schermo */
+  .player-detail-shell .player-detail-close-button.sheet-x { right: 6px !important; top: -6px !important; }
+}
