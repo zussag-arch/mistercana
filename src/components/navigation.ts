@@ -144,12 +144,18 @@ export function renderNavigation(
       ></div>
 
       <button
-        class="theme-toggle"
+        class="theme-switch"
         data-theme-toggle
         type="button"
-        title="Cambia tema (chiaro / scuro)"
-        aria-label="Cambia tema"
-      ><span class="theme-toggle-icon" aria-hidden="true"></span></button>
+        role="switch"
+        aria-checked="${typeof document !== 'undefined' && document.documentElement.dataset.theme === 'light' ? 'false' : 'true'}"
+        aria-label="Tema scuro"
+        title="Tema chiaro / scuro"
+      >
+        <svg class="theme-switch-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="theme-switch-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>
+        <span class="theme-switch-knob" aria-hidden="true"></span>
+      </button>
     </header>
 
     ${renderMobileTabbar(activePage, auctionDisabled, auctionLive)}
