@@ -1128,8 +1128,9 @@ function renderSelector(
         Boolean(
           player.player_id,
         ) &&
-        player.role ===
-          activeRole &&
+        (selectorMode === 'player' ||
+          player.role ===
+            activeRole) &&
         !isFldaPlayerAssigned(
           state.auctionAssignments,
           player.player_id!,
@@ -1137,7 +1138,10 @@ function renderSelector(
     )
 
   const visiblePlayers =
-    selectedTeamFilter
+    !teamMode
+      // ricerca libera: tutti i giocatori liberi, in ordine alfabetico
+      ? [...catalog].sort((first, second) => first.name.localeCompare(second.name, 'it'))
+      : selectedTeamFilter
       ? catalog.filter(
           (player) =>
             normalizeText(
@@ -1175,7 +1179,7 @@ function renderSelector(
               ${
                 teamMode
                   ? 'Seleziona squadra'
-                  : 'Seleziona giocatore'
+                  : 'Cerca giocatore'
               }
             </h2>
           </div>
@@ -1393,14 +1397,29 @@ function renderPlayerSearchStrip():
           "
         >
           <span>⌕</span>
-
           <div>
             <small>
               Ruolo ${activeRole}
             </small>
-
             <strong>
               Squadra → giocatore
+            </strong>
+          </div>
+        </button>
+        <button
+          id="searchAuctionPlayerButton"
+          type="button"
+          class="auction-call-selector"
+        >
+          <span>
+            <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          </span>
+          <div>
+            <small>
+              Tutti i ruoli
+            </small>
+            <strong>
+              Cerca giocatore
             </strong>
           </div>
         </button>
@@ -4242,6 +4261,26 @@ export function bindAuctionEvents(
 
   document
     .querySelector(
+      '#searchAuctionPlayerButton',
+    )
+    ?.addEventListener(
+      'click',
+      () => {
+        selectorMode =
+          'player'
+
+        selectedTeamFilter =
+          ''
+
+        detailPlayerId =
+          null
+
+        actions.onRender()
+      },
+    )
+
+  document
+    .querySelector(
       '#selectAuctionTeamButton',
     )
     ?.addEventListener(
@@ -4340,6 +4379,10 @@ export function bindAuctionEvents(
     document.querySelector<HTMLInputElement>(
       '#auctionSelectorSearch',
     )
+
+  if (selectorMode === 'player') {
+    selectorSearch?.focus()
+  }
 
   const selectorResults =
     document.querySelector<HTMLElement>(

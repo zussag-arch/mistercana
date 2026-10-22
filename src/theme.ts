@@ -14,6 +14,10 @@ function savedTheme(): Theme {
 
 export function applyTheme(theme: Theme): void {
   document.documentElement.dataset.theme = theme
+  // interruttore: acceso = tema scuro
+  document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
+    button.setAttribute('aria-checked', String(theme === 'dark'))
+  })
   // colore della barra del browser / di stato (Android, Safari) in tinta col tema
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'light' ? '#f6f1e8' : '#121517')
   try { window.localStorage.setItem(THEME_KEY, theme) } catch { /* solo comodità */ }

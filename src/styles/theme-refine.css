@@ -149,7 +149,7 @@ body {
   .topbar-page-actions::-webkit-scrollbar { display: none; }
   .topbar-page-actions > * { flex: 0 0 auto; }
   .main-nav { grid-column: 1 / -1; grid-row: 2; overflow-x: auto; scrollbar-width: none; }
-  .theme-toggle { grid-column: 2; grid-row: 1; position: static; }
+  .theme-switch { grid-column: 2; grid-row: 1; position: static; }
 }
 
 /* icona "annulla" disegnata (freccia verso destra che curva e torna) */
