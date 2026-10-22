@@ -30,6 +30,18 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-180.png" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <script>
+      // iPhone: ora e batteria scure nel tema chiaro, bianche nel tema scuro.
+      // iOS legge questa impostazione all'apertura dell'app, quindi va decisa subito.
+      try {
+        var light = localStorage.getItem('mistercana_theme_v1') === 'light'
+        document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]')
+          .setAttribute('content', light ? 'default' : 'black-translucent')
+        document.querySelector('meta[name="theme-color"]')
+          .setAttribute('content', light ? '#f6f1e8' : '#121517')
+        document.documentElement.dataset.theme = light ? 'light' : 'dark'
+      } catch (e) {}
+    </script>
     <meta name="apple-mobile-web-app-title" content="MisterCanà" />
 
     <!-- iPhone / iPad: schermata di avvio per ogni misura di schermo -->
