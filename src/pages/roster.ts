@@ -125,7 +125,7 @@ function renderInfirmary(rosterIds: Set<string>, byId: Map<string | null, FldaPl
   const mine = all.filter((item) => rosterIds.has(item.playerId))
   const others = all.filter((item) => !rosterIds.has(item.playerId))
   return `<section class="roster-section infirmary">
-    <div class="roster-section-head"><h2>Infermeria</h2><span>${day ? `giornata ${day}` : ''} · fonte formazioni probabili FantaLab</span></div>
+    <div class="roster-section-head"><h2>Infermeria</h2><span>${day ? `giornata ${day}` : ''} · fonti FantaLab e SOS Fanta</span></div>
     <h3 class="roster-bench-title">La tua rosa</h3>
     ${mine.length ? `<div class="infirmary-list">${mine.map((item) => infirmaryRow(byId.get(item.playerId), item.probable, true, day)).join('')}</div>` : '<p class="roster-note">Nessun giocatore della tua rosa è fuori o in dubbio.</p>'}
     <details class="infirmary-all"><summary>Tutta la Serie A <small>${others.length} giocatori</small></summary>
