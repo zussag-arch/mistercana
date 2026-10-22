@@ -65,7 +65,8 @@ function renderPopover(pick: MatchdayPick): string {
   const status = statusLabel(p)
   const ica = getICaV3(pick.player.player_id)?.score
   const prob = Math.round(pick.probability * 100)
-  return `<div class="roster-pop-head">
+  return `<button type="button" class="roster-pop-close" data-roster-close aria-label="Chiudi">×</button>
+    <div class="roster-pop-head">
       <span class="role-badge role-${pick.player.role.toLowerCase()}">${pick.player.role}</span>
       <div><strong>${escapePlayerHtml(pick.player.name)}</strong><small>${escapePlayerHtml(pick.player.team)}${p?.opponent ? ` · ${p.home ? 'vs' : '@'} ${escapePlayerHtml(p.opponent)}` : ''}</small></div>
     </div>
@@ -87,7 +88,11 @@ function dot(pick: MatchdayPick): string {
   const status = statusLabel(pick.probable)
   const surname = pick.player.name.replace(/\s+[A-Z]\.$/, '')
   return `<button type="button" class="pitch-dot role-${pick.player.role.toLowerCase()}${pick.out ? ' out' : ''}" data-roster-dot="${escapePlayerHtml(pick.player.player_id ?? '')}" aria-label="${escapePlayerHtml(pick.player.name)}">
-    <span class="pitch-dot-circle">${display(pick.expected, 1)}${status ? `<i class="pitch-dot-flag ${status.tone}" title="${status.text}"></i>` : ''}</span>
+    <span class="pitch-dot-marker">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><path class="pitch-dot-shape" d="M20 2.8c1 0 1.9.3 2.7.9l13.4 9.7c1.6 1.1 2.2 3.1 1.6 4.9l-5.1 15.8c-.6 1.8-2.3 3-4.2 3H11.6c-1.9 0-3.6-1.2-4.2-3L2.3 18.3c-.6-1.8 0-3.8 1.6-4.9l13.4-9.7c.8-.6 1.7-.9 2.7-.9Z"/></svg>
+      <b>${display(pick.expected, 1)}</b>
+      ${status ? `<i class="pitch-dot-flag ${status.tone}" title="${status.text}"></i>` : ''}
+    </span>
     <span class="pitch-dot-name">${escapePlayerHtml(surname)}</span>
   </button>`
 }
@@ -145,10 +150,10 @@ export function renderRosterPage(): string {
     </div>`
 
   if (!choice || choice.league !== league) {
-    return `<section class="page roster-page"><header class="roster-header"><h1>Rosa</h1><p>Scegli lega e squadra: l'app ricorda la scelta.</p></header>${selector}</section>`
+    return `<section class="page roster-page"><header class="roster-hero"><div class="roster-hero-title"><h1>Rosa</h1><p>Scegli lega e squadra: l'app ricorda la scelta.</p></div>${selector}</header></section>`
   }
   if (!dataset || dataset.source !== 'flda') {
-    return `<section class="page roster-page"><header class="roster-header"><h1>Rosa</h1></header>${selector}<div class="players-loading">Caricamento giocatori…</div></section>`
+    return `<section class="page roster-page"><header class="roster-hero"><div class="roster-hero-title"><h1>Rosa</h1></div>${selector}</header><div class="players-loading">Caricamento giocatori…</div></section>`
   }
 
   const byId = new Map(dataset.players.map((player) => [player.player_id, player]))
@@ -160,8 +165,10 @@ export function renderRosterPage(): string {
   const spent = picks.reduce((sum, pick) => sum + pick.price, 0)
 
   return `<section class="page roster-page">
-    <header class="roster-header"><div><h1>${escapePlayerHtml(choice.team)}</h1><p>${LEAGUE_LABEL[choice.league]} · ${picks.length} giocatori · ${spent} crediti spesi</p></div></header>
-    ${selector}
+    <header class="roster-hero">
+      <div class="roster-hero-title"><span class="roster-hero-kicker">${LEAGUE_LABEL[choice.league]}</span><h1>${escapePlayerHtml(choice.team)}</h1><p>${picks.length} giocatori · ${spent} crediti spesi${day ? ` · prossima: giornata ${day}` : ''}</p></div>
+      ${selector}
+    </header>
     <div class="roster-layout">
       <section class="roster-section">
         <div class="roster-section-head"><h2>Formazione consigliata</h2><span>${day ? `giornata ${day}` : 'prossima giornata'}${lineup ? ` · ${lineup.module} · ${display(lineup.total, 1)} fantapunti attesi` : ''}</span></div>
@@ -194,14 +201,17 @@ export function bindRosterEvents(actions: RosterActions): void {
   })
 
   const pop = document.querySelector<HTMLElement>('.roster-pop')
-  if (!pop) return
-  let pinned: HTMLElement | null = null
-  const hide = () => { pop.hidden = true; pinned = null }
+  const page = document.querySelector<HTMLElement>('.roster-page')
+  if (!pop || !page) return
+  let current: string | null = null
+  const hide = () => { pop.hidden = true; current = null }
   const show = (target: HTMLElement) => {
-    const pick = picksById.get(target.dataset.rosterDot ?? '')
+    const id = target.dataset.rosterDot ?? ''
+    const pick = picksById.get(id)
     if (!pick) return
     pop.innerHTML = renderPopover(pick)
     pop.hidden = false
+    current = id
     const rect = target.getBoundingClientRect()
     const width = pop.offsetWidth
     const height = pop.offsetHeight
@@ -212,23 +222,19 @@ export function bindRosterEvents(actions: RosterActions): void {
     pop.style.top = `${top}px`
   }
 
-  document.querySelectorAll<HTMLElement>('[data-roster-dot]').forEach((target) => {
-    target.addEventListener('mouseenter', () => { if (!pinned) show(target) })
-    target.addEventListener('mouseleave', () => { if (!pinned) window.setTimeout(() => { if (!pinned && !pop.matches(':hover')) hide() }, 120) })
-    target.addEventListener('click', (event) => {
-      event.stopPropagation()
-      if (pinned === target) { hide(); return }
-      show(target)
-      pinned = target
-    })
-  })
-  pop.addEventListener('mouseleave', () => { if (!pinned) hide() })
-  pop.addEventListener('click', (event) => {
-    const open = (event.target as HTMLElement).closest<HTMLElement>('[data-roster-open]')
-    if (open?.dataset.rosterOpen) actions.onOpenPlayer(open.dataset.rosterOpen)
-  })
-  document.addEventListener('click', (event) => {
-    if (!pop.hidden && !pop.contains(event.target as Node)) hide()
+  // un solo gestore per campo e panchina: si apre solo toccando
+  page.addEventListener('click', (event) => {
+    const target = event.target as HTMLElement
+    if (target.closest('[data-roster-close]')) { hide(); return }
+    const open = target.closest<HTMLElement>('[data-roster-open]')
+    if (open?.dataset.rosterOpen) { actions.onOpenPlayer(open.dataset.rosterOpen); return }
+    const dot = target.closest<HTMLElement>('[data-roster-dot]')
+    if (dot) {
+      if (current === dot.dataset.rosterDot) hide()
+      else show(dot)
+      return
+    }
+    if (!pop.contains(target)) hide()
   })
   window.addEventListener('scroll', () => { if (!pop.hidden) hide() }, { passive: true })
 }

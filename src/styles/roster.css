@@ -201,3 +201,54 @@
   .pitch-dot { width: 64px; }
   .pitch-dot-circle { width: 42px; height: 42px; font-size: 13px; }
 }
+
+/* segnalino a pentagono stondato */
+.pitch-dot-marker { position: relative; display: grid; place-items: center; width: 52px; height: 52px; transition: transform .15s; }
+.pitch-dot-marker svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 4px 6px rgba(0,0,0,.28)); }
+.pitch-dot-shape { stroke: #fff; stroke-width: 2.5; stroke-linejoin: round; fill: var(--surface-raised); }
+.pitch-dot.role-p .pitch-dot-shape { fill: var(--role-p); }
+.pitch-dot.role-d .pitch-dot-shape { fill: var(--role-d); }
+.pitch-dot.role-c .pitch-dot-shape { fill: var(--role-c); }
+.pitch-dot.role-a .pitch-dot-shape { fill: var(--role-a); }
+.pitch-dot-marker b { position: relative; margin-top: 3px; font: 800 14px var(--font-ui); color: #1b1e21; }
+.pitch-dot:hover .pitch-dot-marker, .pitch-dot:focus-visible .pitch-dot-marker { transform: translateY(-2px); }
+.pitch-dot.out .pitch-dot-marker { filter: grayscale(1); opacity: .6; }
+.pitch-dot-marker .pitch-dot-flag { top: -2px; right: 0; }
+.pitch-dot-circle { display: none; }
+.bench .pitch-dot-marker { width: 44px; height: 44px; }
+.bench .pitch-dot-marker b { font-size: 12px; }
+.bench .pitch-dot-shape { stroke: var(--surface); }
+@media (max-width: 700px) {
+  .pitch-dot-marker { width: 46px; height: 46px; }
+  .pitch-dot-marker b { font-size: 13px; }
+}
+
+/* × del riquadro */
+.roster-pop { padding-top: 14px; }
+.roster-pop-head { padding-right: 36px; }
+.roster-pop-close {
+  position: absolute; top: 10px; right: 10px;
+  display: grid; place-items: center; width: 32px; height: 32px; padding: 0;
+  border: 1px solid var(--line-1); border-radius: 50% !important;
+  background: var(--surface-light); color: var(--text); font-size: 18px; line-height: 1; cursor: pointer;
+}
+
+/* tessera di testata: nome squadra e scelta, distinta dalle altre */
+.roster-hero {
+  display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 18px;
+  padding: 26px 28px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  border-radius: var(--radius-xl);
+  background:
+    radial-gradient(600px 260px at 100% 0%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 70%),
+    color-mix(in srgb, var(--accent) 8%, var(--surface));
+}
+.roster-hero-kicker { display: inline-block; margin-bottom: 6px; padding: 3px 10px; border-radius: 999px; background: var(--accent); color: var(--accent-ink); font-size: 12px; font-weight: 800; }
+.roster-hero h1 { margin: 0; font-size: 40px; line-height: 1.05; }
+.roster-hero p { margin: 6px 0 0; color: var(--text-soft); }
+.roster-hero .roster-picker { margin: 0; }
+@media (max-width: 700px) {
+  .roster-hero { padding: 20px 16px; }
+  .roster-hero h1 { font-size: 30px; }
+  .roster-hero .roster-picker { width: 100%; }
+}
