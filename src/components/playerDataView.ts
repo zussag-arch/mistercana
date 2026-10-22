@@ -95,11 +95,13 @@ export function renderCurrentMetrics(view: PlayerViewModel, compact = false,
   const fldaPma = view.pmaConfiguration ? getFldaPma(view.flda, view.pmaConfiguration) : undefined
   const pmaValue = fldaPma ?? (!view.flda.player_id ? view.legacy?.pmaPercent : undefined)
   const pma = typeof pmaValue === 'number' ? `${display(pmaValue, 1)}%` : '—'
+  // Integrità = tenuta fisica: voto 1-5 dato dai Saggi (non è nel listone FantaLab)
+  const integrity = integritySummary(view)
   const items: Array<[string, string, string, string?]> = [
     ['iCà', display(iCaV3?.score, 1), `fantapunti a partita ×10${typeof iCaV3?.rolePercentile === 'number' ? ` · meglio del ${Math.round(iCaV3.rolePercentile)}% del ruolo` : ''}${typeof iCaV3?.affare === 'number' ? ` · affare ${iCaV3.affare > 0 ? '+' : ''}${Math.round(iCaV3.affare)}` : ''}`, 'player-metric-ica'],
     ['PMA', pma, pma === '—' ? 'dato non disponibile' : view.pmaConfiguration ? `${view.pmaConfiguration.mode === 'classic' ? 'Classic' : 'Mantra'} · ${view.pmaConfiguration.participants} · ${view.pmaConfiguration.defenseModifier ? 'con modificatore' : 'senza modificatore'}` : 'budget iniziale'],
     ['xFM', display(view.flda.fm_exp, 2), 'FM Exp. FLDA'],
-    ['Integrità', display(view.flda.integrita, 0), ''],
+    ['Integrità', integrity.value, integrity.detail],
   ]
   if (compact) items.push(
     ['Titolarità', `${display(view.flda.titolarita_display, 0)}${typeof view.flda.titolarita_display === 'number' ? '%' : ''}`, 'indicatore editoriale'],
@@ -197,6 +199,24 @@ function finiteNumber(value: unknown): number | undefined {
 }
 
 // Sezione "Prezzo e Saggi" come nella Scheda Giocatore V2: prezzo medio grande,
+function integritySummary(view: PlayerViewModel): { value: string; detail: string } {
+  const votes = (view.detail?.saggi ?? [])
+    .map((row) => finiteNumber(field(row, 'integrita')))
+    .filter((value): value is number => value !== undefined)
+    .sort((first, second) => first - second)
+  if (!votes.length) {
+    return typeof view.flda.integrita === 'number'
+      ? { value: display(view.flda.integrita, 0), detail: 'FantaLab' }
+      : { value: '—', detail: 'nessun voto dei Saggi' }
+  }
+  const middle = Math.floor(votes.length / 2)
+  const value = votes.length % 2 ? votes[middle] : (votes[middle - 1] + votes[middle]) / 2
+  return {
+    value: `${display(value, Number.isInteger(value) ? 0 : 1)}/5`,
+    detail: `tenuta fisica · mediana di ${votes.length} Saggi`,
+  }
+}
+
 // striscia con i prezzi dei Saggi e tabella con fascia, affidabilità e integrità.
 export function renderSageSection(view: PlayerViewModel): string {
   const budget = view.initialCredits && view.initialCredits > 0 ? view.initialCredits : SAGE_BUDGET
