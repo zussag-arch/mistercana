@@ -1096,6 +1096,11 @@ function render():
 
 render()
 
+// niente zoom col pizzico (iOS ignora user-scalable=no in alcuni casi)
+for (const name of ['gesturestart', 'gesturechange']) {
+  document.addEventListener(name, (event) => event.preventDefault(), { passive: false })
+}
+
 // chiede al dispositivo di non cancellare i dati dell'app quando manca spazio
 if (navigator.storage?.persist) {
   void navigator.storage.persisted().then((already) => (already ? true : navigator.storage.persist())).catch(() => false)

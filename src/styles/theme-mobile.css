@@ -706,3 +706,6 @@
   /* scheda completa: "Indietro" prende il posto del logo, stesso punto della scheda rapida */
   body:has(.sheet-back-portal) .topbar-brand-stack { visibility: hidden; }
 }
+
+/* niente zoom col doppio tocco */
+html, body { touch-action: manipulation; }
