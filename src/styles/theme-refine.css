@@ -321,3 +321,31 @@ body {
   .main-nav .nav-item { padding-inline: 5px; }
   .topbar { column-gap: 14px; }
 }
+
+/* con una finestra aperta scorre solo lei: la pagina sotto resta ferma */
+html:has(.player-detail-overlay),
+html:has(.overlay:not(.hidden):not([hidden])[aria-hidden="false"]),
+html:has(.goalkeeper-matrix-overlay:not([hidden])),
+html:has(.install-sheet),
+html:has(.round-select-menu) {
+  overflow: hidden;
+}
+html:has(.player-detail-overlay) body,
+html:has(.overlay:not(.hidden):not([hidden])[aria-hidden="false"]) body,
+html:has(.goalkeeper-matrix-overlay:not([hidden])) body,
+html:has(.install-sheet) body {
+  overflow: hidden;
+}
+.player-detail-card,
+.player-detail-overlay,
+.overlay-card,
+.auction-selector-results,
+.goalkeeper-matrix-content,
+.round-select-menu {
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+}
+.player-detail-overlay,
+.overlay {
+  touch-action: pan-y;
+}

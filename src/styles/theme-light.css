@@ -287,6 +287,6 @@ button:not([class*="card"]):not([class*="backdrop"]):not([class*="tile"]):not([c
 :root[data-theme="light"] .auction-player-card:not(.auction-no-player)::before,
 :root[data-theme="light"] .player-full-page-v3 .player-full-header::before,
 :root[data-theme="light"] .player-detail-header::before {
-  -webkit-text-stroke: 2px color-mix(in srgb, var(--rc, var(--accent)) 80%, var(--text));
+  -webkit-text-stroke: 1.5px color-mix(in srgb, var(--rc, var(--accent)) 70%, transparent);
   opacity: 1;
 }
