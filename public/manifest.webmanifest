@@ -9,9 +9,36 @@
   "display": "standalone",
   "background_color": "#121517",
   "theme_color": "#121517",
+  "categories": [
+    "sports",
+    "utilities"
+  ],
+  "orientation": "portrait",
+  "prefer_related_applications": false,
   "icons": [
-    { "src": "/mistercana/icons/mistercana-180.png", "sizes": "180x180", "type": "image/png" },
-    { "src": "/mistercana/icons/mistercana-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/mistercana/icons/mistercana-512.png", "sizes": "512x512", "type": "image/png" }
+    {
+      "src": "/mistercana/icons/mistercana-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/mistercana/icons/mistercana-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/mistercana/icons/maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/mistercana/icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ]
 }

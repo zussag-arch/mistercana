@@ -544,3 +544,89 @@
     background: var(--surface-light) !important;
   }
 }
+
+/* --- Dashboard su telefono: tre schede, numeri compatti --- */
+.dashboard-mobile-tabs { display: none; }
+
+@media (max-width: 700px) {
+  .dashboard-mobile-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    margin: 0 0 12px;
+    padding: 4px;
+    border-radius: 999px;
+    background: var(--surface-light);
+  }
+  .dashboard-mobile-tabs button {
+    min-height: 38px;
+    border: 0;
+    border-radius: 999px !important;
+    background: none;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .dashboard-mobile-tabs button[aria-selected="true"] {
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+  }
+  .dashboard-page { gap: 12px !important; }
+
+  /* Riepilogo */
+  :root[data-dash-tab="summary"] .dashboard-budget-panel,
+  :root[data-dash-tab="summary"] .dashboard-managers-box,
+  :root[data-dash-tab="summary"] .dashboard-participants { display: none !important; }
+  /* Budget */
+  :root[data-dash-tab="budget"] .dashboard-live-summary,
+  :root[data-dash-tab="budget"] .dashboard-setup-steps,
+  :root[data-dash-tab="budget"] .dashboard-stats-grid,
+  :root[data-dash-tab="budget"] .dashboard-managers-box,
+  :root[data-dash-tab="budget"] .dashboard-participants { display: none !important; }
+  /* Allenatori */
+  :root[data-dash-tab="managers"] .dashboard-live-summary,
+  :root[data-dash-tab="managers"] .dashboard-setup-steps,
+  :root[data-dash-tab="managers"] .dashboard-stats-grid,
+  :root[data-dash-tab="managers"] .dashboard-budget-panel { display: none !important; }
+  :root[data-dash-tab="managers"] .dashboard-managers-box { display: block !important; }
+
+  /* numeri a griglia 2×2 invece che uno sotto l'altro */
+  .dashboard-live-kpis,
+  .dashboard-stats-grid,
+  .dashboard-live-roles {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+  .dashboard-live-kpi,
+  .dashboard-stat-card,
+  .dashboard-live-role {
+    padding: 12px !important;
+    min-height: 0 !important;
+  }
+  .dashboard-live-kpi strong,
+  .dashboard-stat-card strong,
+  .dashboard-stat-card .dashboard-stat-value { font-size: 30px !important; }
+  .dashboard-live-summary > header { align-items: center; }
+  .dashboard-live-summary h2 { font-size: 26px !important; }
+  .dashboard-live-role-head { flex-wrap: wrap; gap: 4px; }
+  .dashboard-live-role p,
+  .dashboard-live-role small { font-size: 12px; }
+
+  /* partecipanti: due per riga */
+  .dashboard-participants .auction-participant-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  .dashboard-participants .auction-participants-section { padding: 16px !important; }
+  .dashboard-participants .auction-section-heading h3 { font-size: 24px !important; }
+
+  /* budget: reparti 2×2, profili su una riga scorrevole */
+  .dashboard-budget-panel .budget-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+@media (max-width: 700px) {
+  .dashboard-budget-panel .budget-grid { grid-template-columns: 1fr !important; }
+  .dashboard-budget-panel .budget-field { grid-template-columns: 28px minmax(0, 1fr) auto !important; }
+}
