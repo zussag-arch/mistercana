@@ -178,3 +178,36 @@ body {
 #undoLastAssignmentButton:disabled {
   opacity: 0.4;
 }
+
+/* =========================
+   GERARCHIA: pulsante vs indicatore
+   - "Avvia l'asta" / "LIVE" = l'unico verde pieno, con ombra e freccia
+   - "Stato asta" = indicatore: fondo appena tinto, bordo e testo verdi,
+     pallino di stato, nessuna ombra né freccia
+========================= */
+.dashboard-stat-card:first-child {
+  background: color-mix(in srgb, var(--accent) 9%, var(--surface)) !important;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent) !important;
+  box-shadow: none !important;
+  cursor: default;
+}
+.dashboard-stat-card:first-child * {
+  color: var(--text-soft) !important;
+}
+.dashboard-stat-card:first-child .dashboard-stat-value {
+  color: var(--accent) !important;
+}
+.dashboard-stat-card:first-child .dashboard-stat-label::before {
+  background: var(--accent) !important;
+  border-radius: 50% !important;
+  transform: none !important;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+/* il pulsante resta pieno e "sollevato" */
+.dashboard-go-button {
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+:root[data-theme="light"] .dashboard-stat-card:first-child .dashboard-stat-value {
+  color: color-mix(in srgb, var(--accent) 70%, var(--text)) !important;
+}
