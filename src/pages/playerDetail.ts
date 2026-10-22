@@ -10,7 +10,7 @@ import { getAssignmentFldaId } from '../services/auctionPlayerResolver'
 import {
   auctionStatusClass, auctionStatusLabel, display, displayCount, escapePlayerHtml,
   field, latestHistory, renderCurrentMetrics,
-  renderPerformanceChart, renderPlayerBadges, renderSageSection, renderICaV3Explanation,
+  renderPerformanceChart, renderMatchdayChart, renderPlayerBadges, renderSageSection, renderICaV3Explanation,
 } from '../components/playerDataView'
 import type { PlayerViewModel } from '../components/playerDataView'
 import { displayHistoricalAuctionPrices } from '../domain/historicalAuctionPrice'
@@ -63,13 +63,22 @@ function latestKpis(role: string, row?: FldaRecord): string {
 
 function roleStats(role: string, row?: FldaRecord): string {
   if (!row) return '<p class="player-data-empty">Statistiche non disponibili.</p>'
+  // 12 indicatori per ruolo, stagione in corso
   const fields: Array<[string, string, 'count' | 'decimal']> = role === 'P'
-    ? [['Rigori parati', 'rigori_parati', 'count'], ['Parate', 'saves', 'count'], ['Parate/partita', 'saves_per_match', 'decimal'], ['Rating', 'rating', 'decimal']]
+    ? [['Gol subiti', 'gol_subiti', 'count'], ['Gol subiti/partita', 'goals_conceded_per_match', 'decimal'], ['Clean sheet', 'clean_sheet', 'count'], ['% clean sheet', 'clean_sheet_pct', 'decimal'],
+       ['Parate', 'saves', 'count'], ['Parate/partita', 'saves_per_match', 'decimal'], ['% parate', 'saves_pct', 'decimal'], ['Parate in area', 'saves_inside_box', 'count'],
+       ['Parate fuori area', 'saves_outside_box', 'count'], ['Rigori parati', 'rigori_parati', 'count'], ['Errori da gol', 'errors_to_goal', 'count'], ['Rating', 'rating', 'decimal']]
     : role === 'D'
-      ? [['Recuperi/partita', 'recuperi_per_match', 'decimal'], ['Tackle', 'tackles', 'count'], ['Duelli vinti', 'duels_won', 'count'], ['Falli', 'fouls', 'count']]
+      ? [['Gol', 'goals', 'count'], ['Assist', 'assist', 'count'], ['Contrasti/partita', 'tackles_per_match', 'decimal'], ['Intercetti/partita', 'interceptions_per_match', 'decimal'],
+         ['Spazzate/partita', 'clearances_per_match', 'decimal'], ['Recuperi/partita', 'recuperi_per_match', 'decimal'], ['Duelli vinti/partita', 'duels_won_per_match', 'decimal'], ['Duelli aerei/partita', 'aerial_duels_per_match', 'decimal'],
+         ['Tiri bloccati', 'blocked_shots', 'count'], ['Precisione passaggi %', 'accurate_passes_percentage', 'decimal'], ['Errori da gol', 'errors_to_goal', 'count'], ['Cartellini', 'cards', 'count']]
       : role === 'C'
-        ? [['Passaggi chiave', 'key_passes', 'count'], ['Passaggi precisi', 'accurate_passes', 'count'], ['Tiri', 'total_shots', 'count'], ['xA', 'xa', 'decimal']]
-        : [['Tiri', 'total_shots', 'count'], ['Tiri in porta', 'shots_on_target', 'count'], ['xG', 'xg', 'decimal'], ['xA', 'xa', 'decimal']]
+        ? [['Gol', 'goals', 'count'], ['Assist', 'assist', 'count'], ['xG', 'xg', 'decimal'], ['xA', 'xa', 'decimal'],
+           ['Passaggi chiave/partita', 'key_passes_per_match', 'decimal'], ['Occasioni create', 'big_chances_created', 'count'], ['Tiri/partita', 'shots_per_match', 'decimal'], ['Precisione passaggi %', 'accurate_passes_percentage', 'decimal'],
+           ['% dribbling riusciti', 'dribbles_pct', 'decimal'], ['Palloni giocati/partita', 'touches_per_match', 'decimal'], ['Recuperi/partita', 'recuperi_per_match', 'decimal'], ['Cartellini', 'cards', 'count']]
+        : [['Gol', 'goals', 'count'], ['Assist', 'assist', 'count'], ['xG', 'xg', 'decimal'], ['xG/partita', 'xg_per_match', 'decimal'],
+           ['Tiri/partita', 'shots_per_match', 'decimal'], ['Tiri in porta/partita', 'shots_on_target_per_match', 'decimal'], ['% gol su tiri', 'goals_per_shot', 'decimal'], ['Occasioni mancate', 'big_chances_missed', 'count'],
+           ['Gol di testa', 'headed_goals', 'count'], ['Rigori segnati', 'rigori_fatti', 'count'], ['Rigori guadagnati', 'penalties_won', 'count'], ['xA', 'xa', 'decimal']]
   return statGrid(fields.map(([label, key, format]) => [label, field(row, key), format]))
 }
 
@@ -152,6 +161,8 @@ export function renderFullPlayerPage(reference: string | null, state: AppState):
   const assigned = Boolean(flda.player_id && state.auctionAssignments.some((item) => getAssignmentFldaId(item) === flda.player_id))
   const view: PlayerViewModel = { flda, legacy, legacyId, detail, guide, assigned, auctionLive: state.auctionPhase === 'live', identityAvailable: Boolean(flda.player_id), pmaConfiguration: state.pmaConfiguration, initialCredits: state.initialCredits }
   const latest = latestHistory(detail)
+  // statistiche avanzate: la stagione scorsa, completa (quella in corso è ancora breve)
+  const previousSeason = detail?.history?.[1]
   const roleName = roleNames[role] ?? role
   const context = [flda.team, field(guide, 'coach'), field(guide, 'module')]
     .filter((item) => typeof item === 'string' && item.trim())
@@ -159,17 +170,18 @@ export function renderFullPlayerPage(reference: string | null, state: AppState):
   return `<section class="page player-full-page player-full-page-v3 player-tone-${role.toLowerCase()}">
     <header class="player-full-header" data-role-word="${escapePlayerHtml(roleName)}">
       <div class="player-full-identity"><span class="player-detail-role player-detail-role-${role.toLowerCase()}">${escapePlayerHtml(role)}</span><div><small>${escapePlayerHtml(roleName)}</small><h1${flda.name.trim().endsWith('.') ? ' class="no-dot"' : ''}>${escapePlayerHtml(flda.name)}</h1><p>${context}</p>${renderPlayerBadges(view)}</div></div>
-      <div class="player-full-actions"><button type="button" class="player-full-back" data-player-detail-back aria-label="Torna a Giocatori">←</button><span class="player-status player-status-${auctionStatusClass(view)}">${auctionStatusLabel(view)}</span>${flda.player_id ? `<button type="button" class="player-detail-call-button" data-full-player-call="${escapePlayerHtml(flda.player_id)}" ${state.auctionPhase === 'live' && !assigned ? '' : 'disabled'}>${assigned ? 'assegnato' : 'chiama'}</button>` : ''}</div>
+      <div class="player-full-actions"><button type="button" class="player-full-back sheet-back" data-player-detail-back aria-label="Indietro"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg><span>Indietro</span></button><span class="player-status player-status-${auctionStatusClass(view)}">${auctionStatusLabel(view)}</span>${flda.player_id ? `<button type="button" class="player-detail-call-button" data-full-player-call="${escapePlayerHtml(flda.player_id)}" ${state.auctionPhase === 'live' && !assigned ? '' : 'disabled'}>${assigned ? 'assegnato' : 'chiama'}</button>` : ''}</div>
     </header>
     ${!view.identityAvailable ? '<p class="player-data-alert">Dati FLDA non disponibili per questa identità.</p>' : ''}${detailError ? `<p class="player-data-alert">${escapePlayerHtml(detailError)}</p>` : ''}
     ${renderCurrentMetrics(view, true, displayHistoricalAuctionPrices(detail))}
     <section class="player-full-section player-ica-section"><div class="player-section-heading"><span>Valutazione</span><h2>Perché questo iCà</h2></div>${renderICaV3Explanation(view)}</section>
     <section class="player-full-section"><div class="player-section-heading"><span>Prestazioni</span><h2>Come sta andando</h2></div>${latestKpis(role, latest)}</section>
     <section class="player-full-section player-sage-section"><div class="player-section-heading"><span>Asta</span><h2>Prezzo e Saggi</h2></div>${renderSageSection(view)}</section>
-    <div class="player-chart-grid"><section class="player-full-section"><div class="player-section-heading"><span>Storico</span><h2>MV / FMV</h2></div>${renderPerformanceChart(detail)}</section><section class="player-full-section"><div class="player-section-heading"><span>${escapePlayerHtml(roleName)}</span><h2>Statistiche ruolo</h2></div>${roleStats(role, latest)}</section></div>
+    <section class="player-full-section player-matchdays"><div class="player-section-heading"><span>Stagione ${escapePlayerHtml(String(field(latest, 'season') ?? ''))}</span><h2>Andamento giornata per giornata</h2></div>${renderMatchdayChart(detail)}</section>
+    <div class="player-chart-grid"><section class="player-full-section"><div class="player-section-heading"><span>Stagioni</span><h2>Storico MV / FMV</h2></div>${renderPerformanceChart(detail)}</section><section class="player-full-section"><div class="player-section-heading"><span>${escapePlayerHtml(roleName)} · stagione ${escapePlayerHtml(String(field(latest, 'season') ?? ''))}</span><h2>Statistiche ruolo</h2></div>${roleStats(role, latest)}</section></div>
     ${guideSummary(guide)}
     ${qualitativeGuide(view, guide)}
-    <section class="player-full-section player-advanced"><div class="player-section-heading"><span>Dettaglio</span><h2>Statistiche avanzate</h2></div>${advancedStats(latest)}</section>
+    <section class="player-full-section player-advanced"><div class="player-section-heading"><span>Stagione ${escapePlayerHtml(String(field(previousSeason, 'season') ?? 'precedente'))}</span><h2>Statistiche avanzate</h2></div>${advancedStats(previousSeason)}</section>
   </section>`
 }
 
@@ -187,6 +199,18 @@ async function load(reference: string, actions: PlayerDetailActions): Promise<vo
 
 export function bindFullPlayerPage(reference: string | null, actions: PlayerDetailActions): void {
   document.querySelector('[data-player-detail-back]')?.addEventListener('click', actions.onBack)
+  // telefono: pulsante "Indietro" fisso sullo schermo, fuori dalla pagina animata
+  document.querySelectorAll('.sheet-back-portal').forEach((item) => item.remove())
+  const portal = document.createElement('button')
+  portal.type = 'button'
+  portal.className = 'sheet-back sheet-back-portal'
+  portal.setAttribute('aria-label', 'Indietro')
+  portal.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg><span>Indietro</span>'
+  portal.addEventListener('click', () => {
+    portal.remove()
+    actions.onBack()
+  })
+  document.body.append(portal)
   document.querySelector<HTMLElement>('[data-full-player-call]')?.addEventListener('click', (event) => { const id = (event.currentTarget as HTMLElement).dataset.fullPlayerCall; if (id) actions.onCallPlayer(id) })
   const selected = reference ? resolve(reference) : undefined
   if (reference && !getCachedPlayersDataset()) void load(reference, actions)

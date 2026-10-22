@@ -41,6 +41,10 @@ function setDashTab(tab: DashTab): void {
 }
 
 function syncTabButtons(): void {
+  // il pulsante Indietro della scheda completa sparisce quando si esce dalla scheda
+  if (!document.querySelector('.player-full-page-v3')) {
+    document.querySelectorAll('.sheet-back-portal').forEach((item) => item.remove())
+  }
   const root = document.documentElement.dataset
   document.querySelectorAll<HTMLElement>('button[data-auction-tab]').forEach((button) => {
     button.setAttribute('aria-selected', String(button.dataset.auctionTab === (root.auctionTab ?? 'call')))

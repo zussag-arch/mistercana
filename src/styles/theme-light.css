@@ -194,7 +194,7 @@
 
 /* tutti i bottoni a pillola (lati destro e sinistro tondi);
    restano esclusi i bottoni che sono tessere o righe di elenco */
-button:not([class*="card"]):not([class*="tile"]):not([class*="row"]):not(.round-select-option):not(.dashboard-go-button):not(.auction-selector-player):not(.auction-call-selector):not(.players-filter-toggle):not([class*="chip"]):not(.nav-item):not(.auction-role-tab),
+button:not([class*="card"]):not([class*="backdrop"]):not([class*="tile"]):not([class*="row"]):not(.round-select-option):not(.dashboard-go-button):not(.auction-selector-player):not(.auction-call-selector):not(.players-filter-toggle):not([class*="chip"]):not(.nav-item):not(.auction-role-tab),
 .primary-button,
 .secondary-button,
 .danger-button,
@@ -282,3 +282,11 @@ button:not([class*="card"]):not([class*="tile"]):not([class*="row"]):not(.round-
 .theme-switch-knob { top: 3px; left: 3px; width: 26px; height: 26px; }
 :root:not([data-theme="light"]) .theme-switch-knob { transform: translateX(30px); }
 .theme-switch svg { width: 15px; height: 15px; }
+
+/* tema chiaro: la parola del ruolo bordata (Portiere, Difensore…) più marcata */
+:root[data-theme="light"] .auction-player-card:not(.auction-no-player)::before,
+:root[data-theme="light"] .player-full-page-v3 .player-full-header::before,
+:root[data-theme="light"] .player-detail-header::before {
+  -webkit-text-stroke: 1.5px color-mix(in srgb, var(--rc, var(--accent)) 70%, transparent);
+  opacity: 1;
+}

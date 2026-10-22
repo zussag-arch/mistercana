@@ -1,3 +1,4 @@
+import { latestAuctionSeason } from '../domain/historicalAuctionPrice'
 import type { FldaPlayer, FldaPlayerDetail, FldaRecord } from '../services/flda'
 import type { Player } from '../domain/player'
 import type { PmaConfiguration } from '../app/state'
@@ -95,15 +96,17 @@ export function renderCurrentMetrics(view: PlayerViewModel, compact = false,
   const fldaPma = view.pmaConfiguration ? getFldaPma(view.flda, view.pmaConfiguration) : undefined
   const pmaValue = fldaPma ?? (!view.flda.player_id ? view.legacy?.pmaPercent : undefined)
   const pma = typeof pmaValue === 'number' ? `${display(pmaValue, 1)}%` : '—'
+  // Integrità = tenuta fisica: voto 1-5 dato dai Saggi (non è nel listone FantaLab)
+  const integrity = integritySummary(view)
   const items: Array<[string, string, string, string?]> = [
     ['iCà', display(iCaV3?.score, 1), `fantapunti a partita ×10${typeof iCaV3?.rolePercentile === 'number' ? ` · meglio del ${Math.round(iCaV3.rolePercentile)}% del ruolo` : ''}${typeof iCaV3?.affare === 'number' ? ` · affare ${iCaV3.affare > 0 ? '+' : ''}${Math.round(iCaV3.affare)}` : ''}`, 'player-metric-ica'],
     ['PMA', pma, pma === '—' ? 'dato non disponibile' : view.pmaConfiguration ? `${view.pmaConfiguration.mode === 'classic' ? 'Classic' : 'Mantra'} · ${view.pmaConfiguration.participants} · ${view.pmaConfiguration.defenseModifier ? 'con modificatore' : 'senza modificatore'}` : 'budget iniziale'],
     ['xFM', display(view.flda.fm_exp, 2), 'FM Exp. FLDA'],
-    ['Integrità', display(view.flda.integrita, 0), ''],
+    ['Integrità', integrity.value, integrity.detail],
   ]
   if (compact) items.push(
     ['Titolarità', `${display(view.flda.titolarita_display, 0)}${typeof view.flda.titolarita_display === 'number' ? '%' : ''}`, 'indicatore editoriale'],
-    ['Prezzo storico A/B', historicalPrice ?? '— / —', 'stagione 2025/26', 'player-metric-history'],
+    ["Prezzo d'asta A/B", historicalPrice ?? '— / —', latestAuctionSeason(view.detail) ? `asta ${latestAuctionSeason(view.detail)}` : 'nessuna asta registrata', 'player-metric-history'],
   )
   // MV/FMV della stagione più recente disponibile; il listone legacy solo come ripiego.
   const latest = latestHistory(view.detail)
@@ -197,6 +200,24 @@ function finiteNumber(value: unknown): number | undefined {
 }
 
 // Sezione "Prezzo e Saggi" come nella Scheda Giocatore V2: prezzo medio grande,
+function integritySummary(view: PlayerViewModel): { value: string; detail: string } {
+  const votes = (view.detail?.saggi ?? [])
+    .map((row) => finiteNumber(field(row, 'integrita')))
+    .filter((value): value is number => value !== undefined)
+    .sort((first, second) => first - second)
+  if (!votes.length) {
+    return typeof view.flda.integrita === 'number'
+      ? { value: display(view.flda.integrita, 0), detail: 'FantaLab' }
+      : { value: '—', detail: 'nessun voto dei Saggi' }
+  }
+  const middle = Math.floor(votes.length / 2)
+  const value = votes.length % 2 ? votes[middle] : (votes[middle - 1] + votes[middle]) / 2
+  return {
+    value: `${display(value, Number.isInteger(value) ? 0 : 1)}/5`,
+    detail: `tenuta fisica · mediana di ${votes.length} Saggi`,
+  }
+}
+
 // striscia con i prezzi dei Saggi e tabella con fascia, affidabilità e integrità.
 export function renderSageSection(view: PlayerViewModel): string {
   const budget = view.initialCredits && view.initialCredits > 0 ? view.initialCredits : SAGE_BUDGET
@@ -370,4 +391,85 @@ export function renderICaV3Explanation(view: PlayerViewModel): string {
       <li class="total"><b>= iCà ${display(result.score, 1)}</b><small>${display((result.score ?? 0) / 10, 2)} fantapunti attesi a partita, ×10</small></li>
     </ol>
   </div>`
+}
+
+/* =========================
+   ANDAMENTO GIORNATE (stagione in corso)
+   Area = fantavoto, linea azzurra = voto. Le giornate senza voto
+   interrompono l'area e mostrano un "SV" grigio.
+========================= */
+
+function smoothPath(points: Array<[number, number]>): string {
+  if (points.length === 1) {
+    const [x, y] = points[0]
+    return `M${x - 22},${y} L${x + 22},${y}`
+  }
+  let path = `M${points[0][0]},${points[0][1]}`
+  for (let index = 1; index < points.length; index += 1) {
+    const [x0, y0] = points[index - 1]
+    const [x1, y1] = points[index]
+    const mid = (x0 + x1) / 2
+    path += ` C${mid},${y0} ${mid},${y1} ${x1},${y1}`
+  }
+  return path
+}
+
+export function renderMatchdayChart(detail?: FldaPlayerDetail): string {
+  const days = detail?.matchdays ?? []
+  if (!days.length) return chartEmpty('Voti per giornata non disponibili.')
+  const width = 620
+  const height = 250
+  const top = 40
+  const base = 200
+  const step = Math.min(70, (width - 40) / days.length)
+  const x = (index: number) => 20 + step / 2 + index * step
+  const voted = days.flatMap((day) => [day.mv, day.fmv]).filter((value): value is number => typeof value === 'number')
+  const min = Math.min(...voted, 6) - 0.75
+  const max = Math.max(...voted, 6) + 0.75
+  const y = (value: number) => base - ((value - min) / Math.max(max - min, 1)) * (base - top - 20)
+
+  // segmenti di giornate consecutive con voto
+  const segments: Array<Array<{ index: number; mv: number | null; fmv: number }>> = []
+  days.forEach((day, index) => {
+    const fmv = day.fmv ?? day.mv
+    if (typeof fmv !== 'number') return
+    const last = segments[segments.length - 1]
+    const entry = { index, mv: day.mv, fmv }
+    if (last && last[last.length - 1].index === index - 1) last.push(entry)
+    else segments.push([entry])
+  })
+
+  const shapes = segments.map((segment) => {
+    const fmvPoints = segment.map((item) => [x(item.index), y(item.fmv)] as [number, number])
+    const half = segment.length === 1 ? 22 : step / 2
+    const left = x(segment[0].index) - half
+    const right = x(segment[segment.length - 1].index) + half
+    const line = smoothPath(fmvPoints)
+    const area = `M${left},${base} L${left},${fmvPoints[0][1]} L${fmvPoints[0][0]},${fmvPoints[0][1]} ${line.replace(/^M[^ ]+/, '')} L${right},${fmvPoints[fmvPoints.length - 1][1]} L${right},${base} Z`
+    const mvPoints = segment.filter((item) => typeof item.mv === 'number').map((item) => [x(item.index), y(item.mv as number)] as [number, number])
+    return `<path d="${area}" class="md-area"/>${mvPoints.length ? `<path d="${smoothPath(mvPoints)}" class="md-line md-line-mv"/>` : ''}<path d="${line}" class="md-line md-line-fmv"/>`
+  }).join('')
+
+  const markers = days.map((day, index) => {
+    const cx = x(index)
+    const label = `<text x="${cx}" y="${base + 34}" text-anchor="middle" class="md-day">${day.matchday}</text>`
+    const fmv = day.fmv ?? day.mv
+    if (typeof fmv !== 'number') {
+      return `<circle cx="${cx}" cy="${base - 12}" r="14" class="md-sv"/><text x="${cx}" y="${base - 8}" text-anchor="middle" class="md-sv-text">SV</text>${label}`
+    }
+    const mv = day.mv
+    const fmvY = y(fmv)
+    const both = typeof mv === 'number' && Math.abs(mv - fmv) >= 0.25
+    const fmvDot = `<circle cx="${cx}" cy="${fmvY - (both && fmv > (mv as number) ? 0 : 0)}" r="14" class="md-dot md-dot-fmv"><title>Giornata ${day.matchday} · voto ${display(mv, 1)} · fantavoto ${display(fmv, 1)}</title></circle><text x="${cx}" y="${fmvY + 4}" text-anchor="middle" class="md-dot-text">${display(fmv, 1)}</text>`
+    const mvDot = both
+      ? `<circle cx="${cx}" cy="${y(mv as number)}" r="13" class="md-dot md-dot-mv"/><text x="${cx}" y="${y(mv as number) + 4}" text-anchor="middle" class="md-dot-text">${display(mv, 1)}</text>`
+      : ''
+    return `${mvDot}${fmvDot}${label}`
+  }).join('')
+
+  return `<div class="player-chart md-chart"><svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Voto e fantavoto giornata per giornata">
+    <defs><linearGradient id="mdArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="md-stop-top"/><stop offset="1" class="md-stop-bottom"/></linearGradient></defs>
+    ${shapes}${markers}
+    <g class="chart-legend"><circle cx="470" cy="18" r="5" class="md-legend-mv"/><text x="481" y="22">Voto</text><circle cx="530" cy="18" r="5" class="md-legend-fmv"/><text x="541" y="22">Fantavoto</text></g>
+  </svg></div>`
 }

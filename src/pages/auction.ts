@@ -34,7 +34,7 @@ import type {
 import {
   renderPlayerDetailOverlay,
 } from '../components/playerDetailOverlay'
-import { displayHistoricalAuctionPrices } from '../domain/historicalAuctionPrice'
+import { displayHistoricalAuctionPrices, latestAuctionSeason } from '../domain/historicalAuctionPrice'
 import type { FldaPlayer } from '../services/flda'
 import { getCachedPlayerDetail, getCachedPlayersDataset, getFldaIdForLegacyId, getLegacyPlayerForFldaId, loadPlayerDetail, loadPlayersDataset } from '../services/playerRepository'
 import { getAssignmentFldaId, isFldaPlayerAssigned, resolveAssignmentPlayer, resolveCurrentAuctionPlayer, resolveFldaPlayer, summarizeManagerAssignments } from '../services/auctionPlayerResolver'
@@ -1632,7 +1632,7 @@ function renderPlayerCard(
           "
         >
           <span>
-            Prezzo storico A/B
+            Prezzo d'asta A/B
           </span>
 
           <strong>
@@ -1640,7 +1640,7 @@ function renderPlayerCard(
           </strong>
 
           <small>
-            ${historicalDetail?.auction_prices?.length ? 'stagione 2025/26' : 'storico non disponibile'}
+            ${latestAuctionSeason(historicalDetail) ? `asta ${latestAuctionSeason(historicalDetail)}` : 'nessuna asta registrata'}
           </small>
         </div>
       </div>
@@ -4137,6 +4137,14 @@ export function bindAuctionEvents(
       },
     )
 
+  // scheda rapida → scheda completa
+  document.querySelector<HTMLElement>('#playerDetailOverlay [data-open-full-player]')?.addEventListener('click', (event) => {
+    const reference = (event.currentTarget as HTMLElement).dataset.openFullPlayer
+    if (!reference) return
+    detailPlayerId = null
+    actions.onOpenFullPlayer(reference)
+  })
+
   document
     .querySelectorAll<HTMLButtonElement>(
       '[data-close-player-detail]',
@@ -5420,7 +5428,7 @@ function renderFldaPlayerCard(
         <div class="auction-main-value"><span>xFM</span><strong>${formatNumber(flda?.fm_exp ?? undefined, 2)}</strong></div>
         <div class="auction-main-value"><span>Titolarità</span><strong>${formatPercent(flda?.titolarita_display ?? undefined, 0)}</strong></div>
         <div class="auction-main-value"><span>iCà</span><strong>${formatNumber(getICaV3(strategyPlayer?.fantalabId)?.score, 1)}</strong></div>
-        <div class="auction-main-value auction-history-value"><span>Prezzo storico A/B</span><strong>${displayHistoricalAuctionPrices(historicalDetail)}</strong><small>${historicalDetail?.auction_prices?.length ? 'stagione 2025/26' : 'storico non disponibile'}</small></div>
+        <div class="auction-main-value auction-history-value"><span>Prezzo d'asta A/B</span><strong>${displayHistoricalAuctionPrices(historicalDetail)}</strong><small>${latestAuctionSeason(historicalDetail) ? `asta ${latestAuctionSeason(historicalDetail)}` : 'nessuna asta registrata'}</small></div>
       </div>
       <div class="auction-insight-row">
         <div class="auction-insight-metric"><span>PMA</span><strong>${formatPercent(strategyPlayer?.pmaPercent, 1)}</strong></div>

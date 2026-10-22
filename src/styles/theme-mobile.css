@@ -640,3 +640,69 @@
     backdrop-filter: none !important;
   }
 }
+
+/* --- pulsante "Indietro" delle schede giocatore ---
+   sul computer: nella scheda rapida resta la ×; nella completa un pulsante normale
+   su telefono: sempre in alto a sinistra, fisso, ben visibile, uguale nelle due schede */
+.sheet-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 38px;
+  padding: 0 14px 0 8px;
+  border: 1px solid var(--line-1);
+  border-radius: 999px !important;
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.sheet-back svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.player-quick-card > .sheet-back { display: none; }
+
+@media (max-width: 700px) {
+  .player-quick-card > .sheet-back,
+  .sheet-back-portal {
+    position: fixed;
+    top: calc(env(safe-area-inset-top) + 10px);
+    left: 12px;
+    z-index: 9200;
+    display: inline-flex;
+    min-height: 42px;
+    padding: 0 16px 0 10px;
+    background: var(--surface);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
+  }
+  /* la × e la vecchia freccia non servono più su telefono */
+  .player-quick-card .player-detail-close-button { display: none !important; }
+  /* spazio in cima perché il pulsante non copra il nome */
+  .player-quick-card { padding-top: 60px !important; }
+  .player-full-page-v3 { padding-top: 56px; }
+}
+
+.sheet-back-portal { display: none; }
+@media (max-width: 700px) {
+  .sheet-back-portal { display: inline-flex; }
+  /* nella scheda completa su telefono resta solo il pulsante fisso */
+  .player-full-back { display: none !important; }
+}
+
+/* Asta: Giocatori e Obiettivi sono già nel menu, niente doppioni in alto */
+#goToPlayersButton,
+#goToObjectivesButton {
+  display: none !important;
+}
+@media (max-width: 700px) {
+  /* scheda completa: "Indietro" prende il posto del logo, stesso punto della scheda rapida */
+  body:has(.sheet-back-portal) .topbar-brand-stack { visibility: hidden; }
+}

@@ -1,0 +1,2227 @@
+ID Fantacalcio;Nome;Squadra;Ruolo;Giornata;Voto;Fantavoto
+4431;Carnesecchi;Atalanta;P;1;6.5;6.5
+554;Zappacosta;Atalanta;D;1;6.5;6.5
+2640;Kolasinac;Atalanta;D;1;6;6
+5526;Scalvini;Atalanta;D;1;6;6
+5578;Kossounou;Atalanta;D;1;5.5;5.5
+7219;Bernasconi;Atalanta;D;1;5.5;5.5
+2077;Pasalic;Atalanta;C;1;5.5;5.5
+4364;Gaetano;Atalanta;C;1;6.5;7.5
+4479;Elmas;Atalanta;C;1;;
+5119;Samardzic;Atalanta;C;1;6;6
+5422;Zalewski;Atalanta;C;1;6;6
+5792;Ederson D.S.;Atalanta;C;1;6;6
+2137;Scamacca;Atalanta;A;1;6;6
+4371;Raspadori;Atalanta;A;1;7;10
+5995;De Ketelaere;Atalanta;A;1;6;6
+6435;Krstovic;Atalanta;A;1;7;10
+133;Skorupski;Bologna;P;1;6;5
+4433;Zortea;Bologna;D;1;6;6
+4734;Miranda J.;Bologna;D;1;6;6
+5678;Holm;Bologna;D;1;6;6
+7212;Heggem;Bologna;D;1;5.5;5
+7326;Helland;Bologna;D;1;6;6
+184;Bernardeschi;Bologna;C;1;6.5;6.5
+2167;Orsolini;Bologna;C;1;5.5;5.5
+2765;Odgaard;Bologna;C;1;5.5;5
+4436;Cambiaghi;Bologna;C;1;5.5;5
+5858;Ferguson;Bologna;C;1;6;6
+6225;El Azzouzi O.;Bologna;C;1;5;4.5
+6844;Rowe;Bologna;C;1;5.5;5.5
+7528;Amondarain;Bologna;C;1;;
+4359;Piccoli;Bologna;A;1;6;6
+6675;Dovbyk;Bologna;A;1;5;5
+4360;Caprile;Cagliari;P;1;6;6
+4461;Zappa;Cagliari;D;1;6;6
+5701;Obert;Cagliari;D;1;6;6
+7268;Rodriguez Ju.;Cagliari;D;1;6.5;6.5
+7274;Zè Pedro;Cagliari;D;1;5.5;5
+7548;Aurelio;Cagliari;D;1;;
+1871;Deiola;Cagliari;C;1;6;6
+4260;Winks;Cagliari;C;1;6;6
+4870;Adopo;Cagliari;C;1;6.5;7.5
+6010;Fazzini;Cagliari;C;1;5.5;5
+6640;Felici;Cagliari;C;1;6;6
+7311;Romano;Cagliari;C;1;7;10
+4896;Maldini;Cagliari;A;1;6;6
+6243;Borrelli;Cagliari;A;1;6;6
+6598;Mutandwa;Cagliari;A;1;;
+7374;Mendy P.;Cagliari;A;1;5.5;5.5
+6966;Butez;Como;P;1;6;5
+5641;Chalobah T.;Como;D;1;6.5;6.5
+6727;Couto;Como;D;1;5;5
+6867;Valle;Como;D;1;5.5;5.5
+6869;Ramon;Como;D;1;6;6
+7014;Smolcic I.;Como;D;1;;
+5036;Caqueret;Como;C;1;;
+5559;Da Cunha;Como;C;1;6;6
+6151;Perrone;Como;C;1;6;6
+6678;Liberali;Como;C;1;6;6
+6875;Paz N.;Como;C;1;5.5;5.5
+7126;Baturina;Como;C;1;5.5;5.5
+7129;Rodriguez Je.;Como;C;1;5.5;5.5
+7412;Milla;Como;C;1;6.5;6.5
+6967;Diao;Como;A;1;6;6
+7017;Douvikas;Como;A;1;6.5;9.5
+2521;De Gea;Fiorentina;P;1;5.5;1.5
+4378;Ranieri L.;Fiorentina;D;1;5;5
+5365;Dragusin;Fiorentina;D;1;4;4
+5885;Dodò;Fiorentina;D;1;5;5
+6531;Jimenez A.;Fiorentina;D;1;5.5;5.5
+7175;Joao Mario;Fiorentina;D;1;5;5
+7294;Valdepenas;Fiorentina;D;1;;
+1933;Mandragora;Fiorentina;C;1;5;5
+4465;Fagioli;Fiorentina;C;1;5.5;5
+4947;Brescianini;Fiorentina;C;1;5.5;5.5
+6294;Ndour;Fiorentina;C;1;5.5;5.5
+6908;Atta;Fiorentina;C;1;5;5
+7078;Mastantuono;Fiorentina;C;1;5.5;5.5
+7464;Oulai;Fiorentina;C;1;6;6
+2097;Kean;Fiorentina;A;1;6;6
+7023;Pellegrino M.;Fiorentina;A;1;5;4.5
+6415;Palmisani;Frosinone;P;1;6.5;5.5
+4375;Terzic;Frosinone;D;1;5.5;5.5
+4952;Monterisi;Frosinone;D;1;5;5
+5757;Cittadini;Frosinone;D;1;5.5;5.5
+6238;Oyono A.;Frosinone;D;1;6;6
+7467;Calvani;Frosinone;D;1;6.5;6
+7469;Bracaglia;Frosinone;D;1;6;6
+5998;Zerbin;Frosinone;C;1;6;6
+6506;Fini;Frosinone;C;1;6;6
+6903;Hasa;Frosinone;C;1;6;6
+6917;Masini;Frosinone;C;1;6;6
+7472;Calò;Frosinone;C;1;5.5;5.5
+7473;Cichella;Frosinone;C;1;5.5;5.5
+7551;Schmid;Frosinone;C;1;5;4.5
+5436;Raimondo;Frosinone;A;1;5.5;5.5
+6204;Kvernadze;Frosinone;A;1;6;6
+7332;Bijlow;Genoa;P;1;6;4
+5514;Vasquez;Genoa;D;1;5.5;5.5
+5750;Ostigard;Genoa;D;1;7;6.5
+6660;Marcandalli;Genoa;D;1;6;6
+6814;Norton-Cuffy;Genoa;D;1;6;6
+6977;Otoa;Genoa;D;1;4.5;4.5
+4970;Messias;Genoa;C;1;6;6
+5791;Frendrup;Genoa;C;1;6;6
+5823;Baldanzi;Genoa;C;1;6;6
+5946;Sow;Genoa;C;1;5.5;5.5
+6020;Ellertsson;Genoa;C;1;5.5;5.5
+7341;Amorim;Genoa;C;1;6.5;6.5
+7409;Meichtry;Genoa;C;1;5.5;5.5
+4923;Colombo;Genoa;A;1;6;6
+6164;Vitinha O.;Genoa;A;1;5.5;5.5
+7582;Zulevic;Genoa;A;1;;
+5116;Martinez Jo.;Inter;P;1;6;5
+254;Dimarco;Inter;D;1;6;6
+2120;Bastoni;Inter;D;1;6;6
+2514;Stones;Inter;D;1;6;6
+4159;Akanji;Inter;D;1;5.5;5.5
+6217;Bisseck;Inter;D;1;7;10
+152;Zielinski;Inter;C;1;7;10
+1870;Barella;Inter;C;1;6;6
+2194;Calhanoglu;Inter;C;1;7;9.5
+5301;Luis Henrique;Inter;C;1;6;6
+6274;Diouf;Inter;C;1;7;9
+6503;Stankovic A.;Inter;C;1;;
+7070;Sucic P.;Inter;C;1;6.5;6.5
+2764;Martinez L.;Inter;A;1;5.5;5
+6669;Bonny;Inter;A;1;6;6
+7071;Esposito F.P.;Inter;A;1;7.5;11.5
+218;Perin;Juventus;P;1;;
+4964;Vicario;Juventus;P;1;6;6
+2788;Bremer;Juventus;D;1;7.5;10.5
+4657;Celik;Juventus;D;1;6;5.5
+4976;Kalulu;Juventus;D;1;6.5;6.5
+5520;Cambiaso;Juventus;D;1;6;5.5
+6766;Kelly L.;Juventus;D;1;5.5;5.5
+827;Locatelli;Juventus;C;1;6;6
+4911;Douglas Luiz;Juventus;C;1;5.5;5.5
+4973;McKennie;Juventus;C;1;6;6
+5685;Koopmeiners;Juventus;C;1;;
+5761;Zhegrova;Juventus;C;1;6;6
+6884;Conceicao;Juventus;C;1;6.5;7.5
+2832;Boga;Juventus;A;1;6;6
+5951;Kolo Muani;Juventus;A;1;5;5
+6434;Yildiz;Juventus;A;1;5.5;5.5
+6482;Mandas;Lazio;P;1;6.5;6.5
+2188;Marusic;Lazio;D;1;6;6
+4817;Pedraza;Lazio;D;1;6;6
+5620;Tavares N.;Lazio;D;1;;
+6320;Doekhi;Lazio;D;1;6.5;6.5
+7012;Provstgaard;Lazio;D;1;6;5.5
+7131;Floriani Mussolini;Lazio;D;1;6;5.5
+632;Zaccagni;Lazio;C;1;6;6
+2848;Frattesi;Lazio;C;1;7.5;10.5
+4459;Rovella;Lazio;C;1;6.5;6.5
+5500;Cancellieri;Lazio;C;1;5.5;5
+6398;Isaksen;Lazio;C;1;6;6
+6629;Dele-Bashiru;Lazio;C;1;5.5;5.5
+7314;Taylor K.;Lazio;C;1;6;6
+5672;Dia;Lazio;A;1;6.5;7
+6556;Noslin;Lazio;A;1;;
+2134;Falcone;Lecce;P;1;7;7
+4502;Gallo;Lecce;D;1;5.5;5.5
+6632;Gaspar K.;Lecce;D;1;7;6.5
+6989;Tiago Gabriel;Lecce;D;1;7;10
+6990;Veiga D.;Lecce;D;1;6.5;7
+7182;Ndaba;Lecce;D;1;6;6
+7240;Siebert;Lecce;D;1;6.5;6.5
+5457;Maleh;Lecce;C;1;6.5;6.5
+5504;Coulibaly L.;Lecce;C;1;7;8
+6549;Pierotti;Lecce;C;1;6;6
+7248;Gorter;Lecce;C;1;7;10
+7318;Gandelman;Lecce;C;1;;
+7322;Ngom;Lecce;C;1;6;5.5
+5029;Geubbels;Lecce;A;1;5.5;5.5
+7001;N'Dri;Lecce;A;1;5.5;5.5
+7252;Stulic;Lecce;A;1;5.5;5.5
+4312;Maignan;Milan;P;1;6;5
+4401;Gabbia;Milan;D;1;6;6
+5022;Pavlovic;Milan;D;1;6;6
+5273;Estupinan;Milan;D;1;6;6
+5739;De Winter;Milan;D;1;7;7
+5833;Gila;Milan;D;1;6.5;6.5
+6496;Bartesaghi;Milan;D;1;6;6
+2379;Rabiot;Milan;C;1;7.5;11.5
+2606;Modric;Milan;C;1;6;6
+4199;Loftus-Cheek;Milan;C;1;6;5.5
+4856;Chukwueze;Milan;C;1;7;8
+4892;Saelemaekers;Milan;C;1;6;6
+5295;Musah;Milan;C;1;6;6
+6618;Cissè A.;Milan;C;1;7;10
+7203;Jashari;Milan;C;1;6.5;6.5
+6397;Ramos G.;Milan;A;1;6;6
+6682;Pizzignacco;Monza;P;1;5;1
+2115;Delli Carri;Monza;D;1;;
+4925;Carboni A.;Monza;D;1;5.5;5.5
+5838;Birindelli;Monza;D;1;5.5;5.5
+6659;Lucchesi;Monza;D;1;5;4.5
+7238;Kouadio;Monza;D;1;5.5;5
+7476;Bakoune;Monza;D;1;6;6
+7485;Mangas;Monza;D;1;5.5;5.5
+5525;Galazzi;Monza;C;1;6;6
+5878;Colpani;Monza;C;1;5;5
+6592;Forson O.;Monza;C;1;6;6
+7574;Foe Ondoa;Monza;C;1;6;6
+7575;Mout;Monza;C;1;6;7
+2155;Cutrone;Monza;A;1;6;6
+7523;Varela G.;Monza;A;1;7;10
+7546;Robinson J.;Monza;A;1;;
+572;Meret;Napoli;P;1;6;6
+1852;Spinazzola;Napoli;D;1;5.5;5.5
+2816;Di Lorenzo;Napoli;D;1;6.5;6.5
+4409;Rrahmani;Napoli;D;1;6.5;6.5
+5840;Olivera;Napoli;D;1;;
+6638;Marin R.;Napoli;D;1;5.5;5.5
+536;Politano;Napoli;C;1;5.5;5
+2517;De Bruyne;Napoli;C;1;7.5;11.5
+4220;Zambo Anguissa;Napoli;C;1;5.5;5.5
+4287;Lobotka;Napoli;C;1;6.5;6.5
+4777;McTominay;Napoli;C;1;6;6
+7223;Vergara;Napoli;C;1;7.5;11.5
+6052;Hojlund;Napoli;A;1;5.5;5.5
+6215;Lucca;Napoli;A;1;6.5;6.5
+7120;Lang;Napoli;A;1;6;6
+7351;Santos A.;Napoli;A;1;6;6
+6662;Corvi;Parma;P;1;5.5;4.5
+5862;Valeri;Parma;D;1;6;6
+6664;Delprato;Parma;D;1;6;6
+7202;Ndiaye;Parma;D;1;6;6
+7235;Troilo;Parma;D;1;6;6
+6207;Almqvist;Parma;C;1;6;6
+6666;Bernabè;Parma;C;1;6;6
+6897;Kouda;Parma;C;1;5.5;5.5
+6898;Keita M.;Parma;C;1;6;6
+7138;Ordonez C.;Parma;C;1;6;6
+7276;Cremaschi;Parma;C;1;;
+7536;Diallo O.;Parma;C;1;6;6
+7581;Konate A.;Parma;C;1;5.5;5.5
+6229;Tourè E.;Parma;A;1;5.5;5.5
+7342;Elphege;Parma;A;1;5.5;5.5
+7561;Lontani;Parma;A;1;6.5;6.5
+5841;Svilar;Roma;P;1;6;6
+2296;Mancini;Roma;D;1;6.5;6.5
+4317;N'Dicka;Roma;D;1;6;6
+4807;Hermoso;Roma;D;1;6.5;6
+7181;Wesley;Roma;D;1;6.5;6.5
+7529;Koulierakis;Roma;D;1;6;6
+7599;Lulli;Roma;D;1;6.5;6.5
+779;Cristante;Roma;C;1;6.5;6.5
+5589;Konè M.;Roma;C;1;6;5.5
+6190;Pisilli;Roma;C;1;6.5;9.5
+6271;El Aynaoui;Roma;C;1;;
+7556;Mora;Roma;C;1;6.5;6.5
+309;Dybala;Roma;A;1;8;11
+5585;Malen;Roma;A;1;8.5;17.5
+5734;Soulè;Roma;A;1;6;6
+6572;Castro S.;Roma;A;1;6;6
+4236;Muric;Sassuolo;P;1;6;4
+5851;Doig;Sassuolo;D;1;6;6
+7154;Odenthal;Sassuolo;D;1;7;10
+7396;Macchioni;Sassuolo;D;1;5;5
+7564;Leysen F.;Sassuolo;D;1;5.5;5.5
+7573;Cinquegrano;Sassuolo;D;1;5.5;5.5
+2528;Matic;Sassuolo;C;1;6.5;6.5
+5462;Ciervo;Sassuolo;C;1;;
+5735;Volpato;Sassuolo;C;1;6.5;6.5
+5844;Thorstvedt;Sassuolo;C;1;6;6
+6677;Adzic;Sassuolo;C;1;5.5;5.5
+6895;Dominguez B.;Sassuolo;C;1;6;6
+7036;Bakola;Sassuolo;C;1;6;6
+6060;Laurientè;Sassuolo;A;1;6;6
+7347;Bowie;Sassuolo;A;1;5.5;5.5
+7591;Kulla;Sassuolo;A;1;;
+7457;Mascardi;Torino;P;1;6;4
+5010;Ismajli;Torino;D;1;6;6
+6426;Pedersen;Torino;D;1;6;6
+6495;Comuzzo;Torino;D;1;6;6
+6642;Coco;Torino;D;1;5.5;5.5
+7069;Fortini;Torino;D;1;6;6
+5687;Vlasic;Torino;C;1;5;5
+5888;Casadei;Torino;C;1;5;5
+6170;Gineitis;Torino;C;1;5.5;6.5
+6827;Njie;Torino;C;1;6.5;6.5
+7060;Cacciamani;Torino;C;1;5.5;5.5
+7183;Aboukhlal;Torino;C;1;5.5;5.5
+7535;Fitz-Jim;Torino;C;1;6;6
+2061;Simeone;Torino;A;1;5.5;5.5
+6646;Adams C.;Torino;A;1;7;10
+7349;Kulenovic;Torino;A;1;;
+6462;Okoye;Udinese;P;1;6.5;5.5
+4994;Vojvoda;Udinese;D;1;6.5;6.5
+5555;Kamara H.;Udinese;D;1;7;10
+5994;Ebosse;Udinese;D;1;6;6
+6021;Abankwah;Udinese;D;1;6;5.5
+6925;Palma;Udinese;D;1;6.5;6.5
+6956;Solet;Udinese;D;1;6;6
+2766;Zaniolo;Udinese;C;1;6.5;6.5
+6212;Zarraga;Udinese;C;1;;
+6680;Karlstrom;Udinese;C;1;6.5;6.5
+6684;Ekkelenkamp;Udinese;C;1;6.5;7.5
+6783;Unai Gomez;Udinese;C;1;;
+7198;Piotrowski;Udinese;C;1;6;5.5
+7208;Miller L.;Udinese;C;1;6;6
+7161;Bayo V.;Udinese;A;1;5;5
+7272;Gueye;Udinese;A;1;5.5;5.5
+6248;Stankovic F.;Venezia;P;1;5.5;3.5
+4845;Correia T.;Venezia;D;1;6.5;6.5
+5695;Haps;Venezia;D;1;5.5;5.5
+6681;Sagrado;Venezia;D;1;;
+6821;Hainaut;Venezia;D;1;5.5;5.5
+6892;Schingtienne;Venezia;D;1;5;5
+7253;Bella-Kotchap;Venezia;D;1;5;5
+7478;Franjic;Venezia;D;1;5.5;5.5
+5507;Busio;Venezia;C;1;6;6
+5674;Basic;Venezia;C;1;5.5;5.5
+6994;Perez K.;Venezia;C;1;5.5;5.5
+7481;Dagasso;Venezia;C;1;5;4.5
+6904;Yeboah J.;Venezia;A;1;6;6
+7449;Rrahmani Al.;Venezia;A;1;;
+7484;Adams A.;Venezia;A;1;5.5;5.5
+4431;Carnesecchi;Atalanta;P;2;7;7
+554;Zappacosta;Atalanta;D;2;5.5;5.5
+2640;Kolasinac;Atalanta;D;2;6;6
+4887;Bellanova;Atalanta;D;2;;
+5526;Scalvini;Atalanta;D;2;6;6
+5578;Kossounou;Atalanta;D;2;6;6
+2077;Pasalic;Atalanta;C;2;5.5;5.5
+4364;Gaetano;Atalanta;C;2;5;5
+4479;Elmas;Atalanta;C;2;5.5;5.5
+5119;Samardzic;Atalanta;C;2;7;10
+5422;Zalewski;Atalanta;C;2;6.5;7.5
+5792;Ederson D.S.;Atalanta;C;2;5.5;5.5
+2137;Scamacca;Atalanta;A;2;5.5;5.5
+4371;Raspadori;Atalanta;A;2;5.5;5.5
+5995;De Ketelaere;Atalanta;A;2;5.5;5.5
+6435;Krstovic;Atalanta;A;2;5.5;5
+133;Skorupski;Bologna;P;2;5;4
+4433;Zortea;Bologna;D;2;6;6
+5678;Holm;Bologna;D;2;6.5;6.5
+7212;Heggem;Bologna;D;2;5.5;5.5
+7326;Helland;Bologna;D;2;6;6
+7483;Alhassane;Bologna;D;2;6;6
+184;Bernardeschi;Bologna;C;2;6.5;6.5
+2167;Orsolini;Bologna;C;2;6;6
+2765;Odgaard;Bologna;C;2;6;6
+4436;Cambiaghi;Bologna;C;2;6.5;6.5
+5298;Pobega;Bologna;C;2;6;6
+5858;Ferguson;Bologna;C;2;6;6
+6054;Moro N.;Bologna;C;2;;
+7528;Amondarain;Bologna;C;2;5.5;5.5
+4359;Piccoli;Bologna;A;2;5;5
+6675;Dovbyk;Bologna;A;2;5.5;5.5
+4360;Caprile;Cagliari;P;2;7;6
+5701;Obert;Cagliari;D;2;5.5;5.5
+7268;Rodriguez Ju.;Cagliari;D;2;6;6
+7274;Zè Pedro;Cagliari;D;2;6;6
+7532;Kofler;Cagliari;D;2;6;6
+1871;Deiola;Cagliari;C;2;5.5;5
+4260;Winks;Cagliari;C;2;5;5
+4870;Adopo;Cagliari;C;2;5.5;5.5
+5462;Ciervo;Cagliari;C;2;;
+6010;Fazzini;Cagliari;C;2;5.5;5.5
+6815;Fadera;Cagliari;C;2;6;6
+7311;Romano;Cagliari;C;2;6;6
+4896;Maldini;Cagliari;A;2;5.5;5.5
+6243;Borrelli;Cagliari;A;2;;
+7374;Mendy P.;Cagliari;A;2;6;6
+7547;Kevin Carlos;Cagliari;A;2;5.5;5
+6966;Butez;Como;P;2;5.5;4.5
+5641;Chalobah T.;Como;D;2;6.5;6.5
+6727;Couto;Como;D;2;6;6
+6867;Valle;Como;D;2;6.5;6.5
+6869;Ramon;Como;D;2;6;6
+6893;Kempf;Como;D;2;6.5;6.5
+7014;Smolcic I.;Como;D;2;5.5;5.5
+7414;Kaiki;Como;D;2;;
+5036;Caqueret;Como;C;2;6;6
+5559;Da Cunha;Como;C;2;6.5;6.5
+6151;Perrone;Como;C;2;6;6
+6875;Paz N.;Como;C;2;6;6
+7126;Baturina;Como;C;2;7.5;10.5
+7412;Milla;Como;C;2;7;7
+6967;Diao;Como;A;2;6.5;7.5
+7017;Douvikas;Como;A;2;7;10
+2521;De Gea;Fiorentina;P;2;5;2
+5365;Dragusin;Fiorentina;D;2;4;3.5
+5603;Pongracic;Fiorentina;D;2;5;5
+6531;Jimenez A.;Fiorentina;D;2;4.5;4
+7175;Joao Mario;Fiorentina;D;2;;
+7294;Valdepenas;Fiorentina;D;2;5;5
+7410;Viery;Fiorentina;D;2;5.5;5.5
+1933;Mandragora;Fiorentina;C;2;5.5;5.5
+4465;Fagioli;Fiorentina;C;2;5.5;5.5
+4947;Brescianini;Fiorentina;C;2;5.5;5.5
+5800;Gudmundsson A.;Fiorentina;C;2;4.5;4
+6294;Ndour;Fiorentina;C;2;4.5;4.5
+6908;Atta;Fiorentina;C;2;4;4
+7078;Mastantuono;Fiorentina;C;2;5;5
+7464;Oulai;Fiorentina;C;2;5;5
+7023;Pellegrino M.;Fiorentina;A;2;4.5;4.5
+6415;Palmisani;Frosinone;P;2;6;6
+4375;Terzic;Frosinone;D;2;6;6
+4952;Monterisi;Frosinone;D;2;7;7
+5757;Cittadini;Frosinone;D;2;6;6
+6238;Oyono A.;Frosinone;D;2;6.5;6.5
+7467;Calvani;Frosinone;D;2;6.5;6
+7469;Bracaglia;Frosinone;D;2;7.5;11
+5998;Zerbin;Frosinone;C;2;6.5;6.5
+6506;Fini;Frosinone;C;2;6;6
+6917;Masini;Frosinone;C;2;6.5;6.5
+7472;Calò;Frosinone;C;2;7;8
+7550;Grillitsch;Frosinone;C;2;;
+7551;Schmid;Frosinone;C;2;6.5;6.5
+5436;Raimondo;Frosinone;A;2;8;13.5
+6204;Kvernadze;Frosinone;A;2;7.5;8.5
+7610;Birligea;Frosinone;A;2;;
+7332;Bijlow;Genoa;P;2;5;4
+5514;Vasquez;Genoa;D;2;6;6
+5750;Ostigard;Genoa;D;2;6;5.5
+6660;Marcandalli;Genoa;D;2;5.5;5.5
+6814;Norton-Cuffy;Genoa;D;2;5.5;5.5
+4970;Messias;Genoa;C;2;6;6
+5791;Frendrup;Genoa;C;2;6;6
+5823;Baldanzi;Genoa;C;2;5.5;5.5
+5946;Sow;Genoa;C;2;6;6
+6020;Ellertsson;Genoa;C;2;5.5;5.5
+7341;Amorim;Genoa;C;2;;
+7409;Meichtry;Genoa;C;2;5.5;5.5
+4923;Colombo;Genoa;A;2;5.5;5.5
+6164;Vitinha O.;Genoa;A;2;5.5;5.5
+7600;Osmajic;Genoa;A;2;5.5;5.5
+5116;Martinez Jo.;Inter;P;2;6;6
+254;Dimarco;Inter;D;2;6.5;6.5
+2120;Bastoni;Inter;D;2;6.5;6.5
+2514;Stones;Inter;D;2;6;6
+4159;Akanji;Inter;D;2;5.5;5
+4177;Pavard;Inter;D;2;6;6
+6217;Bisseck;Inter;D;2;6.5;6.5
+152;Zielinski;Inter;C;2;6.5;6.5
+1870;Barella;Inter;C;2;7;8
+2194;Calhanoglu;Inter;C;2;7;10
+5172;Jones C.;Inter;C;2;6;6
+5301;Luis Henrique;Inter;C;2;6;6
+7070;Sucic P.;Inter;C;2;6.5;6.5
+2764;Martinez L.;Inter;A;2;6;6
+4871;Thuram;Inter;A;2;5.5;5.5
+7071;Esposito F.P.;Inter;A;2;6.5;6.5
+4964;Vicario;Juventus;P;2;6.5;6.5
+2788;Bremer;Juventus;D;2;6.5;6.5
+4657;Celik;Juventus;D;2;6;6
+4976;Kalulu;Juventus;D;2;6.5;6.5
+5520;Cambiaso;Juventus;D;2;;
+6042;Lucumì;Juventus;D;2;5.5;5
+6766;Kelly L.;Juventus;D;2;6;6
+827;Locatelli;Juventus;C;2;7;7.5
+4179;Gonzalez N.;Juventus;C;2;7.5;10.5
+4911;Douglas Luiz;Juventus;C;2;6;6
+5685;Koopmeiners;Juventus;C;2;7;10
+6884;Conceicao;Juventus;C;2;6.5;6.5
+7436;Alajbegovic;Juventus;C;2;5.5;5.5
+2832;Boga;Juventus;A;2;6;6
+5544;David;Juventus;A;2;5;5
+5951;Kolo Muani;Juventus;A;2;6;6
+6482;Mandas;Lazio;P;2;6;6
+2263;Lazzari;Lazio;D;2;;
+4817;Pedraza;Lazio;D;2;6;6
+5620;Tavares N.;Lazio;D;2;6.5;7.5
+6320;Doekhi;Lazio;D;2;6;6
+7012;Provstgaard;Lazio;D;2;6;6
+7131;Floriani Mussolini;Lazio;D;2;6.5;6.5
+632;Zaccagni;Lazio;C;2;6;5.5
+2848;Frattesi;Lazio;C;2;7;10
+4459;Rovella;Lazio;C;2;6;6
+5500;Cancellieri;Lazio;C;2;6;6
+6191;Belahyane;Lazio;C;2;6;6
+6398;Isaksen;Lazio;C;2;6;6
+7314;Taylor K.;Lazio;C;2;6;6
+2038;Pinamonti;Lazio;A;2;;
+5672;Dia;Lazio;A;2;5.5;5.5
+2134;Falcone;Lecce;P;2;5.5;1.5
+6632;Gaspar K.;Lecce;D;2;4;4
+6989;Tiago Gabriel;Lecce;D;2;5;5
+6990;Veiga D.;Lecce;D;2;5;5
+7182;Ndaba;Lecce;D;2;5;5
+7240;Siebert;Lecce;D;2;4.5;4.5
+5007;Ilic;Lecce;C;2;5.5;5
+5457;Maleh;Lecce;C;2;5.5;5.5
+5504;Coulibaly L.;Lecce;C;2;5;5
+6549;Pierotti;Lecce;C;2;5.5;5.5
+7248;Gorter;Lecce;C;2;5;5
+7322;Ngom;Lecce;C;2;5;5
+5029;Geubbels;Lecce;A;2;5;5
+7001;N'Dri;Lecce;A;2;6;6
+7252;Stulic;Lecce;A;2;5;5
+7602;Fatah;Lecce;A;2;5.5;5.5
+4312;Maignan;Milan;P;2;6;6
+4401;Gabbia;Milan;D;2;;
+5022;Pavlovic;Milan;D;2;6.5;6
+5273;Estupinan;Milan;D;2;;
+5739;De Winter;Milan;D;2;6.5;6.5
+5833;Gila;Milan;D;2;6.5;6.5
+6496;Bartesaghi;Milan;D;2;6;6
+2379;Rabiot;Milan;C;2;6;6
+2606;Modric;Milan;C;2;6;6
+4199;Loftus-Cheek;Milan;C;2;6;6
+4856;Chukwueze;Milan;C;2;6.5;6.5
+4892;Saelemaekers;Milan;C;2;7;8
+5295;Musah;Milan;C;2;6.5;6.5
+6618;Cissè A.;Milan;C;2;5.5;5.5
+7203;Jashari;Milan;C;2;6;6
+6397;Ramos G.;Milan;A;2;7;10
+4485;Thiam;Monza;P;2;4.5;1.5
+2115;Delli Carri;Monza;D;2;6;6
+4925;Carboni A.;Monza;D;2;5.5;5.5
+5838;Birindelli;Monza;D;2;6;6
+6659;Lucchesi;Monza;D;2;5.5;5
+7238;Kouadio;Monza;D;2;6;6
+7485;Mangas;Monza;D;2;6.5;7.5
+5878;Colpani;Monza;C;2;6.5;9.5
+6252;Folorunsho;Monza;C;2;6;6
+6592;Forson O.;Monza;C;2;;
+6593;Akinsanmiro;Monza;C;2;6.5;7.5
+7574;Foe Ondoa;Monza;C;2;5.5;5.5
+7575;Mout;Monza;C;2;5;5
+2155;Cutrone;Monza;A;2;6;6
+5882;Mota;Monza;A;2;;
+7523;Varela G.;Monza;A;2;7;10
+572;Meret;Napoli;P;2;6;4
+1852;Spinazzola;Napoli;D;2;6;6
+2816;Di Lorenzo;Napoli;D;2;5.5;5
+4409;Rrahmani;Napoli;D;2;6;7
+5840;Olivera;Napoli;D;2;5;5
+6638;Marin R.;Napoli;D;2;5;5
+536;Politano;Napoli;C;2;5.5;5.5
+2517;De Bruyne;Napoli;C;2;6.5;6.5
+4220;Zambo Anguissa;Napoli;C;2;5;5
+4287;Lobotka;Napoli;C;2;6;6
+4777;McTominay;Napoli;C;2;5.5;5.5
+6052;Hojlund;Napoli;A;2;7;10
+6215;Lucca;Napoli;A;2;;
+6831;Neres;Napoli;A;2;;
+7120;Lang;Napoli;A;2;5.5;5.5
+7351;Santos A.;Napoli;A;2;6;6
+6662;Corvi;Parma;P;2;6;4
+5862;Valeri;Parma;D;2;6;6
+6664;Delprato;Parma;D;2;6;5.5
+7235;Troilo;Parma;D;2;5;4.5
+7255;Britschgi;Parma;D;2;6;6
+7615;Drobnic;Parma;D;2;5.5;5.5
+6207;Almqvist;Parma;C;2;;
+6666;Bernabè;Parma;C;2;5.5;5.5
+6898;Keita M.;Parma;C;2;5;5
+7138;Ordonez C.;Parma;C;2;6;6
+7276;Cremaschi;Parma;C;2;5.5;5.5
+7581;Konate A.;Parma;C;2;4.5;4
+6229;Tourè E.;Parma;A;2;5.5;5.5
+7342;Elphege;Parma;A;2;;
+7554;Romero D.;Parma;A;2;6.5;6.5
+7561;Lontani;Parma;A;2;6;6
+5841;Svilar;Roma;P;2;6.5;6.5
+2296;Mancini;Roma;D;2;6.5;7.5
+4807;Hermoso;Roma;D;2;6.5;6.5
+4998;Molina N.;Roma;D;2;6;6
+6631;Ghilardi;Roma;D;2;7;7
+7181;Wesley;Roma;D;2;7;8
+7599;Lulli;Roma;D;2;6.5;6.5
+22;De Roon;Roma;C;2;;
+779;Cristante;Roma;C;2;6.5;6.5
+5589;Konè M.;Roma;C;2;7;7
+6190;Pisilli;Roma;C;2;6.5;6.5
+7556;Mora;Roma;C;2;7;10
+309;Dybala;Roma;A;2;7;7
+5585;Malen;Roma;A;2;8;13.5
+5734;Soulè;Roma;A;2;7;10
+6572;Castro S.;Roma;A;2;6;6
+4236;Muric;Sassuolo;P;2;6.5;5.5
+5851;Doig;Sassuolo;D;2;6;6
+6672;Idzes;Sassuolo;D;2;6;6
+7329;Obrador;Sassuolo;D;2;6;6
+7564;Leysen F.;Sassuolo;D;2;6.5;7.5
+7573;Cinquegrano;Sassuolo;D;2;6;6
+2528;Matic;Sassuolo;C;2;6;5.5
+5735;Volpato;Sassuolo;C;2;7;9.5
+5844;Thorstvedt;Sassuolo;C;2;6;6
+6246;Lipani;Sassuolo;C;2;;
+6677;Adzic;Sassuolo;C;2;6.5;7.5
+6895;Dominguez B.;Sassuolo;C;2;5.5;5.5
+7036;Bakola;Sassuolo;C;2;6;6
+531;Berardi;Sassuolo;A;2;7;10
+6060;Laurientè;Sassuolo;A;2;6.5;6
+7347;Bowie;Sassuolo;A;2;5.5;5.5
+7457;Mascardi;Torino;P;2;5.5;3.5
+5010;Ismajli;Torino;D;2;6;6
+6495;Comuzzo;Torino;D;2;6.5;9.5
+6642;Coco;Torino;D;2;6;6
+7069;Fortini;Torino;D;2;6;6
+7526;Comert;Torino;D;2;6;6
+5687;Vlasic;Torino;C;2;5.5;5.5
+6005;Ilkhan;Torino;C;2;5.5;5.5
+6170;Gineitis;Torino;C;2;5.5;5
+7060;Cacciamani;Torino;C;2;6.5;7.5
+7183;Aboukhlal;Torino;C;2;5.5;5.5
+7535;Fitz-Jim;Torino;C;2;6;6
+608;Zapata D.;Torino;A;2;;
+2061;Simeone;Torino;A;2;5.5;5.5
+6646;Adams C.;Torino;A;2;6;6
+7349;Kulenovic;Torino;A;2;5.5;5.5
+6462;Okoye;Udinese;P;2;6;4
+4994;Vojvoda;Udinese;D;2;6.5;6.5
+5555;Kamara H.;Udinese;D;2;7;10
+5820;Bertola;Udinese;D;2;6;6
+5994;Ebosse;Udinese;D;2;5.5;5.5
+6021;Abankwah;Udinese;D;2;6.5;6.5
+6956;Solet;Udinese;D;2;6;6
+7312;Arizala;Udinese;D;2;;
+6212;Zarraga;Udinese;C;2;6;6
+6680;Karlstrom;Udinese;C;2;6.5;6.5
+6684;Ekkelenkamp;Udinese;C;2;7.5;10.5
+6783;Unai Gomez;Udinese;C;2;5.5;5.5
+7198;Piotrowski;Udinese;C;2;6.5;9.5
+7208;Miller L.;Udinese;C;2;6;6
+5637;Davis K.;Udinese;A;2;6.5;6.5
+7272;Gueye;Udinese;A;2;6;6
+6248;Stankovic F.;Venezia;P;2;6.5;4.5
+4845;Correia T.;Venezia;D;2;6;6
+5695;Haps;Venezia;D;2;6.5;6
+6821;Hainaut;Venezia;D;2;6;6
+6892;Schingtienne;Venezia;D;2;6;5.5
+7253;Bella-Kotchap;Venezia;D;2;5;5
+7478;Franjic;Venezia;D;2;6;6
+7538;Halhal;Venezia;D;2;5;3
+5319;Sohm;Venezia;C;2;6;6
+5507;Busio;Venezia;C;2;5.5;5.5
+5674;Basic;Venezia;C;2;6;6
+6994;Perez K.;Venezia;C;2;6;5.5
+6904;Yeboah J.;Venezia;A;2;6.5;6.5
+7449;Rrahmani Al.;Venezia;A;2;;
+7482;Lauberbach;Venezia;A;2;;
+7484;Adams A.;Venezia;A;2;5.5;5.5
+4431;Carnesecchi;Atalanta;P;3;7;5
+554;Zappacosta;Atalanta;D;3;5.5;5.5
+2640;Kolasinac;Atalanta;D;3;6.5;6.5
+4887;Bellanova;Atalanta;D;3;5.5;5
+5526;Scalvini;Atalanta;D;3;6.5;6.5
+5578;Kossounou;Atalanta;D;3;5.5;5.5
+1850;Kessiè;Atalanta;C;3;;
+2077;Pasalic;Atalanta;C;3;5.5;5.5
+4364;Gaetano;Atalanta;C;3;5.5;4.5
+4479;Elmas;Atalanta;C;3;5.5;5.5
+5119;Samardzic;Atalanta;C;3;6;6
+5422;Zalewski;Atalanta;C;3;5.5;5.5
+5792;Ederson D.S.;Atalanta;C;3;7;10
+2137;Scamacca;Atalanta;A;3;6;6
+5995;De Ketelaere;Atalanta;A;3;6;6
+6435;Krstovic;Atalanta;A;3;5;5
+133;Skorupski;Bologna;P;3;6.5;4.5
+4734;Miranda J.;Bologna;D;3;6.5;7.5
+5675;Theate;Bologna;D;3;5.5;5.5
+5678;Holm;Bologna;D;3;6;5.5
+7212;Heggem;Bologna;D;3;5;5
+7483;Alhassane;Bologna;D;3;5.5;5.5
+184;Bernardeschi;Bologna;C;3;6;6
+2765;Odgaard;Bologna;C;3;5.5;5.5
+4436;Cambiaghi;Bologna;C;3;6;6
+5298;Pobega;Bologna;C;3;6;6
+5858;Ferguson;Bologna;C;3;6;6
+6054;Moro N.;Bologna;C;3;5.5;5.5
+6833;Mbangula;Bologna;C;3;;
+7629;Libra;Bologna;C;3;6;6
+4359;Piccoli;Bologna;A;3;6.5;9.5
+6675;Dovbyk;Bologna;A;3;7;9.5
+4360;Caprile;Cagliari;P;3;6;6
+5701;Obert;Cagliari;D;3;6.5;6.5
+7268;Rodriguez Ju.;Cagliari;D;3;6;6
+7274;Zè Pedro;Cagliari;D;3;6.5;6.5
+7532;Kofler;Cagliari;D;3;6;6
+801;Gagliardini;Cagliari;C;3;5.5;5.5
+1871;Deiola;Cagliari;C;3;6.5;6
+4260;Winks;Cagliari;C;3;6.5;6.5
+4870;Adopo;Cagliari;C;3;6.5;6.5
+6010;Fazzini;Cagliari;C;3;7;8
+6640;Felici;Cagliari;C;3;;
+6815;Fadera;Cagliari;C;3;6;6
+7311;Romano;Cagliari;C;3;6.5;6.5
+4896;Maldini;Cagliari;A;3;7;10
+7374;Mendy P.;Cagliari;A;3;6.5;6.5
+7630;Sugamele;Cagliari;A;3;6.5;6.5
+6966;Butez;Como;P;3;6;5
+5641;Chalobah T.;Como;D;3;6;6
+6727;Couto;Como;D;3;7;8
+6867;Valle;Como;D;3;7;8
+6869;Ramon;Como;D;3;6;6
+5036;Caqueret;Como;C;3;6.5;6.5
+5453;Ricci S.;Como;C;3;;
+5559;Da Cunha;Como;C;3;6.5;6.5
+6151;Perrone;Como;C;3;6.5;6.5
+6678;Liberali;Como;C;3;;
+6875;Paz N.;Como;C;3;7;10
+7126;Baturina;Como;C;3;7;9.5
+7412;Milla;Como;C;3;;
+2097;Kean;Como;A;3;6.5;7.5
+6967;Diao;Como;A;3;7.5;13.5
+7017;Douvikas;Como;A;3;5.5;5.5
+2521;De Gea;Fiorentina;P;3;6;4
+5365;Dragusin;Fiorentina;D;3;5.5;6.5
+7175;Joao Mario;Fiorentina;D;3;5.5;5.5
+7294;Valdepenas;Fiorentina;D;3;5;5
+7410;Viery;Fiorentina;D;3;5.5;5.5
+4465;Fagioli;Fiorentina;C;3;5.5;5.5
+4947;Brescianini;Fiorentina;C;3;6;6
+6294;Ndour;Fiorentina;C;3;5.5;5.5
+6827;Njie;Fiorentina;C;3;6;6
+6908;Atta;Fiorentina;C;3;6;6
+7078;Mastantuono;Fiorentina;C;3;5.5;5.5
+7464;Oulai;Fiorentina;C;3;6;6
+7625;Goncalves P.;Fiorentina;C;3;;
+5694;Beto;Fiorentina;A;3;5.5;5.5
+7023;Pellegrino M.;Fiorentina;A;3;6.5;9.5
+7623;Gnonto;Fiorentina;A;3;5.5;5.5
+6415;Palmisani;Frosinone;P;3;6;4
+4952;Monterisi;Frosinone;D;3;;
+5424;Amey;Frosinone;D;3;;
+5757;Cittadini;Frosinone;D;3;6;6
+6238;Oyono A.;Frosinone;D;3;7;7.5
+7467;Calvani;Frosinone;D;3;6.5;6.5
+7469;Bracaglia;Frosinone;D;3;6;6
+6506;Fini;Frosinone;C;3;6;6
+6917;Masini;Frosinone;C;3;6.5;7.5
+7472;Calò;Frosinone;C;3;6.5;6.5
+7473;Cichella;Frosinone;C;3;6;6
+7551;Schmid;Frosinone;C;3;6;5.5
+5436;Raimondo;Frosinone;A;3;7.5;13.5
+6204;Kvernadze;Frosinone;A;3;7;10
+6530;Ghedjemis;Frosinone;A;3;6;6
+7610;Birligea;Frosinone;A;3;;
+7332;Bijlow;Genoa;P;3;5.5;1.5
+791;Sabelli;Genoa;D;3;5;5
+5514;Vasquez;Genoa;D;3;5;5
+5750;Ostigard;Genoa;D;3;4.5;4
+6047;Ehizibue;Genoa;D;3;5.5;5.5
+6660;Marcandalli;Genoa;D;3;4.5;4.5
+4970;Messias;Genoa;C;3;6;6
+5791;Frendrup;Genoa;C;3;5;5
+5823;Baldanzi;Genoa;C;3;6;6
+5946;Sow;Genoa;C;3;5.5;5
+6020;Ellertsson;Genoa;C;3;5.5;5.5
+7341;Amorim;Genoa;C;3;5.5;5.5
+7409;Meichtry;Genoa;C;3;;
+4923;Colombo;Genoa;A;3;6.5;7.5
+6164;Vitinha O.;Genoa;A;3;5.5;5.5
+7600;Osmajic;Genoa;A;3;6.5;9.5
+5116;Martinez Jo.;Inter;P;3;6.5;4.5
+254;Dimarco;Inter;D;3;6.5;7.5
+2120;Bastoni;Inter;D;3;5.5;5.5
+4159;Akanji;Inter;D;3;6.5;7.5
+5877;Carlos Augusto;Inter;D;3;6.5;7.5
+6217;Bisseck;Inter;D;3;6.5;6.5
+152;Zielinski;Inter;C;3;6.5;6.5
+1870;Barella;Inter;C;3;5.5;5.5
+2194;Calhanoglu;Inter;C;3;6;6
+5172;Jones C.;Inter;C;3;6;6
+6274;Diouf;Inter;C;3;6;6
+7070;Sucic P.;Inter;C;3;5.5;5.5
+2764;Martinez L.;Inter;A;3;7.5;13
+4871;Thuram;Inter;A;3;7;10
+6669;Bonny;Inter;A;3;;
+7071;Esposito F.P.;Inter;A;3;6;6
+4964;Vicario;Juventus;P;3;6;5
+2788;Bremer;Juventus;D;3;6;6
+4657;Celik;Juventus;D;3;5.5;5.5
+4976;Kalulu;Juventus;D;3;6.5;6.5
+5831;Gatti;Juventus;D;3;7;9.5
+6042;Lucumì;Juventus;D;3;6.5;6.5
+827;Locatelli;Juventus;C;3;5.5;5.5
+4179;Gonzalez N.;Juventus;C;3;6.5;6.5
+4911;Douglas Luiz;Juventus;C;3;5.5;5.5
+5685;Koopmeiners;Juventus;C;3;6.5;7.5
+5761;Zhegrova;Juventus;C;3;;
+6884;Conceicao;Juventus;C;3;6.5;6.5
+7436;Alajbegovic;Juventus;C;3;5.5;5.5
+2832;Boga;Juventus;A;3;5.5;5.5
+5951;Kolo Muani;Juventus;A;3;4.5;4.5
+6752;Woltemade;Juventus;A;3;6;6
+6482;Mandas;Lazio;P;3;6.5;5.5
+4817;Pedraza;Lazio;D;3;;
+5620;Tavares N.;Lazio;D;3;6.5;6.5
+6320;Doekhi;Lazio;D;3;6.5;7.5
+7012;Provstgaard;Lazio;D;3;5.5;5.5
+7131;Floriani Mussolini;Lazio;D;3;5.5;5.5
+632;Zaccagni;Lazio;C;3;6.5;7.5
+2848;Frattesi;Lazio;C;3;7;10
+5500;Cancellieri;Lazio;C;3;6;6
+5800;Gudmundsson A.;Lazio;C;3;7;10
+6191;Belahyane;Lazio;C;3;6.5;6.5
+6398;Isaksen;Lazio;C;3;5.5;5
+7314;Taylor K.;Lazio;C;3;6;6
+2038;Pinamonti;Lazio;A;3;5;5
+6556;Noslin;Lazio;A;3;6;6
+2134;Falcone;Lecce;P;3;6.5;5
+4502;Gallo;Lecce;D;3;5.5;5.5
+6632;Gaspar K.;Lecce;D;3;5;4.5
+6989;Tiago Gabriel;Lecce;D;3;5;5
+6990;Veiga D.;Lecce;D;3;5.5;5.5
+7240;Siebert;Lecce;D;3;5.5;5
+5007;Ilic;Lecce;C;3;5;5
+5457;Maleh;Lecce;C;3;5.5;5.5
+5504;Coulibaly L.;Lecce;C;3;6;6
+6015;Berisha M.;Lecce;C;3;;
+6549;Pierotti;Lecce;C;3;5.5;5.5
+7322;Ngom;Lecce;C;3;5.5;5.5
+7619;Monteiro J.;Lecce;C;3;5.5;5.5
+7001;N'Dri;Lecce;A;3;6;6
+7252;Stulic;Lecce;A;3;5.5;5.5
+7602;Fatah;Lecce;A;3;5.5;5.5
+4312;Maignan;Milan;P;3;6;5
+5022;Pavlovic;Milan;D;3;6;6
+5273;Estupinan;Milan;D;3;6;5.5
+5739;De Winter;Milan;D;3;6.5;6
+5812;Terracciano F.;Milan;D;3;;
+5833;Gila;Milan;D;3;6.5;6.5
+2379;Rabiot;Milan;C;3;5;5
+2606;Modric;Milan;C;3;6;6
+4199;Loftus-Cheek;Milan;C;3;5.5;5.5
+4856;Chukwueze;Milan;C;3;6.5;7.5
+4892;Saelemaekers;Milan;C;3;5.5;5.5
+5295;Musah;Milan;C;3;6;6
+6372;Moreira;Milan;C;3;5;5
+6618;Cissè A.;Milan;C;3;7;9.5
+7203;Jashari;Milan;C;3;;
+6397;Ramos G.;Milan;A;3;5;5
+4485;Thiam;Monza;P;3;6;5
+4925;Carboni A.;Monza;D;3;6;6
+5838;Birindelli;Monza;D;3;6;6
+6659;Lucchesi;Monza;D;3;6.5;6.5
+7238;Kouadio;Monza;D;3;6;6
+7476;Bakoune;Monza;D;3;;
+7485;Mangas;Monza;D;3;6;7
+7604;Maye;Monza;D;3;;
+5878;Colpani;Monza;C;3;6;6
+6252;Folorunsho;Monza;C;3;5.5;5
+6592;Forson O.;Monza;C;3;5.5;5.5
+6593;Akinsanmiro;Monza;C;3;6;6
+7477;Colombo L.;Monza;C;3;5.5;5
+7575;Mout;Monza;C;3;;
+5882;Mota;Monza;A;3;6;6
+7546;Robinson J.;Monza;A;3;7;10
+572;Meret;Napoli;P;3;7;4
+1852;Spinazzola;Napoli;D;3;5.5;5.5
+2816;Di Lorenzo;Napoli;D;3;6;7
+4409;Rrahmani;Napoli;D;3;5.5;5.5
+4664;Badiashile;Napoli;D;3;5;5
+6638;Marin R.;Napoli;D;3;5.5;5
+536;Politano;Napoli;C;3;6.5;9.5
+2517;De Bruyne;Napoli;C;3;6;6
+4220;Zambo Anguissa;Napoli;C;3;5.5;5.5
+4287;Lobotka;Napoli;C;3;6.5;6.5
+5131;Gilmour;Napoli;C;3;;
+7223;Vergara;Napoli;C;3;5.5;5
+6052;Hojlund;Napoli;A;3;7;10
+6215;Lucca;Napoli;A;3;5.5;5.5
+6831;Neres;Napoli;A;3;5.5;5.5
+7351;Santos A.;Napoli;A;3;6;6
+6662;Corvi;Parma;P;3;7;6
+4137;Diego Carlos;Parma;D;3;5.5;5.5
+5307;Valenti;Parma;D;3;6;6
+5862;Valeri;Parma;D;3;6.5;6.5
+6664;Delprato;Parma;D;3;6;6
+7235;Troilo;Parma;D;3;6;6
+7255;Britschgi;Parma;D;3;6;6
+6206;Fabbian;Parma;C;3;5.5;5.5
+6207;Almqvist;Parma;C;3;5.5;5
+6898;Keita M.;Parma;C;3;6;5.5
+7138;Ordonez C.;Parma;C;3;5.5;5.5
+7628;Sierro;Parma;C;3;6;6
+6229;Tourè E.;Parma;A;3;6;6
+7213;Frigan;Parma;A;3;5.5;5.5
+7554;Romero D.;Parma;A;3;5.5;5.5
+7561;Lontani;Parma;A;3;7;10
+5841;Svilar;Roma;P;3;6;5
+2296;Mancini;Roma;D;3;5;5
+4317;N'Dicka;Roma;D;3;5.5;5.5
+4705;Balerdi;Roma;D;3;6.5;6.5
+4807;Hermoso;Roma;D;3;7;10
+4998;Molina N.;Roma;D;3;6;6
+6631;Ghilardi;Roma;D;3;6;6
+7181;Wesley;Roma;D;3;7;7
+7599;Lulli;Roma;D;3;6;6
+779;Cristante;Roma;C;3;6;6
+5589;Konè M.;Roma;C;3;6;6
+7556;Mora;Roma;C;3;6;6
+309;Dybala;Roma;A;3;7;8
+5585;Malen;Roma;A;3;6;6
+5734;Soulè;Roma;A;3;7.5;11.5
+6572;Castro S.;Roma;A;3;6.5;6.5
+4236;Muric;Sassuolo;P;3;5.5;3.5
+5851;Doig;Sassuolo;D;3;6.5;9.5
+6672;Idzes;Sassuolo;D;3;6;5.5
+7329;Obrador;Sassuolo;D;3;;
+7564;Leysen F.;Sassuolo;D;3;6.5;6.5
+7573;Cinquegrano;Sassuolo;D;3;6.5;7.5
+2528;Matic;Sassuolo;C;3;6.5;6.5
+4930;Ghion;Sassuolo;C;3;;
+5735;Volpato;Sassuolo;C;3;6.5;6.5
+5844;Thorstvedt;Sassuolo;C;3;6;6
+6024;Sulemana I.;Sassuolo;C;3;6;6
+6246;Lipani;Sassuolo;C;3;6;6
+6677;Adzic;Sassuolo;C;3;7;10
+531;Berardi;Sassuolo;A;3;6.5;6.5
+6060;Laurientè;Sassuolo;A;3;6.5;6.5
+7347;Bowie;Sassuolo;A;3;7;7
+6534;Perri;Torino;P;3;5.5;4.5
+5010;Ismajli;Torino;D;3;6;6
+5751;Patterson;Torino;D;3;6;6
+6495;Comuzzo;Torino;D;3;6;6
+6642;Coco;Torino;D;3;6;6
+7069;Fortini;Torino;D;3;6.5;6.5
+7220;Belghali;Torino;D;3;6.5;7.5
+7526;Comert;Torino;D;3;6.5;7.5
+1933;Mandragora;Torino;C;3;7.5;10.5
+5687;Vlasic;Torino;C;3;5.5;5.5
+6170;Gineitis;Torino;C;3;5.5;5.5
+7060;Cacciamani;Torino;C;3;6.5;6.5
+7535;Fitz-Jim;Torino;C;3;6.5;6.5
+7624;Braganca;Torino;C;3;6;6
+2061;Simeone;Torino;A;3;6;6
+6646;Adams C.;Torino;A;3;7;10
+6462;Okoye;Udinese;P;3;6;4
+4263;Kabasele;Udinese;D;3;5.5;5.5
+4994;Vojvoda;Udinese;D;3;4.5;4.5
+5555;Kamara H.;Udinese;D;3;6.5;6.5
+5820;Bertola;Udinese;D;3;;
+5994;Ebosse;Udinese;D;3;6;6
+6021;Abankwah;Udinese;D;3;6;6
+6956;Solet;Udinese;D;3;6;6
+6212;Zarraga;Udinese;C;3;5.5;5.5
+6680;Karlstrom;Udinese;C;3;7;9.5
+6684;Ekkelenkamp;Udinese;C;3;5.5;5.5
+6783;Unai Gomez;Udinese;C;3;5.5;5.5
+7198;Piotrowski;Udinese;C;3;;
+7208;Miller L.;Udinese;C;3;6;5.5
+5637;Davis K.;Udinese;A;3;6.5;7.5
+7161;Bayo V.;Udinese;A;3;5.5;5
+6248;Stankovic F.;Venezia;P;3;6;3
+5695;Haps;Venezia;D;3;5.5;5.5
+6681;Sagrado;Venezia;D;3;7;10
+6821;Hainaut;Venezia;D;3;6.5;7.5
+6890;Moreno M.;Venezia;D;3;5.5;5
+6892;Schingtienne;Venezia;D;3;4.5;4.5
+7253;Bella-Kotchap;Venezia;D;3;;
+7538;Halhal;Venezia;D;3;4.5;4
+5319;Sohm;Venezia;C;3;5.5;5
+5507;Busio;Venezia;C;3;6.5;7
+6994;Perez K.;Venezia;C;3;6;6
+7232;Fernandez T.;Venezia;C;3;6;6
+6904;Yeboah J.;Venezia;A;3;7;10
+7449;Rrahmani Al.;Venezia;A;3;5.5;5.5
+7482;Lauberbach;Venezia;A;3;5.5;5.5
+7484;Adams A.;Venezia;A;3;5.5;5.5
+4431;Carnesecchi;Atalanta;P;4;6.5;4.5
+2640;Kolasinac;Atalanta;D;4;4.5;4.5
+4887;Bellanova;Atalanta;D;4;5.5;5.5
+5526;Scalvini;Atalanta;D;4;5.5;5.5
+5578;Kossounou;Atalanta;D;4;5;5
+7219;Bernasconi;Atalanta;D;4;6;6
+1850;Kessiè;Atalanta;C;4;5.5;5.5
+2077;Pasalic;Atalanta;C;4;;
+5119;Samardzic;Atalanta;C;4;5;5
+5792;Ederson D.S.;Atalanta;C;4;5.5;5.5
+6844;Rowe;Atalanta;C;4;5.5;5.5
+2137;Scamacca;Atalanta;A;4;7;10
+4371;Raspadori;Atalanta;A;4;6;6
+5995;De Ketelaere;Atalanta;A;4;5;5
+6435;Krstovic;Atalanta;A;4;5.5;5.5
+7172;Pessina Mas.;Bologna;P;4;6;5
+4734;Miranda J.;Bologna;D;4;5.5;5.5
+5675;Theate;Bologna;D;4;6;6
+5678;Holm;Bologna;D;4;6;6
+7212;Heggem;Bologna;D;4;6.5;6.5
+184;Bernardeschi;Bologna;C;4;6;6
+2765;Odgaard;Bologna;C;4;5.5;5.5
+4436;Cambiaghi;Bologna;C;4;5.5;5.5
+5298;Pobega;Bologna;C;4;6;6
+5858;Ferguson;Bologna;C;4;6.5;6.5
+6054;Moro N.;Bologna;C;4;6;6
+6833;Mbangula;Bologna;C;4;;
+7528;Amondarain;Bologna;C;4;5.5;5
+7629;Libra;Bologna;C;4;5;5
+4359;Piccoli;Bologna;A;4;5.5;5.5
+7627;Enem;Bologna;A;4;;
+4360;Caprile;Cagliari;P;4;6.5;5.5
+5701;Obert;Cagliari;D;4;6;6
+7268;Rodriguez Ju.;Cagliari;D;4;6.5;6.5
+7274;Zè Pedro;Cagliari;D;4;7;7
+7532;Kofler;Cagliari;D;4;;
+7621;Sugawara;Cagliari;D;4;6;6
+1871;Deiola;Cagliari;C;4;7;7
+4260;Winks;Cagliari;C;4;7;7
+4870;Adopo;Cagliari;C;4;6.5;7.5
+6010;Fazzini;Cagliari;C;4;5.5;5.5
+6815;Fadera;Cagliari;C;4;6;6
+7311;Romano;Cagliari;C;4;7;7
+4896;Maldini;Cagliari;A;4;7;10
+7374;Mendy P.;Cagliari;A;4;7;10
+7547;Kevin Carlos;Cagliari;A;4;;
+6344;Sanchez Ro.;Como;P;4;6;5
+6727;Couto;Como;D;4;6;6
+6869;Ramon;Como;D;4;7;10
+6893;Kempf;Como;D;4;6;6
+7414;Kaiki;Como;D;4;6.5;9.5
+5036;Caqueret;Como;C;4;6;5.5
+5453;Ricci S.;Como;C;4;;
+5559;Da Cunha;Como;C;4;6.5;6.5
+6151;Perrone;Como;C;4;6.5;6.5
+6875;Paz N.;Como;C;4;6.5;7.5
+7126;Baturina;Como;C;4;6;6
+7129;Rodriguez Je.;Como;C;4;6;6
+7412;Milla;Como;C;4;;
+2097;Kean;Como;A;4;5.5;5.5
+6967;Diao;Como;A;4;6.5;6.5
+7017;Douvikas;Como;A;4;6;6
+2521;De Gea;Fiorentina;P;4;6;4
+4378;Ranieri L.;Fiorentina;D;4;6;6
+5365;Dragusin;Fiorentina;D;4;6.5;6.5
+5603;Pongracic;Fiorentina;D;4;;
+6531;Jimenez A.;Fiorentina;D;4;6.5;7.5
+7410;Viery;Fiorentina;D;4;6;6
+4465;Fagioli;Fiorentina;C;4;7;8
+4947;Brescianini;Fiorentina;C;4;;
+6294;Ndour;Fiorentina;C;4;6.5;6.5
+6827;Njie;Fiorentina;C;4;6.5;6
+6908;Atta;Fiorentina;C;4;6.5;6.5
+7078;Mastantuono;Fiorentina;C;4;8.5;17.5
+7625;Goncalves P.;Fiorentina;C;4;;
+5694;Beto;Fiorentina;A;4;6;6
+7023;Pellegrino M.;Fiorentina;A;4;7;10
+7623;Gnonto;Fiorentina;A;4;6;6
+6415;Palmisani;Frosinone;P;4;7;6
+4952;Monterisi;Frosinone;D;4;5.5;5.5
+5757;Cittadini;Frosinone;D;4;5.5;5
+6238;Oyono A.;Frosinone;D;4;6;6
+7467;Calvani;Frosinone;D;4;6;6
+7469;Bracaglia;Frosinone;D;4;6;5.5
+5998;Zerbin;Frosinone;C;4;;
+6506;Fini;Frosinone;C;4;6.5;6.5
+6903;Hasa;Frosinone;C;4;6;6
+6917;Masini;Frosinone;C;4;6.5;6.5
+7472;Calò;Frosinone;C;4;6.5;6.5
+7551;Schmid;Frosinone;C;4;6.5;7.5
+5436;Raimondo;Frosinone;A;4;6;6
+6204;Kvernadze;Frosinone;A;4;7;10
+6530;Ghedjemis;Frosinone;A;4;6.5;6.5
+7612;Bobcek;Frosinone;A;4;6;6
+7332;Bijlow;Genoa;P;4;6.5;5.5
+5514;Vasquez;Genoa;D;4;6;8
+5750;Ostigard;Genoa;D;4;6;6
+6047;Ehizibue;Genoa;D;4;6;5.5
+6660;Marcandalli;Genoa;D;4;5.5;5.5
+795;El Shaarawy;Genoa;C;4;6;6
+4970;Messias;Genoa;C;4;6.5;6.5
+5791;Frendrup;Genoa;C;4;5.5;5.5
+5823;Baldanzi;Genoa;C;4;6;6
+5946;Sow;Genoa;C;4;6;7
+6020;Ellertsson;Genoa;C;4;6;6
+7341;Amorim;Genoa;C;4;;
+7409;Meichtry;Genoa;C;4;;
+4923;Colombo;Genoa;A;4;5;2
+6164;Vitinha O.;Genoa;A;4;6;6
+7600;Osmajic;Genoa;A;4;5;5
+5116;Martinez Jo.;Inter;P;4;5;2
+254;Dimarco;Inter;D;4;6;6
+2120;Bastoni;Inter;D;4;6.5;6.5
+2514;Stones;Inter;D;4;5.5;5.5
+4159;Akanji;Inter;D;4;5.5;5.5
+4177;Pavard;Inter;D;4;5.5;5.5
+5877;Carlos Augusto;Inter;D;4;7.5;10.5
+152;Zielinski;Inter;C;4;7;8
+1870;Barella;Inter;C;4;7.5;10.5
+2529;Mkhitaryan;Inter;C;4;6;5.5
+5172;Jones C.;Inter;C;4;6.5;6.5
+6274;Diouf;Inter;C;4;6.5;7.5
+6503;Stankovic A.;Inter;C;4;;
+4871;Thuram;Inter;A;4;7.5;11.5
+6669;Bonny;Inter;A;4;7;10
+7071;Esposito F.P.;Inter;A;4;7;10
+4964;Vicario;Juventus;P;4;6;3
+2788;Bremer;Juventus;D;4;5;5
+4657;Celik;Juventus;D;4;5.5;5.5
+4976;Kalulu;Juventus;D;4;5;5
+6042;Lucumì;Juventus;D;4;6;5.5
+6766;Kelly L.;Juventus;D;4;5;5
+4179;Gonzalez N.;Juventus;C;4;6.5;6.5
+4911;Douglas Luiz;Juventus;C;4;4.5;4
+5680;Sarr P.;Juventus;C;4;5.5;5.5
+5685;Koopmeiners;Juventus;C;4;5.5;5.5
+5761;Zhegrova;Juventus;C;4;7.5;13.5
+6884;Conceicao;Juventus;C;4;5.5;5.5
+7436;Alajbegovic;Juventus;C;4;6;6
+5951;Kolo Muani;Juventus;A;4;5;6
+6752;Woltemade;Juventus;A;4;5.5;5.5
+7648;Oboavwoduo;Juventus;A;4;;
+6482;Mandas;Lazio;P;4;6.5;4.5
+2263;Lazzari;Lazio;D;4;;
+5620;Tavares N.;Lazio;D;4;6;6
+6319;Leite;Lazio;D;4;;
+7012;Provstgaard;Lazio;D;4;6;6
+7131;Floriani Mussolini;Lazio;D;4;5.5;5.5
+7580;Sutalo J.;Lazio;D;4;5.5;5.5
+632;Zaccagni;Lazio;C;4;6.5;7
+2848;Frattesi;Lazio;C;4;6;6
+5500;Cancellieri;Lazio;C;4;7;10
+5800;Gudmundsson A.;Lazio;C;4;6;6
+6191;Belahyane;Lazio;C;4;6.5;6
+6398;Isaksen;Lazio;C;4;5.5;5.5
+7314;Taylor K.;Lazio;C;4;6;6
+2038;Pinamonti;Lazio;A;4;5.5;5.5
+6556;Noslin;Lazio;A;4;7;10
+2134;Falcone;Lecce;P;4;5.5;3.5
+4502;Gallo;Lecce;D;4;6.5;6.5
+6989;Tiago Gabriel;Lecce;D;4;7;10
+6990;Veiga D.;Lecce;D;4;6.5;7
+7240;Siebert;Lecce;D;4;6;6
+5007;Ilic;Lecce;C;4;7;9
+5457;Maleh;Lecce;C;4;6.5;6.5
+5504;Coulibaly L.;Lecce;C;4;7.5;13.5
+6410;Kaba;Lecce;C;4;;
+6549;Pierotti;Lecce;C;4;6;6
+7322;Ngom;Lecce;C;4;6;6
+7619;Monteiro J.;Lecce;C;4;5.5;5.5
+7001;N'Dri;Lecce;A;4;6;5.5
+7252;Stulic;Lecce;A;4;6;6
+7602;Fatah;Lecce;A;4;6;6
+7647;Esteban;Lecce;A;4;6;6
+4312;Maignan;Milan;P;4;6.5;4.5
+5022;Pavlovic;Milan;D;4;5.5;5
+5273;Estupinan;Milan;D;4;5;5
+5739;De Winter;Milan;D;4;5.5;5.5
+5833;Gila;Milan;D;4;5.5;5
+2379;Rabiot;Milan;C;4;6.5;7.5
+2423;Pulisic;Milan;C;4;6.5;7
+2606;Modric;Milan;C;4;5.5;5.5
+4199;Loftus-Cheek;Milan;C;4;5.5;5.5
+4856;Chukwueze;Milan;C;4;6;6
+5295;Musah;Milan;C;4;6.5;6.5
+6372;Moreira;Milan;C;4;8;14
+6618;Cissè A.;Milan;C;4;5.5;5.5
+7618;Hutchinson;Milan;C;4;;
+6397;Ramos G.;Milan;A;4;5.5;5.5
+6519;Camarda;Milan;A;4;;
+4485;Thiam;Monza;P;4;5;2
+4925;Carboni A.;Monza;D;4;5.5;5.5
+5838;Birindelli;Monza;D;4;6;7
+6659;Lucchesi;Monza;D;4;5;5
+7238;Kouadio;Monza;D;4;5;5
+7476;Bakoune;Monza;D;4;5.5;5.5
+7485;Mangas;Monza;D;4;7;10
+5878;Colpani;Monza;C;4;5.5;5.5
+6252;Folorunsho;Monza;C;4;5;5
+6592;Forson O.;Monza;C;4;6;6
+6593;Akinsanmiro;Monza;C;4;5.5;5.5
+7575;Mout;Monza;C;4;;
+2155;Cutrone;Monza;A;4;6;6
+7523;Varela G.;Monza;A;4;6;6
+7546;Robinson J.;Monza;A;4;6.5;6.5
+7620;Zeballos;Monza;A;4;6.5;9.5
+2170;Milinkovic-Savic V.;Napoli;P;4;6;6
+1852;Spinazzola;Napoli;D;4;6.5;6.5
+2816;Di Lorenzo;Napoli;D;4;6;6
+4409;Rrahmani;Napoli;D;4;6.5;6.5
+5840;Olivera;Napoli;D;4;;
+6638;Marin R.;Napoli;D;4;6;6
+7563;Favasuli;Napoli;D;4;7;8
+536;Politano;Napoli;C;4;5.5;5.5
+2517;De Bruyne;Napoli;C;4;6.5;6.5
+4287;Lobotka;Napoli;C;4;7.5;10.5
+5131;Gilmour;Napoli;C;4;6;6
+7223;Vergara;Napoli;C;4;6;6
+6052;Hojlund;Napoli;A;4;5.5;5.5
+6215;Lucca;Napoli;A;4;5.5;5.5
+7120;Lang;Napoli;A;4;6;6
+6662;Corvi;Parma;P;4;6;4
+4137;Diego Carlos;Parma;D;4;5.5;5.5
+5862;Valeri;Parma;D;4;6;6
+6664;Delprato;Parma;D;4;6;6
+7235;Troilo;Parma;D;4;6;6
+7255;Britschgi;Parma;D;4;6;6
+6206;Fabbian;Parma;C;4;;
+6207;Almqvist;Parma;C;4;6.5;7.5
+6666;Bernabè;Parma;C;4;6;6
+6898;Keita M.;Parma;C;4;6;6
+7628;Sierro;Parma;C;4;5.5;5.5
+6229;Tourè E.;Parma;A;4;5.5;5.5
+7213;Frigan;Parma;A;4;5.5;5.5
+7342;Elphege;Parma;A;4;5.5;5.5
+7554;Romero D.;Parma;A;4;7;10
+7561;Lontani;Parma;A;4;6;6
+5841;Svilar;Roma;P;4;6.5;6.5
+2296;Mancini;Roma;D;4;7;7
+4705;Balerdi;Roma;D;4;7;7
+4807;Hermoso;Roma;D;4;6;5.5
+4998;Molina N.;Roma;D;4;6;6
+6986;Rensch;Roma;D;4;;
+7599;Lulli;Roma;D;4;6;6
+22;De Roon;Roma;C;4;6.5;6.5
+779;Cristante;Roma;C;4;6;6
+5589;Konè M.;Roma;C;4;6;6
+6190;Pisilli;Roma;C;4;6.5;9
+7556;Mora;Roma;C;4;6;6
+309;Dybala;Roma;A;4;6.5;6.5
+5585;Malen;Roma;A;4;7;10
+5734;Soulè;Roma;A;4;6;6
+6572;Castro S.;Roma;A;4;5.5;5.5
+4236;Muric;Sassuolo;P;4;5.5;3.5
+4147;Caleta-Car;Sassuolo;D;4;;
+5851;Doig;Sassuolo;D;4;6.5;6.5
+6672;Idzes;Sassuolo;D;4;6.5;6.5
+7564;Leysen F.;Sassuolo;D;4;6.5;6
+7573;Cinquegrano;Sassuolo;D;4;6;6
+2528;Matic;Sassuolo;C;4;7.5;8.5
+5844;Thorstvedt;Sassuolo;C;4;5.5;5.5
+6246;Lipani;Sassuolo;C;4;6.5;6
+6677;Adzic;Sassuolo;C;4;7;10
+6895;Dominguez B.;Sassuolo;C;4;6;6
+7036;Bakola;Sassuolo;C;4;6.5;7.5
+531;Berardi;Sassuolo;A;4;5.5;5.5
+4463;Esposito Se.;Sassuolo;A;4;7.5;10.5
+6060;Laurientè;Sassuolo;A;4;6.5;7.5
+7347;Bowie;Sassuolo;A;4;7;10
+6534;Perri;Torino;P;4;5.5;3.5
+2169;Rodriguez R.;Torino;D;4;6;6
+6495;Comuzzo;Torino;D;4;5.5;5.5
+6642;Coco;Torino;D;4;6;6
+7069;Fortini;Torino;D;4;6;6
+7220;Belghali;Torino;D;4;5.5;5.5
+7526;Comert;Torino;D;4;5.5;5.5
+1933;Mandragora;Torino;C;4;6.5;6.5
+5687;Vlasic;Torino;C;4;5.5;5.5
+6005;Ilkhan;Torino;C;4;5.5;5.5
+6170;Gineitis;Torino;C;4;6;6
+7060;Cacciamani;Torino;C;4;6;6
+7535;Fitz-Jim;Torino;C;4;5.5;5.5
+7624;Braganca;Torino;C;4;6.5;6.5
+608;Zapata D.;Torino;A;4;5.5;5.5
+2061;Simeone;Torino;A;4;5.5;5.5
+6462;Okoye;Udinese;P;4;7;2
+4263;Kabasele;Udinese;D;4;4.5;4.5
+4994;Vojvoda;Udinese;D;4;5.5;5.5
+5555;Kamara H.;Udinese;D;4;5;5
+5820;Bertola;Udinese;D;4;5.5;5.5
+5994;Ebosse;Udinese;D;4;5;5
+6021;Abankwah;Udinese;D;4;6;9
+5850;Lovric;Udinese;C;4;;
+6680;Karlstrom;Udinese;C;4;5;5
+6684;Ekkelenkamp;Udinese;C;4;6.5;9.5
+6783;Unai Gomez;Udinese;C;4;6;7
+7208;Miller L.;Udinese;C;4;5.5;5.5
+7418;Chakvetadze;Udinese;C;4;5.5;5.5
+5637;Davis K.;Udinese;A;4;6.5;7
+7161;Bayo V.;Udinese;A;4;;
+7272;Gueye;Udinese;A;4;6.5;9.5
+6248;Stankovic F.;Venezia;P;4;6;2
+256;Juan Jesus;Venezia;D;4;6;6
+4845;Correia T.;Venezia;D;4;6;6
+5695;Haps;Venezia;D;4;4.5;5.5
+6681;Sagrado;Venezia;D;4;5;5
+6821;Hainaut;Venezia;D;4;6.5;9.5
+6890;Moreno M.;Venezia;D;4;5;5
+6892;Schingtienne;Venezia;D;4;5.5;5
+5319;Sohm;Venezia;C;4;5;4.5
+5507;Busio;Venezia;C;4;6.5;7.5
+5872;Helgason;Venezia;C;4;5.5;5.5
+6994;Perez K.;Venezia;C;4;6;6
+7232;Fernandez T.;Venezia;C;4;;
+6904;Yeboah J.;Venezia;A;4;5.5;5.5
+7482;Lauberbach;Venezia;A;4;;
+7484;Adams A.;Venezia;A;4;6.5;9.5
+4431;Carnesecchi;Atalanta;P;5;6.5;4.5
+4887;Bellanova;Atalanta;D;5;6;6
+5526;Scalvini;Atalanta;D;5;5;5
+6485;Kristensen T.;Atalanta;D;5;5.5;5
+7219;Bernasconi;Atalanta;D;5;5.5;5.5
+1850;Kessiè;Atalanta;C;5;5.5;5
+4364;Gaetano;Atalanta;C;5;5.5;5.5
+4479;Elmas;Atalanta;C;5;;
+5119;Samardzic;Atalanta;C;5;6;6
+5792;Ederson D.S.;Atalanta;C;5;5.5;5.5
+6844;Rowe;Atalanta;C;5;5.5;5.5
+2137;Scamacca;Atalanta;A;5;5.5;5.5
+4371;Raspadori;Atalanta;A;5;5.5;5.5
+5995;De Ketelaere;Atalanta;A;5;6;6
+6435;Krstovic;Atalanta;A;5;5;5
+133;Skorupski;Bologna;P;5;5;4
+487;De Silvestri;Bologna;D;5;5.5;5.5
+4433;Zortea;Bologna;D;5;6;6
+4734;Miranda J.;Bologna;D;5;6.5;6.5
+5675;Theate;Bologna;D;5;6;6
+5678;Holm;Bologna;D;5;;
+7212;Heggem;Bologna;D;5;5.5;5.5
+7326;Helland;Bologna;D;5;6.5;6.5
+184;Bernardeschi;Bologna;C;5;7;10
+2167;Orsolini;Bologna;C;5;6;6
+2765;Odgaard;Bologna;C;5;5.5;5.5
+4436;Cambiaghi;Bologna;C;5;6;6
+5298;Pobega;Bologna;C;5;6.5;6.5
+5858;Ferguson;Bologna;C;5;6;6
+6054;Moro N.;Bologna;C;5;6;6
+4359;Piccoli;Bologna;A;5;5.5;5.5
+4360;Caprile;Cagliari;P;5;7;7
+4210;Mina;Cagliari;D;5;7;7
+5701;Obert;Cagliari;D;5;6;6
+7268;Rodriguez Ju.;Cagliari;D;5;5.5;5.5
+7274;Zè Pedro;Cagliari;D;5;6.5;6.5
+7621;Sugawara;Cagliari;D;5;6;6
+801;Gagliardini;Cagliari;C;5;;
+1871;Deiola;Cagliari;C;5;5.5;5.5
+4260;Winks;Cagliari;C;5;6;6
+4870;Adopo;Cagliari;C;5;6.5;6.5
+6815;Fadera;Cagliari;C;5;;
+7311;Romano;Cagliari;C;5;6.5;6.5
+4896;Maldini;Cagliari;A;5;7;10
+7374;Mendy P.;Cagliari;A;5;6.5;6.5
+7547;Kevin Carlos;Cagliari;A;5;5.5;5.5
+6966;Butez;Como;P;5;6;4
+5641;Chalobah T.;Como;D;5;5.5;5.5
+6727;Couto;Como;D;5;5.5;5
+6867;Valle;Como;D;5;5;5
+6869;Ramon;Como;D;5;5.5;5.5
+7414;Kaiki;Como;D;5;6;6
+5453;Ricci S.;Como;C;5;5.5;5.5
+5559;Da Cunha;Como;C;5;5.5;5.5
+6151;Perrone;Como;C;5;6;6
+6875;Paz N.;Como;C;5;6;6
+7126;Baturina;Como;C;5;5.5;5.5
+7129;Rodriguez Je.;Como;C;5;6;6
+7412;Milla;Como;C;5;5.5;5.5
+2097;Kean;Como;A;5;6;6
+6967;Diao;Como;A;5;5.5;5
+7017;Douvikas;Como;A;5;6;6
+2521;De Gea;Fiorentina;P;5;7;5.5
+4378;Ranieri L.;Fiorentina;D;5;6;5.5
+5365;Dragusin;Fiorentina;D;5;6.5;6.5
+5603;Pongracic;Fiorentina;D;5;;
+6531;Jimenez A.;Fiorentina;D;5;7;10
+7294;Valdepenas;Fiorentina;D;5;6;6
+7410;Viery;Fiorentina;D;5;5;5
+4465;Fagioli;Fiorentina;C;5;6;6
+6294;Ndour;Fiorentina;C;5;6.5;7.5
+6827;Njie;Fiorentina;C;5;6;6
+6908;Atta;Fiorentina;C;5;5.5;5.5
+7078;Mastantuono;Fiorentina;C;5;6;5.5
+7625;Goncalves P.;Fiorentina;C;5;5.5;5.5
+5694;Beto;Fiorentina;A;5;5.5;5.5
+7023;Pellegrino M.;Fiorentina;A;5;5.5;5.5
+7623;Gnonto;Fiorentina;A;5;;
+6415;Palmisani;Frosinone;P;5;9;9
+4952;Monterisi;Frosinone;D;5;6.5;6.5
+5424;Amey;Frosinone;D;5;;
+5757;Cittadini;Frosinone;D;5;6;6
+6238;Oyono A.;Frosinone;D;5;6.5;6.5
+7467;Calvani;Frosinone;D;5;7;7
+7469;Bracaglia;Frosinone;D;5;6.5;6
+5998;Zerbin;Frosinone;C;5;;
+6917;Masini;Frosinone;C;5;6;6
+7456;El Azzouzi A.;Frosinone;C;5;;
+7472;Calò;Frosinone;C;5;7;10
+7473;Cichella;Frosinone;C;5;;
+7551;Schmid;Frosinone;C;5;7.5;9.5
+5436;Raimondo;Frosinone;A;5;6;5.5
+6204;Kvernadze;Frosinone;A;5;7;9.5
+6530;Ghedjemis;Frosinone;A;5;7;7
+7332;Bijlow;Genoa;P;5;6;4
+5750;Ostigard;Genoa;D;5;5;5
+6047;Ehizibue;Genoa;D;5;5.5;5.5
+6660;Marcandalli;Genoa;D;5;5;4.5
+6977;Otoa;Genoa;D;5;6;5.5
+7413;Puczka;Genoa;D;5;6;6
+795;El Shaarawy;Genoa;C;5;5.5;5.5
+2857;Traorè Hj.;Genoa;C;5;;
+4970;Messias;Genoa;C;5;6;6
+5791;Frendrup;Genoa;C;5;6;6
+5823;Baldanzi;Genoa;C;5;5.5;5.5
+5946;Sow;Genoa;C;5;5.5;5.5
+6020;Ellertsson;Genoa;C;5;5.5;5
+4923;Colombo;Genoa;A;5;6.5;7.5
+6164;Vitinha O.;Genoa;A;5;;
+7600;Osmajic;Genoa;A;5;7;10
+5116;Martinez Jo.;Inter;P;5;6.5;4.5
+254;Dimarco;Inter;D;5;5.5;5.5
+2120;Bastoni;Inter;D;5;5.5;5
+4159;Akanji;Inter;D;5;6;5.5
+5877;Carlos Augusto;Inter;D;5;6.5;6.5
+6217;Bisseck;Inter;D;5;5;5
+152;Zielinski;Inter;C;5;5.5;5.5
+1870;Barella;Inter;C;5;5.5;5
+5172;Jones C.;Inter;C;5;5.5;5.5
+5301;Luis Henrique;Inter;C;5;6;6
+6274;Diouf;Inter;C;5;6.5;6.5
+7070;Sucic P.;Inter;C;5;6;6
+2764;Martinez L.;Inter;A;5;8;14
+4871;Thuram;Inter;A;5;6.5;7.5
+6669;Bonny;Inter;A;5;;
+7071;Esposito F.P.;Inter;A;5;;
+4964;Vicario;Juventus;P;5;6.5;6.5
+2788;Bremer;Juventus;D;5;7;10
+4657;Celik;Juventus;D;5;6.5;7.5
+4976;Kalulu;Juventus;D;5;6;6
+6042;Lucumì;Juventus;D;5;6.5;6.5
+6766;Kelly L.;Juventus;D;5;;
+4179;Gonzalez N.;Juventus;C;5;6;6
+4911;Douglas Luiz;Juventus;C;5;6;6
+4973;McKennie;Juventus;C;5;6.5;6.5
+5680;Sarr P.;Juventus;C;5;6;6
+5685;Koopmeiners;Juventus;C;5;6;6
+5761;Zhegrova;Juventus;C;5;6.5;7.5
+6884;Conceicao;Juventus;C;5;7;9.5
+7436;Alajbegovic;Juventus;C;5;6.5;6.5
+5951;Kolo Muani;Juventus;A;5;7;7
+6752;Woltemade;Juventus;A;5;;
+6482;Mandas;Lazio;P;5;7.5;10.5
+2263;Lazzari;Lazio;D;5;;
+4817;Pedraza;Lazio;D;5;;
+5620;Tavares N.;Lazio;D;5;6.5;7.5
+7012;Provstgaard;Lazio;D;5;6;6
+7131;Floriani Mussolini;Lazio;D;5;5.5;5.5
+7580;Sutalo J.;Lazio;D;5;6.5;6.5
+632;Zaccagni;Lazio;C;5;7;10
+2848;Frattesi;Lazio;C;5;6;6
+5500;Cancellieri;Lazio;C;5;6.5;6.5
+5800;Gudmundsson A.;Lazio;C;5;;
+6191;Belahyane;Lazio;C;5;6;6
+6398;Isaksen;Lazio;C;5;;
+7314;Taylor K.;Lazio;C;5;6.5;6.5
+2038;Pinamonti;Lazio;A;5;;
+6556;Noslin;Lazio;A;5;7;10
+2134;Falcone;Lecce;P;5;6;3
+4502;Gallo;Lecce;D;5;5.5;5.5
+6632;Gaspar K.;Lecce;D;5;5;5
+6990;Veiga D.;Lecce;D;5;5.5;5
+7240;Siebert;Lecce;D;5;4.5;4.5
+5007;Ilic;Lecce;C;5;5.5;5.5
+5457;Maleh;Lecce;C;5;5.5;5.5
+5504;Coulibaly L.;Lecce;C;5;5.5;5.5
+6410;Kaba;Lecce;C;5;6;6
+6549;Pierotti;Lecce;C;5;5.5;5.5
+7322;Ngom;Lecce;C;5;5.5;5.5
+7619;Monteiro J.;Lecce;C;5;5.5;5.5
+7001;N'Dri;Lecce;A;5;;
+7252;Stulic;Lecce;A;5;5.5;5.5
+7602;Fatah;Lecce;A;5;6;6
+7647;Esteban;Lecce;A;5;6;6
+4312;Maignan;Milan;P;5;6;6
+5022;Pavlovic;Milan;D;5;6.5;7.5
+5273;Estupinan;Milan;D;5;6.5;6.5
+5739;De Winter;Milan;D;5;6;6
+5833;Gila;Milan;D;5;6.5;6.5
+6496;Bartesaghi;Milan;D;5;;
+2379;Rabiot;Milan;C;5;7;10
+2423;Pulisic;Milan;C;5;7.5;10.5
+2606;Modric;Milan;C;5;6.5;6.5
+4199;Loftus-Cheek;Milan;C;5;5.5;5.5
+4856;Chukwueze;Milan;C;5;6;6
+4892;Saelemaekers;Milan;C;5;6.5;6.5
+5295;Musah;Milan;C;5;;
+6372;Moreira;Milan;C;5;7;10
+6397;Ramos G.;Milan;A;5;7;8
+6519;Camarda;Milan;A;5;;
+7301;Tornqvist;Monza;P;5;6.5;5.5
+4925;Carboni A.;Monza;D;5;6;6
+5838;Birindelli;Monza;D;5;6.5;7
+6659;Lucchesi;Monza;D;5;6.5;6.5
+7238;Kouadio;Monza;D;5;6;5.5
+7476;Bakoune;Monza;D;5;6.5;6.5
+7485;Mangas;Monza;D;5;6;6
+7604;Maye;Monza;D;5;;
+6252;Folorunsho;Monza;C;5;5.5;5
+6593;Akinsanmiro;Monza;C;5;6;6
+7574;Foe Ondoa;Monza;C;5;6;6
+7575;Mout;Monza;C;5;;
+2155;Cutrone;Monza;A;5;5.5;5.5
+5882;Mota;Monza;A;5;6.5;6.5
+7523;Varela G.;Monza;A;5;7.5;13
+7546;Robinson J.;Monza;A;5;6.5;6.5
+2170;Milinkovic-Savic V.;Napoli;P;5;7;6
+2816;Di Lorenzo;Napoli;D;5;6;6
+4409;Rrahmani;Napoli;D;5;6.5;6.5
+5840;Olivera;Napoli;D;5;6;6
+6638;Marin R.;Napoli;D;5;5.5;5.5
+7563;Favasuli;Napoli;D;5;6.5;6.5
+536;Politano;Napoli;C;5;6.5;7.5
+2517;De Bruyne;Napoli;C;5;5.5;5.5
+4220;Zambo Anguissa;Napoli;C;5;;
+4287;Lobotka;Napoli;C;5;6;6
+5131;Gilmour;Napoli;C;5;7;10
+6052;Hojlund;Napoli;A;5;5.5;5.5
+6215;Lucca;Napoli;A;5;5.5;5.5
+6831;Neres;Napoli;A;5;6;6
+7120;Lang;Napoli;A;5;5.5;5.5
+6662;Corvi;Parma;P;5;6;5
+4137;Diego Carlos;Parma;D;5;6.5;6.5
+5862;Valeri;Parma;D;5;6.5;6.5
+6664;Delprato;Parma;D;5;6;5.5
+7235;Troilo;Parma;D;5;5.5;5
+7255;Britschgi;Parma;D;5;;
+7615;Drobnic;Parma;D;5;6;5.5
+6206;Fabbian;Parma;C;5;6;6
+6207;Almqvist;Parma;C;5;7;10
+6898;Keita M.;Parma;C;5;6.5;6.5
+7138;Ordonez C.;Parma;C;5;;
+7628;Sierro;Parma;C;5;5.5;5.5
+6229;Tourè E.;Parma;A;5;6.5;7.5
+7342;Elphege;Parma;A;5;6.5;7.5
+7554;Romero D.;Parma;A;5;7;10
+7561;Lontani;Parma;A;5;5.5;5.5
+5841;Svilar;Roma;P;5;7;5
+2296;Mancini;Roma;D;5;6;6
+4317;N'Dicka;Roma;D;5;6;5.5
+4705;Balerdi;Roma;D;5;6.5;6.5
+4807;Hermoso;Roma;D;5;5.5;5.5
+4998;Molina N.;Roma;D;5;6.5;7.5
+6631;Ghilardi;Roma;D;5;5.5;5
+6986;Rensch;Roma;D;5;6;6
+7181;Wesley;Roma;D;5;6.5;6.5
+7529;Koulierakis;Roma;D;5;;
+779;Cristante;Roma;C;5;6.5;6.5
+5589;Konè M.;Roma;C;5;8;14
+6190;Pisilli;Roma;C;5;5.5;5.5
+309;Dybala;Roma;A;5;7;7
+5585;Malen;Roma;A;5;6;6
+5734;Soulè;Roma;A;5;6.5;6.5
+4236;Muric;Sassuolo;P;5;4.5;2.5
+4147;Caleta-Car;Sassuolo;D;5;6;6
+5851;Doig;Sassuolo;D;5;5.5;5.5
+7564;Leysen F.;Sassuolo;D;5;6;6
+7573;Cinquegrano;Sassuolo;D;5;5.5;5.5
+2528;Matic;Sassuolo;C;5;6.5;6.5
+5844;Thorstvedt;Sassuolo;C;5;5.5;5.5
+6246;Lipani;Sassuolo;C;5;6;5.5
+6677;Adzic;Sassuolo;C;5;7;10
+6895;Dominguez B.;Sassuolo;C;5;6;6
+7036;Bakola;Sassuolo;C;5;6.5;6.5
+531;Berardi;Sassuolo;A;5;5.5;5.5
+4463;Esposito Se.;Sassuolo;A;5;5.5;5.5
+6060;Laurientè;Sassuolo;A;5;6;6
+7159;Skjellerup;Sassuolo;A;5;;
+7347;Bowie;Sassuolo;A;5;6;6
+6534;Perri;Torino;P;5;6;5
+5010;Ismajli;Torino;D;5;5.5;5.5
+5751;Patterson;Torino;D;5;6;5.5
+6642;Coco;Torino;D;5;6;6
+7069;Fortini;Torino;D;5;5.5;5.5
+7220;Belghali;Torino;D;5;6;5.5
+7526;Comert;Torino;D;5;5.5;5.5
+1933;Mandragora;Torino;C;5;6;7
+5687;Vlasic;Torino;C;5;5.5;5.5
+6005;Ilkhan;Torino;C;5;6;6
+6218;Oristanio;Torino;C;5;6;6
+7060;Cacciamani;Torino;C;5;6;6
+7535;Fitz-Jim;Torino;C;5;6;6
+7624;Braganca;Torino;C;5;6;5.5
+2061;Simeone;Torino;A;5;5.5;5.5
+7349;Kulenovic;Torino;A;5;7;10
+6462;Okoye;Udinese;P;5;6;5
+4263;Kabasele;Udinese;D;5;5;5
+4994;Vojvoda;Udinese;D;5;5.5;5.5
+5527;Zanoli;Udinese;D;5;6.5;6.5
+5555;Kamara H.;Udinese;D;5;5.5;5.5
+5994;Ebosse;Udinese;D;5;5.5;5.5
+6021;Abankwah;Udinese;D;5;6.5;6.5
+2766;Zaniolo;Udinese;C;5;5.5;5
+6680;Karlstrom;Udinese;C;5;6.5;6
+6684;Ekkelenkamp;Udinese;C;5;6;6
+6783;Unai Gomez;Udinese;C;5;5;5
+7208;Miller L.;Udinese;C;5;5;5
+7418;Chakvetadze;Udinese;C;5;6;6
+5637;Davis K.;Udinese;A;5;6;6
+7161;Bayo V.;Udinese;A;5;6;6
+7272;Gueye;Udinese;A;5;6;6
+6248;Stankovic F.;Venezia;P;5;6;4
+256;Juan Jesus;Venezia;D;5;5.5;5
+4845;Correia T.;Venezia;D;5;6;5.5
+6681;Sagrado;Venezia;D;5;;
+6821;Hainaut;Venezia;D;5;6;6
+6890;Moreno M.;Venezia;D;5;6;5.5
+6892;Schingtienne;Venezia;D;5;6;5.5
+5319;Sohm;Venezia;C;5;6;6
+5872;Helgason;Venezia;C;5;5.5;5.5
+6994;Perez K.;Venezia;C;5;6;5.5
+7232;Fernandez T.;Venezia;C;5;;
+7635;Fanne;Venezia;C;5;6;6
+6904;Yeboah J.;Venezia;A;5;4.5;1.5
+7449;Rrahmani Al.;Venezia;A;5;5.5;5.5
+7484;Adams A.;Venezia;A;5;5;5
+4431;Carnesecchi;Atalanta;P;6;6;5
+554;Zappacosta;Atalanta;D;6;5.5;5.5
+2640;Kolasinac;Atalanta;D;6;6;6
+4887;Bellanova;Atalanta;D;6;7;7
+5526;Scalvini;Atalanta;D;6;6;6
+6485;Kristensen T.;Atalanta;D;6;6;6
+7219;Bernasconi;Atalanta;D;6;6;6
+1850;Kessiè;Atalanta;C;6;7;10
+4364;Gaetano;Atalanta;C;6;;
+4479;Elmas;Atalanta;C;6;5.5;5.5
+5119;Samardzic;Atalanta;C;6;6;6
+5422;Zalewski;Atalanta;C;6;;
+5792;Ederson D.S.;Atalanta;C;6;6;6
+6844;Rowe;Atalanta;C;6;6;6
+5995;De Ketelaere;Atalanta;A;6;6;6
+6435;Krstovic;Atalanta;A;6;8;15
+7172;Pessina Mas.;Bologna;P;6;5;4
+2525;Darmian;Bologna;D;6;6;6
+4433;Zortea;Bologna;D;6;6;6
+4734;Miranda J.;Bologna;D;6;6.5;6.5
+5498;Casale;Bologna;D;6;6.5;6.5
+7212;Heggem;Bologna;D;6;6;5.5
+7326;Helland;Bologna;D;6;6;6
+7483;Alhassane;Bologna;D;6;;
+184;Bernardeschi;Bologna;C;6;;
+2167;Orsolini;Bologna;C;6;7.5;10.5
+4436;Cambiaghi;Bologna;C;6;7;9
+5298;Pobega;Bologna;C;6;6.5;6.5
+5858;Ferguson;Bologna;C;6;6.5;6.5
+6225;El Azzouzi O.;Bologna;C;6;6;5.5
+4359;Piccoli;Bologna;A;6;6.5;6.5
+7627;Enem;Bologna;A;6;7;10
+4360;Caprile;Cagliari;P;6;7;6
+4210;Mina;Cagliari;D;6;6.5;6.5
+5701;Obert;Cagliari;D;6;5.5;5.5
+7268;Rodriguez Ju.;Cagliari;D;6;6;5.5
+7274;Zè Pedro;Cagliari;D;6;6;6
+7621;Sugawara;Cagliari;D;6;6;6
+1871;Deiola;Cagliari;C;6;6;5.5
+4260;Winks;Cagliari;C;6;6.5;6.5
+4870;Adopo;Cagliari;C;6;6;6
+6010;Fazzini;Cagliari;C;6;;
+6815;Fadera;Cagliari;C;6;6;6
+7311;Romano;Cagliari;C;6;6.5;6.5
+7579;Massolin;Cagliari;C;6;6;6
+4896;Maldini;Cagliari;A;6;7;10
+5336;Nzola;Cagliari;A;6;6;6
+7374;Mendy P.;Cagliari;A;6;7;8
+6966;Butez;Como;P;6;6;6
+5641;Chalobah T.;Como;D;6;6.5;6.5
+6727;Couto;Como;D;6;6;6
+6869;Ramon;Como;D;6;7;7
+6893;Kempf;Como;D;6;;
+7414;Kaiki;Como;D;6;6.5;6.5
+5036;Caqueret;Como;C;6;6;6
+5559;Da Cunha;Como;C;6;6.5;6.5
+6151;Perrone;Como;C;6;5.5;5.5
+6875;Paz N.;Como;C;6;6;6
+7126;Baturina;Como;C;6;5.5;5
+7127;Addai;Como;C;6;;
+7129;Rodriguez Je.;Como;C;6;6;6
+7412;Milla;Como;C;6;;
+6967;Diao;Como;A;6;6;5.5
+7017;Douvikas;Como;A;6;5.5;5.5
+2521;De Gea;Fiorentina;P;6;5.5;3.5
+4378;Ranieri L.;Fiorentina;D;6;5;4.5
+5365;Dragusin;Fiorentina;D;6;5;5
+5885;Dodò;Fiorentina;D;6;;
+6531;Jimenez A.;Fiorentina;D;6;6;6
+7294;Valdepenas;Fiorentina;D;6;5.5;5.5
+7410;Viery;Fiorentina;D;6;5.5;5
+4465;Fagioli;Fiorentina;C;6;5.5;5.5
+6294;Ndour;Fiorentina;C;6;5.5;5.5
+6827;Njie;Fiorentina;C;6;5.5;5.5
+7078;Mastantuono;Fiorentina;C;6;6;6
+7464;Oulai;Fiorentina;C;6;5.5;5
+7625;Goncalves P.;Fiorentina;C;6;;
+5694;Beto;Fiorentina;A;6;5.5;5.5
+7023;Pellegrino M.;Fiorentina;A;6;6;6
+7623;Gnonto;Fiorentina;A;6;5.5;5.5
+6415;Palmisani;Frosinone;P;6;6;3
+4375;Terzic;Frosinone;D;6;6;6
+5757;Cittadini;Frosinone;D;6;5.5;5.5
+6238;Oyono A.;Frosinone;D;6;6;6
+7467;Calvani;Frosinone;D;6;5.5;5.5
+7469;Bracaglia;Frosinone;D;6;6;6
+5998;Zerbin;Frosinone;C;6;;
+6506;Fini;Frosinone;C;6;6;6
+6917;Masini;Frosinone;C;6;5.5;5.5
+7472;Calò;Frosinone;C;6;6;6
+7473;Cichella;Frosinone;C;6;;
+7551;Schmid;Frosinone;C;6;6;6
+5436;Raimondo;Frosinone;A;6;5.5;5.5
+6204;Kvernadze;Frosinone;A;6;6;6
+6530;Ghedjemis;Frosinone;A;6;5.5;5.5
+7612;Bobcek;Frosinone;A;6;5.5;5.5
+7332;Bijlow;Genoa;P;6;6;5
+791;Sabelli;Genoa;D;6;;
+5514;Vasquez;Genoa;D;6;5.5;3
+5750;Ostigard;Genoa;D;6;6.5;6.5
+6047;Ehizibue;Genoa;D;6;6;6
+6660;Marcandalli;Genoa;D;6;6;6
+6977;Otoa;Genoa;D;6;6;6
+7413;Puczka;Genoa;D;6;;
+795;El Shaarawy;Genoa;C;6;7;7
+2857;Traorè Hj.;Genoa;C;6;6.5;6
+4970;Messias;Genoa;C;6;7;10
+5791;Frendrup;Genoa;C;6;6.5;6.5
+6020;Ellertsson;Genoa;C;6;6.5;6.5
+7608;Wiafe;Genoa;C;6;6;5.5
+6164;Vitinha O.;Genoa;A;6;5.5;5
+7600;Osmajic;Genoa;A;6;7.5;11.5
+5116;Martinez Jo.;Inter;P;6;6;6
+254;Dimarco;Inter;D;6;6.5;6.5
+4177;Pavard;Inter;D;6;6;6
+5877;Carlos Augusto;Inter;D;6;6.5;6.5
+5982;Spence;Inter;D;6;6;6
+6217;Bisseck;Inter;D;6;6;6
+2194;Calhanoglu;Inter;C;6;7;10
+2529;Mkhitaryan;Inter;C;6;6.5;7.5
+5301;Luis Henrique;Inter;C;6;6;6
+6274;Diouf;Inter;C;6;6;6
+6503;Stankovic A.;Inter;C;6;6;6
+7070;Sucic P.;Inter;C;6;7;10
+2764;Martinez L.;Inter;A;6;6;6
+4871;Thuram;Inter;A;6;7;10
+6669;Bonny;Inter;A;6;6;6
+7071;Esposito F.P.;Inter;A;6;7;7
+4964;Vicario;Juventus;P;6;6;5
+2788;Bremer;Juventus;D;6;6;6
+4657;Celik;Juventus;D;6;6;6
+4976;Kalulu;Juventus;D;6;6;6
+5520;Cambiaso;Juventus;D;6;5.5;5.5
+6042;Lucumì;Juventus;D;6;5.5;5.5
+4179;Gonzalez N.;Juventus;C;6;5.5;5.5
+4911;Douglas Luiz;Juventus;C;6;6;6
+4973;McKennie;Juventus;C;6;5.5;5
+5680;Sarr P.;Juventus;C;6;6;6
+5685;Koopmeiners;Juventus;C;6;;
+5761;Zhegrova;Juventus;C;6;6;6
+6884;Conceicao;Juventus;C;6;5.5;5.5
+7436;Alajbegovic;Juventus;C;6;6.5;7.5
+5951;Kolo Muani;Juventus;A;6;6;9
+6752;Woltemade;Juventus;A;6;5.5;5.5
+6482;Mandas;Lazio;P;6;6.5;5.5
+4817;Pedraza;Lazio;D;6;6.5;7.5
+5620;Tavares N.;Lazio;D;6;7;10
+6319;Leite;Lazio;D;6;6;5.5
+6320;Doekhi;Lazio;D;6;6;5.5
+7012;Provstgaard;Lazio;D;6;6;5.5
+7131;Floriani Mussolini;Lazio;D;6;6;6
+7580;Sutalo J.;Lazio;D;6;6;6
+632;Zaccagni;Lazio;C;6;6;6
+2848;Frattesi;Lazio;C;6;6;6
+6191;Belahyane;Lazio;C;6;6;6
+6398;Isaksen;Lazio;C;6;7;10
+6629;Dele-Bashiru;Lazio;C;6;6;6
+7314;Taylor K.;Lazio;C;6;6.5;6.5
+2038;Pinamonti;Lazio;A;6;7;10
+6556;Noslin;Lazio;A;6;7.5;9.5
+2134;Falcone;Lecce;P;6;5.5;3.5
+4502;Gallo;Lecce;D;6;5.5;5.5
+6989;Tiago Gabriel;Lecce;D;6;5.5;5.5
+6990;Veiga D.;Lecce;D;6;6;7
+7240;Siebert;Lecce;D;6;6;6
+5007;Ilic;Lecce;C;6;6;5.5
+5457;Maleh;Lecce;C;6;6;5.5
+5504;Coulibaly L.;Lecce;C;6;6;6
+6549;Pierotti;Lecce;C;6;5.5;5.5
+7318;Gandelman;Lecce;C;6;;
+7322;Ngom;Lecce;C;6;5.5;5.5
+7619;Monteiro J.;Lecce;C;6;;
+5029;Geubbels;Lecce;A;6;5.5;5.5
+7001;N'Dri;Lecce;A;6;6;6
+7602;Fatah;Lecce;A;6;7;10
+7647;Esteban;Lecce;A;6;5.5;5
+4312;Maignan;Milan;P;6;6.5;5.5
+4401;Gabbia;Milan;D;6;5.5;5.5
+5022;Pavlovic;Milan;D;6;6;5.5
+5273;Estupinan;Milan;D;6;5.5;5
+5739;De Winter;Milan;D;6;6;5.5
+5833;Gila;Milan;D;6;6.5;6.5
+2379;Rabiot;Milan;C;6;7;10
+2423;Pulisic;Milan;C;6;5.5;5.5
+2606;Modric;Milan;C;6;6.5;7.5
+4856;Chukwueze;Milan;C;6;5.5;5.5
+5295;Musah;Milan;C;6;5.5;5.5
+6372;Moreira;Milan;C;6;6.5;6.5
+6618;Cissè A.;Milan;C;6;;
+7203;Jashari;Milan;C;6;;
+7618;Hutchinson;Milan;C;6;;
+6397;Ramos G.;Milan;A;6;6;5.5
+7301;Tornqvist;Monza;P;6;6;3
+4925;Carboni A.;Monza;D;6;5.5;5
+5838;Birindelli;Monza;D;6;5;5
+6537;Goglichidze;Monza;D;6;6.5;9.5
+6659;Lucchesi;Monza;D;6;4.5;3.5
+7238;Kouadio;Monza;D;6;5.5;5.5
+7476;Bakoune;Monza;D;6;5.5;5.5
+7485;Mangas;Monza;D;6;6.5;6.5
+7604;Maye;Monza;D;6;6;6
+6252;Folorunsho;Monza;C;6;5.5;5.5
+6593;Akinsanmiro;Monza;C;6;5.5;5.5
+7574;Foe Ondoa;Monza;C;6;5.5;5.5
+5882;Mota;Monza;A;6;7;8
+6145;Ngonge;Monza;A;6;5.5;5.5
+7523;Varela G.;Monza;A;6;6;6
+7620;Zeballos;Monza;A;6;5.5;5.5
+572;Meret;Napoli;P;6;6;6
+1852;Spinazzola;Napoli;D;6;6;6
+2816;Di Lorenzo;Napoli;D;6;6.5;6.5
+4409;Rrahmani;Napoli;D;6;6.5;6
+4664;Badiashile;Napoli;D;6;6;5.5
+6638;Marin R.;Napoli;D;6;6.5;6.5
+536;Politano;Napoli;C;6;;
+2517;De Bruyne;Napoli;C;6;7.5;13.5
+4287;Lobotka;Napoli;C;6;6;6
+4777;McTominay;Napoli;C;6;6;6
+5131;Gilmour;Napoli;C;6;6;6
+6052;Hojlund;Napoli;A;6;6.5;6.5
+6215;Lucca;Napoli;A;6;5.5;5.5
+6831;Neres;Napoli;A;6;6;6
+7120;Lang;Napoli;A;6;7;10
+7162;Giovane;Napoli;A;6;6.5;7.5
+6662;Corvi;Parma;P;6;5.5;2.5
+4137;Diego Carlos;Parma;D;6;4.5;4.5
+5862;Valeri;Parma;D;6;5;5
+6149;Carboni F.;Parma;D;6;5;5
+6664;Delprato;Parma;D;6;5.5;5.5
+7235;Troilo;Parma;D;6;5;5
+7255;Britschgi;Parma;D;6;;
+6206;Fabbian;Parma;C;6;5;5
+6666;Bernabè;Parma;C;6;5.5;5.5
+6898;Keita M.;Parma;C;6;5;5
+7628;Sierro;Parma;C;6;5;5
+6229;Tourè E.;Parma;A;6;5.5;5.5
+7213;Frigan;Parma;A;6;;
+7342;Elphege;Parma;A;6;5.5;5.5
+7554;Romero D.;Parma;A;6;6;6
+7561;Lontani;Parma;A;6;5.5;5.5
+610;Gollini;Roma;P;6;6.5;6.5
+2296;Mancini;Roma;D;6;6.5;6.5
+4317;N'Dicka;Roma;D;6;6;6
+4705;Balerdi;Roma;D;6;6;6
+4807;Hermoso;Roma;D;6;6;6
+4998;Molina N.;Roma;D;6;6;6
+6986;Rensch;Roma;D;6;6;6
+7181;Wesley;Roma;D;6;6;6
+7599;Lulli;Roma;D;6;;
+22;De Roon;Roma;C;6;6.5;6
+530;Pellegrini Lo.;Roma;C;6;6;6
+5589;Konè M.;Roma;C;6;6;5.5
+6190;Pisilli;Roma;C;6;;
+309;Dybala;Roma;A;6;6;6
+5585;Malen;Roma;A;6;4.5;3.5
+5734;Soulè;Roma;A;6;5.5;5
+4236;Muric;Sassuolo;P;6;6;5
+4147;Caleta-Car;Sassuolo;D;6;5.5;5.5
+5851;Doig;Sassuolo;D;6;6;6
+6896;Van Der Brempt;Sassuolo;D;6;5.5;5.5
+7154;Odenthal;Sassuolo;D;6;7;10
+7564;Leysen F.;Sassuolo;D;6;6;6
+7573;Cinquegrano;Sassuolo;D;6;;
+2528;Matic;Sassuolo;C;6;6;6
+5844;Thorstvedt;Sassuolo;C;6;5.5;5
+6246;Lipani;Sassuolo;C;6;;
+6677;Adzic;Sassuolo;C;6;6;6
+7036;Bakola;Sassuolo;C;6;6.5;6.5
+531;Berardi;Sassuolo;A;6;5.5;5
+4463;Esposito Se.;Sassuolo;A;6;6.5;6.5
+6060;Laurientè;Sassuolo;A;6;6.5;6.5
+7347;Bowie;Sassuolo;A;6;6;6
+6534;Perri;Torino;P;6;6;5
+2169;Rodriguez R.;Torino;D;6;6;6
+5010;Ismajli;Torino;D;6;6;6
+6495;Comuzzo;Torino;D;6;5.5;5.5
+6642;Coco;Torino;D;6;6.5;6.5
+7220;Belghali;Torino;D;6;5.5;5.5
+1933;Mandragora;Torino;C;6;6;6
+5687;Vlasic;Torino;C;6;6;6
+6005;Ilkhan;Torino;C;6;6;6
+6170;Gineitis;Torino;C;6;;
+6218;Oristanio;Torino;C;6;5.5;5.5
+7060;Cacciamani;Torino;C;6;6;6
+7624;Braganca;Torino;C;6;7;10
+2061;Simeone;Torino;A;6;6;6
+6646;Adams C.;Torino;A;6;6;6
+7349;Kulenovic;Torino;A;6;6.5;9.5
+6462;Okoye;Udinese;P;6;4.5;2.5
+2404;Alaba;Udinese;D;6;6;6
+4994;Vojvoda;Udinese;D;6;5.5;5.5
+5555;Kamara H.;Udinese;D;6;6;6
+5820;Bertola;Udinese;D;6;6;5.5
+5994;Ebosse;Udinese;D;6;6;6
+6021;Abankwah;Udinese;D;6;5.5;5.5
+6956;Solet;Udinese;D;6;6;6
+7312;Arizala;Udinese;D;6;;
+6212;Zarraga;Udinese;C;6;6;6
+6680;Karlstrom;Udinese;C;6;5.5;5.5
+6684;Ekkelenkamp;Udinese;C;6;7;10
+6783;Unai Gomez;Udinese;C;6;5.5;5.5
+7092;Jovanovic;Udinese;C;6;5.5;5.5
+7418;Chakvetadze;Udinese;C;6;5.5;5.5
+5637;Davis K.;Udinese;A;6;6;6
+6248;Stankovic F.;Venezia;P;6;6.5;3.5
+256;Juan Jesus;Venezia;D;6;4.5;4
+4845;Correia T.;Venezia;D;6;;
+6681;Sagrado;Venezia;D;6;6.5;7.5
+6821;Hainaut;Venezia;D;6;6.5;9.5
+6890;Moreno M.;Venezia;D;6;4.5;4
+6892;Schingtienne;Venezia;D;6;;
+7538;Halhal;Venezia;D;6;5;5
+5319;Sohm;Venezia;C;6;5.5;5.5
+5674;Basic;Venezia;C;6;6;6
+5872;Helgason;Venezia;C;6;;
+6994;Perez K.;Venezia;C;6;5.5;5.5
+6904;Yeboah J.;Venezia;A;6;6;6
+7449;Rrahmani Al.;Venezia;A;6;;
+7482;Lauberbach;Venezia;A;6;;
+7484;Adams A.;Venezia;A;6;5.5;5.5
+4431;Carnesecchi;Atalanta;P;7;6.5;6.5
+554;Zappacosta;Atalanta;D;7;5.5;5.5
+2640;Kolasinac;Atalanta;D;7;6;6
+4887;Bellanova;Atalanta;D;7;6;7
+6485;Kristensen T.;Atalanta;D;7;4.5;4.5
+7219;Bernasconi;Atalanta;D;7;5;5
+7633;Obric;Atalanta;D;7;4.5;4
+2077;Pasalic;Atalanta;C;7;5.5;5.5
+4364;Gaetano;Atalanta;C;7;7;10
+5119;Samardzic;Atalanta;C;7;5.5;5.5
+5422;Zalewski;Atalanta;C;7;6.5;7.5
+5792;Ederson D.S.;Atalanta;C;7;5;4.5
+6844;Rowe;Atalanta;C;7;5;5
+2137;Scamacca;Atalanta;A;7;6;6
+5995;De Ketelaere;Atalanta;A;7;5;5
+6435;Krstovic;Atalanta;A;7;6.5;9.5
+133;Skorupski;Bologna;P;7;6;3
+2525;Darmian;Bologna;D;7;6;6
+4433;Zortea;Bologna;D;7;5.5;5.5
+4734;Miranda J.;Bologna;D;7;6.5;7
+5498;Casale;Bologna;D;7;5.5;5.5
+5675;Theate;Bologna;D;7;6;5.5
+7326;Helland;Bologna;D;7;5.5;5.5
+184;Bernardeschi;Bologna;C;7;6;5.5
+4436;Cambiaghi;Bologna;C;7;6;6
+5298;Pobega;Bologna;C;7;7;9.5
+5858;Ferguson;Bologna;C;7;5.5;5.5
+6054;Moro N.;Bologna;C;7;5.5;5.5
+4359;Piccoli;Bologna;A;7;6;6
+6675;Dovbyk;Bologna;A;7;5.5;5.5
+7627;Enem;Bologna;A;7;5.5;5.5
+4360;Caprile;Cagliari;P;7;5.5;1.5
+4210;Mina;Cagliari;D;7;4;4
+5701;Obert;Cagliari;D;7;4;4
+7268;Rodriguez Ju.;Cagliari;D;7;4.5;4.5
+7274;Zè Pedro;Cagliari;D;7;4.5;4.5
+7621;Sugawara;Cagliari;D;7;5.5;5.5
+1871;Deiola;Cagliari;C;7;;
+4260;Winks;Cagliari;C;7;5;4.5
+4870;Adopo;Cagliari;C;7;4;4
+6815;Fadera;Cagliari;C;7;5.5;5
+7165;Liteta;Cagliari;C;7;;
+7311;Romano;Cagliari;C;7;4.5;4.5
+4896;Maldini;Cagliari;A;7;5;5
+5336;Nzola;Cagliari;A;7;5;5
+7374;Mendy P.;Cagliari;A;7;5.5;5.5
+7547;Kevin Carlos;Cagliari;A;7;5.5;5.5
+6966;Butez;Como;P;7;6.5;5.5
+5641;Chalobah T.;Como;D;7;;
+6601;Kambwala;Como;D;7;;
+6867;Valle;Como;D;7;6.5;7
+6869;Ramon;Como;D;7;7;6.5
+6893;Kempf;Como;D;7;6.5;6.5
+7014;Smolcic I.;Como;D;7;6;6
+7414;Kaiki;Como;D;7;6;6
+5036;Caqueret;Como;C;7;6.5;7.5
+5453;Ricci S.;Como;C;7;;
+5559;Da Cunha;Como;C;7;6;6
+6151;Perrone;Como;C;7;6;6
+6678;Liberali;Como;C;7;7;10
+6875;Paz N.;Como;C;7;7.5;11
+7412;Milla;Como;C;7;6.5;6.5
+7017;Douvikas;Como;A;7;7;10
+2521;De Gea;Fiorentina;P;7;5.5;2.5
+5365;Dragusin;Fiorentina;D;7;5;5
+5603;Pongracic;Fiorentina;D;7;6;9
+5885;Dodò;Fiorentina;D;7;6;6
+6531;Jimenez A.;Fiorentina;D;7;5.5;5.5
+7294;Valdepenas;Fiorentina;D;7;5.5;5.5
+7410;Viery;Fiorentina;D;7;5;5
+4465;Fagioli;Fiorentina;C;7;6;6
+4947;Brescianini;Fiorentina;C;7;6;6
+6294;Ndour;Fiorentina;C;7;5.5;5
+6827;Njie;Fiorentina;C;7;5;5
+7078;Mastantuono;Fiorentina;C;7;6;5.5
+7625;Goncalves P.;Fiorentina;C;7;5;5
+5694;Beto;Fiorentina;A;7;;
+7023;Pellegrino M.;Fiorentina;A;7;5;5
+7623;Gnonto;Fiorentina;A;7;5.5;5.5
+6415;Palmisani;Frosinone;P;7;6;4
+4952;Monterisi;Frosinone;D;7;5.5;5.5
+5424;Amey;Frosinone;D;7;;
+5757;Cittadini;Frosinone;D;7;6.5;6.5
+6238;Oyono A.;Frosinone;D;7;6.5;6.5
+7469;Bracaglia;Frosinone;D;7;6;6
+7553;Omar Fayed;Frosinone;D;7;6;6
+5998;Zerbin;Frosinone;C;7;6;6
+6917;Masini;Frosinone;C;7;7;7
+7472;Calò;Frosinone;C;7;7.5;11.5
+7473;Cichella;Frosinone;C;7;;
+7551;Schmid;Frosinone;C;7;6.5;6.5
+5436;Raimondo;Frosinone;A;7;8.5;17.5
+6204;Kvernadze;Frosinone;A;7;7;7
+6530;Ghedjemis;Frosinone;A;7;6.5;6.5
+7610;Birligea;Frosinone;A;7;;
+7332;Bijlow;Genoa;P;7;6;4
+5514;Vasquez;Genoa;D;7;5.5;5
+5750;Ostigard;Genoa;D;7;5.5;5
+6660;Marcandalli;Genoa;D;7;5.5;5.5
+7413;Puczka;Genoa;D;7;5;5
+795;El Shaarawy;Genoa;C;7;6;6
+4970;Messias;Genoa;C;7;5.5;5.5
+5791;Frendrup;Genoa;C;7;5.5;5.5
+6020;Ellertsson;Genoa;C;7;5.5;5
+7341;Amorim;Genoa;C;7;;
+7608;Wiafe;Genoa;C;7;5.5;5.5
+6164;Vitinha O.;Genoa;A;7;5.5;5.5
+7600;Osmajic;Genoa;A;7;5.5;5.5
+7622;Robinho Junior;Genoa;A;7;;
+5116;Martinez Jo.;Inter;P;7;6;5
+254;Dimarco;Inter;D;7;6;6
+2120;Bastoni;Inter;D;7;6;6
+4159;Akanji;Inter;D;7;6;6
+5877;Carlos Augusto;Inter;D;7;7.5;11
+6217;Bisseck;Inter;D;7;6;6
+152;Zielinski;Inter;C;7;6.5;7.5
+1870;Barella;Inter;C;7;6.5;7.5
+2194;Calhanoglu;Inter;C;7;6;6
+2529;Mkhitaryan;Inter;C;7;6.5;6.5
+5301;Luis Henrique;Inter;C;7;5;5
+6274;Diouf;Inter;C;7;6.5;6.5
+7070;Sucic P.;Inter;C;7;5.5;5.5
+4871;Thuram;Inter;A;7;7;9.5
+6669;Bonny;Inter;A;7;7;10
+7071;Esposito F.P.;Inter;A;7;5.5;5
+4964;Vicario;Juventus;P;7;6;3
+2788;Bremer;Juventus;D;7;4.5;4.5
+4657;Celik;Juventus;D;7;5;5
+4976;Kalulu;Juventus;D;7;5.5;5.5
+5520;Cambiaso;Juventus;D;7;6;6
+6042;Lucumì;Juventus;D;7;5;5
+4179;Gonzalez N.;Juventus;C;7;5;5
+4911;Douglas Luiz;Juventus;C;7;5.5;5.5
+4973;McKennie;Juventus;C;7;5.5;5.5
+5680;Sarr P.;Juventus;C;7;5;5
+5761;Zhegrova;Juventus;C;7;5.5;5.5
+6884;Conceicao;Juventus;C;7;5.5;5.5
+7436;Alajbegovic;Juventus;C;7;6;6
+2832;Boga;Juventus;A;7;;
+5951;Kolo Muani;Juventus;A;7;5;5
+6752;Woltemade;Juventus;A;7;5.5;5.5
+6482;Mandas;Lazio;P;7;6;6
+2263;Lazzari;Lazio;D;7;;
+4817;Pedraza;Lazio;D;7;;
+5620;Tavares N.;Lazio;D;7;7;8
+7012;Provstgaard;Lazio;D;7;7;10
+7131;Floriani Mussolini;Lazio;D;7;6.5;6.5
+7580;Sutalo J.;Lazio;D;7;6.5;6.5
+632;Zaccagni;Lazio;C;7;6.5;7
+2848;Frattesi;Lazio;C;7;6;6
+6191;Belahyane;Lazio;C;7;7;7
+6398;Isaksen;Lazio;C;7;7;10
+6629;Dele-Bashiru;Lazio;C;7;7;10
+7314;Taylor K.;Lazio;C;7;6.5;6
+2038;Pinamonti;Lazio;A;7;6;7
+6556;Noslin;Lazio;A;7;5.5;5.5
+2134;Falcone;Lecce;P;7;6;6
+4502;Gallo;Lecce;D;7;7;8
+6632;Gaspar K.;Lecce;D;7;7.5;10.5
+6989;Tiago Gabriel;Lecce;D;7;7;7
+6990;Veiga D.;Lecce;D;7;6.5;6.5
+7240;Siebert;Lecce;D;7;7;10
+5457;Maleh;Lecce;C;7;6;6
+5504;Coulibaly L.;Lecce;C;7;6;6
+6410;Kaba;Lecce;C;7;6;6
+6549;Pierotti;Lecce;C;7;6;6
+7322;Ngom;Lecce;C;7;6;6
+7619;Monteiro J.;Lecce;C;7;;
+5029;Geubbels;Lecce;A;7;5;5
+7001;N'Dri;Lecce;A;7;7.5;10.5
+7602;Fatah;Lecce;A;7;5.5;5.5
+7647;Esteban;Lecce;A;7;6;6
+4312;Maignan;Milan;P;7;6.5;4.5
+4751;Tomori;Milan;D;7;;
+5022;Pavlovic;Milan;D;7;6;6
+5273;Estupinan;Milan;D;7;5.5;5.5
+5739;De Winter;Milan;D;7;5.5;5.5
+5833;Gila;Milan;D;7;7;10
+2379;Rabiot;Milan;C;7;7.5;11
+2423;Pulisic;Milan;C;7;6.5;6.5
+2606;Modric;Milan;C;7;6.5;6.5
+4199;Loftus-Cheek;Milan;C;7;6;6
+4856;Chukwueze;Milan;C;7;6;6
+5295;Musah;Milan;C;7;6;6
+6372;Moreira;Milan;C;7;7;8
+7203;Jashari;Milan;C;7;6;6
+7618;Hutchinson;Milan;C;7;5.5;5.5
+6397;Ramos G.;Milan;A;7;6.5;6.5
+7301;Tornqvist;Monza;P;7;7;7
+4925;Carboni A.;Monza;D;7;7;7
+5838;Birindelli;Monza;D;7;6.5;6
+6537;Goglichidze;Monza;D;7;7;7
+7238;Kouadio;Monza;D;7;7.5;10.5
+7476;Bakoune;Monza;D;7;;
+7485;Mangas;Monza;D;7;6.5;6.5
+5878;Colpani;Monza;C;7;6.5;6.5
+6252;Folorunsho;Monza;C;7;;
+6592;Forson O.;Monza;C;7;;
+6593;Akinsanmiro;Monza;C;7;7;7
+7574;Foe Ondoa;Monza;C;7;7;8
+2155;Cutrone;Monza;A;7;;
+5882;Mota;Monza;A;7;6.5;7.5
+7523;Varela G.;Monza;A;7;8.5;15.5
+7546;Robinson J.;Monza;A;7;7.5;10.5
+572;Meret;Napoli;P;7;6;5
+1852;Spinazzola;Napoli;D;7;5.5;5.5
+2816;Di Lorenzo;Napoli;D;7;5.5;5.5
+4409;Rrahmani;Napoli;D;7;5;5
+4664;Badiashile;Napoli;D;7;5.5;5.5
+5840;Olivera;Napoli;D;7;;
+6202;Beukema;Napoli;D;7;6;6
+536;Politano;Napoli;C;7;6;6
+2517;De Bruyne;Napoli;C;7;5;2
+4287;Lobotka;Napoli;C;7;6;6
+4777;McTominay;Napoli;C;7;5.5;5.5
+5131;Gilmour;Napoli;C;7;6;6
+6052;Hojlund;Napoli;A;7;6.5;6.5
+6215;Lucca;Napoli;A;7;5;5
+7162;Giovane;Napoli;A;7;5.5;5.5
+7351;Santos A.;Napoli;A;7;6.5;6.5
+6662;Corvi;Parma;P;7;6;3
+4137;Diego Carlos;Parma;D;7;5;4.5
+5862;Valeri;Parma;D;7;5.5;5.5
+6664;Delprato;Parma;D;7;5;5
+7235;Troilo;Parma;D;7;5;4.5
+7255;Britschgi;Parma;D;7;5;4.5
+7615;Drobnic;Parma;D;7;5.5;5.5
+6206;Fabbian;Parma;C;7;5.5;5.5
+6666;Bernabè;Parma;C;7;6;6
+6898;Keita M.;Parma;C;7;5.5;5.5
+7138;Ordonez C.;Parma;C;7;;
+7536;Diallo O.;Parma;C;7;6;6
+6229;Tourè E.;Parma;A;7;5.5;5.5
+7213;Frigan;Parma;A;7;6;6
+7554;Romero D.;Parma;A;7;6;6
+7561;Lontani;Parma;A;7;5.5;5.5
+610;Gollini;Roma;P;7;6;6
+4317;N'Dicka;Roma;D;7;6;6
+4705;Balerdi;Roma;D;7;6.5;6.5
+4807;Hermoso;Roma;D;7;6;6
+6631;Ghilardi;Roma;D;7;;
+6986;Rensch;Roma;D;7;5.5;5.5
+7181;Wesley;Roma;D;7;;
+7529;Koulierakis;Roma;D;7;6;6
+7599;Lulli;Roma;D;7;7;10
+22;De Roon;Roma;C;7;6;6
+530;Pellegrini Lo.;Roma;C;7;6;6
+6190;Pisilli;Roma;C;7;6.5;6
+7556;Mora;Roma;C;7;6;6
+7651;Di Nunzio;Roma;C;7;;
+5734;Soulè;Roma;A;7;7;6.5
+6572;Castro S.;Roma;A;7;7;10
+4236;Muric;Sassuolo;P;7;4;0
+4147;Caleta-Car;Sassuolo;D;7;4.5;4.5
+5851;Doig;Sassuolo;D;7;5;5
+6896;Van Der Brempt;Sassuolo;D;7;5;5
+7154;Odenthal;Sassuolo;D;7;5;5
+7329;Obrador;Sassuolo;D;7;6;6
+2528;Matic;Sassuolo;C;7;5.5;5.5
+5735;Volpato;Sassuolo;C;7;;
+5844;Thorstvedt;Sassuolo;C;7;6.5;9.5
+6246;Lipani;Sassuolo;C;7;6;6
+6895;Dominguez B.;Sassuolo;C;7;6;6
+7036;Bakola;Sassuolo;C;7;5.5;6.5
+531;Berardi;Sassuolo;A;7;7;10
+4463;Esposito Se.;Sassuolo;A;7;6.5;7.5
+6060;Laurientè;Sassuolo;A;7;5.5;5.5
+7347;Bowie;Sassuolo;A;7;5.5;5
+6534;Perri;Torino;P;7;6.5;6.5
+5010;Ismajli;Torino;D;7;6;5.5
+6495;Comuzzo;Torino;D;7;6.5;6
+6642;Coco;Torino;D;7;6.5;6.5
+7220;Belghali;Torino;D;7;7;9
+1933;Mandragora;Torino;C;7;6;6
+5687;Vlasic;Torino;C;7;6.5;6.5
+5888;Casadei;Torino;C;7;6;6
+6170;Gineitis;Torino;C;7;5.5;5.5
+7060;Cacciamani;Torino;C;7;6;6
+7183;Aboukhlal;Torino;C;7;6;6
+7624;Braganca;Torino;C;7;6.5;6.5
+608;Zapata D.;Torino;A;7;;
+2061;Simeone;Torino;A;7;8;14
+6646;Adams C.;Torino;A;7;7;10
+7349;Kulenovic;Torino;A;7;6;6
+6462;Okoye;Udinese;P;7;6.5;3.5
+2404;Alaba;Udinese;D;7;5.5;5.5
+4994;Vojvoda;Udinese;D;7;5;5
+5527;Zanoli;Udinese;D;7;5.5;5.5
+5555;Kamara H.;Udinese;D;7;5.5;5
+5994;Ebosse;Udinese;D;7;5;5
+6925;Palma;Udinese;D;7;5.5;5.5
+6956;Solet;Udinese;D;7;4.5;4.5
+7312;Arizala;Udinese;D;7;5;5
+6212;Zarraga;Udinese;C;7;5.5;5.5
+6680;Karlstrom;Udinese;C;7;4.5;4.5
+6684;Ekkelenkamp;Udinese;C;7;4.5;4.5
+6783;Unai Gomez;Udinese;C;7;5.5;5.5
+7198;Piotrowski;Udinese;C;7;5.5;5.5
+7418;Chakvetadze;Udinese;C;7;5.5;5.5
+5637;Davis K.;Udinese;A;7;5;5
+6248;Stankovic F.;Venezia;P;7;8;11
+256;Juan Jesus;Venezia;D;7;7;7
+5481;Mazzocchi;Venezia;D;7;6;6
+5695;Haps;Venezia;D;7;6.5;6.5
+6821;Hainaut;Venezia;D;7;6;6
+6890;Moreno M.;Venezia;D;7;5.5;5.5
+6892;Schingtienne;Venezia;D;7;6;6
+7538;Halhal;Venezia;D;7;6.5;6.5
+5319;Sohm;Venezia;C;7;6.5;7.5
+5674;Basic;Venezia;C;7;6;5.5
+5872;Helgason;Venezia;C;7;6;6
+6994;Perez K.;Venezia;C;7;6.5;6
+7635;Fanne;Venezia;C;7;;
+6904;Yeboah J.;Venezia;A;7;6;6
+7449;Rrahmani Al.;Venezia;A;7;6;6
+7484;Adams A.;Venezia;A;7;7;10
