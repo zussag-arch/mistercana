@@ -3811,6 +3811,12 @@ function renderLiveAuction(
         </div>
       </div>
 
+      <div class="auction-mobile-tabs" role="tablist" aria-label="Sezioni asta">
+        <button type="button" data-auction-tab="call" role="tab">Chiamata</button>
+        <button type="button" data-auction-tab="advice" role="tab">Consigli</button>
+        <button type="button" data-auction-tab="market" role="tab">Mercato</button>
+      </div>
+
       ${renderPlayerSearchStrip()}
 
       <div class="auction-workspace">

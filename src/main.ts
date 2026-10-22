@@ -15,13 +15,16 @@ import './styles/theme-v3-objectives.css'
 import './styles/theme-v3-data.css'
 import './styles/theme-light.css'
 import './styles/theme-refine.css'
+import './styles/theme-mobile.css'
 import { initTheme } from './theme'
 import { initRoundSelects } from './components/roundSelect'
 import { initAuctionShortcuts } from './components/auctionShortcuts'
+import { initMobileApp } from './components/mobileApp'
 
 initTheme()
 initRoundSelects()
 initAuctionShortcuts()
+initMobileApp()
 
 import {
   renderNavigation,
