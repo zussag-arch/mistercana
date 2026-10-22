@@ -508,3 +508,39 @@
     width: 100% !important;
   }
 }
+
+@media (max-width: 700px) {
+  /* ruoli e azioni dell'asta su una riga, allineati */
+  .topbar-page-actions {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center;
+    gap: 6px;
+  }
+  .topbar-page-actions .auction-role-switcher > div { padding: 3px; }
+  .topbar-page-actions .auction-role-tab { width: 30px !important; height: 34px !important; }
+  .topbar-page-actions .auction-toolbar-actions {
+    flex-wrap: nowrap !important;
+    margin-left: auto;
+  }
+  .topbar .topbar-page-actions #undoLastAssignmentButton,
+  .topbar .topbar-page-actions #endAuctionButton {
+    padding: 0 11px !important;
+    font-size: 12px !important;
+  }
+}
+@media (max-width: 700px) {
+  .topbar-page-actions .auction-role-switcher {
+    width: auto !important;
+    flex: none;
+  }
+  .topbar-page-actions .auction-toolbar-actions { width: auto !important; flex: none; }
+  .undo-extra { display: none; }
+}
+@media (max-width: 700px) {
+  :root[data-auction-tab="call"] .auction-live-price-row #auctionUnsoldButton,
+  :root[data-auction-tab="call"] .auction-live-price-row #auctionCancelCallButton {
+    border: 1px solid var(--line-1) !important;
+    background: var(--surface-light) !important;
+  }
+}
