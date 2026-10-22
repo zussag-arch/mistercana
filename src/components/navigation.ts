@@ -59,7 +59,7 @@ export function renderNavigation(
     },
     {
       id: 'roster',
-      label: 'LA MIA ROSA',
+      label: 'ROSA',
     },
     {
       id: 'insights',

@@ -1,12 +1,14 @@
-// La mia rosa: la tua squadra di lega, la formazione consigliata per la
-// prossima giornata e lo stato di ogni giocatore (forma, avversario, probabili).
+// La mia rosa: campetto con la formazione consigliata della prossima giornata,
+// panchina, infermeria. I dettagli di ogni giocatore stanno in un riquadro che
+// compare passando sopra (o toccando) il suo pallino.
 import {
-  evaluatePick, leagueTeams, nextMatchday, suggestLineup, teamRoster,
+  evaluatePick, infirmary, leagueTeams, nextMatchday, suggestLineup, teamRoster,
 } from '../data/roster'
-import type { League, MatchdayPick } from '../data/roster'
+import type { League, MatchdayPick, Probable } from '../data/roster'
 import { getICaV3 } from '../data/icaV3Data'
 import { getCachedPlayersDataset } from '../services/playerRepository'
 import { display, escapePlayerHtml } from '../components/playerDataView'
+import type { FldaPlayer } from '../services/flda'
 
 const CHOICE_KEY = 'mistercana_my_roster_v1'
 const LEAGUE_LABEL: Record<League, string> = { SERIE_A: 'Serie A', SERIE_B: 'Serie B' }
@@ -28,50 +30,106 @@ function saveChoice(choice: Choice): void {
 }
 
 let league: League = loadChoice()?.league ?? 'SERIE_A'
+// dati dei pallini per il riquadro, ricostruiti a ogni disegno della pagina
+let picksById = new Map<string, MatchdayPick>()
+
+/* ---------- pezzi del riquadro ---------- */
 
 function formDots(values: Array<number | null>): string {
   if (!values.length) return '<span class="roster-form-empty">—</span>'
   return `<span class="roster-form">${values.map((value) => {
     if (typeof value !== 'number') return '<i class="sv" title="senza voto">sv</i>'
     const tone = value >= 7 ? 'great' : value >= 6 ? 'good' : value >= 5.5 ? 'ok' : 'bad'
-    return `<i class="${tone}" title="${display(value, 1)}">${display(value, 1)}</i>`
+    return `<i class="${tone}">${display(value, 1)}</i>`
   }).join('')}</span>`
 }
 
-function statusChip(pick: MatchdayPick): string {
+function statusLabel(p?: Probable): { text: string; tone: 'bad' | 'warn' } | undefined {
+  if (!p) return undefined
+  if (p.injured) return { text: 'infortunato', tone: 'bad' }
+  if (p.suspended) return { text: 'squalificato', tone: 'bad' }
+  if (p.unavailable) return { text: 'indisponibile', tone: 'bad' }
+  if (p.doubtful) return { text: 'in dubbio', tone: 'warn' }
+  if (p.warned) return { text: 'diffidato', tone: 'warn' }
+  return undefined
+}
+
+function returnText(p: Probable, day?: number): string {
+  if (!p.returnDay) return ''
+  if (day && p.returnDay <= day) return 'rientro previsto questa giornata'
+  return `rientro previsto: ${p.returnDay}ª giornata${day ? ` (tra ${p.returnDay - day})` : ''}`
+}
+
+function renderPopover(pick: MatchdayPick): string {
   const p = pick.probable
-  if (p?.injured) return `<span class="roster-chip bad" title="${escapePlayerHtml(p.note)}">infortunato</span>`
-  if (p?.suspended) return '<span class="roster-chip bad">squalificato</span>'
-  if (p?.unavailable) return `<span class="roster-chip bad" title="${escapePlayerHtml(p.note)}">indisponibile</span>`
-  if (p?.doubtful) return `<span class="roster-chip warn" title="${escapePlayerHtml(p.note)}">in dubbio</span>`
-  if (p?.warned) return '<span class="roster-chip warn">diffidato</span>'
-  return ''
-}
-
-function opponent(pick: MatchdayPick): string {
-  const p = pick.probable
-  if (!p?.opponent) return '<span class="roster-muted">—</span>'
-  return `<span class="roster-opponent">${p.home ? 'vs' : '@'} ${escapePlayerHtml(p.opponent)}</span>`
-}
-
-function probability(pick: MatchdayPick): string {
-  const value = Math.round(pick.probability * 100)
-  const tone = pick.out ? 'out' : value >= 75 ? 'high' : value >= 50 ? 'mid' : 'low'
-  return `<span class="roster-prob ${tone}"><b style="width:${value}%"></b><em>${value}%</em></span>`
-}
-
-function pickRow(pick: MatchdayPick, highlight = false): string {
+  const status = statusLabel(p)
   const ica = getICaV3(pick.player.player_id)?.score
-  return `<button type="button" class="roster-row${highlight ? ' starter' : ''}${pick.out ? ' out' : ''}" data-player-ref="${escapePlayerHtml(pick.player.player_id ?? '')}">
-    <span class="role-badge role-${pick.player.role.toLowerCase()}">${pick.player.role}</span>
-    <span class="roster-name"><strong>${escapePlayerHtml(pick.player.name)}</strong><small>${escapePlayerHtml(pick.player.team)} · ${opponent(pick)}</small></span>
-    <span class="roster-cell" data-label="Forma">${formDots(pick.recent)}</span>
-    <span class="roster-cell" data-label="Titolare">${probability(pick)}</span>
-    <span class="roster-cell roster-ica" data-label="iCà">${display(ica, 1)}</span>
-    <span class="roster-cell roster-expected" data-label="Attesi">${display(pick.expected, 1)}</span>
-    <span class="roster-status">${statusChip(pick)}${pick.reasons.filter((reason) => !['infortunato', 'squalificato', 'indisponibile', 'in dubbio'].includes(reason)).slice(0, 2).map((reason) => `<span class="roster-reason">${escapePlayerHtml(reason)}</span>`).join('')}</span>
+  const prob = Math.round(pick.probability * 100)
+  return `<div class="roster-pop-head">
+      <span class="role-badge role-${pick.player.role.toLowerCase()}">${pick.player.role}</span>
+      <div><strong>${escapePlayerHtml(pick.player.name)}</strong><small>${escapePlayerHtml(pick.player.team)}${p?.opponent ? ` · ${p.home ? 'vs' : '@'} ${escapePlayerHtml(p.opponent)}` : ''}</small></div>
+    </div>
+    ${status ? `<p class="roster-pop-status ${status.tone}"><b>${status.text}</b>${p?.note ? ` · ${escapePlayerHtml(p.note)}` : ''}${p ? ` ${returnText(p, nextMatchday())}` : ''}</p>` : ''}
+    <div class="roster-pop-grid">
+      <div><span>Attesi</span><strong class="accent">${display(pick.expected, 1)}</strong></div>
+      <div><span>iCà</span><strong>${display(ica, 1)}</strong></div>
+      <div><span>Titolare</span><strong>${prob}%</strong></div>
+      <div><span>Prezzo</span><strong>${pick.price} cr</strong></div>
+    </div>
+    <div class="roster-pop-form"><span>Ultime 5</span>${formDots(pick.recent)}</div>
+    ${pick.reasons.filter((reason) => !status || reason !== status.text).length ? `<div class="roster-pop-reasons">${pick.reasons.filter((reason) => !status || reason !== status.text).map((reason) => `<span>${escapePlayerHtml(reason)}</span>`).join('')}</div>` : ''}
+    <button type="button" class="roster-pop-open" data-roster-open="${escapePlayerHtml(pick.player.player_id ?? '')}">Scheda completa →</button>`
+}
+
+/* ---------- campetto ---------- */
+
+function dot(pick: MatchdayPick): string {
+  const status = statusLabel(pick.probable)
+  const surname = pick.player.name.replace(/\s+[A-Z]\.$/, '')
+  return `<button type="button" class="pitch-dot role-${pick.player.role.toLowerCase()}${pick.out ? ' out' : ''}" data-roster-dot="${escapePlayerHtml(pick.player.player_id ?? '')}" aria-label="${escapePlayerHtml(pick.player.name)}">
+    <span class="pitch-dot-circle">${display(pick.expected, 1)}${status ? `<i class="pitch-dot-flag ${status.tone}" title="${status.text}"></i>` : ''}</span>
+    <span class="pitch-dot-name">${escapePlayerHtml(surname)}</span>
   </button>`
 }
+
+function renderPitch(starters: MatchdayPick[]): string {
+  const line = (role: string) => `<div class="pitch-line">${starters.filter((pick) => pick.player.role === role).map(dot).join('')}</div>`
+  return `<div class="pitch">
+    <div class="pitch-marks" aria-hidden="true"><span class="pitch-half"></span><span class="pitch-circle"></span><span class="pitch-box top"></span><span class="pitch-box bottom"></span></div>
+    ${line('A')}${line('C')}${line('D')}${line('P')}
+  </div>`
+}
+
+/* ---------- infermeria ---------- */
+
+function infirmaryRow(player: FldaPlayer | undefined, p: Probable, mine: boolean, day?: number): string {
+  if (!player) return ''
+  const status = statusLabel(p)
+  return `<div class="infirmary-row${mine ? ' mine' : ''}">
+    <span class="role-badge role-${player.role.toLowerCase()}">${player.role}</span>
+    <div class="infirmary-name"><strong>${escapePlayerHtml(player.name)}</strong><small>${escapePlayerHtml(player.team)}</small></div>
+    <span class="roster-chip ${status?.tone ?? 'warn'}">${status?.text ?? ''}</span>
+    <p>${escapePlayerHtml(p.note || '—')}</p>
+    <span class="infirmary-return">${p.returnDay ? (day && p.returnDay <= day ? 'questa giornata' : `${p.returnDay}ª giornata`) : '—'}</span>
+  </div>`
+}
+
+function renderInfirmary(rosterIds: Set<string>, byId: Map<string | null, FldaPlayer>): string {
+  const day = nextMatchday()
+  const all = infirmary().sort((a, b) => (a.probable.returnDay ?? 99) - (b.probable.returnDay ?? 99))
+  const mine = all.filter((item) => rosterIds.has(item.playerId))
+  const others = all.filter((item) => !rosterIds.has(item.playerId))
+  return `<section class="roster-section infirmary">
+    <div class="roster-section-head"><h2>Infermeria</h2><span>${day ? `giornata ${day}` : ''} · fonte formazioni probabili FantaLab</span></div>
+    <h3 class="roster-bench-title">La tua rosa</h3>
+    ${mine.length ? `<div class="infirmary-list">${mine.map((item) => infirmaryRow(byId.get(item.playerId), item.probable, true, day)).join('')}</div>` : '<p class="roster-note">Nessun giocatore della tua rosa è fuori o in dubbio.</p>'}
+    <details class="infirmary-all"><summary>Tutta la Serie A <small>${others.length} giocatori</small></summary>
+      <div class="infirmary-list">${others.map((item) => infirmaryRow(byId.get(item.playerId), item.probable, false, day)).join('')}</div>
+    </details>
+  </section>`
+}
+
+/* ---------- pagina ---------- */
 
 export function renderRosterPage(): string {
   const choice = loadChoice()
@@ -80,49 +138,42 @@ export function renderRosterPage(): string {
   const selector = `
     <div class="roster-picker">
       <div class="roster-league" role="tablist">${(['SERIE_A', 'SERIE_B'] as League[]).map((item) => `<button type="button" data-roster-league="${item}" aria-selected="${item === league}">${LEAGUE_LABEL[item]}</button>`).join('')}</div>
-      <select class="roster-team" data-roster-team aria-label="La mia squadra">
+      <select class="roster-team" data-roster-team aria-label="Squadra">
         <option value="">Scegli la tua squadra…</option>
         ${teams.map((team) => `<option value="${escapePlayerHtml(team)}" ${choice?.league === league && choice.team === team ? 'selected' : ''}>${escapePlayerHtml(team)}</option>`).join('')}
       </select>
     </div>`
 
   if (!choice || choice.league !== league) {
-    return `<section class="page roster-page">
-      <header class="roster-header"><h1>La mia rosa</h1><p>Scegli lega e squadra: l'app ricorda la scelta.</p></header>
-      ${selector}
-    </section>`
+    return `<section class="page roster-page"><header class="roster-header"><h1>Rosa</h1><p>Scegli lega e squadra: l'app ricorda la scelta.</p></header>${selector}</section>`
   }
   if (!dataset || dataset.source !== 'flda') {
-    return `<section class="page roster-page"><header class="roster-header"><h1>La mia rosa</h1></header>${selector}<div class="players-loading">Caricamento giocatori…</div></section>`
+    return `<section class="page roster-page"><header class="roster-header"><h1>Rosa</h1></header>${selector}<div class="players-loading">Caricamento giocatori…</div></section>`
   }
 
   const byId = new Map(dataset.players.map((player) => [player.player_id, player]))
-  const picks = teamRoster(choice.league, choice.team)
-    .flatMap((entry) => { const player = byId.get(entry.playerId); return player ? [evaluatePick(player, entry.price)] : [] })
+  const roster = teamRoster(choice.league, choice.team)
+  const picks = roster.flatMap((entry) => { const player = byId.get(entry.playerId); return player ? [evaluatePick(player, entry.price)] : [] })
+  picksById = new Map(picks.map((pick) => [pick.player.player_id ?? '', pick]))
   const lineup = suggestLineup(picks)
   const day = nextMatchday()
   const spent = picks.reduce((sum, pick) => sum + pick.price, 0)
-  const starters = new Set(lineup?.starters ?? [])
-  const byRole = (role: string) => picks.filter((pick) => pick.player.role === role).sort((a, b) => b.expected - a.expected)
 
   return `<section class="page roster-page">
-    <header class="roster-header">
-      <div><h1>${escapePlayerHtml(choice.team)}</h1><p>${LEAGUE_LABEL[choice.league]} · ${picks.length} giocatori · ${spent} crediti spesi</p></div>
-    </header>
+    <header class="roster-header"><div><h1>${escapePlayerHtml(choice.team)}</h1><p>${LEAGUE_LABEL[choice.league]} · ${picks.length} giocatori · ${spent} crediti spesi</p></div></header>
     ${selector}
-    <section class="roster-section">
-      <div class="roster-section-head"><h2>Formazione consigliata</h2><span>${day ? `giornata ${day}` : 'prossima giornata'}${lineup ? ` · ${lineup.module} · ${display(lineup.total, 1)} fantapunti attesi` : ''}</span></div>
-      ${lineup ? `
-        <div class="roster-list">${lineup.starters.map((pick) => pickRow(pick, true)).join('')}</div>
-        <h3 class="roster-bench-title">Panchina</h3>
-        <div class="roster-list">${lineup.bench.map((pick) => pickRow(pick)).join('')}</div>
-        <p class="roster-note">Attesi = fantapunti stimati nella partita: fantamedia (iCà) e forma delle ultime 5, avversario, casa/trasferta, × probabilità di giocare dalle formazioni probabili.</p>`
-      : '<p class="roster-note">Rosa incompleta: servono almeno 1 portiere, 3 difensori, 3 centrocampisti e 1 attaccante.</p>'}
-    </section>
-    <section class="roster-section">
-      <div class="roster-section-head"><h2>Rosa per reparto</h2><span>forma ultime 5 giornate</span></div>
-      ${['P', 'D', 'C', 'A'].map((role) => `<div class="roster-list">${byRole(role).map((pick) => pickRow(pick, starters.has(pick))).join('')}</div>`).join('')}
-    </section>
+    <div class="roster-layout">
+      <section class="roster-section">
+        <div class="roster-section-head"><h2>Formazione consigliata</h2><span>${day ? `giornata ${day}` : 'prossima giornata'}${lineup ? ` · ${lineup.module} · ${display(lineup.total, 1)} fantapunti attesi` : ''}</span></div>
+        ${lineup ? `${renderPitch(lineup.starters)}
+          <h3 class="roster-bench-title">Panchina</h3>
+          <div class="bench">${lineup.bench.map(dot).join('')}</div>
+          <p class="roster-note">Nel pallino i fantapunti attesi nella partita. Passa sopra o tocca un giocatore per i dettagli.</p>`
+        : '<p class="roster-note">Rosa incompleta: servono almeno 1 portiere, 3 difensori, 3 centrocampisti e 1 attaccante.</p>'}
+      </section>
+      ${renderInfirmary(new Set(roster.map((entry) => entry.playerId)), byId)}
+    </div>
+    <div class="roster-pop" role="dialog" aria-live="polite" hidden></div>
   </section>`
 }
 
@@ -141,7 +192,43 @@ export function bindRosterEvents(actions: RosterActions): void {
     if (team) saveChoice({ league, team })
     actions.onRender()
   })
-  document.querySelectorAll<HTMLElement>('.roster-row[data-player-ref]').forEach((row) => row.addEventListener('click', () => {
-    if (row.dataset.playerRef) actions.onOpenPlayer(row.dataset.playerRef)
-  }))
+
+  const pop = document.querySelector<HTMLElement>('.roster-pop')
+  if (!pop) return
+  let pinned: HTMLElement | null = null
+  const hide = () => { pop.hidden = true; pinned = null }
+  const show = (target: HTMLElement) => {
+    const pick = picksById.get(target.dataset.rosterDot ?? '')
+    if (!pick) return
+    pop.innerHTML = renderPopover(pick)
+    pop.hidden = false
+    const rect = target.getBoundingClientRect()
+    const width = pop.offsetWidth
+    const height = pop.offsetHeight
+    const left = Math.min(Math.max(8, rect.left + rect.width / 2 - width / 2), window.innerWidth - width - 8)
+    const below = rect.bottom + 8
+    const top = below + height < window.innerHeight - 70 ? below : Math.max(8, rect.top - height - 8)
+    pop.style.left = `${left}px`
+    pop.style.top = `${top}px`
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-roster-dot]').forEach((target) => {
+    target.addEventListener('mouseenter', () => { if (!pinned) show(target) })
+    target.addEventListener('mouseleave', () => { if (!pinned) window.setTimeout(() => { if (!pinned && !pop.matches(':hover')) hide() }, 120) })
+    target.addEventListener('click', (event) => {
+      event.stopPropagation()
+      if (pinned === target) { hide(); return }
+      show(target)
+      pinned = target
+    })
+  })
+  pop.addEventListener('mouseleave', () => { if (!pinned) hide() })
+  pop.addEventListener('click', (event) => {
+    const open = (event.target as HTMLElement).closest<HTMLElement>('[data-roster-open]')
+    if (open?.dataset.rosterOpen) actions.onOpenPlayer(open.dataset.rosterOpen)
+  })
+  document.addEventListener('click', (event) => {
+    if (!pop.hidden && !pop.contains(event.target as Node)) hide()
+  })
+  window.addEventListener('scroll', () => { if (!pop.hidden) hide() }, { passive: true })
 }

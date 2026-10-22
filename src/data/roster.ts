@@ -90,6 +90,9 @@ export interface Probable {
   warned: boolean
   unavailable: boolean
   note: string
+  /** infortunio: dalla giornata / rientro previsto (giornata) */
+  fromDay?: number
+  returnDay?: number
 }
 
 let probableCache: Map<string, Probable> | null = null
@@ -109,6 +112,8 @@ export function probables(): Map<string, Probable> {
     warned: row['Diffidato'] === 'Sì',
     unavailable: row['Indisponibile'] === 'Sì',
     note: row['Nota'] ?? '',
+    fromDay: num(row['Dalla giornata']),
+    returnDay: num(row['Rientro giornata']),
   }]))
   return probableCache
 }
@@ -226,4 +231,11 @@ export function suggestLineup(picks: MatchdayPick[]): LineupSuggestion | undefin
     }
   }
   return best
+}
+
+/** Tutti i giocatori fuori o in dubbio per la prossima giornata (Serie A). */
+export function infirmary(): Array<{ playerId: string; probable: Probable }> {
+  return [...probables().entries()]
+    .filter(([, item]) => item.injured || item.suspended || item.unavailable || item.doubtful)
+    .map(([playerId, probable]) => ({ playerId, probable }))
 }
