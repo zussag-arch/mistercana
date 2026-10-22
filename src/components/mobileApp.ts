@@ -21,11 +21,46 @@ export function setAuctionTab(tab: AuctionTab): void {
   window.scrollTo({ top: 0 })
 }
 
+// Schede della Dashboard su telefono (Riepilogo / Budget / Allenatori)
+const DASH_KEY = 'mistercana_dashboard_tab_v1'
+type DashTab = 'summary' | 'budget' | 'managers'
+
+function currentDashTab(): DashTab {
+  try {
+    const saved = window.sessionStorage.getItem(DASH_KEY)
+    if (saved === 'budget' || saved === 'managers') return saved
+  } catch { /* solo comodità */ }
+  return 'summary'
+}
+
+function setDashTab(tab: DashTab): void {
+  document.documentElement.dataset.dashTab = tab
+  try { window.sessionStorage.setItem(DASH_KEY, tab) } catch { /* solo comodità */ }
+  syncTabButtons()
+  window.scrollTo({ top: 0 })
+}
+
+function syncTabButtons(): void {
+  const root = document.documentElement.dataset
+  document.querySelectorAll<HTMLElement>('[data-auction-tab]').forEach((button) => {
+    button.setAttribute('aria-selected', String(button.dataset.auctionTab === (root.auctionTab ?? 'call')))
+  })
+  document.querySelectorAll<HTMLElement>('[data-dash-tab]').forEach((button) => {
+    button.setAttribute('aria-selected', String(button.dataset.dashTab === (root.dashTab ?? 'summary')))
+  })
+}
+
 export function initMobileApp(): void {
   document.documentElement.dataset.auctionTab = currentTab()
+  document.documentElement.dataset.dashTab = currentDashTab()
 
   document.addEventListener('click', (event) => {
     const target = event.target as HTMLElement | null
+    const dash = target?.closest<HTMLElement>('[data-dash-tab]')
+    if (dash?.dataset.dashTab) {
+      setDashTab(dash.dataset.dashTab as DashTab)
+      return
+    }
     const tab = target?.closest<HTMLElement>('[data-auction-tab]')
     if (tab?.dataset.auctionTab) {
       setAuctionTab(tab.dataset.auctionTab as AuctionTab)
@@ -38,10 +73,5 @@ export function initMobileApp(): void {
   })
 
   // le etichette delle schede vengono ridisegnate con la pagina: riallinea lo stato
-  new MutationObserver(() => {
-    const tab = document.documentElement.dataset.auctionTab ?? 'call'
-    document.querySelectorAll<HTMLElement>('[data-auction-tab]').forEach((button) => {
-      button.setAttribute('aria-selected', String(button.dataset.auctionTab === tab))
-    })
-  }).observe(document.body, { childList: true, subtree: true })
+  new MutationObserver(syncTabButtons).observe(document.body, { childList: true, subtree: true })
 }

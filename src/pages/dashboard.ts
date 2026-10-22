@@ -1104,6 +1104,11 @@ export function renderDashboardPage(
         >
         </div>
       </div>
+      <div class="dashboard-mobile-tabs" role="tablist" aria-label="Sezioni dashboard">
+        <button type="button" data-dash-tab="summary" role="tab">Riepilogo</button>
+        <button type="button" data-dash-tab="budget" role="tab">Budget</button>
+        <button type="button" data-dash-tab="managers" role="tab">Allenatori</button>
+      </div>
       ${state.auctionPhase === 'live' ? renderLiveSummary(state) + `<div class="dashboard-participants">${renderAuctionParticipantsCard(state)}</div>` : renderSetupSteps(state, activeManagers.length, distributionIsValid)}
 
       <section
@@ -1281,6 +1286,7 @@ export function renderDashboardPage(
           class="
             panel
             dashboard-panel
+            dashboard-budget-panel
           "
         >
           <div
