@@ -678,9 +678,7 @@ function applyCsvFiles(): void {
   for (const item of pendingCsv) {
     if (item.ok && item.key) files[item.key] = { fileName: item.fileName, content: item.content, loadedAt }
   }
-  try {
-    saveCsvOverrides(files)
-  } catch {
+  if (!saveCsvOverrides(files)) {
     window.alert('Spazio del browser insufficiente per salvare i file.')
     return
   }

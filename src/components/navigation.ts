@@ -139,6 +139,7 @@ export function renderNavigation(
       <div
         id="topbarPageActions"
         class="topbar-page-actions"
+        role="toolbar"
         aria-label="Azioni pagina"
       ></div>
 

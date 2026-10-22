@@ -8,6 +8,7 @@ import './styles/playerDetail.css'
 import './styles/objectives.css'
 import './styles/insights.css'
 import './styles/importExport.css'
+import './styles/fonts.css'
 import './styles/theme-v3.css'
 import './styles/theme-v3-auction.css'
 import './styles/theme-v3-dashboard.css'
@@ -612,9 +613,25 @@ function mountAuctionCompetitors(
 
 function saveAndRender():
   void {
-  saveState(state)
+  const saved =
+    saveState(state)
 
   render()
+
+  if (!saved) {
+    showSaveWarning()
+  }
+}
+
+// avviso ben visibile se il telefono non riesce a salvare
+function showSaveWarning(): void {
+  if (document.querySelector('.save-warning')) return
+  const warning = document.createElement('div')
+  warning.className = 'save-warning'
+  warning.setAttribute('role', 'alert')
+  warning.innerHTML = "<strong>Salvataggio non riuscito</strong> La memoria del dispositivo è piena o bloccata. Le modifiche restano finché l'app è aperta: esporta un backup da Dati."
+  document.body.append(warning)
+  window.setTimeout(() => warning.remove(), 9000)
 }
 
 function navigateAndRender(
@@ -1079,9 +1096,24 @@ function render():
 
 render()
 
+// chiede al dispositivo di non cancellare i dati dell'app quando manca spazio
+if (navigator.storage?.persist) {
+  void navigator.storage.persisted().then((already) => (already ? true : navigator.storage.persist())).catch(() => false)
+}
+
 // PWA: registra il service worker solo nella versione pubblicata
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch(() => { /* senza copia offline l'app funziona lo stesso */ })
+    navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`)
+      .then(() => navigator.serviceWorker.ready)
+      .then((registration) => {
+        // passa al service worker i file già caricati: copia offline completa dal primo avvio
+        const urls = [
+          window.location.origin + import.meta.env.BASE_URL,
+          ...performance.getEntriesByType('resource').map((entry) => entry.name),
+        ].filter((url) => url.startsWith(window.location.origin + import.meta.env.BASE_URL))
+        registration.active?.postMessage({ type: 'precache', urls })
+      })
+      .catch(() => { /* senza copia offline l'app funziona lo stesso */ })
   })
 }

@@ -8,7 +8,6 @@
    senza toccare i fogli di stile delle pagine.
 ========================= */
 
-@import url("https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700;800;900&family=Lexend:wght@300;400;500;600;700;800&display=swap");
 
 :root {
   --font-display: "Unbounded", "Lexend", system-ui, sans-serif;

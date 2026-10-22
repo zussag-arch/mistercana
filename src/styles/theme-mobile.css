@@ -630,3 +630,19 @@
   .dashboard-budget-panel .budget-grid { grid-template-columns: 1fr !important; }
   .dashboard-budget-panel .budget-field { grid-template-columns: 28px minmax(0, 1fr) auto !important; }
 }
+
+/* iPhone, app installata, tema chiaro: la barra di stato di iOS scrive in bianco
+   ("black-translucent"); una fascia antracite dietro ora e batteria le rende leggibili */
+@media (display-mode: standalone) {
+  :root[data-theme="light"] body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    height: env(safe-area-inset-top);
+    background: #34383c;
+    pointer-events: none;
+  }
+}

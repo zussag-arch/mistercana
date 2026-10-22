@@ -89,14 +89,27 @@ export type StateBackupParseResult =
    SAVE
 ========================= */
 
+/**
+ * Salva lo stato. Restituisce false se il telefono rifiuta di scrivere
+ * (memoria piena, archiviazione bloccata): l'app continua a funzionare
+ * e avvisa, invece di andare in errore a metà di un'aggiudicazione.
+ */
 export function saveState(
   state: AppState,
-): void {
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(state),
-  )
+): boolean {
+  try {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(state),
+    )
+    return true
+  } catch {
+    return false
+  }
 }
+
+// copia dei dati salvati che non si riescono a leggere: non va mai sovrascritta
+const UNREADABLE_KEY = `${STORAGE_KEY}_illeggibile`
 
 /* =========================
    AUCTION PHASE MIGRATION
@@ -808,9 +821,27 @@ export function loadState():
       parsed,
     )
   } catch {
+    // dati illeggibili: se ne conserva una copia prima di ripartire,
+    // così il prossimo salvataggio non li cancella per sempre
+    try {
+      if (!localStorage.getItem(UNREADABLE_KEY)) {
+        localStorage.setItem(UNREADABLE_KEY, raw)
+      }
+    } catch {
+      /* se non si può nemmeno copiare, si riparte comunque */
+    }
     return structuredClone(
       defaultState,
     )
+  }
+}
+
+/** Dati salvati che non è stato possibile leggere (per recuperarli a mano). */
+export function getUnreadableBackup(): string | null {
+  try {
+    return localStorage.getItem(UNREADABLE_KEY)
+  } catch {
+    return null
   }
 }
 
