@@ -58,7 +58,8 @@ test('call actions accept FLDA UUID without requiring legacy mapping', () => {
   const main = source('src/main.ts')
   // la scheda rapida apre la scheda completa con l'ID FantaLab (la chiamata si fa da lì)
   assert.match(overlay, /data-open-full-player="\$\{escapePlayerHtml\(view\.flda\.player_id/)
-  assert.match(detail, /escapePlayerHtml\(flda\.player_id\)/)
+  // la scheda completa ha solo la × di chiusura
+  assert.match(detail, /data-player-detail-back aria-label="Chiudi"/)
   assert.match(main, /dataset\.byId\.get\(playerId\)/)
 })
 
