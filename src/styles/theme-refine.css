@@ -151,3 +151,30 @@ body {
   .main-nav { grid-column: 1 / -1; grid-row: 2; overflow-x: auto; scrollbar-width: none; }
   .theme-toggle { grid-column: 2; grid-row: 1; position: static; }
 }
+
+/* icona "annulla" disegnata (freccia verso destra che curva e torna) */
+.undo-icon {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+#undoLastAssignmentButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-color: color-mix(in srgb, var(--yellow) 45%, transparent) !important;
+  background: color-mix(in srgb, var(--yellow) 12%, var(--surface)) !important;
+  color: var(--yellow) !important;
+  font-weight: 700;
+}
+:root[data-theme="light"] #undoLastAssignmentButton {
+  color: color-mix(in srgb, var(--yellow) 45%, var(--text)) !important;
+}
+#undoLastAssignmentButton:disabled {
+  opacity: 0.4;
+}

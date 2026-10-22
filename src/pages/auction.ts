@@ -1903,7 +1903,7 @@ function renderPlayerCard(
           type="button"
           class="auction-secondary-action"
         >
-          Annulla
+          Annulla chiamata
         </button>
       </div>
 
@@ -3798,7 +3798,8 @@ function renderLiveAuction(
                 : 'disabled'
             }
           >
-            ↶ Annulla ultima
+            <svg class="undo-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>
+            Annulla<span class="undo-extra"> ultima</span>
           </button>
 
           <button
@@ -5398,7 +5399,7 @@ function renderFldaPlayerCard(
         <div class="auction-price-stepper"><button id="auctionPricePlusOneButton" type="button" title="+1 (Spazio)" ${assigned ? 'disabled' : ''}>+1</button><button id="auctionPricePlusTenButton" type="button" title="+10 (Maiusc+Spazio)" ${assigned ? 'disabled' : ''}>+10</button></div>
         <button id="auctionOpenAwardButton" type="button" class="auction-primary-action" title="Aggiudicato (Invio)" ${assigned ? 'disabled' : ''}>Aggiudicato</button>
         <button id="auctionUnsoldButton" type="button" class="auction-secondary-action" ${assigned ? 'disabled' : ''}>Invenduto</button>
-        <button id="auctionCancelCallButton" type="button" class="auction-secondary-action">Annulla</button>
+        <button id="auctionCancelCallButton" type="button" class="auction-secondary-action">Annulla chiamata</button>
       </div>
     </section>`
 }
