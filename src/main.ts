@@ -17,6 +17,7 @@ import './styles/theme-v3-data.css'
 import './styles/theme-light.css'
 import './styles/theme-refine.css'
 import './styles/theme-mobile.css'
+import './styles/app-shell.css'
 import { initTheme } from './theme'
 import { initRoundSelects } from './components/roundSelect'
 import { initAuctionShortcuts } from './components/auctionShortcuts'
@@ -1064,6 +1065,9 @@ function render():
   if (!app) {
     return
   }
+
+  // la pagina attiva decide se il contenuto è fisso (Dashboard, Asta, Rosa) o scorre
+  document.documentElement.dataset.page = activePage
 
   app.innerHTML = `
     ${renderNavigation(

@@ -19,6 +19,7 @@ export function setAuctionTab(tab: AuctionTab): void {
     button.setAttribute('aria-selected', String(button.dataset.auctionTab === tab))
   })
   window.scrollTo({ top: 0 })
+  document.querySelector('.app-main')?.scrollTo({ top: 0 })
 }
 
 // Schede della Dashboard su telefono (Riepilogo / Budget / Allenatori)
@@ -38,6 +39,7 @@ function setDashTab(tab: DashTab): void {
   try { window.sessionStorage.setItem(DASH_KEY, tab) } catch { /* solo comodità */ }
   syncTabButtons()
   window.scrollTo({ top: 0 })
+  document.querySelector('.app-main')?.scrollTo({ top: 0 })
 }
 
 function syncTabButtons(): void {

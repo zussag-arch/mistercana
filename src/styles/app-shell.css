@@ -1,0 +1,167 @@
+/* =========================
+   STRUTTURA "APP"
+   Il documento non scorre mai: barra in alto (e barra in basso su telefono)
+   restano ferme. Scorre solo l'area del contenuto, e nelle pagine fisse
+   (Dashboard, Asta, Rosa su computer) nemmeno quella: scorrono solo i
+   riquadri interni lunghi. Barre di scorrimento nascoste ovunque.
+========================= */
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body {
+  min-height: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+#app {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#app > .topbar {
+  flex: none;
+  position: relative !important;
+  top: auto !important;
+}
+
+.app-main {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* niente barre di scorrimento visibili (si scorre lo stesso) */
+.app-main,
+.app-main * {
+  scrollbar-width: none;
+}
+.app-main::-webkit-scrollbar,
+.app-main *::-webkit-scrollbar {
+  display: none;
+}
+
+/* telefono: spazio per la barra in basso dentro l'area che scorre */
+@media (max-width: 700px) {
+  .app-main {
+    padding-bottom: calc(var(--tabbar-total, 62px) + 16px);
+  }
+}
+
+/* =========================
+   PAGINE FISSE (computer)
+========================= */
+@media (min-width: 1001px) {
+  :root[data-page="dashboard"] .app-main,
+  :root[data-page="auction"] .app-main,
+  :root[data-page="roster"] .app-main {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  :root[data-page="dashboard"] .app-main > .page,
+  :root[data-page="auction"] .app-main > .page,
+  :root[data-page="roster"] .app-main > .page {
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* ---------- Dashboard ---------- */
+  .dashboard-page {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
+    align-content: stretch;
+    gap: 16px !important;
+    padding-bottom: 16px;
+  }
+  .dashboard-page > .dashboard-mobile-tabs { display: none; }
+  .dashboard-page > .overlay { position: fixed; }
+  /* configurazione (budget + allenatori): riquadro che scorre al suo interno */
+  .dashboard-page > div:not(.dashboard-mobile-tabs):not(.dashboard-participants):not(.overlay) {
+    min-height: 0;
+    overflow-y: auto;
+  }
+  /* prima dell'asta: passi, numeri, configurazione uno sotto l'altro */
+  .dashboard-page:not(:has(.dashboard-live-summary)) > .dashboard-setup-steps { grid-column: 1 / -1; grid-row: 1; }
+  .dashboard-page:not(:has(.dashboard-live-summary)) > .dashboard-stats-grid { grid-column: 1 / -1; grid-row: 2; }
+  .dashboard-page:not(:has(.dashboard-live-summary)) > div:not(.dashboard-mobile-tabs):not(.overlay) { grid-column: 1 / -1; grid-row: 3; }
+  /* asta live: la tua asta e configurazione a sinistra, partecipanti a destra */
+  .dashboard-page:has(.dashboard-live-summary) > .dashboard-live-summary { grid-column: 1; grid-row: 1; }
+  .dashboard-page:has(.dashboard-live-summary) > .dashboard-stats-grid { display: none !important; }
+  .dashboard-page:has(.dashboard-live-summary) > .dashboard-participants { grid-column: 2; grid-row: 1 / 4; min-height: 0; overflow-y: auto; }
+  .dashboard-page:has(.dashboard-live-summary) > div:not(.dashboard-mobile-tabs):not(.dashboard-participants):not(.overlay) { grid-column: 1; grid-row: 2 / 4; }
+  .dashboard-participants .auction-participant-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+
+  /* ---------- Asta ---------- */
+  .auction-live-page {
+    display: flex !important;
+    flex-direction: column;
+    padding-bottom: 16px;
+  }
+  .auction-live-page > .auction-workspace {
+    flex: 1;
+    min-height: 0;
+    align-items: stretch !important;
+  }
+  .auction-workspace-main,
+  .auction-side-panels {
+    min-height: 0;
+    overflow-y: auto;
+    padding-bottom: 4px;
+  }
+  .auction-live-page > .auction-market-followup:empty { display: none; }
+
+  /* ---------- Rosa ---------- */
+  .roster-page {
+    display: flex !important;
+    flex-direction: column;
+    padding-bottom: 16px;
+  }
+  .roster-page > .roster-layout {
+    flex: 1;
+    min-height: 0;
+    align-items: stretch !important;
+  }
+  .roster-layout > .roster-section {
+    min-height: 0;
+    overflow-y: auto;
+  }
+}
+
+@media (min-width: 1001px) {
+  /* pagine fisse: niente fascia vuota in basso */
+  :root[data-page="dashboard"] .app-main,
+  :root[data-page="auction"] .app-main,
+  :root[data-page="roster"] .app-main { padding-bottom: 20px !important; }
+  :root[data-page="dashboard"] .app-main > .page,
+  :root[data-page="auction"] .app-main > .page,
+  :root[data-page="roster"] .app-main > .page { padding-bottom: 0 !important; }
+
+  /* le tessere dentro le colonne non si schiacciano: è la colonna che scorre */
+  .auction-workspace-main > *,
+  .auction-side-panels > *,
+  .roster-layout > .roster-section > *,
+  .dashboard-page > div > * { flex-shrink: 0; }
+  .auction-workspace-main .auction-history-slot { contain: none; flex: none !important; min-height: 0; }
+
+  /* Dashboard live: reparti 2×2 nella colonna */
+  .dashboard-page:has(.dashboard-live-summary) .dashboard-live-roles {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+@media (min-width: 1001px) {
+  /* colonna sinistra più stretta: budget e reparti su due colonne */
+  .dashboard-page:has(.dashboard-live-summary) .budget-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .dashboard-page:has(.dashboard-live-summary) .dashboard-live-role-head { flex-wrap: wrap; }
+}

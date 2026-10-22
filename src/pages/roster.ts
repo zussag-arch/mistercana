@@ -237,5 +237,6 @@ export function bindRosterEvents(actions: RosterActions): void {
     }
     if (!pop.contains(target)) hide()
   })
-  window.addEventListener('scroll', () => { if (!pop.hidden) hide() }, { passive: true })
+  // lo scorrimento avviene dentro l'app (non nella finestra): ascolto in cattura
+  document.addEventListener('scroll', () => { if (!pop.hidden) hide() }, { passive: true, capture: true })
 }
