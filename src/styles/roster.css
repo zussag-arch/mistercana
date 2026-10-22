@@ -1,0 +1,203 @@
+/* =========================
+   LA MIA ROSA
+========================= */
+.roster-page { width: 100%; max-width: 1280px; margin-inline: auto; display: grid; gap: 16px; }
+.roster-header h1 { margin: 0; font-size: 34px; }
+.roster-header p { margin: 4px 0 0; color: var(--muted); }
+
+.roster-picker { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.roster-league { display: inline-flex; padding: 4px; border-radius: 999px; background: var(--surface-light); }
+.roster-league button {
+  min-height: 36px; padding: 0 16px; border: 0; border-radius: 999px !important;
+  background: none; color: var(--muted); font-weight: 700; cursor: pointer;
+}
+.roster-league button[aria-selected="true"] { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,.18); }
+.roster-team {
+  min-height: 44px; min-width: 240px; padding: 0 16px; border: 1px solid var(--line-1);
+  border-radius: 999px; background: var(--surface); color: var(--text); font: inherit; font-weight: 600;
+}
+
+.roster-section { padding: 22px; border: 1px solid var(--line-2); border-radius: var(--radius-xl); background: var(--surface); }
+.roster-section-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+.roster-section-head h2 { margin: 0; font-size: 24px; display: flex; }
+.roster-section-head h2::after { content: "."; color: var(--accent); }
+.roster-section-head span { color: var(--muted); font-size: 13px; }
+.roster-bench-title { margin: 18px 0 8px; font-size: 15px; color: var(--muted); }
+.roster-note { margin: 14px 0 0; color: var(--muted); font-size: 12px; }
+.roster-list { display: grid; }
+.roster-list + .roster-list { margin-top: 14px; }
+
+.roster-row {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1.6fr) minmax(0, 1.4fr) 110px 56px 60px minmax(0, 1.3fr);
+  align-items: center; gap: 12px;
+  width: 100%; padding: 10px 6px;
+  border: 0 !important; border-bottom: 1px solid var(--line-2) !important; border-radius: 0 !important;
+  background: none; color: var(--text); text-align: left; font: inherit; cursor: pointer;
+}
+.roster-row:hover { background: rgba(var(--ink-rgb), .03); }
+.roster-row.starter .roster-name strong::before { content: "●"; margin-right: 6px; color: var(--accent); font-size: 10px; vertical-align: 2px; }
+.roster-row.out { opacity: .55; }
+.roster-name { display: grid; min-width: 0; }
+.roster-name strong { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.roster-name small { color: var(--muted); font-size: 12px; }
+.roster-opponent { color: var(--text-soft); font-weight: 600; }
+.roster-muted { color: var(--muted); }
+
+.roster-form { display: inline-flex; gap: 3px; }
+.roster-form i {
+  display: inline-grid; place-items: center; width: 30px; height: 22px; border-radius: 6px;
+  font-style: normal; font-size: 11px; font-weight: 700; color: var(--on-color);
+}
+.roster-form i.great { background: var(--green); }
+.roster-form i.good { background: color-mix(in srgb, var(--green) 55%, var(--surface)); color: var(--text); }
+.roster-form i.ok { background: color-mix(in srgb, var(--yellow) 45%, var(--surface)); color: var(--text); }
+.roster-form i.bad { background: color-mix(in srgb, var(--red) 55%, var(--surface)); color: var(--text); }
+.roster-form i.sv { background: var(--surface-light); color: var(--muted); }
+
+.roster-prob { position: relative; display: block; height: 22px; border-radius: 999px; background: var(--surface-light); overflow: hidden; }
+.roster-prob b { position: absolute; inset: 0 auto 0 0; border-radius: 999px; }
+.roster-prob.high b { background: color-mix(in srgb, var(--green) 70%, transparent); }
+.roster-prob.mid b { background: color-mix(in srgb, var(--yellow) 70%, transparent); }
+.roster-prob.low b, .roster-prob.out b { background: color-mix(in srgb, var(--red) 60%, transparent); }
+.roster-prob em { position: relative; display: block; text-align: center; font-style: normal; font-size: 11px; font-weight: 700; line-height: 22px; color: var(--text); }
+.roster-ica, .roster-expected { font-family: var(--font-display); font-size: 16px; }
+.roster-expected { color: var(--accent); }
+.roster-status { display: flex; flex-wrap: wrap; gap: 4px; }
+.roster-chip, .roster-reason { padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+.roster-chip.bad { background: color-mix(in srgb, var(--red) 20%, transparent); color: var(--red); }
+.roster-chip.warn { background: color-mix(in srgb, var(--yellow) 22%, transparent); color: color-mix(in srgb, var(--yellow) 60%, var(--text)); }
+.roster-reason { background: var(--surface-light); color: var(--text-soft); font-weight: 600; }
+
+@media (max-width: 700px) {
+  .roster-section { padding: 16px 14px; }
+  .roster-team { flex: 1 1 100%; min-width: 0; }
+  .roster-row {
+    grid-template-columns: 30px minmax(0, 1fr) auto;
+    grid-template-areas:
+      "badge name expected"
+      "badge form prob"
+      "badge status status";
+    row-gap: 6px;
+  }
+  .roster-row > .role-badge { grid-area: badge; align-self: start; }
+  .roster-name { grid-area: name; }
+  .roster-row > [data-label="Forma"] { grid-area: form; }
+  .roster-row > [data-label="Titolare"] { grid-area: prob; width: 90px; }
+  .roster-row > .roster-ica { display: none; }
+  .roster-row > .roster-expected { grid-area: expected; }
+  .roster-status { grid-area: status; }
+  .roster-form i { width: 26px; }
+}
+.roster-section-head h2 { display: block; }
+.roster-section-head h2::after { display: inline; }
+
+/* ---------- impaginazione: campetto a sinistra, infermeria a destra ---------- */
+.roster-layout { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 1000px) { .roster-layout { grid-template-columns: 1fr; } }
+
+/* ---------- campetto ---------- */
+.pitch {
+  position: relative;
+  display: grid;
+  gap: 18px;
+  padding: 26px 12px;
+  border-radius: 22px;
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(180deg, rgba(255,255,255,.035) 0 48px, transparent 48px 96px),
+    linear-gradient(180deg, #1f6b47, #175a3b);
+}
+:root[data-theme="light"] .pitch {
+  background:
+    repeating-linear-gradient(180deg, rgba(255,255,255,.12) 0 48px, transparent 48px 96px),
+    linear-gradient(180deg, #7ccf9f, #5fbd8a);
+}
+.pitch-marks > * { position: absolute; border: 2px solid rgba(255,255,255,.35); pointer-events: none; }
+.pitch-half { left: 0; right: 0; top: 50%; height: 0; border-width: 2px 0 0; }
+.pitch-circle { left: 50%; top: 50%; width: 90px; height: 90px; border-radius: 50%; transform: translate(-50%, -50%); }
+.pitch-box { left: 28%; right: 28%; height: 52px; }
+.pitch-box.top { top: -2px; border-top: 0; }
+.pitch-box.bottom { bottom: -2px; border-bottom: 0; }
+.pitch-line { position: relative; display: flex; justify-content: space-evenly; gap: 6px; }
+
+.pitch-dot {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  min-width: 0; width: 72px; padding: 0; border: 0 !important; background: none; cursor: pointer;
+}
+.pitch-dot-circle {
+  position: relative;
+  display: grid; place-items: center;
+  width: 48px; height: 48px; border-radius: 50%;
+  border: 3px solid #fff;
+  font: 800 14px var(--font-ui); color: #1b1e21;
+  box-shadow: 0 4px 10px rgba(0,0,0,.25);
+  transition: transform .15s;
+}
+.pitch-dot:hover .pitch-dot-circle, .pitch-dot:focus-visible .pitch-dot-circle { transform: scale(1.08); }
+.pitch-dot.role-p .pitch-dot-circle { background: var(--role-p); }
+.pitch-dot.role-d .pitch-dot-circle { background: var(--role-d); }
+.pitch-dot.role-c .pitch-dot-circle { background: var(--role-c); }
+.pitch-dot.role-a .pitch-dot-circle { background: var(--role-a); }
+.pitch-dot.out .pitch-dot-circle { filter: grayscale(1); opacity: .6; }
+.pitch-dot-name {
+  max-width: 100%; padding: 2px 8px; border-radius: 999px;
+  background: rgba(0,0,0,.55); color: #fff; font-size: 11px; font-weight: 700;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.pitch-dot-flag { position: absolute; top: -4px; right: -4px; width: 14px; height: 14px; border-radius: 50%; border: 2px solid #fff; }
+.pitch-dot-flag.bad { background: var(--red); }
+.pitch-dot-flag.warn { background: var(--yellow); }
+
+.bench { display: flex; flex-wrap: wrap; gap: 10px 4px; padding: 12px 6px; border-radius: 18px; background: var(--surface-light); }
+.bench .pitch-dot-name { background: var(--surface); color: var(--text); }
+.bench .pitch-dot-circle { width: 40px; height: 40px; font-size: 12px; border-color: var(--surface); }
+
+/* ---------- riquadro del giocatore ---------- */
+.roster-pop {
+  position: fixed; z-index: 9100;
+  width: min(320px, calc(100vw - 16px));
+  padding: 14px; border: 1px solid var(--line-1); border-radius: 18px;
+  background: var(--surface); color: var(--text);
+  box-shadow: 0 16px 40px rgba(0,0,0,.35);
+  display: grid; gap: 10px;
+}
+.roster-pop[hidden] { display: none; }
+.roster-pop-head { display: flex; align-items: center; gap: 10px; }
+.roster-pop-head div { display: grid; }
+.roster-pop-head strong { font-size: 16px; }
+.roster-pop-head small { color: var(--muted); }
+.roster-pop-status { margin: 0; padding: 8px 10px; border-radius: 12px; font-size: 12px; line-height: 1.4; }
+.roster-pop-status.bad { background: color-mix(in srgb, var(--red) 15%, transparent); }
+.roster-pop-status.warn { background: color-mix(in srgb, var(--yellow) 18%, transparent); }
+.roster-pop-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.roster-pop-grid div { display: grid; padding: 8px; border-radius: 10px; background: var(--surface-light); }
+.roster-pop-grid span, .roster-pop-form > span { color: var(--muted); font-size: 11px; }
+.roster-pop-grid strong { font-family: var(--font-display); font-size: 16px; }
+.roster-pop-grid strong.accent { color: var(--accent); }
+.roster-pop-form { display: grid; gap: 4px; }
+.roster-pop-reasons { display: flex; flex-wrap: wrap; gap: 4px; }
+.roster-pop-reasons span { padding: 2px 8px; border-radius: 999px; background: var(--surface-light); color: var(--text-soft); font-size: 11px; font-weight: 600; }
+.roster-pop-open { min-height: 36px; border: 1px solid var(--line-1); background: var(--surface-light); color: var(--text); font-weight: 700; cursor: pointer; }
+
+/* ---------- infermeria ---------- */
+.infirmary-list { display: grid; }
+.infirmary-row {
+  display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; grid-template-areas: "badge name chip" "badge note back";
+  gap: 4px 10px; align-items: center; padding: 10px 2px; border-bottom: 1px solid var(--line-2);
+}
+.infirmary-row > .role-badge { grid-area: badge; align-self: start; }
+.infirmary-name { grid-area: name; display: grid; min-width: 0; }
+.infirmary-name small { color: var(--muted); font-size: 12px; }
+.infirmary-row .roster-chip { grid-area: chip; justify-self: end; }
+.infirmary-row p { grid-area: note; margin: 0; color: var(--text-soft); font-size: 12px; line-height: 1.35; }
+.infirmary-return { grid-area: back; justify-self: end; color: var(--muted); font-size: 12px; font-weight: 700; white-space: nowrap; }
+.infirmary-all { margin-top: 14px; }
+.infirmary-all summary { cursor: pointer; font-weight: 700; color: var(--text-soft); }
+.infirmary-all summary small { color: var(--muted); font-weight: 500; }
+
+@media (max-width: 700px) {
+  .pitch { padding: 20px 4px; gap: 14px; }
+  .pitch-dot { width: 64px; }
+  .pitch-dot-circle { width: 42px; height: 42px; font-size: 13px; }
+}
