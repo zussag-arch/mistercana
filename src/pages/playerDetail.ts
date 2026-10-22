@@ -8,7 +8,7 @@ import {
 import { getLegacyIdFromFldaId } from '../services/playerIdentity'
 import { getAssignmentFldaId } from '../services/auctionPlayerResolver'
 import {
-  auctionStatusClass, auctionStatusLabel, display, displayCount, escapePlayerHtml,
+  display, displayCount, escapePlayerHtml,
   field, latestHistory, renderCurrentMetrics,
   renderPerformanceChart, renderMatchdayChart, renderPlayerBadges, renderSageSection, renderICaV3Explanation,
 } from '../components/playerDataView'
@@ -170,7 +170,7 @@ export function renderFullPlayerPage(reference: string | null, state: AppState):
   return `<section class="page player-full-page player-full-page-v3 player-tone-${role.toLowerCase()}">
     <header class="player-full-header" data-role-word="${escapePlayerHtml(roleName)}">
       <div class="player-full-identity"><span class="player-detail-role player-detail-role-${role.toLowerCase()}">${escapePlayerHtml(role)}</span><div><small>${escapePlayerHtml(roleName)}</small><h1${flda.name.trim().endsWith('.') ? ' class="no-dot"' : ''}>${escapePlayerHtml(flda.name)}</h1><p>${context}</p>${renderPlayerBadges(view)}</div></div>
-      <div class="player-full-actions"><button type="button" class="player-full-back sheet-back" data-player-detail-back aria-label="Indietro"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg><span>Indietro</span></button><span class="player-status player-status-${auctionStatusClass(view)}">${auctionStatusLabel(view)}</span>${flda.player_id ? `<button type="button" class="player-detail-call-button" data-full-player-call="${escapePlayerHtml(flda.player_id)}" ${state.auctionPhase === 'live' && !assigned ? '' : 'disabled'}>${assigned ? 'assegnato' : 'chiama'}</button>` : ''}</div>
+      <div class="player-full-actions"><button type="button" class="player-full-back sheet-close" data-player-detail-back aria-label="Chiudi">×</button></div>
     </header>
     ${!view.identityAvailable ? '<p class="player-data-alert">Dati FLDA non disponibili per questa identità.</p>' : ''}${detailError ? `<p class="player-data-alert">${escapePlayerHtml(detailError)}</p>` : ''}
     ${renderCurrentMetrics(view, true, displayHistoricalAuctionPrices(detail))}
@@ -199,18 +199,6 @@ async function load(reference: string, actions: PlayerDetailActions): Promise<vo
 
 export function bindFullPlayerPage(reference: string | null, actions: PlayerDetailActions): void {
   document.querySelector('[data-player-detail-back]')?.addEventListener('click', actions.onBack)
-  // telefono: pulsante "Indietro" fisso sullo schermo, fuori dalla pagina animata
-  document.querySelectorAll('.sheet-back-portal').forEach((item) => item.remove())
-  const portal = document.createElement('button')
-  portal.type = 'button'
-  portal.className = 'sheet-back sheet-back-portal'
-  portal.setAttribute('aria-label', 'Indietro')
-  portal.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg><span>Indietro</span>'
-  portal.addEventListener('click', () => {
-    portal.remove()
-    actions.onBack()
-  })
-  document.body.append(portal)
   document.querySelector<HTMLElement>('[data-full-player-call]')?.addEventListener('click', (event) => { const id = (event.currentTarget as HTMLElement).dataset.fullPlayerCall; if (id) actions.onCallPlayer(id) })
   const selected = reference ? resolve(reference) : undefined
   if (reference && !getCachedPlayersDataset()) void load(reference, actions)
