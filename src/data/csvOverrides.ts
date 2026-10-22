@@ -48,8 +48,14 @@ export function getCsvOverrides(): Partial<Record<CsvKey, CsvOverride>> {
   return typeof window === 'undefined' ? {} : readAll()
 }
 
-export function saveCsvOverrides(files: Partial<Record<CsvKey, CsvOverride>>): void {
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...readAll(), ...files }))
+/** Salva i CSV caricati; false se la memoria del dispositivo è piena o bloccata. */
+export function saveCsvOverrides(files: Partial<Record<CsvKey, CsvOverride>>): boolean {
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...readAll(), ...files }))
+    return true
+  } catch {
+    return false
+  }
 }
 
 export function clearCsvOverrides(): void {

@@ -15,7 +15,7 @@ function currentTab(): AuctionTab {
 export function setAuctionTab(tab: AuctionTab): void {
   document.documentElement.dataset.auctionTab = tab
   try { window.sessionStorage.setItem(TAB_KEY, tab) } catch { /* solo comodità */ }
-  document.querySelectorAll<HTMLElement>('[data-auction-tab]').forEach((button) => {
+  document.querySelectorAll<HTMLElement>('button[data-auction-tab]').forEach((button) => {
     button.setAttribute('aria-selected', String(button.dataset.auctionTab === tab))
   })
   window.scrollTo({ top: 0 })
@@ -42,10 +42,10 @@ function setDashTab(tab: DashTab): void {
 
 function syncTabButtons(): void {
   const root = document.documentElement.dataset
-  document.querySelectorAll<HTMLElement>('[data-auction-tab]').forEach((button) => {
+  document.querySelectorAll<HTMLElement>('button[data-auction-tab]').forEach((button) => {
     button.setAttribute('aria-selected', String(button.dataset.auctionTab === (root.auctionTab ?? 'call')))
   })
-  document.querySelectorAll<HTMLElement>('[data-dash-tab]').forEach((button) => {
+  document.querySelectorAll<HTMLElement>('button[data-dash-tab]').forEach((button) => {
     button.setAttribute('aria-selected', String(button.dataset.dashTab === (root.dashTab ?? 'summary')))
   })
 }
@@ -56,12 +56,12 @@ export function initMobileApp(): void {
 
   document.addEventListener('click', (event) => {
     const target = event.target as HTMLElement | null
-    const dash = target?.closest<HTMLElement>('[data-dash-tab]')
+    const dash = target?.closest<HTMLElement>('button[data-dash-tab]')
     if (dash?.dataset.dashTab) {
       setDashTab(dash.dataset.dashTab as DashTab)
       return
     }
-    const tab = target?.closest<HTMLElement>('[data-auction-tab]')
+    const tab = target?.closest<HTMLElement>('button[data-auction-tab]')
     if (tab?.dataset.auctionTab) {
       setAuctionTab(tab.dataset.auctionTab as AuctionTab)
       return
@@ -73,5 +73,14 @@ export function initMobileApp(): void {
   })
 
   // le etichette delle schede vengono ridisegnate con la pagina: riallinea lo stato
-  new MutationObserver(syncTabButtons).observe(document.body, { childList: true, subtree: true })
+  // allinea le schede dopo ogni ridisegno, al massimo una volta per fotogramma
+  let pending = false
+  new MutationObserver(() => {
+    if (pending) return
+    pending = true
+    window.requestAnimationFrame(() => {
+      pending = false
+      syncTabButtons()
+    })
+  }).observe(document.getElementById('app') ?? document.body, { childList: true, subtree: true })
 }
