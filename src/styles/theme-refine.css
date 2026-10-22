@@ -377,3 +377,52 @@ html:has(.install-sheet) body {
 .md-stop-top { stop-color: var(--green); stop-opacity: 0.55; }
 .md-stop-bottom { stop-color: var(--green); stop-opacity: 0.06; }
 .md-chart .chart-legend text { font-size: 12px; fill: var(--muted); }
+
+/* =========================
+   LIQUID GLASS per i riquadri sovrapposti
+   fondo traslucido + sfocatura e saturazione di ciò che sta dietro,
+   riflesso chiaro in alto, bordo luminoso sottile
+========================= */
+:root {
+  --glass-bg: color-mix(in srgb, var(--surface) 64%, transparent);
+  --glass-strong: color-mix(in srgb, var(--surface) 82%, transparent);
+  --glass-border: rgba(255, 255, 255, 0.16);
+  --glass-shine: rgba(255, 255, 255, 0.22);
+}
+:root[data-theme="light"] {
+  --glass-bg: color-mix(in srgb, #fffdf8 62%, transparent);
+  --glass-strong: color-mix(in srgb, #fffdf8 84%, transparent);
+  --glass-border: rgba(255, 255, 255, 0.75);
+  --glass-shine: rgba(255, 255, 255, 0.9);
+}
+.roster-pop,
+.round-select-menu,
+.install-card,
+.roster-pop-close,
+.save-warning {
+  background:
+    linear-gradient(140deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.02) 45%, rgba(255, 255, 255, 0.06)),
+    var(--glass-bg) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  backdrop-filter: blur(22px) saturate(180%);
+  border: 1px solid var(--glass-border) !important;
+  box-shadow: inset 0 1px 0 var(--glass-shine), inset 0 -1px 0 rgba(0, 0, 0, 0.06), 0 18px 48px rgba(0, 0, 0, 0.32) !important;
+}
+/* finestre grandi (schede, aggiudicazione, selettori): vetro più pieno, per leggere bene */
+.player-detail-card,
+.overlay-card,
+.goalkeeper-matrix-dialog {
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.02) 40%),
+    var(--glass-strong) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(170%);
+  backdrop-filter: blur(28px) saturate(170%);
+  border: 1px solid var(--glass-border) !important;
+  box-shadow: inset 0 1px 0 var(--glass-shine), 0 24px 70px rgba(0, 0, 0, 0.38) !important;
+}
+/* tessere interne del riquadro: vetro leggero */
+.roster-pop-grid div,
+.roster-pop-open {
+  background: rgba(var(--ink-rgb), 0.06) !important;
+  border-color: var(--glass-border) !important;
+}

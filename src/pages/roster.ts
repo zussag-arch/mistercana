@@ -87,20 +87,20 @@ function renderPopover(pick: MatchdayPick): string {
 function dot(pick: MatchdayPick): string {
   const status = statusLabel(pick.probable)
   const surname = pick.player.name.replace(/\s+[A-Z]\.$/, '')
-  return `<button type="button" class="pitch-dot role-${pick.player.role.toLowerCase()}${pick.out ? ' out' : ''}" data-roster-dot="${escapePlayerHtml(pick.player.player_id ?? '')}" aria-label="${escapePlayerHtml(pick.player.name)}">
-    <span class="pitch-dot-marker">
-      <svg viewBox="0 0 40 40" aria-hidden="true"><path class="pitch-dot-shape" d="M20 2.8c1 0 1.9.3 2.7.9l13.4 9.7c1.6 1.1 2.2 3.1 1.6 4.9l-5.1 15.8c-.6 1.8-2.3 3-4.2 3H11.6c-1.9 0-3.6-1.2-4.2-3L2.3 18.3c-.6-1.8 0-3.8 1.6-4.9l13.4-9.7c.8-.6 1.7-.9 2.7-.9Z"/></svg>
+  return `<button type="button" class="rpitch-dot role-${pick.player.role.toLowerCase()}${pick.out ? ' out' : ''}" data-roster-dot="${escapePlayerHtml(pick.player.player_id ?? '')}" aria-label="${escapePlayerHtml(pick.player.name)}">
+    <span class="rpitch-dot-marker">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><path class="rpitch-dot-shape" d="M20 2.8c1 0 1.9.3 2.7.9l13.4 9.7c1.6 1.1 2.2 3.1 1.6 4.9l-5.1 15.8c-.6 1.8-2.3 3-4.2 3H11.6c-1.9 0-3.6-1.2-4.2-3L2.3 18.3c-.6-1.8 0-3.8 1.6-4.9l13.4-9.7c.8-.6 1.7-.9 2.7-.9Z"/></svg>
       <b>${display(pick.expected, 1)}</b>
-      ${status ? `<i class="pitch-dot-flag ${status.tone}" title="${status.text}"></i>` : ''}
+      ${status ? `<i class="rpitch-dot-flag ${status.tone}" title="${status.text}"></i>` : ''}
     </span>
-    <span class="pitch-dot-name">${escapePlayerHtml(surname)}</span>
+    <span class="rpitch-dot-name">${escapePlayerHtml(surname)}</span>
   </button>`
 }
 
 function renderPitch(starters: MatchdayPick[]): string {
-  const line = (role: string) => `<div class="pitch-line">${starters.filter((pick) => pick.player.role === role).map(dot).join('')}</div>`
-  return `<div class="pitch">
-    <div class="pitch-marks" aria-hidden="true"><span class="pitch-half"></span><span class="pitch-circle"></span><span class="pitch-box top"></span><span class="pitch-box bottom"></span></div>
+  const line = (role: string) => `<div class="rpitch-line">${starters.filter((pick) => pick.player.role === role).map(dot).join('')}</div>`
+  return `<div class="rpitch">
+    <div class="rpitch-marks" aria-hidden="true"><span class="rpitch-half"></span><span class="rpitch-circle"></span><span class="rpitch-box top"></span><span class="rpitch-box bottom"></span></div>
     ${line('A')}${line('C')}${line('D')}${line('P')}
   </div>`
 }
@@ -216,8 +216,9 @@ export function bindRosterEvents(actions: RosterActions): void {
     const width = pop.offsetWidth
     const height = pop.offsetHeight
     const left = Math.min(Math.max(8, rect.left + rect.width / 2 - width / 2), window.innerWidth - width - 8)
-    const below = rect.bottom + 8
-    const top = below + height < window.innerHeight - 70 ? below : Math.max(8, rect.top - height - 8)
+    const below = rect.bottom + 60
+    // sopra il riquadro c'è la × (48 px): se sotto non c'è spazio, il riquadro va sopra il giocatore
+    const top = below + height < window.innerHeight - 70 ? below : Math.max(60, rect.top - height - 12)
     pop.style.left = `${left}px`
     pop.style.top = `${top}px`
   }

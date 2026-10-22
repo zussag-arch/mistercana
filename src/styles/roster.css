@@ -97,7 +97,7 @@
 @media (max-width: 1000px) { .roster-layout { grid-template-columns: 1fr; } }
 
 /* ---------- campetto ---------- */
-.pitch {
+.rpitch {
   position: relative;
   display: grid;
   gap: 18px;
@@ -108,24 +108,24 @@
     repeating-linear-gradient(180deg, rgba(255,255,255,.035) 0 48px, transparent 48px 96px),
     linear-gradient(180deg, #1f6b47, #175a3b);
 }
-:root[data-theme="light"] .pitch {
+:root[data-theme="light"] .rpitch {
   background:
     repeating-linear-gradient(180deg, rgba(255,255,255,.12) 0 48px, transparent 48px 96px),
     linear-gradient(180deg, #7ccf9f, #5fbd8a);
 }
-.pitch-marks > * { position: absolute; border: 2px solid rgba(255,255,255,.35); pointer-events: none; }
-.pitch-half { left: 0; right: 0; top: 50%; height: 0; border-width: 2px 0 0; }
-.pitch-circle { left: 50%; top: 50%; width: 90px; height: 90px; border-radius: 50%; transform: translate(-50%, -50%); }
-.pitch-box { left: 28%; right: 28%; height: 52px; }
-.pitch-box.top { top: -2px; border-top: 0; }
-.pitch-box.bottom { bottom: -2px; border-bottom: 0; }
-.pitch-line { position: relative; display: flex; justify-content: space-evenly; gap: 6px; }
+.rpitch-marks > * { position: absolute; border: 2px solid rgba(255,255,255,.35); pointer-events: none; }
+.rpitch-half { left: 0; right: 0; top: 50%; height: 0; border-width: 2px 0 0; }
+.rpitch-circle { left: 50%; top: 50%; width: 90px; height: 90px; border-radius: 50%; transform: translate(-50%, -50%); }
+.rpitch-box { left: 28%; right: 28%; height: 52px; }
+.rpitch-box.top { top: -2px; border-top: 0; }
+.rpitch-box.bottom { bottom: -2px; border-bottom: 0; }
+.rpitch-line { position: relative; display: flex; justify-content: space-evenly; gap: 6px; }
 
-.pitch-dot {
+.rpitch-dot {
   display: flex; flex-direction: column; align-items: center; gap: 4px;
   min-width: 0; width: 72px; padding: 0; border: 0 !important; background: none; cursor: pointer;
 }
-.pitch-dot-circle {
+.rpitch-dot-circle {
   position: relative;
   display: grid; place-items: center;
   width: 48px; height: 48px; border-radius: 50%;
@@ -134,24 +134,24 @@
   box-shadow: 0 4px 10px rgba(0,0,0,.25);
   transition: transform .15s;
 }
-.pitch-dot:hover .pitch-dot-circle, .pitch-dot:focus-visible .pitch-dot-circle { transform: scale(1.08); }
-.pitch-dot.role-p .pitch-dot-circle { background: var(--role-p); }
-.pitch-dot.role-d .pitch-dot-circle { background: var(--role-d); }
-.pitch-dot.role-c .pitch-dot-circle { background: var(--role-c); }
-.pitch-dot.role-a .pitch-dot-circle { background: var(--role-a); }
-.pitch-dot.out .pitch-dot-circle { filter: grayscale(1); opacity: .6; }
-.pitch-dot-name {
+.rpitch-dot:hover .rpitch-dot-circle, .rpitch-dot:focus-visible .rpitch-dot-circle { transform: scale(1.08); }
+.rpitch-dot.role-p .rpitch-dot-circle { background: var(--role-p); }
+.rpitch-dot.role-d .rpitch-dot-circle { background: var(--role-d); }
+.rpitch-dot.role-c .rpitch-dot-circle { background: var(--role-c); }
+.rpitch-dot.role-a .rpitch-dot-circle { background: var(--role-a); }
+.rpitch-dot.out .rpitch-dot-circle { filter: grayscale(1); opacity: .6; }
+.rpitch-dot-name {
   max-width: 100%; padding: 2px 8px; border-radius: 999px;
   background: rgba(0,0,0,.55); color: #fff; font-size: 11px; font-weight: 700;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.pitch-dot-flag { position: absolute; top: -4px; right: -4px; width: 14px; height: 14px; border-radius: 50%; border: 2px solid #fff; }
-.pitch-dot-flag.bad { background: var(--red); }
-.pitch-dot-flag.warn { background: var(--yellow); }
+.rpitch-dot-flag { position: absolute; top: -4px; right: -4px; width: 14px; height: 14px; border-radius: 50%; border: 2px solid #fff; }
+.rpitch-dot-flag.bad { background: var(--red); }
+.rpitch-dot-flag.warn { background: var(--yellow); }
 
 .bench { display: flex; flex-wrap: wrap; gap: 10px 4px; padding: 12px 6px; border-radius: 18px; background: var(--surface-light); }
-.bench .pitch-dot-name { background: var(--surface); color: var(--text); }
-.bench .pitch-dot-circle { width: 40px; height: 40px; font-size: 12px; border-color: var(--surface); }
+.bench .rpitch-dot-name { background: var(--surface); color: var(--text); }
+.bench .rpitch-dot-circle { width: 40px; height: 40px; font-size: 12px; border-color: var(--surface); }
 
 /* ---------- riquadro del giocatore ---------- */
 .roster-pop {
@@ -197,30 +197,30 @@
 .infirmary-all summary small { color: var(--muted); font-weight: 500; }
 
 @media (max-width: 700px) {
-  .pitch { padding: 20px 4px; gap: 14px; }
-  .pitch-dot { width: 64px; }
-  .pitch-dot-circle { width: 42px; height: 42px; font-size: 13px; }
+  .rpitch { padding: 20px 4px; gap: 14px; }
+  .rpitch-dot { width: 64px; }
+  .rpitch-dot-circle { width: 42px; height: 42px; font-size: 13px; }
 }
 
 /* segnalino a pentagono stondato */
-.pitch-dot-marker { position: relative; display: grid; place-items: center; width: 52px; height: 52px; transition: transform .15s; }
-.pitch-dot-marker svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 4px 6px rgba(0,0,0,.28)); }
-.pitch-dot-shape { stroke: #fff; stroke-width: 2.5; stroke-linejoin: round; fill: var(--surface-raised); }
-.pitch-dot.role-p .pitch-dot-shape { fill: var(--role-p); }
-.pitch-dot.role-d .pitch-dot-shape { fill: var(--role-d); }
-.pitch-dot.role-c .pitch-dot-shape { fill: var(--role-c); }
-.pitch-dot.role-a .pitch-dot-shape { fill: var(--role-a); }
-.pitch-dot-marker b { position: relative; margin-top: 3px; font: 800 14px var(--font-ui); color: #1b1e21; }
-.pitch-dot:hover .pitch-dot-marker, .pitch-dot:focus-visible .pitch-dot-marker { transform: translateY(-2px); }
-.pitch-dot.out .pitch-dot-marker { filter: grayscale(1); opacity: .6; }
-.pitch-dot-marker .pitch-dot-flag { top: -2px; right: 0; }
-.pitch-dot-circle { display: none; }
-.bench .pitch-dot-marker { width: 44px; height: 44px; }
-.bench .pitch-dot-marker b { font-size: 12px; }
-.bench .pitch-dot-shape { stroke: var(--surface); }
+.rpitch-dot-marker { position: relative; display: grid; place-items: center; width: 52px; height: 52px; transition: transform .15s; }
+.rpitch-dot-marker svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 4px 6px rgba(0,0,0,.28)); }
+.rpitch-dot-shape { stroke: #fff; stroke-width: 2.5; stroke-linejoin: round; fill: var(--surface-raised); }
+.rpitch-dot.role-p .rpitch-dot-shape { fill: var(--role-p); }
+.rpitch-dot.role-d .rpitch-dot-shape { fill: var(--role-d); }
+.rpitch-dot.role-c .rpitch-dot-shape { fill: var(--role-c); }
+.rpitch-dot.role-a .rpitch-dot-shape { fill: var(--role-a); }
+.rpitch-dot-marker b { position: relative; margin-top: 3px; font: 800 14px var(--font-ui); color: #1b1e21; }
+.rpitch-dot:hover .rpitch-dot-marker, .rpitch-dot:focus-visible .rpitch-dot-marker { transform: translateY(-2px); }
+.rpitch-dot.out .rpitch-dot-marker { filter: grayscale(1); opacity: .6; }
+.rpitch-dot-marker .rpitch-dot-flag { top: -2px; right: 0; }
+.rpitch-dot-circle { display: none; }
+.bench .rpitch-dot-marker { width: 44px; height: 44px; }
+.bench .rpitch-dot-marker b { font-size: 12px; }
+.bench .rpitch-dot-shape { stroke: var(--surface); }
 @media (max-width: 700px) {
-  .pitch-dot-marker { width: 46px; height: 46px; }
-  .pitch-dot-marker b { font-size: 13px; }
+  .rpitch-dot-marker { width: 46px; height: 46px; }
+  .rpitch-dot-marker b { font-size: 13px; }
 }
 
 /* × del riquadro */
@@ -251,4 +251,15 @@
   .roster-hero { padding: 20px 16px; }
   .roster-hero h1 { font-size: 30px; }
   .roster-hero .roster-picker { width: 100%; }
+}
+
+/* × fuori dal riquadro, sopra a destra */
+.roster-pop { overflow: visible; }
+.roster-pop-head { padding-right: 0; }
+.roster-pop-close {
+  top: -50px !important;
+  right: 0 !important;
+  width: 40px !important;
+  height: 40px !important;
+  font-size: 20px !important;
 }
