@@ -216,9 +216,9 @@ export function bindRosterEvents(actions: RosterActions): void {
     const width = pop.offsetWidth
     const height = pop.offsetHeight
     const left = Math.min(Math.max(8, rect.left + rect.width / 2 - width / 2), window.innerWidth - width - 8)
-    const below = rect.bottom + 60
-    // sopra il riquadro c'è la × (48 px): se sotto non c'è spazio, il riquadro va sopra il giocatore
-    const top = below + height < window.innerHeight - 70 ? below : Math.max(60, rect.top - height - 12)
+    const below = rect.bottom + 18
+    // la × sporge di metà dall'angolo: 18 px di margine; se sotto non c'è spazio, il riquadro va sopra
+    const top = below + height < window.innerHeight - 70 ? below : Math.max(18, rect.top - height - 18)
     pop.style.left = `${left}px`
     pop.style.top = `${top}px`
   }
