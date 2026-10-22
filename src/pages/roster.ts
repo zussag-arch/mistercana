@@ -89,7 +89,7 @@ function dot(pick: MatchdayPick): string {
   const surname = pick.player.name.replace(/\s+[A-Z]\.$/, '')
   return `<button type="button" class="rpitch-dot role-${pick.player.role.toLowerCase()}${pick.out ? ' out' : ''}" data-roster-dot="${escapePlayerHtml(pick.player.player_id ?? '')}" aria-label="${escapePlayerHtml(pick.player.name)}">
     <span class="rpitch-dot-marker">
-      <svg viewBox="0 0 40 40" aria-hidden="true"><path class="rpitch-dot-shape" d="M20 2.8c1 0 1.9.3 2.7.9l13.4 9.7c1.6 1.1 2.2 3.1 1.6 4.9l-5.1 15.8c-.6 1.8-2.3 3-4.2 3H11.6c-1.9 0-3.6-1.2-4.2-3L2.3 18.3c-.6-1.8 0-3.8 1.6-4.9l13.4-9.7c.8-.6 1.7-.9 2.7-.9Z"/></svg>
+      <svg viewBox="0 0 40 40" aria-hidden="true"><path class="rpitch-dot-shape" d="M23.18 5.21 Q29.49 8.44 34.51 13.44 Q37.69 15.75 36.47 19.50 Q35.36 26.49 32.15 32.80 Q30.93 36.55 27.00 36.55 Q20.00 37.65 13.00 36.55 Q9.07 36.55 7.85 32.80 Q4.64 26.49 3.53 19.50 Q2.31 15.75 5.49 13.44 Q10.51 8.44 16.82 5.21 Q20.00 2.90 23.18 5.21 Z"/></svg>
       <b>${display(pick.expected, 1)}</b>
       ${status ? `<i class="rpitch-dot-flag ${status.tone}" title="${status.text}"></i>` : ''}
     </span>
