@@ -612,7 +612,7 @@ function renderCsvUpload(): string {
     <div class="csv-upload">
       <div class="csv-upload-copy">
         <strong>Carica nuovi dati</strong>
-        <p><b>Aggiorna da FantaLab</b> apre il login FantaLab e scarica tutto da solo (serve FLDA acceso sul computer). In alternativa scegli i CSV a mano. In entrambi i casi vedi un'anteprima prima di applicare.</p>
+        <p><b>Aggiorna da FantaLab</b> apre il login FantaLab, scarica tutto da solo e lo pubblica online per tutti i dispositivi (serve FLDA acceso sul computer). In alternativa scegli i CSV a mano. In entrambi i casi vedi un'anteprima prima di applicare.</p>
       </div>
       <div class="csv-upload-actions">
         <button id="fantalabSyncButton" type="button" class="data-transfer-button data-transfer-button-primary" ${syncRunning ? 'disabled' : ''}>Aggiorna da FantaLab</button>
@@ -696,6 +696,7 @@ const SYNC_STEPS: Record<string, string> = {
   login: 'Login FantaLab',
   download: 'Download da FantaLab',
   export: 'Preparazione file',
+  publish: 'Pubblicazione per tutti i dispositivi',
 }
 
 interface SyncState {
