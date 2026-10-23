@@ -116,19 +116,7 @@
     1px solid
     color-mix(in srgb, var(--accent) 30%, transparent);
 
-  border-radius: 18px;
-
-  background:
-    linear-gradient(
-      180deg,
-      var(--accent),
-      var(--accent)
-    );
-
-  color: var(--on-color);
-
   font-size: 13px;
-  font-weight: 800;
 
   cursor: pointer;
 
@@ -228,10 +216,6 @@
 
 .dashboard-stat-value {
   display: block;
-
-  font-size: 19px;
-  font-weight: 900;
-  line-height: 1;
 }
 
 .dashboard-stat-value.is-green {
@@ -518,22 +502,6 @@
 }
 
 /* C */
-
-.dashboard-page
-.budget-field:nth-child(3)::before {
-  background:
-    linear-gradient(
-      90deg,
-      var(--accent) 0%,
-      var(--accent) 100%
-    );
-}
-
-.dashboard-page
-.budget-field:nth-child(3)
-> span {
-  color: var(--accent);
-}
 
 /* A */
 
@@ -931,15 +899,6 @@ input:focus {
   justify-content: center;
 
   min-height: 132px;
-
-  border:
-    1px dashed
-    rgba(var(--ink-rgb), 0.14);
-
-  border-radius: 24px;
-
-  background:
-    rgba(var(--ink-rgb), 0.015);
 
   color: var(--muted);
 

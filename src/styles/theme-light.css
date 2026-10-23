@@ -78,18 +78,8 @@
 /* ---------- pulsante tema ---------- */
 
 .theme-switch {
-  flex: none;
-  width: 38px;
-  height: 38px;
-  margin-left: 8px;
-  border-radius: 999px;
-  border: 1px solid var(--line-1);
-  background: var(--surface-light);
   color: var(--text);
-  cursor: pointer;
-  display: inline-grid;
   place-items: center;
-  transition: background 0.2s, transform 0.2s, border-color 0.2s;
 }
 /* luna nel tema scuro, sole in quello chiaro */
 
@@ -190,12 +180,8 @@ button:not([class*="card"]):not([class*="backdrop"]):not([class*="tile"]):not([c
 
 /* ---------- interruttore del tema: sole | luna, cursore che scorre ---------- */
 .theme-switch {
-  position: relative;
   flex: none;
-  width: 64px;
-  height: 34px;
   margin-left: 8px;
-  padding: 0 9px;
   display: inline-flex;
   align-items: center;
   justify-content: space-between;
@@ -210,8 +196,6 @@ button:not([class*="card"]):not([class*="backdrop"]):not([class*="tile"]):not([c
 .theme-switch svg {
   position: relative;
   z-index: 1;
-  width: 15px;
-  height: 15px;
   fill: none;
   stroke: var(--muted);
   stroke-width: 2;
@@ -221,10 +205,6 @@ button:not([class*="card"]):not([class*="backdrop"]):not([class*="tile"]):not([c
 }
 .theme-switch-knob {
   position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 26px;
-  height: 26px;
   border-radius: 50%;
   background: var(--surface);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
@@ -232,7 +212,6 @@ button:not([class*="card"]):not([class*="backdrop"]):not([class*="tile"]):not([c
 }
 /* tema scuro: cursore sulla luna (destra) */
 :root:not([data-theme="light"]) .theme-switch-knob {
-  transform: translateX(30px);
   background: var(--surface-raised);
 }
 :root:not([data-theme="light"]) .theme-switch-moon { stroke: var(--yellow); }
@@ -243,10 +222,7 @@ button:not([class*="card"]):not([class*="backdrop"]):not([class*="tile"]):not([c
 }
 
 /* interruttore: un po' più compatto e sempre riferimento del suo cursore */
-.theme-switch { position: relative !important; width: 56px; height: 30px; padding: 0 7px; }
-.theme-switch-knob { width: 22px; height: 22px; }
-:root:not([data-theme="light"]) .theme-switch-knob { transform: translateX(26px); }
-.theme-switch svg { width: 13px; height: 13px; }
+.theme-switch { position: relative !important; }
 
 /* lente del pulsante Cerca giocatore */
 .search-icon {

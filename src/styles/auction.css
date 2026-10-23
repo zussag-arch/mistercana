@@ -9,13 +9,6 @@
 
 .auction-kicker {
   display: block;
-
-  color: var(--muted);
-
-  font-size: 11px;
-  font-weight: 850;
-
-  letter-spacing: 0.12em;
 }
 
 /* =========================
@@ -81,10 +74,6 @@
   border:
     1px solid
     rgba(var(--ink-rgb), 0.09);
-
-  border-radius: 16px;
-
-  background: var(--surface);
 }
 
 .auction-role-tab {
@@ -92,8 +81,6 @@
   height: 31px;
 
   border: 0;
-
-  border-radius: 12px;
 
   background: transparent;
 
@@ -156,16 +143,6 @@
   opacity: 0.35;
 
   cursor: default;
-}
-
-.auction-quick-nav {
-  border-color:
-    color-mix(in srgb, var(--blue) 25%, transparent);
-
-  background:
-    color-mix(in srgb, var(--blue) 7%, transparent);
-
-  color: var(--blue);
 }
 
 .live-badge {
@@ -252,15 +229,12 @@
 }
 
 .auction-call-selectors {
-  display: grid;
 
   grid-template-columns:
     repeat(
       2,
       minmax(0, 1fr)
     );
-
-  gap: 7px;
 }
 
 .auction-call-selector {
@@ -297,17 +271,11 @@
 }
 
 .auction-call-selector > span {
-  width: 28px;
-  height: 28px;
 
   display: grid;
   place-items: center;
 
   flex: 0 0 auto;
-
-  border-radius: 10px;
-
-  background: var(--surface-raised);
 }
 
 .auction-call-selector > div {
@@ -317,16 +285,6 @@
   flex-direction: column;
 
   gap: 1px;
-}
-
-.auction-call-selector small {
-  color: var(--muted);
-
-  font-size: 11px;
-}
-
-.auction-call-selector strong {
-  font-size: 11px;
 }
 
 /* =========================
@@ -546,57 +504,7 @@
 
   flex: 0 0 auto;
 
-  border-radius: 9px;
-
-  color: var(--on-color);
-
   font-size: 11px;
-  font-weight: 900;
-}
-
-.auction-role-badge.large {
-  width: 38px;
-  height: 38px;
-
-  border-radius: 13px;
-
-  font-size: 13px;
-}
-
-.auction-role-badge.role-p {
-  background:
-    linear-gradient(
-      135deg,
-      var(--yellow),
-      var(--yellow)
-    );
-}
-
-.auction-role-badge.role-d {
-  background:
-    linear-gradient(
-      135deg,
-      var(--blue),
-      var(--blue)
-    );
-}
-
-.auction-role-badge.role-c {
-  background:
-    linear-gradient(
-      135deg,
-      var(--accent),
-      var(--accent)
-    );
-}
-
-.auction-role-badge.role-a {
-  background:
-    linear-gradient(
-      135deg,
-      var(--red),
-      var(--red)
-    );
 }
 
 /* =========================
@@ -609,10 +517,6 @@
   grid-template-columns:
     minmax(0, 2.25fr)
     minmax(330px, 0.9fr);
-
-  align-items: start;
-
-  gap: 12px;
 }
 
 .auction-workspace-main,
@@ -632,8 +536,6 @@
 
 .auction-roster-metrics {
   display: grid;
-
-  gap: 7px;
 }
 
 .auction-roster-metric-card {
@@ -642,16 +544,6 @@
   border:
     1px solid
     color-mix(in srgb, var(--accent) 13%, transparent);
-
-  border-radius: 17px;
-
-  background:
-    linear-gradient(
-      180deg,
-      rgba(var(--ink-rgb), 0.014),
-      rgba(var(--ink-rgb), 0.004)
-    ),
-    var(--surface);
 }
 
 .auction-roster-metric-card h3 {
@@ -679,10 +571,6 @@
 
   padding: 6px;
 
-  border-radius: 10px;
-
-  background: var(--surface-light);
-
   text-align: center;
 }
 
@@ -707,8 +595,6 @@
 
 .auction-player-card {
   height: 100%;
-
-  padding: 17px;
 
   border:
     1px solid
@@ -750,17 +636,7 @@
   gap: 11px;
 }
 
-.auction-player-identity h2 {
-  margin: 3px 0 0;
-
-  font-size: 25px;
-  line-height: 1;
-}
-
 .auction-player-identity p {
-  margin: 5px 0 0;
-
-  color: var(--muted);
 
   font-size: 11px;
 }
@@ -805,48 +681,15 @@
 ========================= */
 
 .auction-main-values {
-  display: grid;
-
-  grid-template-columns:
-    1.2fr
-    repeat(
-      3,
-      1fr
-    );
-
-  gap: 6px;
 
   margin-top: 10px;
 
-  padding: 6px;
-
-  border:
-    1px solid
-    var(--line-2);
-
   border-radius: 19px;
-
-  background: var(--surface);
 }
 
 .auction-main-value {
   min-height: 62px;
-
-  display: flex;
-  flex-direction: column;
   justify-content: center;
-
-  gap: 3px;
-
-  padding: 9px 11px;
-
-  border:
-    1px solid
-    rgba(var(--ink-rgb), 0.045);
-
-  border-radius: 15px;
-
-  background: var(--surface);
 }
 
 .auction-main-value.featured {
@@ -905,8 +748,6 @@
   align-items: center;
 
   gap: 22px;
-
-  padding: 8px 4px;
 }
 
 .auction-insight-metric {
@@ -1009,11 +850,8 @@
 }
 
 .auction-price-summary {
-  display: flex;
   align-items: stretch;
   justify-content: space-between;
-
-  gap: 12px;
 }
 
 .auction-recommendation-primary {
@@ -1023,22 +861,6 @@
     auto;
 
   min-height: 78px;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-
-  gap: 4px;
-
-  padding: 10px 13px;
-
-  border:
-    1px solid
-    rgba(var(--ink-rgb), 0.045);
-
-  border-radius: 16px;
-
-  background: var(--surface);
 }
 
 .auction-recommendation-primary span {
@@ -1066,15 +888,6 @@
 }
 
 .auction-price-limits {
-  display: grid;
-
-  grid-template-columns:
-    repeat(
-      3,
-      1fr
-    );
-
-  gap: 6px;
 
   margin-top: 6px;
 }
@@ -1087,16 +900,6 @@
   justify-content: center;
 
   gap: 3px;
-
-  padding: 9px 11px;
-
-  border:
-    1px solid
-    rgba(var(--ink-rgb), 0.045);
-
-  border-radius: 15px;
-
-  background: var(--surface);
 }
 
 .auction-price-limit span {
@@ -1155,33 +958,8 @@
 ========================= */
 
 .auction-live-price-row {
-  display: grid;
-
-  grid-template-columns:
-    105px
-    auto
-    auto
-    auto
-    auto;
-
-  align-items: end;
-
-  gap: 7px;
 
   margin-top: 9px;
-}
-
-.auction-live-price-field {
-  display: flex;
-  flex-direction: column;
-
-  gap: 4px;
-}
-
-.auction-live-price-field > span {
-  color: var(--muted);
-
-  font-size: 11px;
 }
 
 .auction-live-price-field input {
@@ -1209,35 +987,12 @@
 }
 
 .auction-price-stepper {
-  display: grid;
 
   grid-template-columns:
     repeat(
       2,
       52px
     );
-
-  gap: 5px;
-}
-
-.auction-price-stepper button {
-  height: 40px;
-
-  border:
-    1px solid
-    color-mix(in srgb, var(--blue) 30%, transparent);
-
-  border-radius: 13px;
-
-  background:
-    color-mix(in srgb, var(--blue) 8%, transparent);
-
-  color: var(--blue);
-
-  font-size: 11px;
-  font-weight: 900;
-
-  cursor: pointer;
 }
 
 .auction-price-stepper button:disabled {
@@ -1256,31 +1011,6 @@
   font-weight: 800;
 
   cursor: pointer;
-}
-
-.auction-primary-action {
-  border:
-    1px solid
-    color-mix(in srgb, var(--accent) 50%, transparent);
-
-  background:
-    linear-gradient(
-      180deg,
-      var(--accent),
-      var(--accent)
-    );
-
-  color: var(--on-color);
-}
-
-.auction-secondary-action {
-  border:
-    1px solid
-    var(--line-2);
-
-  background: var(--surface-light);
-
-  color: var(--text-soft);
 }
 
 /* =========================
@@ -1479,16 +1209,7 @@
 .auction-call-recommendation {
   margin-top: 9px;
 
-  padding: 11px;
-
-  border:
-    1px solid
-    color-mix(in srgb, var(--accent) 28%, transparent);
-
   border-radius: 17px;
-
-  background:
-    color-mix(in srgb, var(--accent) 4%, transparent);
 }
 
 .auction-recommendation-name-button {
@@ -1547,22 +1268,7 @@
 
   padding: 6px 10px;
 
-  border:
-    1px solid
-    color-mix(in srgb, var(--accent) 28%, transparent);
-
-  border-radius:
-    var(--radius-pill);
-
-  background:
-    color-mix(in srgb, var(--accent) 8%, transparent);
-
-  color: var(--accent);
-
   font: inherit;
-
-  font-size: 11px;
-  font-weight: 850;
   line-height: 1.2;
 
   text-align: left;
@@ -1784,14 +1490,6 @@ span:not(.auction-role-badge) {
     6px
     5px
     9px;
-
-  border:
-    1px solid
-    var(--line-2);
-
-  border-radius: 12px;
-
-  background: var(--surface);
 }
 
 .auction-call-alternative > div {
@@ -1992,38 +1690,15 @@ span:not(.auction-role-badge) {
 ========================= */
 
 .auction-top-ica-list {
-  display: grid;
-
-  gap: 4px;
 
   margin-top: 8px;
 }
 
 .auction-top-ica-row {
-  display: grid;
-
-  grid-template-columns:
-    minmax(0, 1fr)
-    48px
-    auto;
-
-  align-items: center;
-
-  gap: 6px;
-
-  min-height: 35px;
-
-  padding:
-    4px
-    5px
-    4px
-    9px;
 
   border:
     1px solid
     rgba(var(--ink-rgb), 0.055);
-
-  border-radius: 11px;
 
   background: var(--surface);
 }
@@ -2662,13 +2337,9 @@ label > span {
 
   gap: 9px;
 
-  padding: 8px 10px;
-
   border:
     1px solid
     var(--line-2);
-
-  border-radius: 15px;
 
   background: var(--surface);
 }

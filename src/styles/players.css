@@ -212,13 +212,6 @@
 .players-toolbar
 input[type="search"] {
   order: 12;
-
-  flex:
-    0
-    0
-    260px;
-
-  width: 260px;
 }
 
 /* =========================
@@ -481,12 +474,6 @@ input[type="search"] {
 .players-table-header {
   background: var(--surface);
 
-  color: var(--muted);
-
-  font-size: 11px;
-
-  text-transform: uppercase;
-
   letter-spacing: 0.05em;
 }
 
@@ -508,27 +495,15 @@ input[type="search"] {
 
 .players-table-row {
   width: 100%;
-
-  border: 0;
   border-top:
     1px solid
     var(--line-2);
-
-  background: var(--bg);
 
   color: var(--text);
 
   text-align: left;
 
   cursor: pointer;
-
-  transition:
-    background-color
-      var(--motion-fast)
-      var(--ease-standard),
-    border-color
-      var(--motion-fast)
-      var(--ease-standard);
 }
 
 .players-table-row:focus-visible {
@@ -586,10 +561,6 @@ input[type="search"] {
 
 .players-player-cell small {
   margin-top: 2px;
-
-  color: var(--muted);
-
-  font-size: 11px;
 }
 
 .players-name-line {
@@ -612,27 +583,8 @@ input[type="search"] {
 ========================= */
 
 .role-badge {
-  display: grid;
-  place-items: center;
-
-  flex:
-    0
-    0
-    auto;
-
-  width: 30px;
-  height: 30px;
-
-  border:
-    1px solid
-    rgba(var(--ink-rgb), 0.07);
-
-  border-radius: 11px;
 
   background: var(--surface-raised);
-
-  font-size: 11px;
-  font-weight: 900;
 }
 
 .role-p {
@@ -674,8 +626,6 @@ input[type="search"] {
       58%
     );
 
-  font-weight: 900;
-
   font-variant-numeric:
     tabular-nums;
 }
@@ -690,8 +640,6 @@ input[type="search"] {
 
 .players-dual-value small {
   display: inline;
-
-  color: var(--muted-soft);
 }
 
 /* =========================
@@ -705,23 +653,6 @@ input[type="search"] {
 
   width: max-content;
   max-width: 100%;
-
-  padding: 5px 8px;
-
-  border-radius:
-    var(--radius-pill);
-
-  font-size: 11px;
-  font-weight: 800;
-
-  letter-spacing: 0.04em;
-}
-
-.player-status-free {
-  background:
-    color-mix(in srgb, var(--accent) 12%, transparent);
-
-  color: var(--accent);
 }
 
 .player-status-assigned {
@@ -767,15 +698,11 @@ input[type="search"] {
     1px solid
     var(--line-2);
 
-  border-radius:
-    var(--radius-pill);
-
   background: var(--surface-raised);
 
   color: var(--text-soft);
 
   font-size: 11px;
-  font-weight: 800;
   line-height: 1;
 }
 
@@ -962,18 +889,6 @@ input[type="search"] {
     display: none;
   }
 
-  .players-table-row {
-    grid-template-columns:
-      repeat(
-        2,
-        minmax(0, 1fr)
-      );
-
-    gap: 10px;
-
-    padding: 13px;
-  }
-
   .players-table-row
   > div:not(
     .players-player-cell
@@ -994,19 +909,6 @@ input[type="search"] {
     text-transform: uppercase;
   }
 
-  .players-player-cell {
-    grid-column:
-      1 / -1;
-  }
-
-  .players-name-line
-  .player-signals {
-    max-width:
-      calc(
-        100vw - 155px
-      );
-  }
-
   .players-footer-info {
     padding:
       0
@@ -1014,7 +916,6 @@ input[type="search"] {
   }
 
   .player-status {
-    white-space: normal;
 
     text-align: center;
   }

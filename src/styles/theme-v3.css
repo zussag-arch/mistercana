@@ -53,7 +53,6 @@ body {
     radial-gradient(900px 500px at 85% -10%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 60%),
     radial-gradient(700px 500px at -10% 30%, color-mix(in srgb, var(--blue) 6%, transparent), transparent 60%),
     var(--bg);
-  background-attachment: fixed;
 }
 
 /* ---------- titoli e numeri ---------- */
@@ -308,7 +307,6 @@ input[type="search"]:focus,
 /* navigazione e marchio */
 .brand {
   font-size: 22px;
-  text-transform: lowercase;
 }
 
 .nav-item {
@@ -317,7 +315,6 @@ input[type="search"]:focus,
   font-weight: 600;
   letter-spacing: 0.01em;
   text-transform: lowercase;
-  border-radius: var(--radius-pill);
 }
 
 /* titoli di sezione: grandi, stretti, col punto verde */
@@ -383,18 +380,12 @@ input[type="search"]:focus,
 }
 
 .dashboard-stat-card:first-child {
-  border: 0;
-  background: linear-gradient(150deg, var(--accent), var(--accent-strong));
   color: var(--accent-ink);
 }
 
 .dashboard-stat-card:first-child *,
 .dashboard-stat-card:first-child .dashboard-stat-label::before {
   color: var(--accent-ink);
-}
-
-.dashboard-stat-card:first-child .dashboard-stat-label::before {
-  background: var(--accent-ink);
 }
 
 /* pannelli grandi */
@@ -646,7 +637,6 @@ input:focus {
 }
 
 .players-ica {
-  font-size: 15px;
   font-weight: 800;
 }
 
@@ -1482,13 +1472,10 @@ input:focus {
 
 .set-pieces-section .set-piece-columns {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
 }
 
 .set-piece-column {
   min-width: 0;
-  padding: 10px;
   border-radius: var(--radius-sm);
   background: var(--surface);
 }
@@ -1516,8 +1503,6 @@ input:focus {
 }
 
 .set-pieces-section ol {
-  display: grid;
-  gap: 5px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -1528,7 +1513,6 @@ input:focus {
   align-items: center;
   gap: 6px;
   min-width: 0;
-  font-size: 12.5px;
   color: var(--text-soft);
 }
 
@@ -1619,18 +1603,13 @@ input:focus {
 }
 
 .goalkeeper-team-chips {
-  display: flex;
   flex-wrap: wrap;
-  gap: 6px;
 }
 
 .goalkeeper-team-chip {
-  padding: 6px 12px;
   border: 1px solid rgba(var(--ink-rgb), 0.13);
-  border-radius: var(--radius-pill);
   background: rgba(var(--ink-rgb), 0.04);
   color: var(--text-soft);
-  font-size: 12.5px;
   font-weight: 700;
   cursor: pointer;
   transition: transform var(--motion-fast), background var(--motion-fast);
@@ -1771,7 +1750,6 @@ input:focus {
 ========================= */
 
 .goalkeeper-matrix-dialog {
-  width: min(1400px, calc(100vw - 32px));
   border: 1px solid rgba(var(--ink-rgb), 0.07);
   border-radius: var(--radius-xl);
   background: var(--bg);
@@ -1808,15 +1786,12 @@ input:focus {
 }
 
 .goalkeeper-matrix-table {
-  width: 100%;
   border-collapse: separate;
   border-spacing: 3px;
-  table-layout: fixed;
 }
 
 .goalkeeper-matrix-table th,
 .goalkeeper-matrix-table td {
-  height: 34px;
   padding: 0;
   border: 0;
   border-radius: 8px;
@@ -1860,9 +1835,7 @@ input:focus {
 /* scala di colore leggibile: rosso → giallo → verde */
 .goalkeeper-matrix-table td.matrix-low { background: color-mix(in srgb, var(--red) 22%, var(--surface)); color: var(--red); }
 .goalkeeper-matrix-table td.matrix-medium { background: color-mix(in srgb, var(--yellow) 18%, var(--surface)); color: var(--yellow); }
-.goalkeeper-matrix-table td.matrix-good { background: color-mix(in srgb, var(--accent) 22%, var(--surface)); color: var(--accent-soft); }
-.goalkeeper-matrix-table td.matrix-excellent { background: var(--accent); color: var(--accent-ink); }
-.goalkeeper-matrix-table td.matrix-empty { background: transparent; color: var(--muted-soft); }
+.goalkeeper-matrix-table td.matrix-empty { color: var(--muted-soft); }
 
 /* squadra scelta: riga e colonna evidenziate, il resto si attenua */
 .goalkeeper-matrix-table:has(.is-selected) td:not(.is-selected) {
@@ -1912,8 +1885,6 @@ input:focus {
 
 /* griglia: larghezza naturale (riempie la finestra quando c'è spazio) */
 .goalkeeper-matrix-table {
-  width: max-content;
-  min-width: 100%;
   table-layout: auto;
 }
 
@@ -1973,7 +1944,6 @@ input:focus {
 /* storico a tutta larghezza come Prezzo e Saggi, su fondo più chiaro */
 .player-chart-grid > .player-history-section {
   grid-column: 1 / -1;
-  background: var(--surface-light);
 }
 
 .player-history-section .player-chart svg {
@@ -2001,13 +1971,6 @@ input:focus {
 .player-history-section .chart-line-fmv { stroke: var(--accent); }
 .player-history-section .chart-dot-mv { fill: var(--blue); }
 .player-history-section .chart-dot-fmv { fill: var(--accent); }
-
-.player-chart-grid > .player-history-section {
-  border-color: rgba(var(--ink-rgb), 0.12);
-  background:
-    linear-gradient(180deg, rgba(var(--ink-rgb), 0.05), rgba(var(--ink-rgb), 0.02)),
-    var(--surface-raised);
-}
 
 /* barre di scorrimento scure in tutta l'app */
 * {
@@ -2246,7 +2209,6 @@ input:focus {
 
 .ica-explain-score > strong {
   font-family: var(--font-display);
-  font-size: 64px;
   font-weight: 900;
   line-height: 0.95;
   letter-spacing: -0.07em;
@@ -2478,7 +2440,6 @@ input:focus {
   padding: 10px 16px 18px;
 }
 .goalkeeper-matrix-scroll {
-  width: 100%;
   min-width: 0;
 }
 .goalkeeper-matrix-table {
