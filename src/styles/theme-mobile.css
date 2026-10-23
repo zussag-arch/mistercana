@@ -718,11 +718,3 @@ html, body { touch-action: manipulation; }
     pointer-events: none;
   }
 }
-@media (max-width: 700px) {
-  /* scende della differenza misurata col vero fondo dello schermo (0 dove non serve) */
-  .mobile-tabbar { bottom: calc(-1 * var(--viewport-gap, 0px)) !important; }
-  .mobile-tabbar::after { height: 40px; }
-}
-@media (max-width: 700px) {
-  :root[data-auction-tab="call"] .auction-live-price-row { bottom: calc(var(--tabbar-total) - var(--viewport-gap, 0px)) !important; }
-}
