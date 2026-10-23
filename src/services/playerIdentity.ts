@@ -1,4 +1,4 @@
-export type IdentityMatchStatus =
+type IdentityMatchStatus =
   | 'identity_matched_id'
   | 'identity_matched_deterministic_normalized'
   | 'identity_unmatched'
@@ -270,20 +270,7 @@ export function getIdentityMatchStatus(
   }
 }
 
-export function getPlayerIdentitySummary():
+function getPlayerIdentitySummary():
   PlayerIdentitySummary {
   return { ...currentSummary }
 }
-
-export async function loadPlayerIdentity(
-  legacyPlayers: LegacyPlayerIdentity[],
-): Promise<PlayerIdentitySummary> {
-  const page = await getFldaPlayers()
-  return initializePlayerIdentity(
-    legacyPlayers,
-    page.players,
-  )
-}
-import {
-  getFldaPlayers,
-} from './flda.ts'

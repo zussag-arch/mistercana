@@ -35,7 +35,7 @@ import type {
    TYPES
 ========================= */
 
-export type GoalkeeperTier =
+type GoalkeeperTier =
   | 'top'
   | 'semitop'
   | 'second'
@@ -632,7 +632,7 @@ function buildRotationPlan(
    TRIO EVALUATION
 ========================= */
 
-export function evaluateGoalkeeperTrio(
+function evaluateGoalkeeperTrio(
   trio: Player[],
   parameters:
     GoalkeeperStrategyParameters =

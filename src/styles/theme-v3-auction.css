@@ -76,7 +76,6 @@
 
 .auction-player-detail-trigger {
   border: 0;
-  border-radius: var(--radius-pill);
   background: rgba(var(--ink-rgb), 0.08);
   color: var(--text-soft);
   font-size: 12px;
@@ -114,7 +113,6 @@
 }
 
 .auction-main-value > strong {
-  font-family: var(--font-display);
   font-size: 26px;
   font-weight: 800;
   line-height: 1;
@@ -123,19 +121,8 @@
 }
 
 .auction-main-value > small {
-  font-size: 11px;
   letter-spacing: 0;
   text-transform: none;
-  color: var(--muted);
-}
-
-.auction-history-value {
-  border-color: rgba(var(--ink-rgb), 0.07);
-  background: var(--surface);
-}
-
-.auction-history-value > strong {
-  color: var(--yellow);
 }
 
 .auction-insight-row {
@@ -253,10 +240,8 @@
   min-width: 56px;
   height: 52px;
   border: 1px solid rgba(var(--ink-rgb), 0.13);
-  border-radius: var(--radius-md);
   background: var(--surface-light);
   color: var(--text);
-  font-family: var(--font-display);
   font-size: 17px;
   font-weight: 800;
   cursor: pointer;
@@ -269,20 +254,15 @@
 .auction-primary-action {
   height: 52px;
   border: 0;
-  border-radius: var(--radius-md);
   background: var(--accent);
   color: var(--accent-ink);
-  font-family: var(--font-display);
   font-size: 17px;
-  font-weight: 800;
-  letter-spacing: -0.03em;
 }
 
 .auction-secondary-action {
   height: 52px;
   padding: 0 16px;
   border: 1px solid rgba(var(--ink-rgb), 0.13);
-  border-radius: var(--radius-md);
   background: transparent;
   color: var(--text-soft);
   font-weight: 700;
@@ -339,7 +319,6 @@
 
 /* storico: compatto e con scorrimento proprio */
 .auction-history-list {
-  max-height: 460px;
   overflow-y: auto;
   padding-right: 4px;
 }
@@ -364,9 +343,6 @@
 }
 
 @media (max-width: 700px) {
-  .auction-main-values {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 
   .auction-price-summary,
   .auction-price-limits {
@@ -390,21 +366,7 @@
   z-index: 1;
 }
 
-.auction-waiting-name {
-  font-family: var(--font-ui);
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0;
-  text-align: left;
-}
-
-.auction-waiting-recap {
-  width: min(460px, 100%);
-  margin-inline: auto;
-}
-
 /* pagina Asta riordinata: storico sotto la concorrenza, Top iCà nella colonna destra */
-.auction-workspace-main { display: flex; flex-direction: column; gap: 12px; }
 .auction-history-slot { order: 10; }
 .auction-history-slot > * { margin: 0; }
 .auction-side-panels > .auction-top-ica-panel,
@@ -412,9 +374,8 @@
 .auction-market-followup:empty { display: none; }
 
 /* interspazi uniformi tra le tessere */
-.auction-workspace { gap: 16px; }
 .auction-workspace-main,
-.auction-side-panels { display: flex; flex-direction: column; gap: 16px; }
+.auction-side-panels { display: flex; flex-direction: column; }
 .auction-workspace-main > *,
 .auction-side-panels > *,
 .auction-roster-metrics > * { margin-top: 0 !important; margin-bottom: 0 !important; }
@@ -428,22 +389,7 @@
   border-radius: 999px;
   gap: 12px;
 }
-.auction-top-ica-name-button {
-  min-height: 40px;
-  padding: 0 18px;
-  border-radius: 999px;
-  font-size: 14px;
-}
-.auction-top-ica-row > span,
-.auction-top-ica-row strong { font-size: 15px; }
-.auction-top-ica-row button:last-child {
-  min-height: 36px;
-  padding: 0 14px;
-  border-radius: 999px;
-  font-size: 12px;
-}
 .auction-top-ica-row > b {
-  font-family: var(--font-display);
   font-size: 17px;
   color: var(--accent);
 }
@@ -480,7 +426,6 @@
   min-height: 36px;
   padding: 0 14px;
   border: 1px solid var(--line-1);
-  border-radius: 999px;
   background: var(--surface-light);
   color: var(--text);
   font-size: 13px;
@@ -523,7 +468,6 @@
 .auction-history-slot .auction-history-price span { font-size: 11px; }
 .auction-history-slot .auction-history-manager strong { font-size: 14px; }
 .auction-history-slot .auction-history-price strong {
-  font-family: var(--font-display);
   font-size: 20px;
 }
 .auction-history-slot .auction-history-actions { display: flex; gap: 8px; }

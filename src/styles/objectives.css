@@ -247,16 +247,6 @@
   border:
     1px solid
     rgba(var(--ink-rgb), 0.08);
-
-  border-radius: 22px;
-
-  background:
-    linear-gradient(
-      180deg,
-      rgba(var(--ink-rgb), 0.014),
-      rgba(var(--ink-rgb), 0.004)
-    ),
-    var(--bg);
 }
 
 .objectives-search-row {
@@ -282,8 +272,6 @@
   border:
     1px solid
     var(--line-2);
-
-  border-radius: 16px;
 
   background: var(--surface);
 
@@ -331,8 +319,6 @@
 
   border: 0;
   outline: 0;
-
-  background: transparent;
 
   color: var(--text);
 
@@ -610,8 +596,6 @@
       4,
       minmax(0, 1fr)
     );
-
-  gap: 14px;
 }
 
 /* =========================
@@ -622,24 +606,6 @@
   min-width: 0;
 
   overflow: hidden;
-
-  border:
-    1px solid
-    rgba(var(--ink-rgb), 0.08);
-
-  border-radius: 26px;
-
-  background:
-    linear-gradient(
-      180deg,
-      rgba(var(--ink-rgb), 0.018),
-      rgba(var(--ink-rgb), 0.006)
-    ),
-    var(--bg);
-
-  box-shadow:
-    inset 0 1px 0
-    rgba(var(--ink-rgb), 0.025);
 
   transition:
     border-color
@@ -655,19 +621,10 @@
   justify-content: space-between;
 
   gap: 12px;
-
-  padding: 14px 15px;
-
-  border-bottom:
-    1px solid
-    rgba(var(--ink-rgb), 0.06);
 }
 
 .objective-role-title {
   min-width: 0;
-
-  display: flex;
-  align-items: center;
 
   gap: 10px;
 }
@@ -683,21 +640,11 @@
 }
 
 .objective-role-count {
-  min-width: 28px;
-  height: 28px;
 
   display: grid;
   place-items: center;
 
-  border-radius:
-    var(--radius-pill);
-
-  background: var(--surface-raised);
-
-  color: var(--muted);
-
   font-size: 11px;
-  font-weight: 750;
 
   font-variant-numeric:
     tabular-nums;
@@ -709,10 +656,6 @@
     background
       var(--motion-fast)
       var(--ease-standard);
-}
-
-.objective-role-content {
-  padding: 11px;
 }
 
 /* =========================
@@ -740,18 +683,6 @@
 }
 
 .role-badge {
-  width: 29px;
-  height: 29px;
-
-  flex: 0 0 auto;
-
-  display: grid;
-  place-items: center;
-
-  border-radius: 11px;
-
-  font-size: 11px;
-  font-weight: 900;
 
   transition:
     border-color
@@ -769,44 +700,24 @@
   border:
     1px solid
     color-mix(in srgb, var(--yellow) 34%, transparent);
-
-  background:
-    color-mix(in srgb, var(--yellow) 16%, transparent);
-
-  color: var(--yellow);
 }
 
 .role-badge.role-d {
   border:
     1px solid
     color-mix(in srgb, var(--blue) 34%, transparent);
-
-  background:
-    color-mix(in srgb, var(--blue) 16%, transparent);
-
-  color: var(--blue);
 }
 
 .role-badge.role-c {
   border:
     1px solid
     color-mix(in srgb, var(--accent) 32%, transparent);
-
-  background:
-    color-mix(in srgb, var(--accent) 14%, transparent);
-
-  color: var(--accent);
 }
 
 .role-badge.role-a {
   border:
     1px solid
     color-mix(in srgb, var(--red) 34%, transparent);
-
-  background:
-    color-mix(in srgb, var(--red) 15%, transparent);
-
-  color: var(--red);
 }
 
 /* =========================
@@ -817,14 +728,6 @@
   margin-bottom: 10px;
 
   overflow: hidden;
-
-  border:
-    1px solid
-    rgba(var(--ink-rgb), 0.06);
-
-  border-radius: 20px;
-
-  background: var(--surface);
 
   transition:
     border-color
@@ -841,20 +744,11 @@
 
 .objective-priority-header {
   min-height: 36px;
-
-  display: flex;
-  align-items: center;
   justify-content: space-between;
-
-  gap: 10px;
-
-  padding: 0 11px;
 
   border-bottom:
     1px solid
     rgba(var(--ink-rgb), 0.05);
-
-  color: var(--muted);
 
   font-size: 11px;
   font-weight: 800;
@@ -873,12 +767,6 @@
 
   border-radius:
     var(--radius-pill);
-
-  background: var(--surface-raised);
-
-  color: var(--muted);
-
-  font-size: 11px;
 
   font-variant-numeric:
     tabular-nums;
@@ -916,14 +804,6 @@
 /* =========================
    PLAYER CARDS
 ========================= */
-
-.objective-priority-list {
-  display: grid;
-
-  gap: 5px;
-
-  padding: 6px;
-}
 
 .objective-player-card {
   min-height: 64px;
@@ -989,25 +869,14 @@
 
 .objective-priority-select {
   min-width: 0;
-  height: 29px;
 
   flex: 1;
-
-  padding: 0 8px;
-
-  border:
-    1px solid
-    var(--line-2);
-
-  border-radius: 12px;
 
   outline: none;
 
   background: var(--surface-light);
 
   color: var(--muted);
-
-  font-size: 11px;
 
   cursor: pointer;
 
@@ -1032,25 +901,11 @@
 }
 
 .objective-remove-button {
-  width: 29px;
-  height: 29px;
 
   flex: 0 0 auto;
 
   display: grid;
   place-items: center;
-
-  border:
-    1px solid
-    var(--line-2);
-
-  border-radius: 11px;
-
-  background: var(--surface-light);
-
-  color: var(--muted);
-
-  font-size: 14px;
 
   cursor: pointer;
 
@@ -1130,8 +985,6 @@
 
   padding: 0 3px;
 
-  color: var(--muted-soft);
-
   font-size: 11px;
 }
 
@@ -1167,18 +1020,8 @@
       space-between;
   }
 
-  .objectives-auction-nav-button {
-    min-height: 40px;
-
-    padding:
-      0
-      16px;
-  }
-
   .objectives-search-panel {
     padding: 8px;
-
-    border-radius: 19px;
   }
 
   .objectives-search-row {
@@ -1198,10 +1041,6 @@
 
   .objectives-role-grid {
     grid-template-columns: 1fr;
-  }
-
-  .objective-role-column {
-    border-radius: 22px;
   }
 
   .objective-add-button {

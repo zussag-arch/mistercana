@@ -45,7 +45,7 @@ export type PriceConstraint =
   | 'role'
   | 'value'
 
-export type AuctionMarketSource =
+type AuctionMarketSource =
   | 'role'
   | 'overall'
   | 'baseline'
@@ -155,7 +155,7 @@ export interface PriceAdvice {
   globalReserve?: number
 }
 
-export interface ReferenceSources {
+interface ReferenceSources {
   pma?: number
   saggi?: number
   ica?: number
@@ -256,7 +256,7 @@ function getIcaImpliedCredits(
   return entry.pmaByRank[Math.min(rank, entry.pmaByRank.length - 1)]
 }
 
-export function getReferenceSources(
+function getReferenceSources(
   state: AppState,
   player: Player,
   allPlayers: Player[],

@@ -2139,7 +2139,7 @@ function confirmRestore():
    EVENTS
 ========================= */
 
-export function bindImportExportEvents():
+function bindImportExportEvents():
   void {
   if (
     importExportEventsBound

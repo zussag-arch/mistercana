@@ -38,12 +38,6 @@ export function displayCount(value: unknown): string {
   return typeof value === 'number' && Number.isFinite(value) ? String(Math.round(value)) : '—'
 }
 
-export function auctionStatusLabel(view: PlayerViewModel): string {
-  if (!view.identityAvailable) return 'IDENTITÀ NON ASSOCIATA'
-  if (!view.auctionLive) return 'NO LIVE'
-  return view.assigned ? 'ASSEGNATO' : 'DA ASSEGNARE'
-}
-
 export function auctionStatusClass(view: PlayerViewModel): string {
   if (!view.identityAvailable) return 'unmatched'
   if (!view.auctionLive) return 'offline'
@@ -125,36 +119,6 @@ function chartEmpty(message: string): string {
   return `<div class="player-chart-empty">${escapePlayerHtml(message)}</div>`
 }
 
-export function renderSageChart(detail?: FldaPlayerDetail): string {
-  const preferred = ['Carmy', 'Recosta', 'Il Tattico', 'SOS Fanta', 'Il Profeta']
-  const rows = (detail?.saggi ?? []).map((row) => ({
-    name: String(field(row, 'saggio') ?? ''),
-    price: field(row, 'prezzo'),
-  })).filter((row): row is { name: string; price: number } => typeof row.price === 'number' && Number.isFinite(row.price))
-    .sort((a, b) => {
-      const ai = preferred.findIndex((item) => a.name.toLocaleLowerCase('it').includes(item.toLocaleLowerCase('it')))
-      const bi = preferred.findIndex((item) => b.name.toLocaleLowerCase('it').includes(item.toLocaleLowerCase('it')))
-      return (ai < 0 ? 99 : ai) - (bi < 0 ? 99 : bi)
-    }).slice(0, 5)
-  if (!rows.length) return chartEmpty('Prezzi Saggi non disponibili.')
-  const average = rows.reduce((sum, row) => sum + row.price, 0) / rows.length
-  const max = Math.max(...rows.map((row) => row.price), average, 1)
-  const baseY = 250
-  const height = 185
-  const barWidth = 70
-  const gap = 40
-  const startX = 62
-  const averageY = baseY - (average / max) * height
-  const ticks = [0, max / 2, max]
-  return `<div class="player-chart"><svg viewBox="0 0 620 315" role="img" aria-label="Prezzi dei cinque Saggi e media descrittiva">
-    <text x="13" y="155" text-anchor="middle" transform="rotate(-90 13 155)" class="chart-axis-title">Prezzo (crediti)</text>
-    ${ticks.map((tick) => { const tickY = baseY - (tick / max) * height; return `<line x1="40" y1="${tickY}" x2="590" y2="${tickY}" class="chart-grid-line"/><text x="35" y="${tickY + 4}" text-anchor="end" class="chart-tick">${display(tick, 0)}</text>` }).join('')}
-    <line x1="40" y1="${averageY}" x2="590" y2="${averageY}" class="chart-average-line"/><text x="56" y="${averageY - 6}" text-anchor="end" class="chart-average-value">${display(average, 1)} cr</text>
-    ${rows.map((row, index) => { const h = (row.price / max) * height; const x = startX + index * (barWidth + gap); return `<rect x="${x}" y="${baseY - h}" width="${barWidth}" height="${h}" rx="10" class="chart-bar"/><text x="${x + barWidth / 2}" y="${baseY - h - 9}" text-anchor="middle" class="chart-value">${display(row.price, 0)}</text><text x="${x + barWidth / 2}" y="280" text-anchor="middle" class="chart-label">${escapePlayerHtml(row.name)}</text>` }).join('')}
-    <line x1="40" y1="${baseY}" x2="590" y2="${baseY}" class="chart-axis"/>
-  </svg></div>`
-}
-
 export function renderPerformanceChart(detail?: FldaPlayerDetail): string {
   const rows = (detail?.history ?? []).map((row) => ({ season: String(field(row, 'season') ?? ''), mv: field(row, 'mv'), fmv: field(row, 'fmv') }))
     .filter((row) => typeof row.mv === 'number' || typeof row.fmv === 'number').reverse()
@@ -177,12 +141,6 @@ export function renderPerformanceChart(detail?: FldaPlayerDetail): string {
 
 export function latestHistory(detail?: FldaPlayerDetail): FldaRecord | undefined {
   return detail?.history?.[0]
-}
-
-export function renderHierarchies(detail?: FldaPlayerDetail): string {
-  const rows = hierarchyRows(detail)
-  if (!rows.length) return '<p class="player-data-empty">Gerarchie non disponibili.</p>'
-  return `<div class="player-chip-list">${rows.map((row) => `<span><strong>${display(field(row, 'hierarchy_type') ?? field(row, 'type') ?? field(row, 'context_type'))}</strong> · posizione ${display(field(row, 'source_rank') ?? field(row, 'source_order'), 0)} <small>ordine editoriale</small></span>`).join('')}</div>`
 }
 
 // I prezzi dei Saggi sono espressi su un budget di 500 crediti.

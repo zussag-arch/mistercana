@@ -14,7 +14,7 @@ export interface RosterMetricPlayer {
   espulsioni?: number | null
 }
 
-export interface RoleRosterMetric {
+interface RoleRosterMetric {
   iCa: number | null
   titolarita: number | null
   prestazione: number | null
@@ -23,7 +23,7 @@ export interface RoleRosterMetric {
 
 export type RosterMetrics = Record<RosterMetricRole, RoleRosterMetric>
 
-export const ROSTER_METRICS_V1 = {
+const ROSTER_METRICS_V1 = {
   teamAttack: { minGoals: 25, maxGoals: 89, promotedScore: 3 },
   goalkeeperTeam: {
     minGoalsAgainst: 29,
@@ -43,7 +43,7 @@ export const ROSTER_METRICS_V1 = {
 } as const
 
 // Dati finali Serie A 2025/26. Sono input V1 sostituibili, non formule definitive.
-export const SERIE_A_2025_26_TEAM_STATS: Readonly<Record<string, {
+const SERIE_A_2025_26_TEAM_STATS: Readonly<Record<string, {
   goalsFor: number
   goalsAgainst: number
   points: number

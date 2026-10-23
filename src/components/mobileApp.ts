@@ -12,7 +12,7 @@ function currentTab(): AuctionTab {
   return 'call'
 }
 
-export function setAuctionTab(tab: AuctionTab): void {
+function setAuctionTab(tab: AuctionTab): void {
   document.documentElement.dataset.auctionTab = tab
   try { window.sessionStorage.setItem(TAB_KEY, tab) } catch { /* solo comodità */ }
   document.querySelectorAll<HTMLElement>('button[data-auction-tab]').forEach((button) => {
