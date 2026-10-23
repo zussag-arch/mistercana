@@ -83,22 +83,7 @@ function syncTabButtons(): void {
   })
 }
 
-// iPhone, app installata con barra di stato trasparente: a volte la pagina "vede" uno schermo
-// più corto (di circa l'altezza della barra di stato) e ciò che sta "in fondo" resta sollevato.
-// Si misura la differenza col vero fondo dello schermo e la barra in basso scende di tanto.
-function syncViewportGap(): void {
-  const standalone = window.matchMedia('(display-mode: standalone)').matches
-    || (navigator as Navigator & { standalone?: boolean }).standalone === true
-  const portrait = window.innerHeight >= window.innerWidth
-  const screenHeight = portrait ? Math.max(screen.height, screen.width) : Math.min(screen.height, screen.width)
-  const gap = standalone ? Math.max(0, Math.min(80, Math.round(screenHeight - window.innerHeight))) : 0
-  document.documentElement.style.setProperty('--viewport-gap', `${gap}px`)
-}
-
 export function initMobileApp(): void {
-  syncViewportGap()
-  window.addEventListener('resize', syncViewportGap)
-  window.addEventListener('orientationchange', () => window.setTimeout(syncViewportGap, 300))
 
   document.documentElement.dataset.auctionTab = currentTab()
   document.documentElement.dataset.dashTab = currentDashTab()

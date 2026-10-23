@@ -18,9 +18,16 @@ body {
   padding-bottom: 0 !important;
 }
 
-#app,
+/* l'app aderisce ai bordi reali dello schermo (position: fixed + inset 0) invece di usare
+   un'altezza calcolata: su iPhone, app installata, "100dvh" può risultare più corto dello
+   schermo e tagliava la barra in basso */
+#app {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
 .app-shell {
-  height: 100dvh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
