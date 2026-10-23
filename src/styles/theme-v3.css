@@ -61,6 +61,7 @@ h1,
 h2,
 h3,
 .brand {
+  font-family: var(--font-display);
   letter-spacing: -0.03em;
   word-spacing: 0.08em;
 }
@@ -103,6 +104,14 @@ td.n {
 }
 
 /* eyebrow: le etichette maiuscole diventano piccole e con il rombo del colore ruolo */
+.auction-kicker {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: lowercase;
+  color: var(--muted);
+}
 
 .auction-kicker::before {
   content: "";
@@ -175,7 +184,13 @@ td.n {
 }
 
 .auction-role-switcher > div {
+  border-radius: var(--radius-pill);
   background: var(--surface-light);
+}
+
+.auction-role-tab {
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
 }
 
 .auction-quick-nav {
@@ -186,10 +201,12 @@ td.n {
 
 /* bottone primario: rettangolo pieno con freccia e ombra a scatto */
 .primary-button {
+  border-radius: 0;
   border: 1.5px solid var(--accent);
   background: var(--accent);
   color: var(--accent-ink);
   font-weight: 800;
+  transition: transform var(--motion-fast), box-shadow var(--motion-fast);
 }
 
 .primary-button:hover:not(:disabled) {
@@ -293,6 +310,8 @@ input[type="search"]:focus,
 }
 
 .nav-item {
+  font-family: var(--font-ui);
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.01em;
   text-transform: lowercase;
@@ -405,6 +424,9 @@ input[type="search"]:focus,
 .dashboard-hero {
   position: relative;
   overflow: hidden;
+  background:
+    radial-gradient(520px 260px at 100% 0%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 70%),
+    linear-gradient(135deg, var(--surface-light), var(--surface));
 }
 
 .auction-player-card::after,
@@ -433,6 +455,7 @@ input:not([type]),
 select,
 textarea {
   border: 1px solid rgba(var(--ink-rgb), 0.13);
+  border-radius: var(--radius-sm);
   background: var(--surface);
   color: var(--text);
 }
@@ -460,7 +483,14 @@ input:focus {
   border-radius: var(--radius-pill);
 }
 
+.dashboard-budget-total-pill {
+  border: 0;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+
 .dashboard-cta-button {
+  border-radius: 0;
   background: var(--accent);
   color: var(--accent-ink);
   font-weight: 800;
@@ -546,6 +576,10 @@ input:focus {
 .role-badge.role-a { background: var(--role-a); }
 
 /* filtri ruolo: pillole, quella attiva prende il colore del ruolo */
+.players-filter-button {
+  font-family: var(--font-display);
+  font-size: 12px;
+}
 
 .players-filter-button[data-player-role="P"].selected { background: var(--role-p); border-color: var(--role-p); color: var(--on-color); }
 .players-filter-button[data-player-role="D"].selected { background: var(--role-d); border-color: var(--role-d); color: var(--on-color); }
@@ -1340,6 +1374,7 @@ input:focus {
   border-radius: var(--radius-pill);
   font-size: 11.5px;
   font-weight: 700;
+  color: var(--text-soft);
 }
 
 .coach-key-good { border-color: var(--good, var(--accent)); background: var(--accent); color: var(--accent-ink); }
@@ -1369,10 +1404,19 @@ input:focus {
 }
 
 /* battitori */
+.set-piece-card {
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  background: var(--surface-light);
+}
 
 .set-piece-card ol,
 .set-piece-card li {
   font-size: 13px;
+}
+
+.set-piece-label {
+  font-size: 12px;
 }
 
 /* =========================
@@ -1438,6 +1482,7 @@ input:focus {
 
 .set-pieces-section .set-piece-label {
   display: block;
+  margin-bottom: 8px;
   font-family: var(--font-ui);
   font-size: 11.5px;
   font-weight: 600;
@@ -1707,6 +1752,7 @@ input:focus {
 .goalkeeper-matrix-dialog {
   border: 1px solid rgba(var(--ink-rgb), 0.07);
   border-radius: var(--radius-xl);
+  background: var(--bg);
 }
 
 .goalkeeper-matrix-header h2::after {
@@ -1724,6 +1770,7 @@ input:focus {
   width: 44px;
   height: 44px;
   border: 0;
+  border-radius: var(--radius-pill);
   background: rgba(var(--ink-rgb), 0.08);
   font-size: 18px;
 }
@@ -1735,6 +1782,7 @@ input:focus {
 
 .goalkeeper-matrix-scroll {
   scrollbar-color: var(--surface-raised) transparent;
+  scrollbar-width: thin;
 }
 
 .goalkeeper-matrix-table {
@@ -1769,6 +1817,7 @@ input:focus {
   position: sticky;
   left: 0;
   z-index: 1;
+  width: 104px;
   padding: 0 10px;
   background: var(--surface);
   color: var(--text-soft);
@@ -1780,11 +1829,13 @@ input:focus {
 .goalkeeper-matrix-corner {
   left: 0;
   z-index: 3 !important;
+  width: 104px;
 }
 
 /* scala di colore leggibile: rosso → giallo → verde */
 .goalkeeper-matrix-table td.matrix-low { background: color-mix(in srgb, var(--red) 22%, var(--surface)); color: var(--red); }
 .goalkeeper-matrix-table td.matrix-medium { background: color-mix(in srgb, var(--yellow) 18%, var(--surface)); color: var(--yellow); }
+.goalkeeper-matrix-table td.matrix-empty { color: var(--muted-soft); }
 
 /* squadra scelta: riga e colonna evidenziate, il resto si attenua */
 .goalkeeper-matrix-table:has(.is-selected) td:not(.is-selected) {
@@ -1821,11 +1872,24 @@ input:focus {
   .goalkeeper-score {
     font-size: 22px;
   }
+
+  .goalkeeper-matrix-table {
+    width: auto;
+    table-layout: auto;
+  }
+
+  .goalkeeper-matrix-table td {
+    min-width: 38px;
+  }
 }
 
 /* griglia: larghezza naturale (riempie la finestra quando c'è spazio) */
 .goalkeeper-matrix-table {
   table-layout: auto;
+}
+
+.goalkeeper-matrix-table td {
+  min-width: 46px;
 }
 
 .goalkeeper-matrix-header h2 {
@@ -2346,6 +2410,7 @@ input:focus {
 .dashboard-cta-button,
 .player-detail-call-button,
 .player-detail-full-button {
+  border-radius: var(--radius-md);
   transition: transform var(--motion-fast), box-shadow var(--motion-fast);
 }
 
@@ -2404,7 +2469,7 @@ input:focus {
 }
 /* scala sempre verde per le compatibilità alte, anche col tema rosso */
 .goalkeeper-matrix-table td.matrix-good { background: color-mix(in srgb, var(--green) 22%, var(--surface)); color: color-mix(in srgb, var(--green) 60%, var(--text)); }
-.goalkeeper-matrix-table td.matrix-excellent { background: var(--green); }
+.goalkeeper-matrix-table td.matrix-excellent { background: var(--green); color: var(--on-color); }
 .goalkeeper-matrix-scroll { display: block; width: 100% !important; }
 .goalkeeper-matrix-table { width: 100% !important; }
 .goalkeeper-matrix-legend .legend-low { background: var(--red); }

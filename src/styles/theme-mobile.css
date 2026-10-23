@@ -24,6 +24,7 @@
     -webkit-text-size-adjust: 100%;
   }
   body {
+    padding-bottom: calc(var(--tabbar-total) + 12px) !important;
     -webkit-tap-highlight-color: transparent;
   }
   button,
@@ -45,7 +46,10 @@
     display: none !important;
   }
   .topbar {
+    position: sticky;
+    top: 0;
     z-index: 50;
+    padding-top: calc(8px + env(safe-area-inset-top));
   }
   body {
     padding-top: 0 !important;
@@ -115,6 +119,7 @@
   .auction-mobile-tabs button {
     min-height: 38px;
     border: 0;
+    border-radius: 999px !important;
     background: none;
     color: var(--muted);
     font-size: 14px;
@@ -149,8 +154,17 @@
   :root[data-auction-tab="market"] .auction-workspace-main > :not(.auction-competitors-section):not(.auction-history-slot) {
     display: none !important;
   }
+  :root[data-auction-tab="market"] .auction-history-slot {
+    contain: none;
+    min-height: 0;
+  }
   :root[data-auction-tab="market"] .auction-history-slot .auction-history-list {
     max-height: none;
+  }
+
+  .auction-side-panels,
+  .auction-workspace-main {
+    gap: 12px;
   }
 
   /* pulsanti del prezzo fissi sopra la barra in basso */
@@ -346,15 +360,23 @@
   /* azioni dell'asta visibili: vanno a capo invece di scorrere nascoste */
   .topbar-page-actions {
     overflow: visible !important;
+    row-gap: 8px;
   }
   .topbar-page-actions .auction-toolbar-actions {
     display: flex !important;
+    gap: 6px;
   }
   /* Giocatori e Obiettivi sono già nella barra in basso */
+  #goToPlayersButton,
+  #goToObjectivesButton {
+    display: none !important;
+  }
   #undoLastAssignmentButton,
   #endAuctionButton {
     display: inline-flex !important;
     min-height: 34px;
+    padding: 0 14px;
+    font-size: 13px;
   }
 }
 
@@ -412,6 +434,7 @@
     font-size: 15px;
   }
   .players-table-row > div::before {
+    content: attr(data-label);
     font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.02em;
@@ -433,8 +456,9 @@
   .players-table-row > [data-label="Titolarità"] { grid-area: tit; }
   .players-table-row > [data-label="MV/FMV"] { grid-area: mv; }
   .players-table-row > [data-label="Stato"] { grid-area: status; align-items: flex-end; }
+  .players-table-row > [data-label="Stato"]::before { content: none; }
   .players-table-row .players-ica { font-size: 26px !important; line-height: 1; }
-  .players-table-row > [data-label="PMA"] { flex-direction: row !important; flex-wrap: wrap; }
+  .players-table-row > [data-label="PMA"] { flex-direction: row !important; flex-wrap: wrap; align-items: baseline; column-gap: 6px; }
   .players-table-row > [data-label="PMA"]::before { flex-basis: 100%; }
   .players-table-row .player-status { font-size: 12px; padding: 4px 10px; }
 
@@ -457,9 +481,11 @@
     align-items: center;
     gap: 6px;
   }
+  .topbar-page-actions .auction-role-switcher > div { padding: 3px; }
   .topbar-page-actions .auction-role-tab { width: 30px !important; height: 34px !important; }
   .topbar-page-actions .auction-toolbar-actions {
     flex-wrap: nowrap !important;
+    margin-left: auto;
   }
   .topbar .topbar-page-actions #undoLastAssignmentButton,
   .topbar .topbar-page-actions #endAuctionButton {
@@ -499,6 +525,7 @@
   .dashboard-mobile-tabs button {
     min-height: 38px;
     border: 0;
+    border-radius: 999px !important;
     background: none;
     color: var(--muted);
     font-size: 14px;
@@ -509,6 +536,7 @@
     color: var(--text);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
   }
+  .dashboard-page { gap: 12px !important; }
 
   /* Riepilogo */
   :root[data-dash-tab="summary"] .dashboard-budget-panel,
@@ -533,6 +561,7 @@
   .dashboard-live-roles {
     display: grid !important;
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
   }
   .dashboard-live-kpi,
   .dashboard-stat-card,

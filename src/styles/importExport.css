@@ -53,6 +53,20 @@
     1px solid
     rgba(var(--ink-rgb), 0.08);
 
+  border-radius: 28px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(var(--ink-rgb), 0.018),
+      rgba(var(--ink-rgb), 0.006)
+    ),
+    var(--bg);
+
+  box-shadow:
+    inset 0 1px 0
+    rgba(var(--ink-rgb), 0.025);
+
   transition:
     border-color
       var(--motion-fast)
@@ -74,6 +88,8 @@
 
 .data-transfer-section-header h2 {
   margin: 4px 0 0;
+
+  font-size: 17px;
 }
 
 .data-transfer-section-header p {
@@ -82,6 +98,15 @@
   color: var(--muted);
 
   font-size: 11px;
+}
+
+.data-transfer-eyebrow {
+  color: var(--muted);
+
+  font-size: 11px;
+  font-weight: 850;
+
+  letter-spacing: 0.11em;
 }
 
 /* =========================
@@ -122,6 +147,14 @@
   border:
     1px solid
     rgba(var(--ink-rgb), 0.07);
+
+  border-radius: 22px;
+
+  background: var(--surface);
+
+  box-shadow:
+    inset 0 1px 0
+    rgba(var(--ink-rgb), 0.018);
 
   transition:
     border-color
@@ -321,6 +354,8 @@
   min-width: 0;
   padding: 13px;
   border: 1px solid rgba(var(--ink-rgb), 0.065);
+  border-radius: 18px;
+  background: var(--surface);
 }
 
 .flda-dataset-heading {
@@ -496,6 +531,8 @@
 
   font-size: 11px;
   font-weight: 750;
+
+  cursor: default;
 
   transition:
     color
@@ -888,6 +925,8 @@
 @media (max-width: 620px) {
   .data-transfer-section {
     padding: 15px;
+
+    border-radius: 22px;
   }
 
   .data-transfer-section-header {

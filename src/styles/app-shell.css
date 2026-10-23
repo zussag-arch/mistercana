@@ -83,6 +83,8 @@ body {
     grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
     grid-template-rows: auto auto minmax(0, 1fr);
     align-content: stretch;
+    gap: 16px !important;
+    padding-bottom: 16px;
   }
   .dashboard-page > .dashboard-mobile-tabs { display: none; }
   .dashboard-page > .overlay { position: fixed; }
@@ -102,11 +104,13 @@ body {
   .dashboard-page:has(.dashboard-live-summary) > .dashboard-participants { grid-column: 1; grid-row: 2; min-height: 0; overflow-y: auto; }
   .dashboard-page:has(.dashboard-live-summary) > div:not(.dashboard-mobile-tabs):not(.dashboard-participants):not(.overlay):not(.dashboard-live-summary) { display: none !important; }
   .dashboard-page:has(.dashboard-live-summary) .dashboard-participants .auction-participant-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
+  .dashboard-participants .auction-participant-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
 
   /* ---------- Asta ---------- */
   .auction-live-page {
     display: flex !important;
     flex-direction: column;
+    padding-bottom: 16px;
   }
   .auction-live-page > .auction-workspace {
     flex: 1;
@@ -125,6 +129,7 @@ body {
   .roster-page {
     display: flex !important;
     flex-direction: column;
+    padding-bottom: 16px;
   }
   .roster-page > .roster-layout {
     flex: 1;
