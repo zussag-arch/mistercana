@@ -50,6 +50,16 @@ export const ICA_V4_PARAMETERS = {
     floor: 0.02,
   },
   seasonMatches: 38,
+  /** stagione fuori dalla Serie A (solo per chi non ne ha in A): tarata su 59 arrivi del 2025/26 */
+  foreign: {
+    /** punti di FM per ogni punto di bonus a partita (3 × gol + assist) sopra 0,15 */
+    bonusWeight: 0.4,
+    bonusNeutral: 0.15,
+    /** seconde leghe e campionati medi (Serie B, Championship, Eredivisie…) rendono meno in A */
+    tierPenalty: [0, 0.3, 0.3] as number[],
+    /** la stagione estera conta la metà di una stagione di Serie A */
+    weight: 0.5,
+  },
 }
 
 export interface ICaV4Season {
@@ -58,7 +68,19 @@ export interface ICaV4Season {
   appearances?: number
 }
 
+export interface ICaV4ForeignSeason {
+  season: string
+  league: string
+  appearances: number
+  /** (3 × gol + assist) a partita */
+  bonusPerMatch: number
+  /** 0 = top 5 europei, 1 = seconde leghe / campionati medi, 2 = minori */
+  tier: number
+}
+
 export interface ICaV4Input extends ICaV3Input {
+  /** ultima stagione fuori dalla Serie A, usata solo se manca ogni stagione di Serie A */
+  foreignSeason?: ICaV4ForeignSeason
   /** stagioni precedenti, dalla più recente */
   pastSeasons: ICaV4Season[]
   /** stagione in corso */
@@ -114,6 +136,16 @@ export function expectedFmV4(input: ICaV4Input, prior: number | undefined): numb
     weight += w
     total += season.fm * w
   })
+  // nessuna stagione di Serie A ma una stagione piena altrove: fantamedia equivalente stimata
+  const hasSerieAHistory = input.pastSeasons.some((season) => validFm(season.fm) && (season.appearances ?? 0) > 0)
+  if (!hasSerieAHistory && input.foreignSeason && finite(prior)) {
+    const f = ICA_V4_PARAMETERS.foreign
+    const season = input.foreignSeason
+    const estimate = prior + f.bonusWeight * (season.bonusPerMatch - f.bonusNeutral) - (f.tierPenalty[season.tier] ?? 0)
+    const w = Math.min(season.appearances, p.maxMatchesPerSeason) * f.weight
+    weight += w
+    total += estimate * w
+  }
   if (weight === 0) {
     if (validFm(input.fantalabXfm) && finite(prior)) return (input.fantalabXfm * 4 + prior * p.priorMatches) / (4 + p.priorMatches)
     if (validFm(input.fantalabXfm)) return input.fantalabXfm
@@ -181,6 +213,12 @@ export function expectedShareV4(input: ICaV4Input): { share: number; parts: ICaV
     const value = clamp(last.appearances / ICA_V4_PARAMETERS.seasonMatches, 0, 1)
     weight += s.previousMatches; total += value * s.previousMatches
     parts.push({ label: `Stagione ${last.season} (${last.appearances} presenze)`, value })
+  }
+  const foreign = input.foreignSeason
+  if (!last && foreign) {
+    const value = clamp(foreign.appearances / 34, 0, 1)
+    weight += s.previousMatches * 0.5; total += value * s.previousMatches * 0.5
+    parts.push({ label: `${foreign.league} ${foreign.season} (${foreign.appearances} presenze)`, value })
   }
   let share = weight > 0 ? total / weight : s.fallback
   // infortunio / indisponibilità: tolte le giornate fino al rientro previsto

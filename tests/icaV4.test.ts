@@ -32,3 +32,12 @@ test('rendimento = qualità × presenze attese', () => {
   const result = calculateICaV4([base({ fm: 7, appearances: 7, minutes: 630, teamMatches: 7, titolarita: 95 }), base({ id: 'y', fm: 6, appearances: 7 })]).get('x')!
   assert.ok(Math.abs(result.score! - result.quality! * result.expectedShare!) < 1e-9)
 })
+
+test('nuovo arrivo senza Serie A: la stagione estera entra nella fantamedia e nelle presenze', () => {
+  const foreign = { season: '2025/2026', league: 'Eredivisie', appearances: 32, bonusPerMatch: 0.9, tier: 1 }
+  const withForeign = expectedFmV4(base({ fm: 6, appearances: 2, foreignSeason: foreign }), 6.2)!
+  const without = expectedFmV4(base({ fm: 6, appearances: 2 }), 6.2)!
+  assert.ok(withForeign > without, `${withForeign} > ${without}`)
+  const share = expectedShareV4(base({ titolarita: 50, appearances: 2, teamMatches: 7, foreignSeason: foreign }))
+  assert.ok(share.parts.some((part) => part.label.startsWith('Eredivisie')))
+})
