@@ -63,6 +63,23 @@ function hierarchyRank(row: FldaRecord): number | undefined {
   return typeof value === 'number' && Number.isFinite(value) ? Math.round(value) : undefined
 }
 
+const ROLE_NAMES: Record<string, string> = { P: 'Portiere', D: 'Difensore', C: 'Centrocampista', A: 'Attaccante' }
+
+/** Testata comune a scheda ridotta e completa: nome grande, squadra · allenatore · modulo, badge,
+    e (solo nella ridotta) il pulsante per la scheda completa sotto. */
+export function renderPlayerHead(view: PlayerViewModel, fullReference?: string): string {
+  const role = view.flda.role.toUpperCase()
+  const roleName = ROLE_NAMES[role] ?? role
+  const guide = view.guide ?? view.detail?.guide ?? undefined
+  const context = [view.flda.team, field(guide, 'coach'), field(guide, 'module')]
+    .filter((item) => typeof item === 'string' && item.trim())
+    .map((item) => escapePlayerHtml(String(item))).join(' · ')
+  const name = view.flda.name
+  return `<header class="player-detail-header player-head" data-role-word="${escapePlayerHtml(roleName)}">
+    <div class="player-detail-identity"><span class="player-detail-role player-detail-role-${role.toLowerCase()}">${escapePlayerHtml(role)}</span><div><span class="player-detail-eyebrow">${escapePlayerHtml(roleName)}</span><h2 id="playerDetailTitle"${name.trim().endsWith('.') ? ' class="no-dot"' : ''}>${escapePlayerHtml(name)}</h2><p>${context}</p>${renderPlayerBadges(view)}${fullReference !== undefined ? `<button type="button" class="player-detail-full-button player-head-full" data-open-full-player="${escapePlayerHtml(fullReference)}">Scheda completa</button>` : ''}</div></div>
+  </header>`
+}
+
 export function renderPlayerBadges(view: PlayerViewModel): string {
   const badges: string[] = []
   if (view.flda.is_starting_xi || (!view.flda.player_id && typeof view.flda.titolarita_display === 'number' && view.flda.titolarita_display >= 90)) {
@@ -111,6 +128,9 @@ export function renderCurrentMetrics(view: PlayerViewModel, compact = false,
     ['MV', display(typeof latestMv === 'number' ? latestMv : view.legacy?.mv, 2), typeof latestMv === 'number' ? seasonNote : 'dato legacy'],
     ['FMV', display(typeof latestFmv === 'number' ? latestFmv : view.legacy?.fmv, 2), typeof latestFmv === 'number' ? seasonNote : 'dato legacy'],
     ['Titolarità', `${display(view.flda.titolarita_display, 0)}${typeof view.flda.titolarita_display === 'number' ? '%' : ''}`, 'indicatore editoriale'],
+  )
+  if (!compact && historicalPrice !== undefined) items.push(
+    ["Prezzo d'asta A/B", historicalPrice || '— / —', latestAuctionSeason(view.detail) ? `asta ${latestAuctionSeason(view.detail)}` : 'nessuna asta registrata', 'player-metric-history'],
   )
   return `<div class="player-current-metrics${compact ? ' player-current-metrics-full' : ''}">${items.map(([label, value, note, className]) => `<div class="${className ?? ''}"${className === 'player-metric-ica' ? ` style="--ica-hue:${icaHue(iCaV3?.rolePercentile)}"` : ''}><span>${label}</span><strong>${value}</strong>${note ? `<small>${note}</small>` : ''}</div>`).join('')}</div>`
 }
