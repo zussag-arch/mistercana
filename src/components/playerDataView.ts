@@ -110,7 +110,7 @@ export function renderCurrentMetrics(view: PlayerViewModel, compact = false,
   // Integrità = tenuta fisica: voto 1-5 dato dai Saggi (non è nel listone FantaLab)
   const integrity = integritySummary(view)
   const items: Array<[string, string, string, string?]> = [
-    ['iCà', display(iCaV3?.score, 1), `fantapunti a partita ×10${typeof iCaV3?.rolePercentile === 'number' ? ` · meglio del ${Math.round(iCaV3.rolePercentile)}% del ruolo` : ''}${typeof iCaV3?.affare === 'number' ? ` · affare ${iCaV3.affare > 0 ? '+' : ''}${Math.round(iCaV3.affare)}` : ''}`, 'player-metric-ica'],
+    ['iCà', display(iCaV3?.score, 1), iCaV3?.version === 'v4' ? `iCà 4 · fantamedia attesa ×10 · presenze ${display((iCaV3.expectedShare ?? 0) * 100, 0)}%${typeof iCaV3.rolePercentile === 'number' ? ` · meglio del ${Math.round(iCaV3.rolePercentile)}% del ruolo` : ''}${typeof iCaV3.affare === 'number' ? ` · affare ${iCaV3.affare > 0 ? '+' : ''}${Math.round(iCaV3.affare)}` : ''}` : `fantapunti a partita ×10${typeof iCaV3?.rolePercentile === 'number' ? ` · meglio del ${Math.round(iCaV3.rolePercentile)}% del ruolo` : ''}${typeof iCaV3?.affare === 'number' ? ` · affare ${iCaV3.affare > 0 ? '+' : ''}${Math.round(iCaV3.affare)}` : ''}`, 'player-metric-ica'],
     ['PMA', pma, pma === '—' ? 'dato non disponibile' : view.pmaConfiguration ? `${view.pmaConfiguration.mode === 'classic' ? 'Classic' : 'Mantra'} · ${view.pmaConfiguration.participants} · ${view.pmaConfiguration.defenseModifier ? 'con modificatore' : 'senza modificatore'}` : 'budget iniziale'],
     ['xFM', display(view.flda.fm_exp, 2), 'FM Exp. FLDA'],
     ['Integrità', integrity.value, integrity.detail],
@@ -354,6 +354,23 @@ export function renderICaV3Explanation(view: PlayerViewModel): string {
   const affare = result.affare
   const affareText = typeof affare !== 'number' ? 'prezzo non disponibile'
     : affare >= 15 ? 'rende più di quanto costa' : affare <= -15 ? 'costa più di quanto rende' : 'prezzo in linea con il valore'
+  if (result.version === 'v4') {
+    return `<div class="ica-explain">
+    <div class="ica-explain-score">
+      <span class="ica-explain-kicker">iCà 4</span>
+      <strong>${display(result.score, 1)}</strong>
+      <small>fantamedia attesa ×10${typeof result.rolePercentile === 'number' ? ` · meglio del ${Math.round(result.rolePercentile)}% del ruolo (contando le presenze)` : ''}</small>
+      ${typeof affare === 'number' ? `<span class="ica-explain-affare tone-${affare >= 15 ? 'good' : affare <= -15 ? 'bad' : 'neutral'}">Affare ${affare > 0 ? '+' : ''}${Math.round(affare)}</span><small>${affareText}</small>` : ''}
+    </div>
+    <ol class="ica-explain-steps">
+      <li><b>Fantamedia attesa ${display(result.expectedFm, 2)}</b><small>stagione in corso e due precedenti, frenate dalla media del ruolo</small></li>
+      ${result.contributions.map((item) => item.value === 0 ? `<li><small>${item.label}</small></li>` : `<li class="${item.value > 0 ? 'up' : 'down'}"><b>${sign(item.value)}</b> ${item.label}</li>`).join('')}
+      <li class="total"><b>= iCà 4 ${display(result.score, 1)}</b><small>fantamedia corretta ${display(result.adjustedFm, 2)} ×10</small></li>
+      <li><b>Presenze attese ${display((result.expectedShare ?? 0) * 100, 0)}%</b><small>${(result.shareParts ?? []).map((part) => `${part.label} ${part.value < 0 ? '−' : ''}${display(Math.abs(part.value) * 100, 0)}%`).join(' · ')}</small></li>
+      <li><b>Rendimento ${display(result.yieldScore, 1)}</b><small>iCà 4 × presenze attese: decide la posizione nel ruolo e l'Affare</small></li>
+    </ol>
+  </div>`
+  }
   return `<div class="ica-explain">
     <div class="ica-explain-score">
       <span class="ica-explain-kicker">iCà</span>

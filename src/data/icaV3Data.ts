@@ -10,6 +10,8 @@ import {
   localTeamHierarchies,
 } from '../services/fantalabLocal'
 import { calculateICaV3, coachRoleTone } from '../domain/icaV3'
+import { getICaV4Results } from './icaV4Data'
+import { icaVersion } from './icaVersion'
 import type { ICaCoachRole } from '../domain/icaV3'
 import type { ICaV3Input, ICaV3Result, ICaV3Role } from '../domain/icaV3'
 import { players as listone } from './players'
@@ -112,11 +114,36 @@ export function buildICaInputs(): ICaV3Input[] {
 }
 
 let cache: Map<string, ICaV3Result> | null = null
+let activeCache: Map<string, ICaV3Result> | null = null
 
-/** Risultati iCà 3 per ID FantaLab (calcolati una volta per sessione). */
-export function getICaV3Results(): Map<string, ICaV3Result> {
+function v3Results(): Map<string, ICaV3Result> {
   if (!cache) cache = calculateICaV3(buildICaInputs())
   return cache
+}
+
+// iCà 4 nella stessa forma: il numero mostrato è la fantamedia attesa corretta ×10 (qualità);
+// la posizione nel ruolo e l'Affare vengono dal rendimento (qualità × presenze attese).
+function v4Results(): Map<string, ICaV3Result> {
+  return new Map([...getICaV4Results()].map(([id, result]) => [id, {
+    id,
+    score: result.quality,
+    rolePercentile: result.rolePercentile,
+    affare: result.affare,
+    expectedFm: result.expectedFm,
+    adjustedFm: result.adjustedFm,
+    expectedShare: result.expectedShare,
+    contributions: result.contributions.map((item) => ({ ...item, unit: 'fm' as const })),
+    missing: result.quality === undefined ? ['fantamedia'] : [],
+    version: 'v4' as const,
+    yieldScore: result.score,
+    shareParts: result.shareParts,
+  }]))
+}
+
+/** Risultati dell'indice scelto in Dati (iCà 3 o iCà 4), per ID FantaLab. */
+export function getICaV3Results(): Map<string, ICaV3Result> {
+  if (!activeCache) activeCache = icaVersion() === 'v4' ? v4Results() : v3Results()
+  return activeCache
 }
 
 export function getICaV3(fantalabId: string | null | undefined): ICaV3Result | undefined {

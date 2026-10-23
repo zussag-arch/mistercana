@@ -508,3 +508,9 @@
 .rival-index { display: flex; flex-wrap: wrap; column-gap: 8px; }
 .rival-history { margin: 0; color: var(--muted); font-size: 12.5px; }
 .rival-history b { color: var(--text); }
+
+/* scelta dell'indice: iCà 3 / iCà 4 */
+.ica-version-switch { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 6px; margin: 4px 0 8px; padding: 4px 4px 4px 12px; border-radius: 999px; background: rgba(var(--ink-rgb), 0.06); font-size: 12.5px; font-weight: 700; color: var(--muted); }
+.ica-version-switch button { min-height: 32px; padding: 0 14px; border: 0 !important; border-radius: 999px !important; background: transparent !important; color: var(--muted) !important; font: inherit; font-weight: 800; cursor: pointer; }
+.ica-version-switch button[aria-pressed="true"] { background: var(--accent) !important; color: var(--accent-ink, #fff) !important; }
+.ica-version-switch small { font-weight: 600; opacity: 0.8; }

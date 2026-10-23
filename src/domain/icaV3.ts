@@ -139,6 +139,12 @@ export interface ICaV3Result {
   expectedShare?: number
   contributions: ICaV3Contribution[]
   missing: string[]
+  /** presente solo se il risultato viene dall'iCà 4 */
+  version?: 'v4'
+  /** iCà 4: rendimento = qualità × presenze attese (ordina il ruolo) */
+  yieldScore?: number
+  /** iCà 4: da cosa sono composte le presenze attese */
+  shareParts?: Array<{ label: string; value: number }>
 }
 
 function finite(value: unknown): value is number {
