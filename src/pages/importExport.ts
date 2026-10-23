@@ -20,8 +20,7 @@ import type { CsvKey, CsvOverride } from '../data/csvOverrides'
 import { analyzeCsv } from '../data/csvImport'
 import type { CsvAnalysis } from '../data/csvImport'
 import { getDataSources, getLastDataUpdate } from '../data/dataSources'
-import { getICaV3Results } from '../data/icaV3Data'
-import { icaVersion, setIcaVersion } from '../data/icaVersion'
+import { getICaResults } from '../data/ica'
 import { localPlayers } from '../services/fantalabLocal'
 import { getCachedPlayersDataset } from '../services/playerRepository'
 import { getAssignmentFldaId } from '../services/auctionPlayerResolver'
@@ -199,10 +198,6 @@ function renderDataSourcesPanel(): string {
           <p class="install-link-row">Link per installare l'app su Android: <code>zussag-arch.github.io/mistercana/?installa</code> <button type="button" class="install-open-button" data-install-open>Installa l'app</button></p>
           <p class="data-last-update">Ultimo aggiornamento dati: <strong>${escapeSourceHtml(lastUpdate.date)}</strong> · ${escapeSourceHtml(lastUpdate.source)}</p>
           <p class="data-last-update">Versione app: <strong>${new Date(__BUILD_DATE__).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' })}</strong></p>
-          <div class="ica-version-switch" role="group" aria-label="Indice di valutazione"><span>Indice di valutazione</span>
-            <button type="button" data-ica-version="v3" aria-pressed="${icaVersion() === 'v3'}">iCà 3</button>
-            <button type="button" data-ica-version="v4" aria-pressed="${icaVersion() === 'v4'}">iCà 4 <small>in prova</small></button>
-          </div>
         </div>
         <span class="data-source-active">In uso: ${escapeSourceHtml(label)}</span>
       </div>
@@ -728,15 +723,6 @@ function bindRivals(): void {
 
 function bindCsvUpload(): void {
   bindRivals()
-  document.addEventListener('click', (event) => {
-    const button = (event.target as HTMLElement | null)?.closest<HTMLElement>('[data-ica-version]')
-    if (!button) return
-    const version = button.dataset.icaVersion === 'v4' ? 'v4' : 'v3'
-    if (version === icaVersion()) return
-    setIcaVersion(version)
-    // tutti i calcoli (lista, Asta, consigli) ripartono con il nuovo indice
-    window.location.reload()
-  })
   document.addEventListener('toggle', (event) => {
     if (event.target instanceof HTMLDetailsElement && event.target.id === 'saggiCreatorsBox' && event.target.open) void loadCreatorOptions()
   }, true)
@@ -774,7 +760,7 @@ function escapeSourceHtml(value: string): string {
 
 function exportPlayerRatings(): void {
   const roleOrder = ['P', 'D', 'C', 'A']
-  const results = getICaV3Results()
+  const results = getICaResults()
   const csvCell = (value: unknown) => {
     const text = typeof value === 'number' ? value.toFixed(1).replace('.', ',') : String(value ?? '')
     return /[;"\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text

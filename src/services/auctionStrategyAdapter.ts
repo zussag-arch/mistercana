@@ -1,5 +1,5 @@
 import { getSaggiForPlayer } from '../data/saggi'
-import { getICaV3 } from '../data/icaV3Data'
+import { getICa } from '../data/ica'
 import type { AppState, AuctionAssignment } from '../app/state'
 import { players as legacyPlayers } from '../data/players'
 import { getFldaPma } from '../domain/pma'
@@ -49,8 +49,8 @@ export function adaptFldaPlayer(
     pmaPercent: getFldaPma(flda, state.pmaConfiguration),
     xFmv: typeof flda.fm_exp === 'number' ? flda.fm_exp : undefined,
     // agli algoritmi serve una qualità 0-100: la posizione nel ruolo
-    iCa: getICaV3(flda.player_id)?.rolePercentile,
-    affare: getICaV3(flda.player_id)?.affare,
+    iCa: getICa(flda.player_id)?.rolePercentile,
+    affare: getICa(flda.player_id)?.affare,
     saggiPrice: medianSaggiPrice(flda.player_id),
     fantalabId: flda.player_id,
     penaltyTaker: legacy?.penaltyTaker ?? flda.penalty_rank === 1,

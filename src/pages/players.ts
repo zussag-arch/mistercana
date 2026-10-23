@@ -1,5 +1,5 @@
 import { isFldaLocalMode } from '../services/flda'
-import { getICaV3 } from '../data/icaV3Data'
+import { getICa } from '../data/ica'
 import type { AppState } from '../app/state'
 import { runOverlayExit } from '../app/motion'
 import type { Player, PlayerRole } from '../domain/player'
@@ -122,7 +122,7 @@ function statusLabel(state: AppState, player: FldaPlayer): string {
 function numeric(value: unknown): number { return typeof value === 'number' ? value : -Infinity }
 // iCà (valore fantacalcistico atteso) per ordinare e mostrare.
 function fldaICa(player: FldaPlayer): number | undefined {
-  return getICaV3(player.player_id)?.score
+  return getICa(player.player_id)?.score
 }
 function affareChip(value: number | undefined): string {
   if (typeof value !== 'number') return ''
@@ -232,8 +232,8 @@ function renderRow(state: AppState, player: FldaPlayer): string {
   const iCa = fldaICa(player)
   return `<div class="players-table-row" role="button" tabindex="0" data-player-ref="${escapePlayerHtml(fldaReference(player))}">
     <div class="players-player-cell"><span class="role-badge role-${player.role.toLowerCase()}">${escapePlayerHtml(player.role)}</span><span><span class="players-name-line"><strong>${escapePlayerHtml(player.name)}</strong>${renderPlayerBadges(view)}</span><small>${escapePlayerHtml(player.team)}</small></span></div>
-    <div data-label="iCà"><span class="players-ica" style="--ica-hue:${icaHue(getICaV3(player.player_id)?.rolePercentile)}">${display(iCa, 1)}</span></div>
-    <div data-label="PMA">${typeof pma === 'number' ? `${display(pma, 1)}%` : '—'}${affareChip(getICaV3(player.player_id)?.affare)}</div>
+    <div data-label="iCà"><span class="players-ica" style="--ica-hue:${icaHue(getICa(player.player_id)?.rolePercentile)}">${display(iCa, 1)}</span></div>
+    <div data-label="PMA">${typeof pma === 'number' ? `${display(pma, 1)}%` : '—'}${affareChip(getICa(player.player_id)?.affare)}</div>
     <div data-label="xFM">${display(player.fm_exp, 2)}</div>
     <div data-label="Titolarità">${display(player.titolarita_display, 0)}${typeof player.titolarita_display === 'number' ? '%' : ''}</div>
     <div data-label="MV/FMV"><span class="players-dual-value">${display(legacy?.mv, 2)} <small>/</small> ${display(legacy?.fmv, 2)}</span></div>

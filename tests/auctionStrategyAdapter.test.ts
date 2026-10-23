@@ -2,13 +2,13 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import test from 'node:test'
 
-test('FLDA-only adapter maps direct inputs, iCà 3 and does not mutate assignments', () => {
+test('FLDA-only adapter maps direct inputs, iCà and does not mutate assignments', () => {
   const adapter = readFileSync(new URL('../src/services/auctionStrategyAdapter.ts', import.meta.url), 'utf8')
   assert.match(adapter, /id: legacy\?\.id \?\? flda\.player_id/)
   assert.match(adapter, /startingProbability:[\s\S]*flda\.titolarita_display/)
   assert.match(adapter, /pmaPercent: getFldaPma\(flda, state\.pmaConfiguration\)/)
   assert.match(adapter, /xFmv:[\s\S]*flda\.fm_exp/)
-  assert.match(adapter, /iCa: getICaV3\(flda\.player_id\)\?\.rolePercentile/)
+  assert.match(adapter, /iCa: getICa\(flda\.player_id\)\?\.rolePercentile/)
   assert.match(adapter, /adapted \? \{ \.\.\.assignment, playerId: adapted\.id \} : \{ \.\.\.assignment \}/)
 })
 

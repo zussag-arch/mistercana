@@ -5,7 +5,7 @@ import {
   evaluatePick, infirmary, leagueTeams, nextMatchday, suggestLineup, teamRoster,
 } from '../data/roster'
 import type { League, MatchdayPick, Probable } from '../data/roster'
-import { getICaV3 } from '../data/icaV3Data'
+import { getICa } from '../data/ica'
 import { getCachedPlayersDataset } from '../services/playerRepository'
 import { display, escapePlayerHtml } from '../components/playerDataView'
 import type { FldaPlayer } from '../services/flda'
@@ -65,7 +65,7 @@ function returnText(p: Probable, day?: number): string {
 function renderPopover(pick: MatchdayPick): string {
   const p = pick.probable
   const status = statusLabel(p)
-  const ica = getICaV3(pick.player.player_id)?.score
+  const ica = getICa(pick.player.player_id)?.score
   const prob = Math.round(pick.probability * 100)
   return `<button type="button" class="roster-pop-close" data-roster-close aria-label="Chiudi">×</button>
     <div class="roster-pop-head">

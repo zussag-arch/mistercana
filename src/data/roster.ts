@@ -5,7 +5,7 @@ import probabiliCsvBundled from '../../database/probabili.csv?raw'
 import sosProbabiliCsvBundled from '../../database/sos_probabili.csv?raw'
 import sosConsigliCsvBundled from '../../database/sos_consigli.csv?raw'
 import { getCsv } from './csvOverrides'
-import { getICaV3 } from './icaV3Data'
+import { getICa } from './ica'
 import { localPlayerDetail, localTeamGuide } from '../services/fantalabLocal'
 import type { FldaPlayer } from '../services/flda'
 
@@ -184,7 +184,7 @@ function lastVotes(playerId: string): Array<number | null> {
 export function evaluatePick(player: FldaPlayer, price: number): MatchdayPick {
   const id = player.player_id ?? ''
   const probable = probables().get(id)
-  const ica = getICaV3(id)
+  const ica = getICa(id)
   const recent = lastVotes(id)
   const voted = recent.filter((value): value is number => typeof value === 'number')
   const form = voted.length >= 2 ? voted.reduce((sum, value) => sum + value, 0) / voted.length : undefined
