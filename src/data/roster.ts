@@ -2,6 +2,8 @@
 // giornata (probabili.csv, da FLDA) e formazione consigliata.
 import asteCsvBundled from '../../database/aste.csv?raw'
 import probabiliCsvBundled from '../../database/probabili.csv?raw'
+import sosProbabiliCsvBundled from '../../database/sos_probabili.csv?raw'
+import sosConsigliCsvBundled from '../../database/sos_consigli.csv?raw'
 import { getCsv } from './csvOverrides'
 import { getICaV3 } from './icaV3Data'
 import { localPlayerDetail, localTeamGuide } from '../services/fantalabLocal'
@@ -9,6 +11,8 @@ import type { FldaPlayer } from '../services/flda'
 
 const asteCsv = getCsv('aste', asteCsvBundled)
 const probabiliCsv = getCsv('probabili', probabiliCsvBundled)
+const sosProbabiliCsv = getCsv('sos_probabili', sosProbabiliCsvBundled)
+const sosConsigliCsv = getCsv('sos_consigli', sosConsigliCsvBundled)
 
 type Row = Record<string, string>
 
@@ -97,7 +101,7 @@ export interface Probable {
 
 let probableCache: Map<string, Probable> | null = null
 
-export function probables(): Map<string, Probable> {
+function probables(): Map<string, Probable> {
   if (probableCache) return probableCache
   probableCache = new Map(parseCsv(probabiliCsv).map((row) => [row['ID FantaLab'], {
     matchday: num(row['Giornata']),
@@ -117,6 +121,31 @@ export function probables(): Map<string, Probable> {
   }]))
   return probableCache
 }
+
+/* =========================
+   SOS FANTA: probabili aggiornate (con ballottaggi) e consigli fascia per fascia
+========================= */
+
+interface SosInfo { probability?: number; duel?: string; fascia?: number; fasciaDay?: number }
+
+let sosCache: Map<string, SosInfo> | null = null
+
+function sosInfo(playerId: string): SosInfo | undefined {
+  if (!sosCache) {
+    sosCache = new Map()
+    for (const row of parseCsv(sosProbabiliCsv)) {
+      sosCache.set(row['ID FantaLab'], { probability: num(row['Probabilità']), duel: row['Ballottaggio'] || undefined })
+    }
+    for (const row of parseCsv(sosConsigliCsv)) {
+      const item = sosCache.get(row['ID FantaLab']) ?? {}
+      sosCache.set(row['ID FantaLab'], { ...item, fascia: num(row['Fascia']), fasciaDay: num(row['Giornata']) })
+    }
+  }
+  return sosCache.get(playerId)
+}
+
+// fascia SOS (1 = da schierare sempre … 9 = da evitare) → correzione dei fantapunti attesi
+const FASCIA_BONUS: Record<number, number> = { 1: 0.5, 2: 0.3, 3: 0.15, 4: 0, 5: -0.1, 6: -0.2, 7: -0.3, 8: -0.4, 9: -0.5, 10: -0.5 }
 
 export function nextMatchday(): number | undefined {
   return [...probables().values()].map((item) => item.matchday).find((day) => day !== undefined)
@@ -183,8 +212,19 @@ export function evaluatePick(player: FldaPlayer, price: number): MatchdayPick {
   if (form !== undefined && form <= usualFm - 0.75) reasons.push('fuori forma')
   if (player.penalty_rank === 1) reasons.push('rigorista')
 
+  // SOS Fanta: fascia della giornata (solo se riferita alla prossima giornata)
+  const sos = sosInfo(id)
+  const day = nextMatchday()
+  if (sos?.fascia && (!day || !sos.fasciaDay || sos.fasciaDay === day)) {
+    base += FASCIA_BONUS[sos.fascia] ?? 0
+    reasons.push(`SOS ${sos.fascia}ª fascia`)
+  }
+  if (sos?.duel) reasons.push(`ballottaggio con ${sos.duel}`)
+
   const out = Boolean(probable && (probable.injured || probable.suspended || probable.unavailable))
+  // probabilità: SOS Fanta (più aggiornata), poi FantaLab, poi titolarità Guida
   const probability = out ? 0
+    : typeof sos?.probability === 'number' ? sos.probability / 100
     : typeof probable?.probability === 'number' ? probable.probability / 100
     : typeof player.titolarita_display === 'number' ? player.titolarita_display / 100
     : 0.5
@@ -200,7 +240,7 @@ export function evaluatePick(player: FldaPlayer, price: number): MatchdayPick {
    FORMAZIONE CONSIGLIATA
 ========================= */
 
-export const MODULES = ['3-4-3', '3-5-2', '4-3-3', '4-4-2', '4-5-1', '5-3-2', '5-4-1'] as const
+const MODULES = ['3-4-3', '3-5-2', '4-3-3', '4-4-2', '4-5-1', '5-3-2', '5-4-1'] as const
 
 export interface LineupSuggestion {
   module: string

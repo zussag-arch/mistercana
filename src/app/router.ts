@@ -16,12 +16,3 @@ export function navigateTo(
   activePage =
     page
 }
-
-export function isActivePage(
-  page: PageId,
-): boolean {
-  return (
-    activePage ===
-    page
-  )
-}

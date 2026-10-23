@@ -76,11 +76,7 @@ button,
   letter-spacing: 0.01em;
 }
 /* restano in Unbounded solo titoli e numeri "eroe" */
-h1, h2, h3,
-.brand,
-.auction-ceiling-value,
-.dashboard-live-kpi strong,
-.auction-main-value strong {
+h1, h2, h3, .brand, .dashboard-live-kpi strong, .auction-main-value strong {
   font-family: var(--font-display);
 }
 
@@ -107,9 +103,8 @@ h1, h2, h3,
   white-space: nowrap;
 }
 .topbar-page-actions .auction-toolbar-stat span { display: none; }
-.topbar-page-actions .auction-role-tab { width: 30px; }
 .main-nav { gap: 2px; }
-.main-nav .nav-item { padding-inline: 9px; white-space: nowrap; }
+.main-nav .nav-item { white-space: nowrap; }
 
 /* attesa: non si allunga a riempire la colonna */
 .auction-workspace-main > .auction-no-player { flex: 0 0 auto !important; height: auto !important; }
@@ -127,7 +122,6 @@ body {
   padding-top: env(safe-area-inset-top);
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
-  padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* telefono */
@@ -142,14 +136,13 @@ body {
     grid-row: 3;
     order: 3;
     justify-content: flex-start;
-    overflow-x: auto;
     scrollbar-width: none;
     padding-bottom: 2px;
   }
   .topbar-page-actions::-webkit-scrollbar { display: none; }
   .topbar-page-actions > * { flex: 0 0 auto; }
   .main-nav { grid-column: 1 / -1; grid-row: 2; overflow-x: auto; scrollbar-width: none; }
-  .theme-switch { grid-column: 2; grid-row: 1; position: static; }
+  .theme-switch { grid-column: 2; grid-row: 1; }
 }
 
 /* icona "annulla" disegnata (freccia verso destra che curva e torna) */
@@ -255,7 +248,6 @@ body {
   color: var(--text-soft);
   font-size: 14px;
 }
-.install-link-row { font-size: 13px; color: var(--muted); }
 .install-link-row code { color: var(--text-soft); }
 .install-open-button {
   margin-left: 6px;
@@ -322,20 +314,7 @@ body {
   .topbar { column-gap: 14px; }
 }
 
-/* con una finestra aperta scorre solo lei: la pagina sotto resta ferma */
-html:has(.player-detail-overlay),
-html:has(.overlay:not(.hidden):not([hidden])[aria-hidden="false"]),
-html:has(.goalkeeper-matrix-overlay:not([hidden])),
-html:has(.install-sheet),
-html:has(.round-select-menu) {
-  overflow: hidden;
-}
-html:has(.player-detail-overlay) body,
-html:has(.overlay:not(.hidden):not([hidden])[aria-hidden="false"]) body,
-html:has(.goalkeeper-matrix-overlay:not([hidden])) body,
-html:has(.install-sheet) body {
-  overflow: hidden;
-}
+/* con una finestra aperta scorre solo lei (il documento non scorre mai: vedi app-shell.css) */
 .player-detail-card,
 .player-detail-overlay,
 .overlay-card,
@@ -353,8 +332,6 @@ html:has(.install-sheet) body {
 /* grafico voti per giornata */
 .md-chart svg { width: 100%; height: auto; overflow: visible; }
 .md-area { fill: url(#mdArea); }
-.md-stop-top { stop-color: color-mix(in srgb, var(--green) 55%, var(--surface)); stop-opacity: 0.9; }
-.md-stop-bottom { stop-color: color-mix(in srgb, var(--green) 10%, var(--surface)); stop-opacity: 0.4; }
 .md-line { fill: none; stroke-width: 3; stroke-linecap: round; }
 .md-line-fmv { stroke: var(--green); }
 .md-line-mv { stroke: var(--blue); }
@@ -369,11 +346,107 @@ html:has(.install-sheet) body {
 .md-legend-fmv { fill: var(--green); }
 
 /* scheda completa su computer: "Indietro" come pillola normale */
-@media (min-width: 701px) {
-  .player-full-back.sheet-back { width: auto !important; height: 38px !important; padding: 0 14px 0 8px !important; }
-}
 /* grafico giornate: misura contenuta, area ben visibile */
 .md-chart { max-width: 760px; margin: 0 auto; }
 .md-stop-top { stop-color: var(--green); stop-opacity: 0.55; }
 .md-stop-bottom { stop-color: var(--green); stop-opacity: 0.06; }
 .md-chart .chart-legend text { font-size: 12px; fill: var(--muted); }
+
+/* =========================
+   LIQUID GLASS per i riquadri sovrapposti
+   fondo traslucido + sfocatura e saturazione di ciò che sta dietro,
+   riflesso chiaro in alto, bordo luminoso sottile
+========================= */
+:root {
+  --glass-bg: color-mix(in srgb, var(--surface) 64%, transparent);
+  --glass-strong: color-mix(in srgb, var(--surface) 82%, transparent);
+  --glass-border: rgba(255, 255, 255, 0.16);
+  --glass-shine: rgba(255, 255, 255, 0.22);
+}
+:root[data-theme="light"] {
+  --glass-bg: color-mix(in srgb, #fffdf8 62%, transparent);
+  --glass-strong: color-mix(in srgb, #fffdf8 84%, transparent);
+  --glass-border: rgba(255, 255, 255, 0.75);
+  --glass-shine: rgba(255, 255, 255, 0.9);
+}
+.roster-pop,
+.round-select-menu,
+.install-card,
+.roster-pop-close,
+.save-warning {
+  background:
+    linear-gradient(140deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.02) 45%, rgba(255, 255, 255, 0.06)),
+    var(--glass-bg) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  backdrop-filter: blur(22px) saturate(180%);
+  border: 1px solid var(--glass-border) !important;
+  box-shadow: inset 0 1px 0 var(--glass-shine), inset 0 -1px 0 rgba(0, 0, 0, 0.06), 0 18px 48px rgba(0, 0, 0, 0.32) !important;
+}
+/* finestre grandi (schede, aggiudicazione, selettori): vetro più pieno, per leggere bene */
+.player-detail-card,
+.overlay-card,
+.goalkeeper-matrix-dialog {
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.02) 40%),
+    var(--glass-strong) !important;
+  /* niente seconda sfocatura: lo sfondo della finestra è già sfocato (pesante per la scheda grafica) */
+  border: 1px solid var(--glass-border) !important;
+  box-shadow: inset 0 1px 0 var(--glass-shine), 0 24px 70px rgba(0, 0, 0, 0.38) !important;
+}
+/* tessere interne del riquadro: vetro leggero */
+.roster-pop-grid div,
+.roster-pop-open {
+  background: rgba(var(--ink-rgb), 0.06) !important;
+  border-color: var(--glass-border) !important;
+}
+
+/* =========================
+   SCHEDA SINTETICA: stesse linee del riquadro della Rosa
+   vetro, × piccola a cavallo dell'angolo in alto a destra (fuori dallo scorrimento)
+========================= */
+.player-detail-shell {
+  position: relative;
+  width: min(1080px, 100%);
+  max-height: calc(100vh - 36px);
+  display: flex;
+}
+.player-detail-shell > .player-detail-card { width: 100% !important; max-height: inherit; }
+.player-detail-close-button.sheet-x,
+.roster-pop-close {
+  display: grid !important;
+  padding: 0 !important;
+  color: var(--text) !important;
+  background:
+    linear-gradient(140deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.02) 45%, rgba(255, 255, 255, 0.06)),
+    var(--glass-bg) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  backdrop-filter: blur(22px) saturate(180%);
+  border: 1px solid var(--glass-border) !important;
+  box-shadow: inset 0 1px 0 var(--glass-shine), 0 6px 16px rgba(0, 0, 0, 0.25) !important;
+}
+/* vetro come il riquadro della Rosa (più leggero del precedente) */
+.player-quick-card {
+  background:
+    linear-gradient(140deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.02) 45%, rgba(255, 255, 255, 0.06)),
+    var(--glass-strong) !important;
+}
+.player-quick-card .player-current-metrics > :not(.player-metric-ica),
+.player-quick-card .player-data-section,
+.player-quick-card .player-overlay-stats {
+  background: rgba(var(--ink-rgb), 0.05) !important;
+  border-color: var(--glass-border) !important;
+}
+@media (max-width: 700px) {
+  .player-detail-shell { width: 100%; max-height: 94vh; }
+}
+/* niente barra di scorrimento visibile nelle schede (si scorre lo stesso) */
+.player-detail-card::-webkit-scrollbar,
+.overlay-card::-webkit-scrollbar,
+.roster-pop::-webkit-scrollbar,
+.round-select-menu::-webkit-scrollbar {
+  display: none;
+}
+@media (max-width: 700px) {
+  /* scheda a tutta larghezza: la × resta dentro lo schermo */
+  .player-detail-shell .player-detail-close-button.sheet-x { right: 6px !important; top: -6px !important; }
+}

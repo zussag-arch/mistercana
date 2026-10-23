@@ -280,8 +280,16 @@ async function loadPreview(reference: string, actions: PlayersActions): Promise<
   }
 }
 
+let playersLoadedListening = false
+let latestPlayersRender: () => void = () => {}
+
 export function bindPlayersEvents(state: AppState, actions: PlayersActions): void {
-  document.addEventListener('mistercana:players-loaded', actions.onRender, { once: true })
+  // un solo ascoltatore in attesa dei dati (non uno per ogni ridisegno)
+  latestPlayersRender = actions.onRender
+  if (!playersLoadedListening) {
+    playersLoadedListening = true
+    document.addEventListener('mistercana:players-loaded', () => { playersLoadedListening = false; latestPlayersRender() }, { once: true })
+  }
   document.querySelector('#playersGoToAuctionButton')?.addEventListener('click', actions.onGoToAuction)
   document.querySelectorAll<HTMLElement>('[data-player-role]').forEach((button) => button.addEventListener('click', () => { viewState.role = button.dataset.playerRole as RoleFilter; actions.onRender() }))
   document.querySelectorAll<HTMLButtonElement>('[data-player-team]').forEach((button) => button.addEventListener('click', () => {

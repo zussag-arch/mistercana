@@ -24,7 +24,6 @@
     -webkit-text-size-adjust: 100%;
   }
   body {
-    padding-bottom: calc(var(--tabbar-total) + 12px) !important;
     -webkit-tap-highlight-color: transparent;
   }
   button,
@@ -46,13 +45,7 @@
     display: none !important;
   }
   .topbar {
-    position: sticky;
-    top: 0;
     z-index: 50;
-    padding-top: calc(8px + env(safe-area-inset-top));
-    background: color-mix(in srgb, var(--bg) 92%, transparent);
-    -webkit-backdrop-filter: blur(14px);
-    backdrop-filter: blur(14px);
   }
   body {
     padding-top: 0 !important;
@@ -122,7 +115,6 @@
   .auction-mobile-tabs button {
     min-height: 38px;
     border: 0;
-    border-radius: 999px !important;
     background: none;
     color: var(--muted);
     font-size: 14px;
@@ -157,17 +149,8 @@
   :root[data-auction-tab="market"] .auction-workspace-main > :not(.auction-competitors-section):not(.auction-history-slot) {
     display: none !important;
   }
-  :root[data-auction-tab="market"] .auction-history-slot {
-    contain: none;
-    min-height: 0;
-  }
   :root[data-auction-tab="market"] .auction-history-slot .auction-history-list {
     max-height: none;
-  }
-
-  .auction-side-panels,
-  .auction-workspace-main {
-    gap: 12px;
   }
 
   /* pulsanti del prezzo fissi sopra la barra in basso */
@@ -178,10 +161,6 @@
     bottom: var(--tabbar-total);
     z-index: 55;
     display: grid !important;
-    grid-template-columns: 1fr auto auto;
-    grid-template-areas:
-      "price plus award"
-      "unsold unsold unsold";
     gap: 8px;
     margin: 0;
     padding: 10px 12px;
@@ -230,9 +209,6 @@
     display: none;
   }
   /* spazio perché la barra del prezzo non copra il fondo della pagina */
-  :root[data-auction-tab="call"] .auction-live-page {
-    padding-bottom: 140px;
-  }
 
   /* tessera giocatore più compatta */
   .auction-player-card {
@@ -243,8 +219,7 @@
 @media (max-width: 700px) {
   /* Chiamata compatta: il tetto deve stare nella prima schermata */
   .auction-player-card::before,
-  .auction-player-card [data-role-word],
-  .auction-player-card .auction-role-word {
+  .auction-player-card [data-role-word] {
     display: none !important;
   }
   .auction-player-header h2 { font-size: 30px !important; }
@@ -263,8 +238,7 @@
     grid-template-columns: 1fr auto !important;
     gap: 8px !important;
   }
-  .auction-recommendation-primary strong,
-  .auction-recommendation .auction-ceiling-value { font-size: 40px !important; }
+  .auction-recommendation-primary strong { font-size: 40px !important; }
   .auction-price-limits {
     grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
     gap: 6px !important;
@@ -274,7 +248,6 @@
   .auction-price-limit small:not(:first-of-type) { display: none; }
 
   /* avversari: due per riga, essenziali */
-  .auction-competitor-grid,
   .auction-competitors-section > div:last-child {
     display: grid !important;
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
@@ -308,10 +281,6 @@
   .auction-history-section h3 { font-size: 24px !important; }
 
   /* barra del prezzo su una riga sola; Invenduto come linguetta sopra */
-  :root[data-auction-tab="call"] .auction-live-price-row {
-    grid-template-columns: minmax(0, 1fr) auto auto;
-    grid-template-areas: "price plus award";
-  }
   :root[data-auction-tab="call"] .auction-live-price-row .auction-secondary-action:first-of-type {
     position: absolute;
     top: -40px;
@@ -322,7 +291,6 @@
     border: 1px solid var(--line-1);
     font-size: 12px;
   }
-  :root[data-auction-tab="call"] .auction-live-page { padding-bottom: 120px; }
 
   /* testata giocatore più bassa */
   .auction-player-card .auction-player-detail-trigger { padding: 4px 10px; font-size: 12px; }
@@ -334,16 +302,8 @@
   /* Invenduto e Annulla: linguette sopra la barra del prezzo */
   :root[data-auction-tab="call"] .auction-live-price-row #auctionUnsoldButton,
   :root[data-auction-tab="call"] .auction-live-price-row #auctionCancelCallButton {
-    display: inline-flex !important;
-    position: absolute;
     top: -40px;
     grid-area: auto;
-    min-height: 32px;
-    padding: 0 14px;
-    border: 1px solid var(--line-1);
-    background: var(--surface);
-    font-size: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
   }
   :root[data-auction-tab="call"] .auction-live-price-row #auctionUnsoldButton { right: 12px; }
   :root[data-auction-tab="call"] .auction-live-price-row #auctionCancelCallButton { right: 118px; }
@@ -352,9 +312,6 @@
 @media (max-width: 700px) {
   :root[data-auction-tab="call"] .auction-live-price-row {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto auto !important;
-    grid-template-areas:
-      "price price plus award"
-      "unsold cancel cancel cancel" !important;
     row-gap: 6px !important;
   }
   :root[data-auction-tab="call"] .auction-live-price-row #auctionUnsoldButton,
@@ -363,7 +320,6 @@
     display: inline-flex !important;
     align-items: center;
     justify-content: center;
-    width: auto;
     min-height: 32px !important;
     padding: 0 12px;
     box-shadow: none;
@@ -389,27 +345,16 @@
 @media (max-width: 700px) {
   /* azioni dell'asta visibili: vanno a capo invece di scorrere nascoste */
   .topbar-page-actions {
-    flex-wrap: wrap !important;
     overflow: visible !important;
-    row-gap: 8px;
   }
   .topbar-page-actions .auction-toolbar-actions {
     display: flex !important;
-    flex-wrap: wrap;
-    gap: 6px;
-    width: auto;
   }
   /* Giocatori e Obiettivi sono già nella barra in basso */
-  #goToPlayersButton,
-  #goToObjectivesButton {
-    display: none !important;
-  }
   #undoLastAssignmentButton,
   #endAuctionButton {
     display: inline-flex !important;
     min-height: 34px;
-    padding: 0 14px;
-    font-size: 13px;
   }
 }
 
@@ -418,11 +363,9 @@
   .topbar .topbar-page-actions #endAuctionButton {
     width: auto !important;
     height: 34px !important;
-    padding: 0 14px !important;
     align-items: center;
     justify-content: center;
     line-height: 1;
-    font-size: 13px !important;
     white-space: nowrap;
   }
   .topbar .topbar-page-actions #undoLastAssignmentButton::after {
@@ -469,7 +412,6 @@
     font-size: 15px;
   }
   .players-table-row > div::before {
-    content: attr(data-label);
     font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.02em;
@@ -491,9 +433,8 @@
   .players-table-row > [data-label="Titolarità"] { grid-area: tit; }
   .players-table-row > [data-label="MV/FMV"] { grid-area: mv; }
   .players-table-row > [data-label="Stato"] { grid-area: status; align-items: flex-end; }
-  .players-table-row > [data-label="Stato"]::before { content: none; }
   .players-table-row .players-ica { font-size: 26px !important; line-height: 1; }
-  .players-table-row > [data-label="PMA"] { flex-direction: row !important; flex-wrap: wrap; align-items: baseline; column-gap: 6px; }
+  .players-table-row > [data-label="PMA"] { flex-direction: row !important; flex-wrap: wrap; }
   .players-table-row > [data-label="PMA"]::before { flex-basis: 100%; }
   .players-table-row .player-status { font-size: 12px; padding: 4px 10px; }
 
@@ -502,7 +443,6 @@
   .players-filters {
     gap: 8px !important;
   }
-  .players-search,
   .players-toolbar input[type="search"] {
     flex: 1 1 100% !important;
     width: 100% !important;
@@ -517,11 +457,9 @@
     align-items: center;
     gap: 6px;
   }
-  .topbar-page-actions .auction-role-switcher > div { padding: 3px; }
   .topbar-page-actions .auction-role-tab { width: 30px !important; height: 34px !important; }
   .topbar-page-actions .auction-toolbar-actions {
     flex-wrap: nowrap !important;
-    margin-left: auto;
   }
   .topbar .topbar-page-actions #undoLastAssignmentButton,
   .topbar .topbar-page-actions #endAuctionButton {
@@ -561,7 +499,6 @@
   .dashboard-mobile-tabs button {
     min-height: 38px;
     border: 0;
-    border-radius: 999px !important;
     background: none;
     color: var(--muted);
     font-size: 14px;
@@ -572,7 +509,6 @@
     color: var(--text);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
   }
-  .dashboard-page { gap: 12px !important; }
 
   /* Riepilogo */
   :root[data-dash-tab="summary"] .dashboard-budget-panel,
@@ -597,7 +533,6 @@
   .dashboard-live-roles {
     display: grid !important;
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 8px !important;
   }
   .dashboard-live-kpi,
   .dashboard-stat-card,
@@ -622,9 +557,6 @@
   .dashboard-participants .auction-section-heading h3 { font-size: 24px !important; }
 
   /* budget: reparti 2×2, profili su una riga scorrevole */
-  .dashboard-budget-panel .budget-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  }
 }
 @media (max-width: 700px) {
   .dashboard-budget-panel .budget-grid { grid-template-columns: 1fr !important; }
@@ -644,40 +576,13 @@
 /* --- pulsante "Indietro" delle schede giocatore ---
    sul computer: nella scheda rapida resta la ×; nella completa un pulsante normale
    su telefono: sempre in alto a sinistra, fisso, ben visibile, uguale nelle due schede */
-.sheet-back {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  min-height: 38px;
-  padding: 0 14px 0 8px;
-  border: 1px solid var(--line-1);
-  border-radius: 999px !important;
-  background: var(--surface);
-  color: var(--text);
-  font-family: var(--font-ui);
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-}
-.sheet-back svg {
-  width: 20px;
-  height: 20px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2.4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.player-quick-card > .sheet-back { display: none; }
 
 @media (max-width: 700px) {
-  .player-quick-card > .sheet-back,
   .sheet-back-portal {
     position: fixed;
     top: calc(env(safe-area-inset-top) + 10px);
     left: 12px;
     z-index: 9200;
-    display: inline-flex;
     min-height: 42px;
     padding: 0 16px 0 10px;
     background: var(--surface);
@@ -686,11 +591,7 @@
   /* la × e la vecchia freccia non servono più su telefono */
   .player-quick-card .player-detail-close-button { display: none !important; }
   /* spazio in cima perché il pulsante non copra il nome */
-  .player-quick-card { padding-top: 60px !important; }
-  .player-full-page-v3 { padding-top: 56px; }
 }
-
-.sheet-back-portal { display: none; }
 @media (max-width: 700px) {
   .sheet-back-portal { display: inline-flex; }
   /* nella scheda completa su telefono resta solo il pulsante fisso */
@@ -704,7 +605,7 @@
 }
 @media (max-width: 700px) {
   /* scheda completa: "Indietro" prende il posto del logo, stesso punto della scheda rapida */
-  body:has(.sheet-back-portal) .topbar-brand-stack { visibility: hidden; }
+  .app-shell[data-view="playerDetail"] .topbar-brand-stack { visibility: hidden; }
 }
 
 /* niente zoom col doppio tocco */
@@ -734,8 +635,8 @@ html, body { touch-action: manipulation; }
 @media (max-width: 700px) {
   /* stessa partenza per scheda rapida e completa */
   /* stessa partenza: la scheda completa senza logo sopra, alla stessa distanza dall'alto */
-  body:has(.player-full-page-v3) .topbar { display: none !important; }
-  body:has(.player-full-page-v3) .page { padding-top: calc(env(safe-area-inset-top) + 28px); }
+  .app-shell[data-view="playerDetail"] .topbar { display: none !important; }
+  .app-shell[data-view="playerDetail"] .page { padding-top: calc(env(safe-area-inset-top) + 28px); }
   .player-detail-overlay { padding-top: calc(env(safe-area-inset-top) + 16px) !important; }
   .player-quick-card { padding-top: 12px !important; }
   .player-full-page-v3 { padding-top: 0 !important; }
@@ -767,6 +668,6 @@ html, body { touch-action: manipulation; }
 @media (max-width: 700px) {
   /* tutto un po' più in basso: il logo esce dalla fascia della barra di stato */
   .topbar { padding-top: calc(env(safe-area-inset-top) + 24px) !important; }
-  body:has(.player-full-page-v3) .page { padding-top: calc(env(safe-area-inset-top) + 40px); }
+  .app-shell[data-view="playerDetail"] .page { padding-top: calc(env(safe-area-inset-top) + 40px); }
   .player-detail-overlay { padding-top: calc(env(safe-area-inset-top) + 28px) !important; }
 }

@@ -4,7 +4,7 @@ const DEFAULT_FLDA_API_URL =
 const DEFAULT_TIMEOUT_MS = 8000
 const UPDATE_TIMEOUT_MS = 120000
 
-export type FldaDatasetStatus =
+type FldaDatasetStatus =
   | 'success'
   | 'warning'
   | 'failed'
@@ -89,7 +89,7 @@ export interface FldaHistoryRecord extends FldaRecord {
   injury_games_missed?: number | null
 }
 
-export interface FldaBulkHistoryPlayer {
+interface FldaBulkHistoryPlayer {
   player_id: string
   history: FldaHistoryRecord[]
 }
@@ -117,10 +117,6 @@ export interface FldaPlayerDetail {
   /** voti della stagione in corso, giornata per giornata (null = senza voto) */
   matchdays?: Array<{ matchday: number; mv: number | null; fmv: number | null }>
 }
-
-export type FldaFixtureContext =
-  | 'goalkeeper'
-  | 'attacker'
 
 export type FldaErrorKind =
   | 'unreachable'

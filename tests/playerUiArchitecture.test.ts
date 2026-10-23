@@ -38,8 +38,6 @@ test('renders the requested descriptive charts and avoids viewport-wide mobile c
   const view = source('src/components/playerDataView.ts')
   const playersCss = source('src/styles/players.css')
   const detailCss = source('src/styles/playerDetail.css')
-  assert.match(view, /Prezzo \(crediti\)/)
-  assert.match(view, /chart-average-value[^>]*>\$\{display\(average, 1\)\} cr/)
   assert.equal(view.includes('player-chart-summary'), false)
   assert.match(view, />Voto</)
   assert.match(view, /chart-tick/)

@@ -45,7 +45,7 @@ export function resolveFldaPlayer(
   }
 }
 
-export function resolveLegacyPlayer(
+function resolveLegacyPlayer(
   id: string | null | undefined,
 ): CanonicalAuctionPlayer | undefined {
   if (!id) return undefined

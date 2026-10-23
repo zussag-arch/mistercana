@@ -37,24 +37,6 @@
 
   padding: 18px;
 
-  border:
-    1px solid
-    rgba(var(--ink-rgb), 0.08);
-
-  border-radius: 28px;
-
-  background:
-    linear-gradient(
-      180deg,
-      rgba(var(--ink-rgb), 0.018),
-      rgba(var(--ink-rgb), 0.006)
-    ),
-    var(--bg);
-
-  box-shadow:
-    inset 0 1px 0
-    rgba(var(--ink-rgb), 0.025);
-
   transition:
     border-color
       var(--motion-fast)
@@ -76,8 +58,6 @@
 
 .insight-section-header h2 {
   margin: 4px 0 0;
-
-  font-size: 17px;
 }
 
 .insight-section-header p {
@@ -88,15 +68,6 @@
   color: var(--muted);
 
   font-size: 11px;
-}
-
-.insight-eyebrow {
-  color: var(--muted);
-
-  font-size: 11px;
-  font-weight: 850;
-
-  letter-spacing: 0.11em;
 }
 
 .insight-database-status,
@@ -203,10 +174,6 @@
     1px solid
     rgba(var(--ink-rgb), 0.08);
 
-  border-radius: 16px;
-
-  background: var(--surface);
-
   transition:
     border-color
       var(--motion-fast)
@@ -251,8 +218,6 @@
 
   border: 0;
   outline: 0;
-
-  background: transparent;
 
   color: var(--text);
 
@@ -404,16 +369,6 @@
 .goalkeeper-recommendations {
   min-height: 134px;
 
-  padding: 13px;
-
-  border:
-    1px solid
-    rgba(var(--ink-rgb), 0.07);
-
-  border-radius: 22px;
-
-  background: var(--surface);
-
   transition:
     border-color
       var(--motion-fast)
@@ -433,8 +388,6 @@
 
   gap: 5px;
 
-  color: var(--muted);
-
   text-align: center;
 }
 
@@ -449,16 +402,6 @@
   font-size: 11px;
 }
 
-.goalkeeper-selection-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  gap: 10px;
-
-  margin-bottom: 9px;
-}
-
 .goalkeeper-selection-heading span {
   color: var(--muted);
 
@@ -471,39 +414,10 @@
 
 .goalkeeper-selection-heading strong {
   color: var(--text-soft);
-
-  font-size: 11px;
-}
-
-.goalkeeper-recommendations-list {
-  display: grid;
-
-  gap: 6px;
 }
 
 .goalkeeper-recommendation {
   min-height: 42px;
-
-  display: grid;
-
-  grid-template-columns:
-    28px
-    minmax(0, 1fr)
-    auto;
-
-  align-items: center;
-
-  gap: 9px;
-
-  padding: 6px 8px;
-
-  border:
-    1px solid
-    rgba(var(--ink-rgb), 0.05);
-
-  border-radius: 14px;
-
-  background: var(--surface-light);
 
   transition:
     border-color
@@ -523,36 +437,12 @@
   }
 }
 
-.goalkeeper-rank {
-  width: 25px;
-  height: 25px;
-
-  display: grid;
-  place-items: center;
-
-  border-radius: 9px;
-
-  background:
-    color-mix(in srgb, var(--yellow) 10%, transparent);
-
-  color: var(--yellow);
-
-  font-size: 11px;
-  font-weight: 900;
-}
-
-.goalkeeper-recommendation-team {
-  min-width: 0;
-}
-
 .goalkeeper-recommendation-team strong {
   display: block;
 
   overflow: hidden;
 
   color: var(--text-soft);
-
-  font-size: 11px;
 
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -562,10 +452,6 @@
   display: block;
 
   margin-top: 2px;
-
-  color: var(--muted-soft);
-
-  font-size: 11px;
 }
 
 .goalkeeper-score {
@@ -575,22 +461,8 @@
   display: grid;
   place-items: center;
 
-  padding: 0 7px;
-
-  border:
-    1px solid
-    color-mix(in srgb, var(--accent) 14%, transparent);
-
   border-radius:
     var(--radius-pill);
-
-  background:
-    color-mix(in srgb, var(--accent) 7%, transparent);
-
-  color: var(--accent);
-
-  font-size: 11px;
-  font-weight: 850;
 
   font-variant-numeric:
     tabular-nums;
@@ -611,8 +483,6 @@
 
   inset: 0;
 
-  padding: 28px;
-
   background:
     color-mix(in srgb, var(--bg) 82%, transparent);
 
@@ -630,10 +500,6 @@
 }
 
 .goalkeeper-matrix-dialog {
-  width: min(
-    1400px,
-    100%
-  );
 
   max-height:
     calc(
@@ -643,18 +509,6 @@
   margin: 0 auto;
 
   overflow: hidden;
-
-  border:
-    1px solid
-    rgba(var(--ink-rgb), 0.09);
-
-  border-radius: 28px;
-
-  background: var(--bg);
-
-  box-shadow:
-    0 28px 80px
-    rgba(0, 0, 0, 0.55);
 
   transform-origin:
     center top;
@@ -746,12 +600,6 @@
   justify-content: space-between;
 
   gap: 20px;
-
-  padding: 18px;
-
-  border-bottom:
-    1px solid
-    rgba(var(--ink-rgb), 0.06);
 }
 
 .goalkeeper-matrix-header h2 {
@@ -762,32 +610,16 @@
 
 .goalkeeper-matrix-header p {
   margin: 6px 0 0;
-
-  color: var(--muted);
-
-  font-size: 11px;
 }
 
 .goalkeeper-matrix-close {
-  width: 36px;
-  height: 36px;
 
   flex: 0 0 auto;
 
   display: grid;
   place-items: center;
 
-  border:
-    1px solid
-    rgba(var(--ink-rgb), 0.09);
-
-  border-radius: 14px;
-
-  background: var(--surface-light);
-
   color: var(--muted);
-
-  font-size: 18px;
 
   cursor: pointer;
 
@@ -834,88 +666,26 @@
 .goalkeeper-matrix-content {
   overflow: auto;
 
-  max-height:
-    calc(
-      100vh - 190px
-    );
-
-  overscroll-behavior:
-    contain;
-
   -webkit-overflow-scrolling:
     touch;
 }
 
-.goalkeeper-matrix-scroll {
-  width: max-content;
-  min-width: 100%;
-}
-
 .goalkeeper-matrix-table {
-  border-collapse:
-    separate;
-
-  border-spacing: 2px;
-
-  padding: 10px;
 
   background: var(--bg);
 }
 
-.goalkeeper-matrix-table th,
-.goalkeeper-matrix-table td {
-  min-width: 46px;
-  height: 37px;
-
-  padding: 0 7px;
-
-  border-radius: 8px;
-
-  text-align: center;
-
-  font-size: 11px;
-}
-
 .goalkeeper-matrix-table thead th {
-  position: sticky;
-
-  z-index: 4;
-
-  top: 0;
-
-  background: var(--surface-light);
-
-  color: var(--muted);
 
   font-weight: 800;
 }
 
 .goalkeeper-matrix-table tbody th {
-  position: sticky;
-
-  z-index: 3;
-
-  left: 0;
 
   min-width: 105px;
-
-  background: var(--surface-light);
-
-  color: var(--muted);
-
-  text-align: left;
-}
-
-.goalkeeper-matrix-corner {
-  left: 0;
-
-  z-index: 5 !important;
 }
 
 .goalkeeper-matrix-table td {
-  color: var(--muted);
-
-  font-weight: 750;
 
   transition:
     opacity
@@ -936,32 +706,8 @@
 }
 
 .matrix-empty {
-  background:
-    rgba(var(--ink-rgb), 0.018);
 
   color: var(--on-color) !important;
-}
-
-.matrix-low {
-  background:
-    color-mix(in srgb, var(--red) 6%, transparent);
-}
-
-.matrix-medium {
-  background:
-    color-mix(in srgb, var(--yellow) 7%, transparent);
-}
-
-.matrix-good {
-  background:
-    color-mix(in srgb, var(--accent) 8%, transparent);
-}
-
-.matrix-excellent {
-  background:
-    color-mix(in srgb, var(--accent) 17%, transparent);
-
-  color: var(--accent) !important;
 }
 
 .goalkeeper-matrix-legend {
@@ -999,26 +745,6 @@
   border-radius: 3px;
 }
 
-.legend-low {
-  background:
-    color-mix(in srgb, var(--red) 30%, transparent);
-}
-
-.legend-medium {
-  background:
-    color-mix(in srgb, var(--yellow) 30%, transparent);
-}
-
-.legend-good {
-  background:
-    color-mix(in srgb, var(--accent) 34%, transparent);
-}
-
-.legend-excellent {
-  background:
-    color-mix(in srgb, var(--accent) 66%, transparent);
-}
-
 .goalkeeper-matrix-empty {
   padding: 30px;
 
@@ -1033,28 +759,7 @@
    SET PIECES
 ========================= */
 
-.set-pieces-grid {
-  display: grid;
-
-  grid-template-columns:
-    repeat(
-      4,
-      minmax(0, 1fr)
-    );
-
-  gap: 11px;
-}
-
 .set-piece-card {
-  padding: 13px;
-
-  border:
-    1px solid
-    rgba(var(--ink-rgb), 0.07);
-
-  border-radius: 20px;
-
-  background: var(--surface);
 
   transition:
     border-color
@@ -1075,7 +780,6 @@
 }
 
 .set-piece-team {
-  padding-bottom: 10px;
 
   border-bottom:
     1px solid
@@ -1088,40 +792,12 @@
 }
 
 .set-piece-columns {
-  display: grid;
-
-  grid-template-columns:
-    repeat(
-      2,
-      minmax(0, 1fr)
-    );
-
-  gap: 13px;
 
   padding-top: 11px;
 }
 
-.set-piece-label {
-  color: var(--muted);
-
-  font-size: 11px;
-  font-weight: 850;
-
-  text-transform: uppercase;
-}
-
-.set-piece-columns ol {
-  margin: 8px 0 0;
-
-  padding-left: 17px;
-}
-
 .set-piece-columns li {
   margin-bottom: 6px;
-
-  color: var(--text-soft);
-
-  font-size: 11px;
 }
 
 .set-piece-empty {
@@ -1134,26 +810,10 @@
 
 .coach-grid {
   display: grid;
-
-  grid-template-columns:
-    repeat(
-      2,
-      minmax(0, 1fr)
-    );
-
-  gap: 14px;
 }
 
 .coach-card {
   overflow: hidden;
-
-  border:
-    1px solid
-    rgba(var(--ink-rgb), 0.07);
-
-  border-radius: 24px;
-
-  background: var(--surface);
 
   transition:
     border-color
@@ -1177,12 +837,6 @@
 
   gap: 18px;
 
-  padding: 13px 14px;
-
-  border-bottom:
-    1px solid
-    rgba(var(--ink-rgb), 0.06);
-
   background:
     rgba(var(--ink-rgb), 0.018);
 }
@@ -1196,16 +850,12 @@
 
 .coach-title-row strong {
   color: var(--text);
-
-  font-size: 11px;
 }
 
 .coach-card-header small {
   display: block;
 
   margin-top: 4px;
-
-  color: var(--muted);
 
   font-size: 11px;
 }
@@ -1217,27 +867,11 @@
     1px solid
     rgba(var(--ink-rgb), 0.09);
 
-  border-radius:
-    var(--radius-pill);
-
   background: var(--surface);
 
   color: var(--text-soft);
 
   font-size: 11px;
-  font-weight: 800;
-}
-
-.coach-card-body {
-  display: grid;
-
-  grid-template-columns:
-    minmax(250px, 0.95fr)
-    minmax(230px, 1.05fr);
-
-  gap: 14px;
-
-  padding: 14px;
 }
 
 /* =========================
@@ -1247,15 +881,11 @@
 .coach-pitch {
   position: relative;
 
-  min-height: 355px;
-
   overflow: hidden;
 
   border:
     1px solid
     color-mix(in srgb, var(--accent) 50%, transparent);
-
-  border-radius: 22px;
 
   background:
     repeating-linear-gradient(
@@ -1371,17 +1001,12 @@
 
   z-index: 5;
 
-  width: 42px;
-  height: 42px;
-
   display: grid;
   place-items: center;
 
   border: 2px solid;
 
   border-radius: 50%;
-
-  font-size: 11px;
   font-weight: 950;
 
   transform:
@@ -1397,8 +1022,7 @@
 
 /* P - GIALLO */
 
-.coach-player-p,
-.coach-role-p {
+.coach-player-p {
   border-color:
     color-mix(in srgb, var(--yellow) 72%, transparent);
 
@@ -1409,8 +1033,7 @@
 
 /* D - BLU */
 
-.coach-player-d,
-.coach-role-d {
+.coach-player-d {
   border-color:
     color-mix(in srgb, var(--blue) 75%, transparent);
 
@@ -1421,8 +1044,7 @@
 
 /* C - VERDE */
 
-.coach-player-c,
-.coach-role-c {
+.coach-player-c {
   border-color:
     color-mix(in srgb, var(--accent) 72%, transparent);
 
@@ -1433,8 +1055,7 @@
 
 /* A - ROSSO */
 
-.coach-player-a,
-.coach-role-a {
+.coach-player-a {
   border-color:
     color-mix(in srgb, var(--red) 75%, transparent);
 
@@ -1446,163 +1067,6 @@
 /* =========================
    COACH MACRO ROLES
 ========================= */
-
-.coach-macro-role-list {
-  display: grid;
-
-  gap: 6px;
-}
-
-.coach-macro-role-row {
-  min-height: 35px;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  gap: 10px;
-
-  padding: 5px 8px;
-
-  border:
-    1px solid
-    rgba(var(--ink-rgb), 0.055);
-
-  border-radius: 14px;
-
-  background: var(--surface);
-
-  transition:
-    border-color
-      var(--motion-fast)
-      var(--ease-standard),
-    background
-      var(--motion-fast)
-      var(--ease-standard);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .coach-macro-role-row:hover {
-    border-color:
-      rgba(var(--ink-rgb), 0.09);
-
-    background: var(--surface-light);
-  }
-}
-
-.coach-macro-role-name {
-  min-width: 0;
-
-  display: flex;
-  align-items: center;
-
-  gap: 8px;
-}
-
-.coach-macro-role-name > div {
-  min-width: 0;
-}
-
-.coach-macro-role-name strong {
-  display: block;
-
-  overflow: hidden;
-
-  color: var(--text-soft);
-
-  font-size: 11px;
-
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.coach-macro-role-name small {
-  display: block;
-
-  margin-top: 2px;
-
-  color: var(--muted-soft);
-
-  font-size: 11px;
-}
-
-.coach-role-dot {
-  width: 27px;
-  height: 27px;
-
-  flex: 0 0 auto;
-
-  display: grid;
-  place-items: center;
-
-  border: 1px solid;
-
-  border-radius: 50%;
-
-  font-size: 11px;
-  font-weight: 900;
-}
-
-.coach-impact-value {
-  min-width: 49px;
-
-  padding: 4px 7px;
-
-  border-radius:
-    var(--radius-pill);
-
-  text-align: center;
-
-  font-size: 11px;
-  font-weight: 800;
-
-  font-variant-numeric:
-    tabular-nums;
-
-  transition:
-    color
-      var(--motion-fast)
-      var(--ease-standard),
-    border-color
-      var(--motion-fast)
-      var(--ease-standard),
-    background
-      var(--motion-fast)
-      var(--ease-standard);
-}
-
-.coach-impact-positive {
-  border:
-    1px solid
-    color-mix(in srgb, var(--accent) 14%, transparent);
-
-  background:
-    color-mix(in srgb, var(--accent) 8%, transparent);
-
-  color: var(--accent);
-}
-
-.coach-impact-negative {
-  border:
-    1px solid
-    color-mix(in srgb, var(--red) 14%, transparent);
-
-  background:
-    color-mix(in srgb, var(--red) 8%, transparent);
-
-  color: var(--red);
-}
-
-.coach-impact-neutral {
-  border:
-    1px solid
-    rgba(var(--ink-rgb), 0.06);
-
-  background:
-    rgba(var(--ink-rgb), 0.025);
-
-  color: var(--muted);
-}
 
 /* =========================
    GENERIC EMPTY
@@ -1628,31 +1092,9 @@
    RESPONSIVE
 ========================= */
 
-@media (max-width: 1180px) {
-  .set-pieces-grid {
-    grid-template-columns:
-      repeat(
-        3,
-        minmax(0, 1fr)
-      );
-  }
-
-  .coach-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
 @media (max-width: 920px) {
   .goalkeeper-tool {
     grid-template-columns: 1fr;
-  }
-
-  .set-pieces-grid {
-    grid-template-columns:
-      repeat(
-        2,
-        minmax(0, 1fr)
-      );
   }
 }
 
@@ -1685,44 +1127,10 @@
       0 14px;
   }
 
-  .set-pieces-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .coach-card-body {
-    grid-template-columns: 1fr;
-  }
-
-  .coach-pitch {
-    min-height: 390px;
-  }
-
-  .goalkeeper-matrix-overlay {
-    padding: 10px;
-  }
-
   .goalkeeper-matrix-dialog {
     max-height:
       calc(
         100vh - 20px
-      );
-
-    border-radius: 22px;
-  }
-
-  .goalkeeper-matrix-header {
-    padding: 15px;
-  }
-
-  .goalkeeper-matrix-close {
-    width: 44px;
-    height: 44px;
-  }
-
-  .goalkeeper-matrix-content {
-    max-height:
-      calc(
-        100vh - 175px
       );
   }
 }
@@ -1737,15 +1145,6 @@
       28px
       minmax(0, 1fr)
       auto;
-  }
-
-  .set-piece-columns {
-    gap: 8px;
-  }
-
-  .coach-player-marker {
-    width: 40px;
-    height: 40px;
   }
 
   .goalkeeper-matrix-legend {
@@ -1777,9 +1176,7 @@
   .goalkeeper-matrix-close,
   .goalkeeper-matrix-table td,
   .set-piece-card,
-  .coach-card,
-  .coach-macro-role-row,
-  .coach-impact-value {
+  .coach-card {
     transition: none;
   }
 

@@ -45,23 +45,20 @@ import type {
   RecommendationResult,
 } from './recommendation'
 
-export {
-  DEFAULT_GOALKEEPER_STRATEGY_PARAMETERS,
-  getGoalkeeperSaggiProfile,
-} from './goalkeeperPlanning'
+
 
 export type {
-  GoalkeeperSaggiProfile,
+  
   GoalkeeperStrategyParameters,
-  GoalkeeperStrategyType,
-  GoalkeeperTier,
+  
+  
 } from './goalkeeperPlanning'
 
 /* =========================
    TYPES
 ========================= */
 
-export interface GoalkeeperStrategyPlan
+interface GoalkeeperStrategyPlan
   extends GoalkeeperPlanningPlan {
   projectedCost?: number
 }
@@ -370,7 +367,7 @@ const PLAN_QUALITY_WEIGHT = 0.6
 const PLAN_CALENDAR_WEIGHT = 0.4
 const PLAN_HOLE_PENALTY = 3
 
-export function goalkeeperPlanScore(
+function goalkeeperPlanScore(
   plan: GoalkeeperPlanningPlan,
 ): number {
   const qualities = plan.players

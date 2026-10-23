@@ -89,7 +89,7 @@ export interface RecommendationParameters {
     number
 }
 
-export const DEFAULT_RECOMMENDATION_PARAMETERS:
+const DEFAULT_RECOMMENDATION_PARAMETERS:
   RecommendationParameters = {
     /*
       Parametri ALPHA.

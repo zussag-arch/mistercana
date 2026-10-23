@@ -9,9 +9,6 @@
 .dashboard-live-summary {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-bottom: 18px;
-  padding: 24px;
   border: 1px solid rgba(var(--ink-rgb), 0.07);
   border-radius: var(--radius-xl);
   background:
@@ -49,7 +46,6 @@
 .dashboard-live-kpis {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
 }
 
 .dashboard-live-kpi {
@@ -70,7 +66,6 @@
 
 .dashboard-live-kpi > strong {
   margin-top: 4px;
-  font-family: var(--font-display);
   font-size: 40px;
   font-weight: 800;
   line-height: 1;
@@ -100,8 +95,6 @@
 
 .dashboard-live-roles {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
 }
 
 .dashboard-live-role {
@@ -183,7 +176,6 @@
 
 .dashboard-setup-steps {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
   margin: 0 0 18px;
   padding: 0;
@@ -236,22 +228,6 @@
   .dashboard-live-kpis,
   .dashboard-live-roles {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 700px) {
-  .dashboard-setup-steps {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .dashboard-live-kpi > strong {
-    font-size: 32px;
-  }
-}
-
-@media (max-width: 420px) {
-  .dashboard-live-roles {
-    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -317,7 +293,7 @@
 }
 .dashboard-go-button > span { flex: 1; display: grid; gap: 2px; }
 .dashboard-go-button strong { font-family: var(--font-display); font-size: 15px; }
-.dashboard-go-button small { opacity: 0.8; font-size: 11px; }
+.dashboard-go-button small { font-size: 11px; }
 .dashboard-go-button i {
   font-style: normal;
   font-size: 20px;
@@ -357,7 +333,6 @@
 /* Partecipanti (solo in asta live): stessa veste delle altre tessere */
 .dashboard-participants .auction-participants-section {
   margin: 0;
-  padding: 26px 28px;
   border: 1px solid rgba(var(--ink-rgb), 0.07);
   border-radius: var(--radius-xl);
   background: var(--surface);
@@ -371,10 +346,7 @@
 .dashboard-participants .auction-section-heading h3::after { content: "."; color: var(--accent); }
 .dashboard-participants .auction-participant-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
 }
 .dashboard-participants .auction-participant-card { padding: 14px 16px; }
 .dashboard-participants .auction-participant-card strong { font-size: 14px; }
 @media (max-width: 1000px) { .dashboard-participants .auction-participant-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 560px) { .dashboard-participants .auction-participant-grid { grid-template-columns: 1fr; } }

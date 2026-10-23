@@ -1,0 +1,213 @@
+/* =========================
+   STRUTTURA "APP"
+   Il documento non scorre mai: barra in alto (e barra in basso su telefono)
+   restano ferme. Scorre solo l'area del contenuto, e nelle pagine fisse
+   (Dashboard, Asta, Rosa su computer) nemmeno quella: scorrono solo i
+   riquadri interni lunghi. Barre di scorrimento nascoste ovunque.
+========================= */
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body {
+  min-height: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+#app,
+.app-shell {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.app-shell > .topbar {
+  flex: none;
+  position: relative !important;
+  top: auto !important;
+}
+
+.app-main {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* niente barre di scorrimento visibili (si scorre lo stesso) */
+.app-main,
+.app-main * {
+  scrollbar-width: none;
+}
+.app-main::-webkit-scrollbar,
+.app-main *::-webkit-scrollbar {
+  display: none;
+}
+
+/* telefono: spazio per la barra in basso dentro l'area che scorre */
+@media (max-width: 700px) {
+  .app-main {
+    padding-bottom: calc(var(--tabbar-total, 62px) + 16px);
+  }
+}
+
+/* =========================
+   PAGINE FISSE (computer)
+========================= */
+@media (min-width: 1001px) {
+  .app-shell[data-view="dashboard"] .app-main,
+  .app-shell[data-view="auction"] .app-main,
+  .app-shell[data-view="roster"] .app-main {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .app-shell[data-view="dashboard"] .app-main > .page,
+  .app-shell[data-view="auction"] .app-main > .page,
+  .app-shell[data-view="roster"] .app-main > .page {
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* ---------- Dashboard ---------- */
+  .dashboard-page {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
+    align-content: stretch;
+  }
+  .dashboard-page > .dashboard-mobile-tabs { display: none; }
+  .dashboard-page > .overlay { position: fixed; }
+  /* configurazione (budget + allenatori): riquadro che scorre al suo interno */
+  .dashboard-page > div:not(.dashboard-mobile-tabs):not(.dashboard-participants):not(.overlay) {
+    min-height: 0;
+    overflow-y: auto;
+  }
+  /* prima dell'asta: passi, numeri, configurazione uno sotto l'altro */
+  .dashboard-page:not(:has(.dashboard-live-summary)) > .dashboard-setup-steps { grid-column: 1 / -1; grid-row: 1; }
+  .dashboard-page:not(:has(.dashboard-live-summary)) > .dashboard-stats-grid { grid-column: 1 / -1; grid-row: 2; }
+  .dashboard-page:not(:has(.dashboard-live-summary)) > div:not(.dashboard-mobile-tabs):not(.overlay) { grid-column: 1 / -1; grid-row: 3; }
+  /* asta live: la tua asta in alto, partecipanti sotto (4 colonne), configurazione nascosta */
+  .dashboard-page:has(.dashboard-live-summary) { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+  .dashboard-page:has(.dashboard-live-summary) > .dashboard-live-summary { grid-column: 1; grid-row: 1; }
+  .dashboard-page:has(.dashboard-live-summary) > .dashboard-stats-grid { display: none !important; }
+  .dashboard-page:has(.dashboard-live-summary) > .dashboard-participants { grid-column: 1; grid-row: 2; min-height: 0; overflow-y: auto; }
+  .dashboard-page:has(.dashboard-live-summary) > div:not(.dashboard-mobile-tabs):not(.dashboard-participants):not(.overlay):not(.dashboard-live-summary) { display: none !important; }
+  .dashboard-page:has(.dashboard-live-summary) .dashboard-participants .auction-participant-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
+
+  /* ---------- Asta ---------- */
+  .auction-live-page {
+    display: flex !important;
+    flex-direction: column;
+  }
+  .auction-live-page > .auction-workspace {
+    flex: 1;
+    min-height: 0;
+    align-items: stretch !important;
+  }
+  .auction-workspace-main,
+  .auction-side-panels {
+    min-height: 0;
+    overflow-y: auto;
+    padding-bottom: 4px;
+  }
+  .auction-live-page > .auction-market-followup:empty { display: none; }
+
+  /* ---------- Rosa ---------- */
+  .roster-page {
+    display: flex !important;
+    flex-direction: column;
+  }
+  .roster-page > .roster-layout {
+    flex: 1;
+    min-height: 0;
+    align-items: stretch !important;
+  }
+  .roster-layout > .roster-section {
+    min-height: 0;
+    overflow-y: auto;
+  }
+}
+
+@media (min-width: 1001px) {
+  /* pagine fisse: niente fascia vuota in basso */
+  .app-shell[data-view="dashboard"] .app-main,
+  .app-shell[data-view="auction"] .app-main,
+  .app-shell[data-view="roster"] .app-main { padding-bottom: 20px !important; }
+  .app-shell[data-view="dashboard"] .app-main > .page,
+  .app-shell[data-view="auction"] .app-main > .page,
+  .app-shell[data-view="roster"] .app-main > .page { padding-bottom: 0 !important; }
+
+  /* le tessere dentro le colonne non si schiacciano: è la colonna che scorre */
+  .auction-workspace-main > *,
+  .auction-side-panels > *,
+  .roster-layout > .roster-section > *,
+  .dashboard-page > div > * { flex-shrink: 0; }
+  .auction-workspace-main .auction-history-slot { contain: none; flex: none !important; min-height: 0; }
+
+  /* Dashboard live: reparti 2×2 nella colonna */
+  .dashboard-page:has(.dashboard-live-summary) .dashboard-live-roles {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+}
+@media (min-width: 1001px) {
+  /* colonna sinistra più stretta: budget e reparti su due colonne */
+  .dashboard-page:has(.dashboard-live-summary) .budget-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .dashboard-page:has(.dashboard-live-summary) .dashboard-live-role-head { flex-wrap: wrap; }
+}
+
+/* lo sfondo non ha bisogno di restare "fisso": la finestra non scorre più */
+body { background-attachment: scroll !important; }
+
+/* =========================
+   SPAZIATURE UNIFORMI
+   Una sola regola per tutte le pagine: stessa distanza tra le schede,
+   stessa distanza tra le tessere dentro le schede, stesso margine interno.
+========================= */
+:root {
+  --space-cards: 16px;   /* tra una scheda e l'altra */
+  --space-tiles: 12px;   /* tra le tessere dentro una scheda */
+  --pad-card: 24px;      /* margine interno delle schede */
+}
+@media (max-width: 700px) {
+  :root { --space-cards: 12px; --space-tiles: 10px; --pad-card: 16px; }
+}
+
+/* tra le schede: stessa distanza, niente margini propri */
+.dashboard-page,
+.roster-page { gap: var(--space-cards) !important; }
+.dashboard-page > section,
+.dashboard-page > div > section,
+.roster-page > * { margin-top: 0 !important; margin-bottom: 0 !important; }
+.dashboard-page > div:not(.overlay):not(.dashboard-mobile-tabs):not(.hidden) {
+  display: flex; flex-direction: column; gap: var(--space-cards);
+}
+
+.dashboard-live-summary,
+.dashboard-participants > section,
+.auction-participants-section {
+  padding: var(--pad-card) !important;
+}
+.dashboard-live-summary,
+.dashboard-live-kpis,
+.dashboard-live-roles,
+.dashboard-stats-grid,
+.auction-participant-grid,
+.budget-grid,
+.auction-workspace,
+.auction-workspace-main,
+.auction-side-panels,
+.roster-layout,
+.roster-section {
+  gap: var(--space-tiles) !important;
+}
+.auction-workspace,
+.roster-layout { gap: var(--space-cards) !important; }

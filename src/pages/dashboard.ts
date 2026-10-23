@@ -1683,6 +1683,9 @@ function loadManagersOpen(): boolean {
   try { return window.localStorage.getItem(MANAGERS_OPEN_KEY) === '1' } catch { return false }
 }
 
+let dashboardDocumentClickBound = false
+let latestCloseAllMenus: () => void = () => {}
+
 export function bindDashboardEvents(
   state: AppState,
   actions: DashboardActions,
@@ -2026,10 +2029,12 @@ export function bindDashboardEvents(
       )
   }
 
-  document.addEventListener(
-    'click',
-    closeAllMenus,
-  )
+  // un solo ascoltatore sul documento, che usa sempre la versione più recente di closeAllMenus
+  latestCloseAllMenus = closeAllMenus
+  if (!dashboardDocumentClickBound) {
+    document.addEventListener('click', () => latestCloseAllMenus())
+    dashboardDocumentClickBound = true
+  }
 
   const managerOverlay =
     document.querySelector<HTMLElement>(

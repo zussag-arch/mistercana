@@ -53,7 +53,6 @@ body {
     radial-gradient(900px 500px at 85% -10%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 60%),
     radial-gradient(700px 500px at -10% 30%, color-mix(in srgb, var(--blue) 6%, transparent), transparent 60%),
     var(--bg);
-  background-attachment: fixed;
 }
 
 /* ---------- titoli e numeri ---------- */
@@ -62,7 +61,6 @@ h1,
 h2,
 h3,
 .brand {
-  font-family: var(--font-display);
   letter-spacing: -0.03em;
   word-spacing: 0.08em;
 }
@@ -79,9 +77,7 @@ h1 {
 
 .page-heading h1::after,
 .auction-live-title h1::after,
-.player-full-section h2::after,
-.player-section h2::after,
-.auction-section h2::after {
+.player-full-section h2::after {
   content: ".";
   color: var(--accent);
 }
@@ -101,21 +97,12 @@ td.n {
 .auction-toolbar-stat strong,
 .auction-roster-metric-values strong,
 .auction-history-count,
-.budget-total,
 .auction-selector-player em {
   font-family: var(--font-display);
   letter-spacing: -0.04em;
 }
 
 /* eyebrow: le etichette maiuscole diventano piccole e con il rombo del colore ruolo */
-.auction-kicker {
-  font-family: var(--font-ui);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  text-transform: lowercase;
-  color: var(--muted);
-}
 
 .auction-kicker::before {
   content: "";
@@ -131,21 +118,16 @@ td.n {
 /* ---------- contenitori ---------- */
 
 .auction-player-card,
-.auction-panel,
-.auction-section,
 .auction-search-strip,
 .auction-participants-section,
 .auction-history-section,
-.player-section,
 .player-full-section,
 .player-data-section,
 .player-detail-card,
 .players-table-card,
 .data-transfer-card,
 .data-transfer-section,
-.flda-panel,
 .flda-dataset-card,
-.data-integrity-panel,
 .overlay-card,
 .panel {
   border-radius: var(--radius-xl);
@@ -193,13 +175,7 @@ td.n {
 }
 
 .auction-role-switcher > div {
-  border-radius: var(--radius-pill);
   background: var(--surface-light);
-}
-
-.auction-role-tab {
-  border-radius: var(--radius-pill);
-  font-family: var(--font-display);
 }
 
 .auction-quick-nav {
@@ -210,12 +186,10 @@ td.n {
 
 /* bottone primario: rettangolo pieno con freccia e ombra a scatto */
 .primary-button {
-  border-radius: 0;
   border: 1.5px solid var(--accent);
   background: var(--accent);
   color: var(--accent-ink);
   font-weight: 800;
-  transition: transform var(--motion-fast), box-shadow var(--motion-fast);
 }
 
 .primary-button:hover:not(:disabled) {
@@ -257,51 +231,6 @@ input[type="search"]:focus,
 }
 
 /* ---------- attesa prossima chiamata (BETA-020) ---------- */
-
-.auction-waiting-recap {
-  margin-top: 18px;
-  padding: 14px 16px;
-  border-radius: var(--radius-md);
-  background: var(--surface-light);
-}
-
-.auction-waiting-recap ol {
-  display: grid;
-  gap: 4px;
-  margin: 10px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.auction-waiting-row {
-  display: grid;
-  grid-template-columns: 25px minmax(0, 1fr) minmax(0, auto) 36px;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 4px;
-}
-
-.auction-waiting-name {
-  overflow: hidden;
-  font-weight: 700;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.auction-waiting-manager {
-  overflow: hidden;
-  color: var(--muted);
-  font-size: 12px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.auction-waiting-row strong {
-  font-family: var(--font-display);
-  text-align: right;
-  letter-spacing: -0.04em;
-  color: var(--accent);
-}
 
 @media (prefers-reduced-motion: reduce) {
   .auction-role-badge.large { transform: none; }
@@ -361,21 +290,16 @@ input[type="search"]:focus,
 /* navigazione e marchio */
 .brand {
   font-size: 22px;
-  text-transform: lowercase;
 }
 
 .nav-item {
-  font-family: var(--font-ui);
-  font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.01em;
   text-transform: lowercase;
-  border-radius: var(--radius-pill);
 }
 
 /* titoli di sezione: grandi, stretti, col punto verde */
 .dashboard-panel-header-row h2,
-.dashboard-hero-title,
 .auction-section-heading h2,
 .auction-panel-title,
 .auction-history-heading h3,
@@ -403,7 +327,6 @@ input[type="search"]:focus,
 }
 
 .dashboard-panel-header-row h2::after,
-.dashboard-hero-title::after,
 .auction-section-heading h2::after,
 .auction-history-heading h3::after,
 .auction-competitors-heading h2::after,
@@ -438,18 +361,12 @@ input[type="search"]:focus,
 }
 
 .dashboard-stat-card:first-child {
-  border: 0;
-  background: linear-gradient(150deg, var(--accent), var(--accent-strong));
   color: var(--accent-ink);
 }
 
 .dashboard-stat-card:first-child *,
 .dashboard-stat-card:first-child .dashboard-stat-label::before {
   color: var(--accent-ink);
-}
-
-.dashboard-stat-card:first-child .dashboard-stat-label::before {
-  background: var(--accent-ink);
 }
 
 /* pannelli grandi */
@@ -475,8 +392,7 @@ input[type="search"]:focus,
   background: var(--surface-light);
 }
 
-.dashboard-add-manager-card,
-.add-manager-card {
+.dashboard-add-manager-card {
   border: 1.5px dashed rgba(var(--ink-rgb), 0.13);
   border-radius: var(--radius-md);
   background: transparent;
@@ -489,9 +405,6 @@ input[type="search"]:focus,
 .dashboard-hero {
   position: relative;
   overflow: hidden;
-  background:
-    radial-gradient(520px 260px at 100% 0%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 70%),
-    linear-gradient(135deg, var(--surface-light), var(--surface));
 }
 
 .auction-player-card::after,
@@ -520,7 +433,6 @@ input:not([type]),
 select,
 textarea {
   border: 1px solid rgba(var(--ink-rgb), 0.13);
-  border-radius: var(--radius-sm);
   background: var(--surface);
   color: var(--text);
 }
@@ -542,22 +454,13 @@ input:focus {
 .dashboard-budget-total-pill,
 .dashboard-live-pill,
 .dashboard-cta-button,
-.dashboard-secondary-footer-button,
 .danger-button,
 .archive-button,
 .profile-button {
   border-radius: var(--radius-pill);
 }
 
-.dashboard-budget-total-pill,
-.budget-total.valid {
-  border: 0;
-  background: var(--accent-soft);
-  color: var(--accent-ink);
-}
-
 .dashboard-cta-button {
-  border-radius: 0;
   background: var(--accent);
   color: var(--accent-ink);
   font-weight: 800;
@@ -596,7 +499,6 @@ input:focus {
 .auction-live-title h1,
 .panel h2,
 .dashboard-panel h2,
-.dashboard-hero-title,
 .auction-section-heading h2,
 .auction-history-heading h3,
 .auction-competitors-heading h2,
@@ -607,9 +509,7 @@ input:focus {
 .insight-section-header h2,
 .data-transfer-section-header h2,
 .player-section-heading h2,
-.player-full-section h2,
-.player-section h2,
-.auction-section h2 {
+.player-full-section h2 {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
@@ -646,10 +546,6 @@ input:focus {
 .role-badge.role-a { background: var(--role-a); }
 
 /* filtri ruolo: pillole, quella attiva prende il colore del ruolo */
-.players-filter-button {
-  font-family: var(--font-display);
-  font-size: 12px;
-}
 
 .players-filter-button[data-player-role="P"].selected { background: var(--role-p); border-color: var(--role-p); color: var(--on-color); }
 .players-filter-button[data-player-role="D"].selected { background: var(--role-d); border-color: var(--role-d); color: var(--on-color); }
@@ -707,7 +603,6 @@ input:focus {
 }
 
 .players-ica {
-  font-size: 15px;
   font-weight: 800;
 }
 
@@ -1445,7 +1340,6 @@ input:focus {
   border-radius: var(--radius-pill);
   font-size: 11.5px;
   font-weight: 700;
-  color: var(--text-soft);
 }
 
 .coach-key-good { border-color: var(--good, var(--accent)); background: var(--accent); color: var(--accent-ink); }
@@ -1474,72 +1368,11 @@ input:focus {
   font-size: 0;
 }
 
-.coach-macro-role-list {
-  display: grid;
-  gap: 2px;
-}
-
-.coach-macro-role-row {
-  min-height: 0;
-  padding: 3px 6px;
-  border: 0;
-  border-radius: 8px;
-  background: none;
-}
-
-.coach-macro-role-row:hover {
-  background: var(--surface);
-}
-
-.coach-macro-role-name {
-  gap: 8px;
-}
-
-.coach-macro-role-name strong {
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.coach-macro-role-name small {
-  display: none;
-}
-
-.coach-role-dot {
-  width: 22px;
-  height: 22px;
-  font-size: 11px;
-}
-
-.coach-impact-value {
-  min-width: 52px;
-  padding: 2px 8px;
-  border-radius: var(--radius-pill);
-  font-family: var(--font-display);
-  font-size: 12.5px;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  text-align: right;
-}
-
-.coach-impact-neutral {
-  color: var(--muted-soft);
-  background: none;
-}
-
 /* battitori */
-.set-piece-card {
-  padding: 14px 16px;
-  border-radius: var(--radius-md);
-  background: var(--surface-light);
-}
 
 .set-piece-card ol,
 .set-piece-card li {
   font-size: 13px;
-}
-
-.set-piece-label {
-  font-size: 12px;
 }
 
 /* =========================
@@ -1595,20 +1428,16 @@ input:focus {
 
 .set-pieces-section .set-piece-columns {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
 }
 
 .set-piece-column {
   min-width: 0;
-  padding: 10px;
   border-radius: var(--radius-sm);
   background: var(--surface);
 }
 
 .set-pieces-section .set-piece-label {
   display: block;
-  margin-bottom: 8px;
   font-family: var(--font-ui);
   font-size: 11.5px;
   font-weight: 600;
@@ -1629,8 +1458,6 @@ input:focus {
 }
 
 .set-pieces-section ol {
-  display: grid;
-  gap: 5px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -1641,7 +1468,6 @@ input:focus {
   align-items: center;
   gap: 6px;
   min-width: 0;
-  font-size: 12.5px;
   color: var(--text-soft);
 }
 
@@ -1732,18 +1558,13 @@ input:focus {
 }
 
 .goalkeeper-team-chips {
-  display: flex;
   flex-wrap: wrap;
-  gap: 6px;
 }
 
 .goalkeeper-team-chip {
-  padding: 6px 12px;
   border: 1px solid rgba(var(--ink-rgb), 0.13);
-  border-radius: var(--radius-pill);
   background: rgba(var(--ink-rgb), 0.04);
   color: var(--text-soft);
-  font-size: 12.5px;
   font-weight: 700;
   cursor: pointer;
   transition: transform var(--motion-fast), background var(--motion-fast);
@@ -1884,10 +1705,8 @@ input:focus {
 ========================= */
 
 .goalkeeper-matrix-dialog {
-  width: min(1400px, calc(100vw - 32px));
   border: 1px solid rgba(var(--ink-rgb), 0.07);
   border-radius: var(--radius-xl);
-  background: var(--bg);
 }
 
 .goalkeeper-matrix-header h2::after {
@@ -1905,7 +1724,6 @@ input:focus {
   width: 44px;
   height: 44px;
   border: 0;
-  border-radius: var(--radius-pill);
   background: rgba(var(--ink-rgb), 0.08);
   font-size: 18px;
 }
@@ -1917,19 +1735,15 @@ input:focus {
 
 .goalkeeper-matrix-scroll {
   scrollbar-color: var(--surface-raised) transparent;
-  scrollbar-width: thin;
 }
 
 .goalkeeper-matrix-table {
-  width: 100%;
   border-collapse: separate;
   border-spacing: 3px;
-  table-layout: fixed;
 }
 
 .goalkeeper-matrix-table th,
 .goalkeeper-matrix-table td {
-  height: 34px;
   padding: 0;
   border: 0;
   border-radius: 8px;
@@ -1955,7 +1769,6 @@ input:focus {
   position: sticky;
   left: 0;
   z-index: 1;
-  width: 104px;
   padding: 0 10px;
   background: var(--surface);
   color: var(--text-soft);
@@ -1967,15 +1780,11 @@ input:focus {
 .goalkeeper-matrix-corner {
   left: 0;
   z-index: 3 !important;
-  width: 104px;
 }
 
 /* scala di colore leggibile: rosso → giallo → verde */
 .goalkeeper-matrix-table td.matrix-low { background: color-mix(in srgb, var(--red) 22%, var(--surface)); color: var(--red); }
 .goalkeeper-matrix-table td.matrix-medium { background: color-mix(in srgb, var(--yellow) 18%, var(--surface)); color: var(--yellow); }
-.goalkeeper-matrix-table td.matrix-good { background: color-mix(in srgb, var(--accent) 22%, var(--surface)); color: var(--accent-soft); }
-.goalkeeper-matrix-table td.matrix-excellent { background: var(--accent); color: var(--accent-ink); }
-.goalkeeper-matrix-table td.matrix-empty { background: transparent; color: var(--muted-soft); }
 
 /* squadra scelta: riga e colonna evidenziate, il resto si attenua */
 .goalkeeper-matrix-table:has(.is-selected) td:not(.is-selected) {
@@ -2012,26 +1821,11 @@ input:focus {
   .goalkeeper-score {
     font-size: 22px;
   }
-
-  .goalkeeper-matrix-table {
-    width: auto;
-    table-layout: auto;
-  }
-
-  .goalkeeper-matrix-table td {
-    min-width: 38px;
-  }
 }
 
 /* griglia: larghezza naturale (riempie la finestra quando c'è spazio) */
 .goalkeeper-matrix-table {
-  width: max-content;
-  min-width: 100%;
   table-layout: auto;
-}
-
-.goalkeeper-matrix-table td {
-  min-width: 46px;
 }
 
 .goalkeeper-matrix-header h2 {
@@ -2086,7 +1880,6 @@ input:focus {
 /* storico a tutta larghezza come Prezzo e Saggi, su fondo più chiaro */
 .player-chart-grid > .player-history-section {
   grid-column: 1 / -1;
-  background: var(--surface-light);
 }
 
 .player-history-section .player-chart svg {
@@ -2114,18 +1907,6 @@ input:focus {
 .player-history-section .chart-line-fmv { stroke: var(--accent); }
 .player-history-section .chart-dot-mv { fill: var(--blue); }
 .player-history-section .chart-dot-fmv { fill: var(--accent); }
-
-.player-history-section .chart-value {
-  fill: var(--text);
-  font-weight: 700;
-}
-
-.player-chart-grid > .player-history-section {
-  border-color: rgba(var(--ink-rgb), 0.12);
-  background:
-    linear-gradient(180deg, rgba(var(--ink-rgb), 0.05), rgba(var(--ink-rgb), 0.02)),
-    var(--surface-raised);
-}
 
 /* barre di scorrimento scure in tutta l'app */
 * {
@@ -2315,14 +2096,6 @@ input:focus {
   font-size: 18px;
 }
 
-.players-ica-v2 {
-  font-family: var(--font-ui);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0;
-  color: var(--muted-soft);
-}
-
 .players-affare {
   padding: 1px 7px;
   border-radius: var(--radius-pill);
@@ -2372,7 +2145,6 @@ input:focus {
 
 .ica-explain-score > strong {
   font-family: var(--font-display);
-  font-size: 64px;
   font-weight: 900;
   line-height: 0.95;
   letter-spacing: -0.07em;
@@ -2574,7 +2346,6 @@ input:focus {
 .dashboard-cta-button,
 .player-detail-call-button,
 .player-detail-full-button {
-  border-radius: var(--radius-md);
   transition: transform var(--motion-fast), box-shadow var(--motion-fast);
 }
 
@@ -2604,7 +2375,6 @@ input:focus {
   padding: 10px 16px 18px;
 }
 .goalkeeper-matrix-scroll {
-  width: 100%;
   min-width: 0;
 }
 .goalkeeper-matrix-table {
@@ -2634,7 +2404,7 @@ input:focus {
 }
 /* scala sempre verde per le compatibilità alte, anche col tema rosso */
 .goalkeeper-matrix-table td.matrix-good { background: color-mix(in srgb, var(--green) 22%, var(--surface)); color: color-mix(in srgb, var(--green) 60%, var(--text)); }
-.goalkeeper-matrix-table td.matrix-excellent { background: var(--green); color: var(--on-color); }
+.goalkeeper-matrix-table td.matrix-excellent { background: var(--green); }
 .goalkeeper-matrix-scroll { display: block; width: 100% !important; }
 .goalkeeper-matrix-table { width: 100% !important; }
 .goalkeeper-matrix-legend .legend-low { background: var(--red); }

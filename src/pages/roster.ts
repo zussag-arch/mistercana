@@ -32,6 +32,8 @@ function saveChoice(choice: Choice): void {
 let league: League = loadChoice()?.league ?? 'SERIE_A'
 // dati dei pallini per il riquadro, ricostruiti a ogni disegno della pagina
 let picksById = new Map<string, MatchdayPick>()
+let hidePopOnScroll: () => void = () => {}
+let scrollListenerReady = false
 
 /* ---------- pezzi del riquadro ---------- */
 
@@ -65,7 +67,8 @@ function renderPopover(pick: MatchdayPick): string {
   const status = statusLabel(p)
   const ica = getICaV3(pick.player.player_id)?.score
   const prob = Math.round(pick.probability * 100)
-  return `<div class="roster-pop-head">
+  return `<button type="button" class="roster-pop-close" data-roster-close aria-label="Chiudi">×</button>
+    <div class="roster-pop-head">
       <span class="role-badge role-${pick.player.role.toLowerCase()}">${pick.player.role}</span>
       <div><strong>${escapePlayerHtml(pick.player.name)}</strong><small>${escapePlayerHtml(pick.player.team)}${p?.opponent ? ` · ${p.home ? 'vs' : '@'} ${escapePlayerHtml(p.opponent)}` : ''}</small></div>
     </div>
@@ -86,16 +89,20 @@ function renderPopover(pick: MatchdayPick): string {
 function dot(pick: MatchdayPick): string {
   const status = statusLabel(pick.probable)
   const surname = pick.player.name.replace(/\s+[A-Z]\.$/, '')
-  return `<button type="button" class="pitch-dot role-${pick.player.role.toLowerCase()}${pick.out ? ' out' : ''}" data-roster-dot="${escapePlayerHtml(pick.player.player_id ?? '')}" aria-label="${escapePlayerHtml(pick.player.name)}">
-    <span class="pitch-dot-circle">${display(pick.expected, 1)}${status ? `<i class="pitch-dot-flag ${status.tone}" title="${status.text}"></i>` : ''}</span>
-    <span class="pitch-dot-name">${escapePlayerHtml(surname)}</span>
+  return `<button type="button" class="rpitch-dot role-${pick.player.role.toLowerCase()}${pick.out ? ' out' : ''}" data-roster-dot="${escapePlayerHtml(pick.player.player_id ?? '')}" aria-label="${escapePlayerHtml(pick.player.name)}">
+    <span class="rpitch-dot-marker">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><path class="rpitch-dot-shape" d="M23.18 5.21 Q29.49 8.44 34.51 13.44 Q37.69 15.75 36.47 19.50 Q35.36 26.49 32.15 32.80 Q30.93 36.55 27.00 36.55 Q20.00 37.65 13.00 36.55 Q9.07 36.55 7.85 32.80 Q4.64 26.49 3.53 19.50 Q2.31 15.75 5.49 13.44 Q10.51 8.44 16.82 5.21 Q20.00 2.90 23.18 5.21 Z"/></svg>
+      <b>${display(pick.expected, 1)}</b>
+      ${status ? `<i class="rpitch-dot-flag ${status.tone}" title="${status.text}"></i>` : ''}
+    </span>
+    <span class="rpitch-dot-name">${escapePlayerHtml(surname)}</span>
   </button>`
 }
 
 function renderPitch(starters: MatchdayPick[]): string {
-  const line = (role: string) => `<div class="pitch-line">${starters.filter((pick) => pick.player.role === role).map(dot).join('')}</div>`
-  return `<div class="pitch">
-    <div class="pitch-marks" aria-hidden="true"><span class="pitch-half"></span><span class="pitch-circle"></span><span class="pitch-box top"></span><span class="pitch-box bottom"></span></div>
+  const line = (role: string) => `<div class="rpitch-line">${starters.filter((pick) => pick.player.role === role).map(dot).join('')}</div>`
+  return `<div class="rpitch">
+    <div class="rpitch-marks" aria-hidden="true"><span class="rpitch-half"></span><span class="rpitch-circle"></span><span class="rpitch-box top"></span><span class="rpitch-box bottom"></span></div>
     ${line('A')}${line('C')}${line('D')}${line('P')}
   </div>`
 }
@@ -120,7 +127,7 @@ function renderInfirmary(rosterIds: Set<string>, byId: Map<string | null, FldaPl
   const mine = all.filter((item) => rosterIds.has(item.playerId))
   const others = all.filter((item) => !rosterIds.has(item.playerId))
   return `<section class="roster-section infirmary">
-    <div class="roster-section-head"><h2>Infermeria</h2><span>${day ? `giornata ${day}` : ''} · fonte formazioni probabili FantaLab</span></div>
+    <div class="roster-section-head"><h2>Infermeria</h2><span>${day ? `giornata ${day}` : ''} · fonti FantaLab e SOS Fanta</span></div>
     <h3 class="roster-bench-title">La tua rosa</h3>
     ${mine.length ? `<div class="infirmary-list">${mine.map((item) => infirmaryRow(byId.get(item.playerId), item.probable, true, day)).join('')}</div>` : '<p class="roster-note">Nessun giocatore della tua rosa è fuori o in dubbio.</p>'}
     <details class="infirmary-all"><summary>Tutta la Serie A <small>${others.length} giocatori</small></summary>
@@ -145,10 +152,10 @@ export function renderRosterPage(): string {
     </div>`
 
   if (!choice || choice.league !== league) {
-    return `<section class="page roster-page"><header class="roster-header"><h1>Rosa</h1><p>Scegli lega e squadra: l'app ricorda la scelta.</p></header>${selector}</section>`
+    return `<section class="page roster-page"><header class="roster-hero"><div class="roster-hero-title"><h1>Rosa</h1><p>Scegli lega e squadra: l'app ricorda la scelta.</p></div>${selector}</header></section>`
   }
   if (!dataset || dataset.source !== 'flda') {
-    return `<section class="page roster-page"><header class="roster-header"><h1>Rosa</h1></header>${selector}<div class="players-loading">Caricamento giocatori…</div></section>`
+    return `<section class="page roster-page"><header class="roster-hero"><div class="roster-hero-title"><h1>Rosa</h1></div>${selector}</header><div class="players-loading">Caricamento giocatori…</div></section>`
   }
 
   const byId = new Map(dataset.players.map((player) => [player.player_id, player]))
@@ -160,8 +167,10 @@ export function renderRosterPage(): string {
   const spent = picks.reduce((sum, pick) => sum + pick.price, 0)
 
   return `<section class="page roster-page">
-    <header class="roster-header"><div><h1>${escapePlayerHtml(choice.team)}</h1><p>${LEAGUE_LABEL[choice.league]} · ${picks.length} giocatori · ${spent} crediti spesi</p></div></header>
-    ${selector}
+    <header class="roster-hero">
+      <div class="roster-hero-title"><span class="roster-hero-kicker">${LEAGUE_LABEL[choice.league]}</span><h1>${escapePlayerHtml(choice.team)}</h1><p>${picks.length} giocatori · ${spent} crediti spesi${day ? ` · prossima: giornata ${day}` : ''}</p></div>
+      ${selector}
+    </header>
     <div class="roster-layout">
       <section class="roster-section">
         <div class="roster-section-head"><h2>Formazione consigliata</h2><span>${day ? `giornata ${day}` : 'prossima giornata'}${lineup ? ` · ${lineup.module} · ${display(lineup.total, 1)} fantapunti attesi` : ''}</span></div>
@@ -193,42 +202,48 @@ export function bindRosterEvents(actions: RosterActions): void {
     actions.onRender()
   })
 
+  if (!scrollListenerReady) {
+    document.addEventListener('scroll', () => hidePopOnScroll(), { passive: true, capture: true })
+    scrollListenerReady = true
+  }
   const pop = document.querySelector<HTMLElement>('.roster-pop')
-  if (!pop) return
-  let pinned: HTMLElement | null = null
-  const hide = () => { pop.hidden = true; pinned = null }
+  const page = document.querySelector<HTMLElement>('.roster-page')
+  if (!pop || !page) return
+  let current: string | null = null
+  const hide = () => { pop.hidden = true; current = null }
   const show = (target: HTMLElement) => {
-    const pick = picksById.get(target.dataset.rosterDot ?? '')
+    const id = target.dataset.rosterDot ?? ''
+    const pick = picksById.get(id)
     if (!pick) return
     pop.innerHTML = renderPopover(pick)
     pop.hidden = false
+    current = id
     const rect = target.getBoundingClientRect()
     const width = pop.offsetWidth
     const height = pop.offsetHeight
     const left = Math.min(Math.max(8, rect.left + rect.width / 2 - width / 2), window.innerWidth - width - 8)
-    const below = rect.bottom + 8
-    const top = below + height < window.innerHeight - 70 ? below : Math.max(8, rect.top - height - 8)
+    const below = rect.bottom + 18
+    // la × sporge di metà dall'angolo: 18 px di margine; se sotto non c'è spazio, il riquadro va sopra
+    const top = below + height < window.innerHeight - 70 ? below : Math.max(18, rect.top - height - 18)
     pop.style.left = `${left}px`
     pop.style.top = `${top}px`
   }
 
-  document.querySelectorAll<HTMLElement>('[data-roster-dot]').forEach((target) => {
-    target.addEventListener('mouseenter', () => { if (!pinned) show(target) })
-    target.addEventListener('mouseleave', () => { if (!pinned) window.setTimeout(() => { if (!pinned && !pop.matches(':hover')) hide() }, 120) })
-    target.addEventListener('click', (event) => {
-      event.stopPropagation()
-      if (pinned === target) { hide(); return }
-      show(target)
-      pinned = target
-    })
+  // un solo gestore per campo e panchina: si apre solo toccando
+  page.addEventListener('click', (event) => {
+    const target = event.target as HTMLElement
+    if (target.closest('[data-roster-close]')) { hide(); return }
+    const open = target.closest<HTMLElement>('[data-roster-open]')
+    if (open?.dataset.rosterOpen) { actions.onOpenPlayer(open.dataset.rosterOpen); return }
+    const dot = target.closest<HTMLElement>('[data-roster-dot]')
+    if (dot) {
+      if (current === dot.dataset.rosterDot) hide()
+      else show(dot)
+      return
+    }
+    if (!pop.contains(target)) hide()
   })
-  pop.addEventListener('mouseleave', () => { if (!pinned) hide() })
-  pop.addEventListener('click', (event) => {
-    const open = (event.target as HTMLElement).closest<HTMLElement>('[data-roster-open]')
-    if (open?.dataset.rosterOpen) actions.onOpenPlayer(open.dataset.rosterOpen)
-  })
-  document.addEventListener('click', (event) => {
-    if (!pop.hidden && !pop.contains(event.target as Node)) hide()
-  })
-  window.addEventListener('scroll', () => { if (!pop.hidden) hide() }, { passive: true })
+  // lo scorrimento avviene dentro l'app (non nella finestra): un solo ascoltatore in cattura,
+  // sostituito a ogni ridisegno invece di accumularsi
+  hidePopOnScroll = () => { if (!pop.hidden) hide() }
 }

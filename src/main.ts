@@ -17,6 +17,7 @@ import './styles/theme-v3-data.css'
 import './styles/theme-light.css'
 import './styles/theme-refine.css'
 import './styles/theme-mobile.css'
+import './styles/app-shell.css'
 import { initTheme } from './theme'
 import { initRoundSelects } from './components/roundSelect'
 import { initAuctionShortcuts } from './components/auctionShortcuts'
@@ -1065,7 +1066,10 @@ function render():
     return
   }
 
-  app.innerHTML = `
+  // la pagina attiva (data-view) decide se il contenuto è fisso (Dashboard, Asta, Rosa) o scorre.
+  // L'attributo sta su un contenitore ricreato a ogni disegno: cambiarlo sul documento
+  // rallentava progressivamente il browser a ogni cambio pagina.
+  app.innerHTML = `<div class="app-shell" data-view="${activePage}">
     ${renderNavigation(
       activePage,
       state.auctionPhase,
@@ -1076,7 +1080,7 @@ function render():
         activePage,
       )}
     </main>
-  `
+  </div>`
 
   /*
     ORDINE IMPORTANTE

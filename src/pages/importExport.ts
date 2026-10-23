@@ -10,6 +10,8 @@ import bundledMatchdayVotesCsv from '../../database/voti_giornate.csv?raw'
 import bundledSeasonHistoryCsv from '../../database/storico_stagioni.csv?raw'
 import bundledAuctionsCsv from '../../database/aste.csv?raw'
 import bundledProbablesCsv from '../../database/probabili.csv?raw'
+import bundledSosProbablesCsv from '../../database/sos_probabili.csv?raw'
+import bundledSosAdviceCsv from '../../database/sos_consigli.csv?raw'
 import { CSV_LABELS, clearCsvOverrides, getCsv, getCsvOverrides, saveCsvOverrides } from '../data/csvOverrides'
 import type { CsvKey, CsvOverride } from '../data/csvOverrides'
 import { analyzeCsv } from '../data/csvImport'
@@ -614,6 +616,8 @@ const BUNDLED_CSV: Record<CsvKey, string> = {
   storico_stagioni: bundledSeasonHistoryCsv,
   aste: bundledAuctionsCsv,
   probabili: bundledProbablesCsv,
+  sos_probabili: bundledSosProbablesCsv,
+  sos_consigli: bundledSosAdviceCsv,
 }
 
 function renderCsvUpload(): string {
@@ -2135,7 +2139,7 @@ function confirmRestore():
    EVENTS
 ========================= */
 
-export function bindImportExportEvents():
+function bindImportExportEvents():
   void {
   if (
     importExportEventsBound

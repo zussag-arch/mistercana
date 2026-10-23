@@ -60,8 +60,6 @@
     1px solid
     rgba(var(--ink-rgb), 0.1);
 
-  border-radius: 26px;
-
   background:
     linear-gradient(
       180deg,
@@ -145,18 +143,8 @@
 ========================= */
 
 .player-detail-role {
-  display: grid;
-  place-items: center;
-
-  flex: 0 0 auto;
 
   min-width: 38px;
-  height: 38px;
-
-  border-radius: 13px;
-
-  font-size: 12px;
-  font-weight: 900;
 }
 
 /* P */
@@ -165,9 +153,6 @@
   border:
     1px solid
     color-mix(in srgb, var(--yellow) 34%, transparent);
-
-  background:
-    color-mix(in srgb, var(--yellow) 16%, transparent);
 
   color: var(--yellow);
 }
@@ -179,9 +164,6 @@
     1px solid
     color-mix(in srgb, var(--blue) 34%, transparent);
 
-  background:
-    color-mix(in srgb, var(--blue) 16%, transparent);
-
   color: var(--blue);
 }
 
@@ -192,9 +174,6 @@
     1px solid
     color-mix(in srgb, var(--accent) 32%, transparent);
 
-  background:
-    color-mix(in srgb, var(--accent) 14%, transparent);
-
   color: var(--accent);
 }
 
@@ -204,9 +183,6 @@
   border:
     1px solid
     color-mix(in srgb, var(--red) 34%, transparent);
-
-  background:
-    color-mix(in srgb, var(--red) 15%, transparent);
 
   color: var(--red);
 }
@@ -296,8 +272,7 @@
 .player-current-metrics > div,
 .player-role-stats > div,
 .player-guide-summary > div,
-.player-advanced-grid > div,
-.player-previous-price {
+.player-advanced-grid > div {
   padding: 12px;
 
   border:
@@ -316,8 +291,7 @@
 .player-current-metrics span,
 .player-role-stats span,
 .player-guide-summary span,
-.player-advanced-grid span,
-.player-previous-price span {
+.player-advanced-grid span {
   display: block;
 
   color: var(--muted);
@@ -333,8 +307,7 @@
 .player-current-metrics strong,
 .player-role-stats strong,
 .player-guide-summary strong,
-.player-advanced-grid strong,
-.player-previous-price strong {
+.player-advanced-grid strong {
   display: block;
 
   margin-top: 4px;
@@ -518,13 +491,7 @@
   stroke-width: 1;
 }
 
-.chart-bar {
-  fill: var(--accent);
-}
-
-.chart-value,
 .chart-label,
-.chart-average-label,
 .chart-legend {
   fill: var(--text-soft);
 
@@ -544,35 +511,6 @@
 
 .chart-axis-title {
   font-weight: 700;
-}
-
-.chart-average-line {
-  stroke: var(--yellow);
-
-  stroke-width: 3;
-
-  stroke-dasharray:
-    8
-    4;
-}
-
-.chart-average-label {
-  fill: var(--orange);
-}
-
-.chart-average-value {
-  fill: var(--yellow);
-
-  stroke: var(--line-2);
-
-  stroke-width: 3px;
-
-  paint-order:
-    stroke
-    fill;
-
-  font-size: 12px;
-  font-weight: 900;
 }
 
 .chart-line {
@@ -633,31 +571,6 @@
 /* =========================
    CHIPS
 ========================= */
-
-.player-chip-list {
-  display: flex;
-  flex-wrap: wrap;
-
-  gap: 7px;
-}
-
-.player-chip-list > span {
-  padding:
-    7px
-    10px;
-
-  border:
-    1px solid
-    rgba(var(--ink-rgb), 0.055);
-
-  border-radius: 11px;
-
-  background: var(--surface-raised);
-
-  color: var(--text-soft);
-
-  font-size: 11px;
-}
 
 /* =========================
    ROLE / GUIDE / ADVANCED
@@ -821,13 +734,6 @@
   margin: 12px 0;
 }
 
-.player-section-heading h2 {
-  margin:
-    3px
-    0
-    12px;
-}
-
 .player-full-section
 > .player-current-metrics {
   margin: 0;
@@ -837,10 +743,6 @@
   color: var(--text-soft);
 
   line-height: 1.55;
-}
-
-.player-previous-price {
-  margin-top: 9px;
 }
 
 /* =========================
@@ -1023,7 +925,6 @@ summary em::after {
   }
 
   .player-detail-header-actions {
-    flex-wrap: wrap;
 
     justify-content: flex-end;
   }
