@@ -3,7 +3,7 @@ import type { PlayerViewModel } from './playerDataView'
 import {
   displayCount, escapePlayerHtml,
   field, latestHistory, renderCurrentMetrics,
-  renderPlayerHead, renderSageSection, renderTeamContext, renderICaV3Explanation,
+  renderPlayerHead, renderSageSection, renderTeamContext, renderICaExplanation,
 } from './playerDataView'
 import '../styles/playerDetail.css'
 
@@ -47,7 +47,7 @@ export function renderPlayerDetailOverlay(
       ${options.error ? `<p class="player-data-alert">${escapePlayerHtml(options.error)}</p>` : ''}
       ${options.loading ? '<p class="player-data-loading">Caricamento dettaglio FLDA…</p>' : `<div class="player-chart-grid">
         <section class="player-data-section player-sage-section"><h3>Prezzo e Saggi</h3>${renderSageSection(view)}</section>
-        <section class="player-data-section player-ica-section"><h3>Perché questo iCà</h3>${renderICaV3Explanation(view)}</section><section class="player-data-section player-history-section"><h3>Contesto squadra</h3>${renderTeamContext(view)}</section>
+        <section class="player-data-section player-ica-section"><h3>Perché questo iCà</h3>${renderICaExplanation(view)}</section><section class="player-data-section player-history-section"><h3>Contesto squadra</h3>${renderTeamContext(view)}</section>
       </div><section class="player-overlay-stats"><h3>Ultima stagione</h3><div class="player-role-stats">${roleFields.map(([label, key]) => `<div><span>${label}</span><strong>${displayCount(field(latest, key))}</strong></div>`).join('')}</div></section>`}
       <footer class="player-detail-actions">
 

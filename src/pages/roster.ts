@@ -5,7 +5,7 @@ import {
   evaluatePick, infirmary, leagueTeams, nextMatchday, suggestLineup, teamRoster,
 } from '../data/roster'
 import type { League, MatchdayPick, Probable } from '../data/roster'
-import { getICaV3 } from '../data/icaV3Data'
+import { getICa } from '../data/ica'
 import { getCachedPlayersDataset } from '../services/playerRepository'
 import { display, escapePlayerHtml } from '../components/playerDataView'
 import type { FldaPlayer } from '../services/flda'
@@ -65,7 +65,7 @@ function returnText(p: Probable, day?: number): string {
 function renderPopover(pick: MatchdayPick): string {
   const p = pick.probable
   const status = statusLabel(p)
-  const ica = getICaV3(pick.player.player_id)?.score
+  const ica = getICa(pick.player.player_id)?.score
   const prob = Math.round(pick.probability * 100)
   return `<button type="button" class="roster-pop-close" data-roster-close aria-label="Chiudi">×</button>
     <div class="roster-pop-head">
@@ -74,11 +74,12 @@ function renderPopover(pick: MatchdayPick): string {
     </div>
     ${status ? `<p class="roster-pop-status ${status.tone}"><b>${status.text}</b>${p?.note ? ` · ${escapePlayerHtml(p.note)}` : ''}${p ? ` ${returnText(p, nextMatchday())}` : ''}</p>` : ''}
     <div class="roster-pop-grid">
-      <div><span>Attesi</span><strong class="accent">${display(pick.expected, 1)}</strong></div>
+      <div><span>FVA</span><strong class="accent">${display(pick.fva, 2)}</strong></div>
       <div><span>iCà</span><strong>${display(ica, 1)}</strong></div>
       <div><span>Titolare</span><strong>${prob}%</strong></div>
       <div><span>Prezzo</span><strong>${pick.price} cr</strong></div>
     </div>
+    ${pick.fvaDetail ? `<p class="roster-pop-fva">${pick.fvaDetail.parts.map((part) => part.label === 'Voto atteso' ? `voto ${display(part.value, 2)}` : `${part.label.toLowerCase()} ${part.value >= 0 ? '+' : '−'}${display(Math.abs(part.value), 2)}`).join(' · ')}</p>` : ''}
     <div class="roster-pop-form"><span>Ultime 5</span>${formDots(pick.recent)}</div>
     ${pick.reasons.filter((reason) => !status || reason !== status.text).length ? `<div class="roster-pop-reasons">${pick.reasons.filter((reason) => !status || reason !== status.text).map((reason) => `<span>${escapePlayerHtml(reason)}</span>`).join('')}</div>` : ''}
     <button type="button" class="roster-pop-open" data-roster-open="${escapePlayerHtml(pick.player.player_id ?? '')}">Scheda completa →</button>`
@@ -92,7 +93,7 @@ function dot(pick: MatchdayPick): string {
   return `<button type="button" class="rpitch-dot role-${pick.player.role.toLowerCase()}${pick.out ? ' out' : ''}" data-roster-dot="${escapePlayerHtml(pick.player.player_id ?? '')}" aria-label="${escapePlayerHtml(pick.player.name)}">
     <span class="rpitch-dot-marker">
       <svg viewBox="0 0 40 40" aria-hidden="true"><path class="rpitch-dot-shape" d="M23.18 5.21 Q29.49 8.44 34.51 13.44 Q37.69 15.75 36.47 19.50 Q35.36 26.49 32.15 32.80 Q30.93 36.55 27.00 36.55 Q20.00 37.65 13.00 36.55 Q9.07 36.55 7.85 32.80 Q4.64 26.49 3.53 19.50 Q2.31 15.75 5.49 13.44 Q10.51 8.44 16.82 5.21 Q20.00 2.90 23.18 5.21 Z"/></svg>
-      <b>${display(pick.expected, 1)}</b>
+      <b>${display(pick.fva, 2)}</b>
       ${status ? `<i class="rpitch-dot-flag ${status.tone}" title="${status.text}"></i>` : ''}
     </span>
     <span class="rpitch-dot-name">${escapePlayerHtml(surname)}</span>
@@ -102,7 +103,7 @@ function dot(pick: MatchdayPick): string {
 function renderPitch(starters: MatchdayPick[]): string {
   const line = (role: string) => `<div class="rpitch-line">${starters.filter((pick) => pick.player.role === role).map(dot).join('')}</div>`
   return `<div class="rpitch">
-    <div class="rpitch-marks" aria-hidden="true"><span class="rpitch-half"></span><span class="rpitch-circle"></span><span class="rpitch-box top"></span><span class="rpitch-box bottom"></span></div>
+    <div class="rpitch-marks" aria-hidden="true"><span class="rpitch-half"></span><span class="rpitch-circle"></span><span class="rpitch-spot"></span><span class="rpitch-box top"></span><span class="rpitch-box bottom"></span><span class="rpitch-small top"></span><span class="rpitch-small bottom"></span></div>
     ${line('A')}${line('C')}${line('D')}${line('P')}
   </div>`
 }

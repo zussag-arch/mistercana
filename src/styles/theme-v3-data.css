@@ -508,3 +508,4 @@
 .rival-index { display: flex; flex-wrap: wrap; column-gap: 8px; }
 .rival-history { margin: 0; color: var(--muted); font-size: 12.5px; }
 .rival-history b { color: var(--text); }
+

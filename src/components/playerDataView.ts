@@ -3,7 +3,8 @@ import type { FldaPlayer, FldaPlayerDetail, FldaRecord } from '../services/flda'
 import type { Player } from '../domain/player'
 import type { PmaConfiguration } from '../app/state'
 import { getFldaPma } from '../domain/pma'
-import { getICaV3 } from '../data/icaV3Data'
+import { getICa } from '../data/ica'
+import { careerFor, heatmapFor, HEATMAP_COLUMNS, HEATMAP_ROWS } from '../data/fotmob'
 
 export interface PlayerViewModel {
   flda: FldaPlayer
@@ -103,14 +104,14 @@ export function renderPlayerBadges(view: PlayerViewModel): string {
 
 export function renderCurrentMetrics(view: PlayerViewModel, compact = false,
   historicalPrice?: string): string {
-  const iCaV3 = getICaV3(view.flda.player_id)
+  const ica = getICa(view.flda.player_id)
   const fldaPma = view.pmaConfiguration ? getFldaPma(view.flda, view.pmaConfiguration) : undefined
   const pmaValue = fldaPma ?? (!view.flda.player_id ? view.legacy?.pmaPercent : undefined)
   const pma = typeof pmaValue === 'number' ? `${display(pmaValue, 1)}%` : '—'
   // Integrità = tenuta fisica: voto 1-5 dato dai Saggi (non è nel listone FantaLab)
   const integrity = integritySummary(view)
   const items: Array<[string, string, string, string?]> = [
-    ['iCà', display(iCaV3?.score, 1), `fantapunti a partita ×10${typeof iCaV3?.rolePercentile === 'number' ? ` · meglio del ${Math.round(iCaV3.rolePercentile)}% del ruolo` : ''}${typeof iCaV3?.affare === 'number' ? ` · affare ${iCaV3.affare > 0 ? '+' : ''}${Math.round(iCaV3.affare)}` : ''}`, 'player-metric-ica'],
+    ['iCà', display(ica?.score, 1), `fantamedia attesa ×10 · presenze ${display((ica?.expectedShare ?? 0) * 100, 0)}%${typeof ica?.rolePercentile === 'number' ? ` · meglio del ${Math.round(ica.rolePercentile)}% del ruolo` : ''}${typeof ica?.affare === 'number' ? ` · affare ${ica.affare > 0 ? '+' : ''}${Math.round(ica.affare)}` : ''}`, 'player-metric-ica'],
     ['PMA', pma, pma === '—' ? 'dato non disponibile' : view.pmaConfiguration ? `${view.pmaConfiguration.mode === 'classic' ? 'Classic' : 'Mantra'} · ${view.pmaConfiguration.participants} · ${view.pmaConfiguration.defenseModifier ? 'con modificatore' : 'senza modificatore'}` : 'budget iniziale'],
     ['xFM', display(view.flda.fm_exp, 2), 'FM Exp. FLDA'],
     ['Integrità', integrity.value, integrity.detail],
@@ -132,7 +133,7 @@ export function renderCurrentMetrics(view: PlayerViewModel, compact = false,
   if (!compact && historicalPrice !== undefined) items.push(
     ["Prezzo d'asta A/B", historicalPrice || '— / —', latestAuctionSeason(view.detail) ? `asta ${latestAuctionSeason(view.detail)}` : 'nessuna asta registrata', 'player-metric-history'],
   )
-  return `<div class="player-current-metrics${compact ? ' player-current-metrics-full' : ''}">${items.map(([label, value, note, className]) => `<div class="${className ?? ''}"${className === 'player-metric-ica' ? ` style="--ica-hue:${icaHue(iCaV3?.rolePercentile)}"` : ''}><span>${label}</span><strong>${value}</strong>${note ? `<small>${note}</small>` : ''}</div>`).join('')}</div>`
+  return `<div class="player-current-metrics${compact ? ' player-current-metrics-full' : ''}">${items.map(([label, value, note, className]) => `<div class="${className ?? ''}"${className === 'player-metric-ica' ? ` style="--ica-hue:${icaHue(ica?.rolePercentile)}"` : ''}><span>${label}</span><strong>${value}</strong>${note ? `<small>${note}</small>` : ''}</div>`).join('')}</div>`
 }
 
 function chartEmpty(message: string): string {
@@ -343,9 +344,9 @@ export function renderTeamContext(view: PlayerViewModel): string {
   </div>`
 }
 
-// "Perché questo iCà": come nasce l'iCà 3 del giocatore, passo per passo.
-export function renderICaV3Explanation(view: PlayerViewModel): string {
-  const result = getICaV3(view.flda.player_id)
+// "Perché questo iCà": come nasce l'iCà del giocatore, passo per passo.
+export function renderICaExplanation(view: PlayerViewModel): string {
+  const result = getICa(view.flda.player_id)
   if (!result) return '<p class="player-data-empty">iCà non disponibile per questo giocatore.</p>'
   if (result.score === undefined) {
     return `<p class="player-data-empty">iCà non calcolabile: manca ${result.missing.join(' e ') || 'un dato'}.</p>`
@@ -358,15 +359,15 @@ export function renderICaV3Explanation(view: PlayerViewModel): string {
     <div class="ica-explain-score">
       <span class="ica-explain-kicker">iCà</span>
       <strong>${display(result.score, 1)}</strong>
-      <small>fantapunti attesi a partita ×10${typeof result.rolePercentile === 'number' ? ` · meglio del ${Math.round(result.rolePercentile)}% del ruolo` : ''}</small>
+      <small>fantamedia attesa ×10${typeof result.rolePercentile === 'number' ? ` · meglio del ${Math.round(result.rolePercentile)}% del ruolo (contando le presenze)` : ''}</small>
       ${typeof affare === 'number' ? `<span class="ica-explain-affare tone-${affare >= 15 ? 'good' : affare <= -15 ? 'bad' : 'neutral'}">Affare ${affare > 0 ? '+' : ''}${Math.round(affare)}</span><small>${affareText}</small>` : ''}
     </div>
     <ol class="ica-explain-steps">
-      <li><b>Fantamedia attesa ${display(result.expectedFm, 2)}</b><small>stagione in corso e scorsa, frenate dalla media del ruolo</small></li>
-      ${result.contributions.map((item) => `<li class="${item.value > 0 ? 'up' : 'down'}"><b>${sign(item.value)}</b> ${item.label}</li>`).join('')}
-      <li><b>Fantamedia corretta ${display(result.adjustedFm, 2)}</b><small>fantamedia attesa più i correttivi</small></li>
-      <li><b>× presenze attese ${display((result.expectedShare ?? 0) * 100, 0)}%</b><small>titolarità Guida, ridotta dagli infortuni</small></li>
-      <li class="total"><b>= iCà ${display(result.score, 1)}</b><small>${display((result.score ?? 0) / 10, 2)} fantapunti attesi a partita, ×10</small></li>
+      <li><b>Fantamedia attesa ${display(result.expectedFm, 2)}</b><small>stagione in corso e due precedenti (o l'ultima all'estero), frenate dalla media del ruolo</small></li>
+      ${result.contributions.map((item) => item.value === 0 ? `<li><small>${item.label}</small></li>` : `<li class="${item.value > 0 ? 'up' : 'down'}"><b>${sign(item.value)}</b> ${item.label}</li>`).join('')}
+      <li class="total"><b>= iCà ${display(result.score, 1)}</b><small>fantamedia corretta ${display(result.adjustedFm, 2)} ×10</small></li>
+      <li><b>Presenze attese ${display((result.expectedShare ?? 0) * 100, 0)}%</b><small>${result.shareParts.map((part) => `${part.label} ${part.value < 0 ? '−' : ''}${display(Math.abs(part.value) * 100, 0)}%`).join(' · ')}</small></li>
+      <li><b>Rendimento ${display(result.yieldScore, 1)}</b><small>iCà × presenze attese: decide la posizione nel ruolo e l'Affare</small></li>
     </ol>
   </div>`
 }
@@ -450,4 +451,72 @@ export function renderMatchdayChart(detail?: FldaPlayerDetail): string {
     ${shapes}${markers}
     <g class="chart-legend"><circle cx="470" cy="18" r="5" class="md-legend-mv"/><text x="481" y="22">Voto</text><circle cx="530" cy="18" r="5" class="md-legend-fmv"/><text x="541" y="22">Fantavoto</text></g>
   </svg></div>`
+}
+
+/* =========================
+   HEATMAP (FotMob): dove tocca palla nella stagione, sul campo 105 × 68
+   Attacca verso destra. Celle sfumate per un effetto morbido.
+========================= */
+const POSITIONS: Record<string, string> = {
+  keeper: 'Portiere', goalkeeper: 'Portiere', 'center back': 'Difensore centrale', 'centre back': 'Difensore centrale',
+  'left back': 'Terzino sinistro', 'right back': 'Terzino destro', 'left wing-back': 'Esterno sinistro', 'right wing-back': 'Esterno destro',
+  'defensive midfielder': 'Mediano', 'central midfielder': 'Centrocampista centrale', 'attacking midfielder': 'Trequartista',
+  'left midfielder': 'Esterno di centrocampo sinistro', 'right midfielder': 'Esterno di centrocampo destro',
+  'left winger': 'Ala sinistra', 'right winger': 'Ala destra', striker: 'Centravanti', forward: 'Attaccante',
+}
+const positionLabel = (value: string) => POSITIONS[value.trim().toLowerCase()] ?? value
+
+/** linee del campo 105 × 68 (attacco verso destra) */
+function pitchLines(): string {
+  return `<g class="pitch-mark" fill="none">
+    <rect x="0" y="0" width="105" height="68" rx="1.5"/>
+    <line x1="52.5" y1="0" x2="52.5" y2="68"/><circle cx="52.5" cy="34" r="9.15"/><circle cx="52.5" cy="34" r="0.5" class="spot"/>
+    <rect x="0" y="13.84" width="16.5" height="40.32"/><rect x="88.5" y="13.84" width="16.5" height="40.32"/>
+    <rect x="0" y="24.84" width="5.5" height="18.32"/><rect x="99.5" y="24.84" width="5.5" height="18.32"/>
+    <path d="M16.5 26.7 A9.15 9.15 0 0 1 16.5 41.3"/><path d="M88.5 26.7 A9.15 9.15 0 0 0 88.5 41.3"/>
+  </g>`
+}
+
+export function renderHeatmap(fantalabId: string | null | undefined): string {
+  const map = heatmapFor(fantalabId)
+  if (!map) return '<p class="player-data-empty">Heatmap non disponibile per questo giocatore.</p>'
+  const w = 105 / HEATMAP_COLUMNS
+  const h = 68 / HEATMAP_ROWS
+  // celle in scala di grigi (opacità = intensità): il filtro le sfuma e le colora come FotMob
+  const cells = map.cells.map((value, index) => value
+    ? `<rect x="${((index % HEATMAP_COLUMNS) * w).toFixed(2)}" y="${(Math.floor(index / HEATMAP_COLUMNS) * h).toFixed(2)}" width="${w.toFixed(2)}" height="${h.toFixed(2)}" fill-opacity="${(value / 9).toFixed(2)}"/>`
+    : '').join('')
+  const id = `heat-${String(fantalabId).replace(/[^a-z0-9]/gi, '').slice(0, 12)}`
+  return `<figure class="player-heatmap">
+    ${typeof map.touches === 'number' ? `<figcaption><span>Tocchi di palla: ${map.touches}</span></figcaption>` : ''}
+    <svg viewBox="-1.5 -4.5 108 74" role="img" aria-label="Heatmap della stagione">
+      <defs>
+        <filter id="${id}" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
+          <feGaussianBlur stdDeviation="2.6" result="blur"/>
+          <feColorMatrix type="matrix" values="0 0 0 2.2 0  0 0 0 2.2 0  0 0 0 2.2 0  0 0 0 2.2 0"/>
+          <feComponentTransfer>
+            <feFuncR type="table" tableValues="0 0.05 0.12 0.55 0.93 0.96 0.92"/>
+            <feFuncG type="table" tableValues="0 0.55 0.66 0.78 0.66 0.42 0.22"/>
+            <feFuncB type="table" tableValues="0 0.38 0.40 0.25 0.10 0.08 0.10"/>
+            <feFuncA type="table" tableValues="0 0 0.55 0.8 0.9 0.95 1"/>
+          </feComponentTransfer>
+        </filter>
+        <clipPath id="${id}-clip"><rect x="0" y="0" width="105" height="68" rx="1.5"/></clipPath>
+      </defs>
+      <rect x="0" y="0" width="105" height="68" rx="1.5" class="pitch-turf"/>
+      <g clip-path="url(#${id}-clip)"><g filter="url(#${id})" fill="#000">${cells}</g></g>
+      ${pitchLines()}
+      <path d="M50 -3.2 h4.5 l1.6 1.6 -1.6 1.6 h-4.5 l1.6 -1.6 z" class="pitch-arrow"/>
+    </svg>
+    <small>${escapePlayerHtml(positionLabel(map.position))}${map.season ? ` · stagione ${escapePlayerHtml(map.season)}` : ''} · attacca verso destra · fonte FotMob</small>
+  </figure>`
+}
+
+/** carriera in tutti i campionati (FotMob), ultime stagioni */
+export function renderCareer(fantalabId: string | null | undefined): string {
+  const rows = careerFor(fantalabId).filter((row) => (row.appearances ?? 0) > 0).slice(0, 12)
+  if (!rows.length) return '<p class="player-data-empty">Carriera non disponibile.</p>'
+  return `<div class="player-career-table"><table><thead><tr><th>Stagione</th><th>Campionato</th><th>Squadra</th><th>Pres.</th><th>Gol</th><th>Ass.</th><th>Voto</th></tr></thead><tbody>
+    ${rows.map((row) => `<tr><td>${escapePlayerHtml(row.season)}</td><td>${escapePlayerHtml(row.league)}</td><td>${escapePlayerHtml(row.team)}</td><td>${displayCount(row.appearances)}</td><td>${displayCount(row.goals)}</td><td>${displayCount(row.assists)}</td><td>${display(row.rating, 2)}</td></tr>`).join('')}
+  </tbody></table></div>`
 }

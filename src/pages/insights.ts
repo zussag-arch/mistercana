@@ -5,7 +5,7 @@ import attackersCsvBundled from '../../database/griglia_attaccanti.csv?raw'
 import fantalabCoachesCsvBundled from '../../database/fantalab_allenatori.csv?raw'
 
 import { getCachedPlayersDataset } from '../services/playerRepository'
-import { getICaV3Results } from '../data/icaV3Data'
+import { getICaResults } from '../data/ica'
 import { localPlayers } from '../services/fantalabLocal'
 
 import {
@@ -1196,10 +1196,10 @@ function renderSetPieceList(team: string, label: string, players: string[]): str
   `
 }
 
-// iCà 3 per ruolo: i migliori per valore atteso (con la V2 accanto per
-// confronto) e i migliori affari (valore alto rispetto al prezzo).
-function renderICaV3Section(): string {
-  const results = getICaV3Results()
+// iCà per ruolo: i migliori per rendimento atteso (iCà × presenze) e i migliori affari
+// (valore alto rispetto al prezzo).
+function renderICaSection(): string {
+  const results = getICaResults()
   const roles: Array<['P' | 'D' | 'C' | 'A', string]> = [['P', 'Portieri'], ['D', 'Difensori'], ['C', 'Centrocampisti'], ['A', 'Attaccanti']]
   const fmt = (value: number | undefined) => typeof value === 'number' ? value.toFixed(1).replace('.', ',') : '—'
   const signed = (value: number | undefined) => typeof value === 'number' ? `${value > 0 ? '+' : ''}${Math.round(value)}` : '—'
@@ -1208,7 +1208,7 @@ function renderICaV3Section(): string {
     const rows = players.filter((player) => player.role === role && player.player_id)
       .map((player) => ({ player, v3: results.get(player.player_id as string) }))
       .filter((row) => typeof row.v3?.score === 'number')
-    const top = [...rows].sort((a, b) => (b.v3!.score! - a.v3!.score!)).slice(0, 6)
+    const top = [...rows].sort((a, b) => ((b.v3!.yieldScore ?? 0) - (a.v3!.yieldScore ?? 0))).slice(0, 6)
     const deals = rows.filter((row) => (row.v3!.rolePercentile ?? 0) >= 40 && typeof row.v3!.affare === 'number')
       .sort((a, b) => b.v3!.affare! - a.v3!.affare!).slice(0, 4)
     const line = (row: typeof rows[number], deal: boolean) => `<li data-player-ref="${escapeHtml(row.player.player_id ?? '')}">
@@ -1230,7 +1230,7 @@ function renderICaV3Section(): string {
         <div>
           <span class="insight-eyebrow">Valutazione</span>
           <h2>iCà e affari</h2>
-          <p>iCà = fantapunti attesi a partita × 10 (fantamedia corretta × probabilità di giocare × 10). Affare = posizione nel ruolo per iCà meno posizione per prezzo: positivo se rende più di quanto costa.</p>
+          <p>iCà = fantamedia attesa corretta × 10. La classifica e l'Affare usano il rendimento (iCà × presenze attese). Affare = posizione nel ruolo per rendimento meno posizione per prezzo: positivo se rende più di quanto costa.</p>
         </div>
         <span class="insight-database-status">FantaLab · ${results.size} giocatori</span>
       </div>
@@ -1245,7 +1245,7 @@ function renderICaV3Section(): string {
 let selectedAttackerTeam = ''
 
 function bestAttacker(team: string): { name: string; score?: number } | undefined {
-  const results = getICaV3Results()
+  const results = getICaResults()
   return localPlayers().players
     .filter((player) => player.team === team && player.role === 'A' && player.player_id)
     .map((player) => ({ name: player.name, score: results.get(player.player_id as string)?.score }))
@@ -2160,7 +2160,7 @@ export function renderInsightsPage():
         </div>
       </div>
 
-      ${renderICaV3Section()}
+      ${renderICaSection()}
       ${renderGoalkeeperSection()}
       ${renderAttackerSection()}
 

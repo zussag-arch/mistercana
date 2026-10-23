@@ -1,4 +1,4 @@
-import { getICaV3 } from '../data/icaV3Data'
+import { getICa } from '../data/ica'
 import type {
   AppState,
   AuctionAssignment,
@@ -546,10 +546,10 @@ function bidDecisionFor(
   const ownerId = getOwnerManagerId(strategy.state)
   const ownerInRole = strategy.state.auctionAssignments
     .filter((item) => item.managerId === ownerId && roleOf.get(item.playerId ?? '') === player.role).length
-  const ica = getICaV3(player.fantalabId)
+  const ica = getICa(player.fantalabId)
   const alternatives = typeof ica?.score === 'number'
     ? strategy.players.filter((item) => item.role === player.role && item.id !== player.id && !assigned.has(item.id)
-      && (getICaV3(item.fantalabId)?.score ?? -Infinity) >= (ica.score ?? 0) - 5).length
+      && (getICa(item.fantalabId)?.score ?? -Infinity) >= (ica.score ?? 0) - 5).length
     : 0
   const rivals = calculateCompetitors(strategy.state, player, strategy.players, profileForManager)
     .map((rival) => ({ name: rival.nickname, capacity: rival.weightedCapacity, estimatedBid: rival.estimatedBid }))
@@ -1675,7 +1675,7 @@ function renderPlayerCard(
 
           <strong>
             ${formatNumber(
-              getICaV3(strategyPlayer?.fantalabId)?.score,
+              getICa(strategyPlayer?.fantalabId)?.score,
               1,
             )}
           </strong>
@@ -2733,7 +2733,7 @@ function renderSuggestedPlayersPanel(
                   iCà
                   <strong>
                     ${formatNumber(
-                      getICaV3(player.fantalabId)?.score,
+                      getICa(player.fantalabId)?.score,
                       1,
                     )}
                   </strong>
@@ -2958,7 +2958,7 @@ function renderTopICaPanel(
                 <b>
                   ${formatNumber(
                     // valore iCà V3 (come in lista e scheda); l'ordine resta per iCà
-                    getICaV3(player.fantalabId)?.score ?? player.iCa,
+                    getICa(player.fantalabId)?.score ?? player.iCa,
                     1,
                   )}
                 </b>
@@ -3008,7 +3008,7 @@ function getRosterMetrics(state: AppState): RosterMetrics {
           id: flda.player_id,
           team: flda.team,
           role: flda.role as AuctionRole,
-          iCa: getICaV3(flda.player_id)?.score,
+          iCa: getICa(flda.player_id)?.score,
           titolarita: flda.titolarita_display,
           xFm: flda.fm_exp,
           presenze: legacy?.appearances,
@@ -5510,7 +5510,7 @@ function renderFldaPlayerCard(
       <div class="auction-main-values">
         <div class="auction-main-value"><span>xFM</span><strong>${formatNumber(flda?.fm_exp ?? undefined, 2)}</strong></div>
         <div class="auction-main-value"><span>Titolarità</span><strong>${formatPercent(flda?.titolarita_display ?? undefined, 0)}</strong></div>
-        <div class="auction-main-value"><span>iCà</span><strong>${formatNumber(getICaV3(strategyPlayer?.fantalabId)?.score, 1)}</strong></div>
+        <div class="auction-main-value"><span>iCà</span><strong>${formatNumber(getICa(strategyPlayer?.fantalabId)?.score, 1)}</strong></div>
         <div class="auction-main-value auction-history-value"><span>Prezzo d'asta A/B</span><strong>${displayHistoricalAuctionPrices(historicalDetail)}</strong><small>${latestAuctionSeason(historicalDetail) ? `asta ${latestAuctionSeason(historicalDetail)}` : 'nessuna asta registrata'}</small></div>
       </div>
       <div class="auction-insight-row">

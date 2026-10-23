@@ -10,7 +10,7 @@ import { getAssignmentFldaId } from '../services/auctionPlayerResolver'
 import {
   display, displayCount, escapePlayerHtml,
   field, latestHistory, renderCurrentMetrics,
-  renderPerformanceChart, renderMatchdayChart, renderPlayerHead, renderSageSection, renderICaV3Explanation,
+  renderPerformanceChart, renderMatchdayChart, renderPlayerHead, renderHeatmap, renderCareer, renderSageSection, renderICaExplanation,
 } from '../components/playerDataView'
 import type { PlayerViewModel } from '../components/playerDataView'
 import { displayHistoricalAuctionPrices } from '../domain/historicalAuctionPrice'
@@ -171,8 +171,9 @@ export function renderFullPlayerPage(reference: string | null, state: AppState):
     ${renderPlayerHead(view)}
     ${!view.identityAvailable ? '<p class="player-data-alert">Dati FLDA non disponibili per questa identità.</p>' : ''}${detailError ? `<p class="player-data-alert">${escapePlayerHtml(detailError)}</p>` : ''}
     ${renderCurrentMetrics(view, false, displayHistoricalAuctionPrices(detail) ?? '')}
-    <section class="player-full-section player-ica-section"><div class="player-section-heading"><span>Valutazione</span><h2>Perché questo iCà</h2></div>${renderICaV3Explanation(view)}</section>
+    <section class="player-full-section player-ica-section"><div class="player-section-heading"><span>Valutazione</span><h2>Perché questo iCà</h2></div>${renderICaExplanation(view)}</section>
     <section class="player-full-section"><div class="player-section-heading"><span>Prestazioni</span><h2>Come sta andando</h2></div>${latestKpis(role, latest)}</section>
+    <div class="player-chart-grid"><section class="player-full-section player-heatmap-section"><div class="player-section-heading"><span>Posizione in campo</span><h2>Heatmap</h2></div>${renderHeatmap(flda.player_id)}</section><section class="player-full-section"><div class="player-section-heading"><span>Campionato · ultime 3 stagioni · FotMob</span><h2>Carriera</h2></div>${renderCareer(flda.player_id)}</section></div>
     <section class="player-full-section player-sage-section"><div class="player-section-heading"><span>Asta</span><h2>Prezzo e Saggi</h2></div>${renderSageSection(view)}</section>
     <section class="player-full-section player-matchdays"><div class="player-section-heading"><span>Stagione ${escapePlayerHtml(String(field(latest, 'season') ?? ''))}</span><h2>Andamento giornata per giornata</h2></div>${renderMatchdayChart(detail)}</section>
     <div class="player-chart-grid"><section class="player-full-section"><div class="player-section-heading"><span>Stagioni</span><h2>Storico MV / FMV</h2></div>${renderPerformanceChart(detail)}</section><section class="player-full-section"><div class="player-section-heading"><span>${escapePlayerHtml(roleName)} · stagione ${escapePlayerHtml(String(field(latest, 'season') ?? ''))}</span><h2>Statistiche ruolo</h2></div>${roleStats(role, latest)}</section></div>

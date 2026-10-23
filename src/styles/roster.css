@@ -202,3 +202,22 @@
   height: 28px !important;
   font-size: 15px !important;
 }
+
+/* campetto in stile FotMob (come la heatmap): campo grigio, linee sottili, bordo arrotondato */
+.rpitch, :root[data-theme="light"] .rpitch {
+  background: var(--pitch-turf, #2b2d2f) !important;
+  border: 1px solid var(--pitch-mark, rgba(255,255,255,.16));
+  border-radius: 18px;
+}
+.rpitch-marks > * { border: 1.5px solid var(--pitch-mark, rgba(255,255,255,.16)) !important; }
+.rpitch-half { border-width: 1.5px 0 0 !important; }
+.rpitch-box { left: 22%; right: 22%; height: 15%; }
+.rpitch-small { position: absolute; left: 38%; right: 38%; height: 5.5%; }
+.rpitch-small.top { top: -2px; border-top: 0 !important; }
+.rpitch-small.bottom { bottom: -2px; border-bottom: 0 !important; }
+.rpitch-spot { left: 50%; top: 50%; width: 5px; height: 5px; border-radius: 50%; transform: translate(-50%, -50%); background: var(--pitch-mark, rgba(255,255,255,.16)); }
+.rpitch-circle { width: 18%; aspect-ratio: 1; height: auto; min-width: 70px; }
+.rpitch-dot-name { background: rgba(0,0,0,.5); }
+:root[data-theme="light"] .rpitch-dot-name { background: rgba(255,255,255,.85); color: #22262a; }
+.roster-pop-fva { margin: 0; color: var(--muted); font-size: 11.5px; line-height: 1.4; }
+.rpitch-dot-marker b { font-size: 12.5px !important; letter-spacing: -0.02em; }

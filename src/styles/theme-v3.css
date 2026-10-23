@@ -2005,7 +2005,7 @@ input:focus {
   color: var(--accent);
 }
 
-/* iCà 3 nella lista: valore grande, V2 piccola sotto, Affare come pillola */
+/* iCà nella lista: valore grande, V2 piccola sotto, Affare come pillola */
 .players-table-row > div[data-label="iCà"],
 .players-table-row > div[data-label="PMA"] {
   display: flex;
@@ -2138,7 +2138,7 @@ input:focus {
 }
 
 /* =========================
-   INSIGHTS — iCà 3 e affari
+   INSIGHTS — iCà e affari
 ========================= */
 
 .ica3-grid {

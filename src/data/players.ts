@@ -599,7 +599,7 @@ export const players:
   basePlayers.map(
     (player) => ({
       ...player,
-      // l'iCà è calcolato da data/icaV3Data (iCà 3), non sul listone
+      // l'iCà è calcolato da data/ica, non sul listone
       iCa: undefined,
       consensus:
         calculateConsensus(

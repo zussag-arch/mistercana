@@ -13,12 +13,14 @@ import bundledProbablesCsv from '../../database/probabili.csv?raw'
 import bundledSosProbablesCsv from '../../database/sos_probabili.csv?raw'
 import bundledSosAdviceCsv from '../../database/sos_consigli.csv?raw'
 import bundledRivalsCsv from '../../database/avversari.csv?raw'
+import bundledCareerCsv from '../../database/carriera.csv?raw'
+import bundledHeatmapCsv from '../../database/heatmap.csv?raw'
 import { CSV_LABELS, clearCsvOverrides, getCsv, getCsvOverrides, saveCsvOverrides } from '../data/csvOverrides'
 import type { CsvKey, CsvOverride } from '../data/csvOverrides'
 import { analyzeCsv } from '../data/csvImport'
 import type { CsvAnalysis } from '../data/csvImport'
 import { getDataSources, getLastDataUpdate } from '../data/dataSources'
-import { getICaV3Results } from '../data/icaV3Data'
+import { getICaResults } from '../data/ica'
 import { localPlayers } from '../services/fantalabLocal'
 import { getCachedPlayersDataset } from '../services/playerRepository'
 import { getAssignmentFldaId } from '../services/auctionPlayerResolver'
@@ -246,6 +248,8 @@ const BUNDLED_CSV: Record<CsvKey, string> = {
   sos_probabili: bundledSosProbablesCsv,
   sos_consigli: bundledSosAdviceCsv,
   avversari: bundledRivalsCsv,
+  carriera: bundledCareerCsv,
+  heatmap: bundledHeatmapCsv,
 }
 
 function renderCsvUpload(): string {
@@ -756,7 +760,7 @@ function escapeSourceHtml(value: string): string {
 
 function exportPlayerRatings(): void {
   const roleOrder = ['P', 'D', 'C', 'A']
-  const results = getICaV3Results()
+  const results = getICaResults()
   const csvCell = (value: unknown) => {
     const text = typeof value === 'number' ? value.toFixed(1).replace('.', ',') : String(value ?? '')
     return /[;"\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text
