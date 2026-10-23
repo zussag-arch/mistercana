@@ -40,6 +40,8 @@ const COACH_COLUMNS = ['Squadra', 'Allenatore', 'Modulo', 'Ruoli chiave', 'Rigor
 
 function detectKey(fileName: string, header: string[]): CsvKey | undefined {
   const name = fileName.toLowerCase()
+  if (header.includes('Griglia') && header.includes('ID FantaLab')) return 'heatmap'
+  if (header.includes('Voto FotMob')) return 'carriera'
   if (header.includes('Soprannome') && header.includes('Squadra') && header.includes('Stagione')) return 'avversari'
   if (header.includes('Fascia') && header.includes('Fonte')) return 'sos_consigli'
   if (header.includes('Ballottaggio') && header.includes('Probabilità')) return 'sos_probabili'
@@ -150,6 +152,8 @@ const LIST_COLUMNS: Partial<Record<CsvKey, string[]>> = {
   sos_probabili: ['ID FantaLab', 'Squadra', 'Probabilità'],
   sos_consigli: ['ID FantaLab', 'Ruolo', 'Fascia'],
   avversari: ['Soprannome', 'Stagione', 'Lega', 'Squadra'],
+  carriera: ['ID FantaLab', 'Stagione', 'Campionato', 'Presenze'],
+  heatmap: ['ID FantaLab', 'Griglia'],
 }
 
 function analyzeList(key: CsvKey, rows: Row[], current: Row[]): { errors: string[]; summary: string[] } {

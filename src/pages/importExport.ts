@@ -13,6 +13,8 @@ import bundledProbablesCsv from '../../database/probabili.csv?raw'
 import bundledSosProbablesCsv from '../../database/sos_probabili.csv?raw'
 import bundledSosAdviceCsv from '../../database/sos_consigli.csv?raw'
 import bundledRivalsCsv from '../../database/avversari.csv?raw'
+import bundledCareerCsv from '../../database/carriera.csv?raw'
+import bundledHeatmapCsv from '../../database/heatmap.csv?raw'
 import { CSV_LABELS, clearCsvOverrides, getCsv, getCsvOverrides, saveCsvOverrides } from '../data/csvOverrides'
 import type { CsvKey, CsvOverride } from '../data/csvOverrides'
 import { analyzeCsv } from '../data/csvImport'
@@ -251,6 +253,8 @@ const BUNDLED_CSV: Record<CsvKey, string> = {
   sos_probabili: bundledSosProbablesCsv,
   sos_consigli: bundledSosAdviceCsv,
   avversari: bundledRivalsCsv,
+  carriera: bundledCareerCsv,
+  heatmap: bundledHeatmapCsv,
 }
 
 function renderCsvUpload(): string {

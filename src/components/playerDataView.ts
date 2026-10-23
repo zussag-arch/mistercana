@@ -4,6 +4,7 @@ import type { Player } from '../domain/player'
 import type { PmaConfiguration } from '../app/state'
 import { getFldaPma } from '../domain/pma'
 import { getICaV3 } from '../data/icaV3Data'
+import { careerFor, heatmapFor, HEATMAP_COLUMNS, HEATMAP_ROWS } from '../data/fotmob'
 
 export interface PlayerViewModel {
   flda: FldaPlayer
@@ -467,4 +468,54 @@ export function renderMatchdayChart(detail?: FldaPlayerDetail): string {
     ${shapes}${markers}
     <g class="chart-legend"><circle cx="470" cy="18" r="5" class="md-legend-mv"/><text x="481" y="22">Voto</text><circle cx="530" cy="18" r="5" class="md-legend-fmv"/><text x="541" y="22">Fantavoto</text></g>
   </svg></div>`
+}
+
+/* =========================
+   HEATMAP (FotMob): dove tocca palla nella stagione, sul campo 105 × 68
+   Attacca verso destra. Celle sfumate per un effetto morbido.
+========================= */
+const POSITIONS: Record<string, string> = {
+  keeper: 'Portiere', goalkeeper: 'Portiere', 'center back': 'Difensore centrale', 'centre back': 'Difensore centrale',
+  'left back': 'Terzino sinistro', 'right back': 'Terzino destro', 'left wing-back': 'Esterno sinistro', 'right wing-back': 'Esterno destro',
+  'defensive midfielder': 'Mediano', 'central midfielder': 'Centrocampista centrale', 'attacking midfielder': 'Trequartista',
+  'left midfielder': 'Esterno di centrocampo sinistro', 'right midfielder': 'Esterno di centrocampo destro',
+  'left winger': 'Ala sinistra', 'right winger': 'Ala destra', striker: 'Centravanti', forward: 'Attaccante',
+}
+const positionLabel = (value: string) => POSITIONS[value.trim().toLowerCase()] ?? value
+
+export function renderHeatmap(fantalabId: string | null | undefined): string {
+  const map = heatmapFor(fantalabId)
+  if (!map) return '<p class="player-data-empty">Heatmap non disponibile per questo giocatore.</p>'
+  const w = 105 / HEATMAP_COLUMNS
+  const h = 68 / HEATMAP_ROWS
+  const cells = map.cells.map((value, index) => {
+    if (!value) return ''
+    const x = (index % HEATMAP_COLUMNS) * w
+    const y = Math.floor(index / HEATMAP_COLUMNS) * h
+    return `<rect x="${(x - w * 0.2).toFixed(2)}" y="${(y - h * 0.2).toFixed(2)}" width="${(w * 1.4).toFixed(2)}" height="${(h * 1.4).toFixed(2)}" rx="3" class="heat-${value}"/>`
+  }).join('')
+  const id = `heatblur-${String(fantalabId).replace(/[^a-z0-9]/gi, '').slice(0, 12)}`
+  return `<figure class="player-heatmap">
+    <svg viewBox="-2 -2 109 72" role="img" aria-label="Heatmap della stagione">
+      <defs><filter id="${id}" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3.2"/></filter><clipPath id="${id}-clip"><rect x="0" y="0" width="105" height="68" rx="2"/></clipPath></defs>
+      <rect x="0" y="0" width="105" height="68" rx="2" class="heat-pitch"/>
+      <g clip-path="url(#${id}-clip)"><g filter="url(#${id})">${cells}</g></g>
+      <g class="heat-lines" fill="none">
+        <rect x="0" y="0" width="105" height="68" rx="2"/>
+        <line x1="52.5" y1="0" x2="52.5" y2="68"/><circle cx="52.5" cy="34" r="9.15"/>
+        <rect x="0" y="13.84" width="16.5" height="40.32"/><rect x="88.5" y="13.84" width="16.5" height="40.32"/>
+        <rect x="0" y="24.84" width="5.5" height="18.32"/><rect x="99.5" y="24.84" width="5.5" height="18.32"/>
+      </g>
+    </svg>
+    <figcaption>${escapePlayerHtml(positionLabel(map.position))}${map.season ? ` · stagione ${escapePlayerHtml(map.season)}` : ''} · attacca verso destra · fonte FotMob</figcaption>
+  </figure>`
+}
+
+/** carriera in tutti i campionati (FotMob), ultime stagioni */
+export function renderCareer(fantalabId: string | null | undefined): string {
+  const rows = careerFor(fantalabId).filter((row) => (row.appearances ?? 0) > 0).slice(0, 12)
+  if (!rows.length) return '<p class="player-data-empty">Carriera non disponibile.</p>'
+  return `<div class="player-career-table"><table><thead><tr><th>Stagione</th><th>Campionato</th><th>Squadra</th><th>Pres.</th><th>Gol</th><th>Ass.</th><th>Voto</th></tr></thead><tbody>
+    ${rows.map((row) => `<tr><td>${escapePlayerHtml(row.season)}</td><td>${escapePlayerHtml(row.league)}</td><td>${escapePlayerHtml(row.team)}</td><td>${displayCount(row.appearances)}</td><td>${displayCount(row.goals)}</td><td>${displayCount(row.assists)}</td><td>${display(row.rating, 2)}</td></tr>`).join('')}
+  </tbody></table></div>`
 }
