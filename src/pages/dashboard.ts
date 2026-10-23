@@ -1631,36 +1631,7 @@ export function renderDashboardPage(
               )
               .join('')}
 
-            <button
-              id="openCreateManagerOverlayButton"
-              type="button"
-              class="
-                dashboard-add-manager-card
-              "
-              ${
-                locked
-                  ? 'disabled'
-                  : ''
-              }
-            >
-              <span
-                class="
-                  dashboard-add-manager-inner
-                "
-              >
-                <span
-                  class="
-                    dashboard-add-manager-icon
-                  "
-                >
-                  ＋
-                </span>
-
-                <span>
-                  Aggiungi allenatore
-                </span>
-              </span>
-            </button>
+            <p class="dashboard-managers-hint">Nuovi allenatori e profili si gestiscono in <b>Dati → Anagrafica avversari</b>.</p>
           </div>
         </details>
       </div>

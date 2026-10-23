@@ -22,7 +22,7 @@ import { getICaV3Results } from '../data/icaV3Data'
 import { localPlayers } from '../services/fantalabLocal'
 import { getCachedPlayersDataset } from '../services/playerRepository'
 import { getAssignmentFldaId } from '../services/auctionPlayerResolver'
-import { profileForManager, renameRival, rivalProfiles } from '../data/rivals'
+import { profileForManager, removeRival, renameRival, rivalProfiles } from '../data/rivals'
 import { buildLeagueRosters } from '../domain/leagueExport'
 import type { ExportPlayer } from '../domain/leagueExport'
 import {
@@ -892,48 +892,207 @@ async function loadCreatorOptions(): Promise<void> {
 const pctDiff = (index: number) => { const value = Math.round((index - 1) * 100); return value === 0 ? "0%" : `${value > 0 ? "+" : "−"}${Math.abs(value)}%` }
 const LEAGUE_SHORT: Record<string, string> = { SERIE_A: 'A', SERIE_B: 'B' }
 
+type Profile = ReturnType<typeof rivalProfiles> extends Map<string, infer P> ? P : never
+
+interface RivalTile {
+  nickname: string
+  profile?: Profile
+  manager?: Manager
+}
+
+function rivalTiles(state: AppState): RivalTile[] {
+  const managers = state.managers.filter((manager) => !manager.archived)
+  const tiles: RivalTile[] = [...rivalProfiles().values()].map((profile) => ({
+    nickname: profile.nickname,
+    profile,
+    manager: managers.find((manager) => profileForManager(manager)?.nickname === profile.nickname),
+  }))
+  // allenatori senza storico (nuovi ingressi aggiunti da qui o già presenti in Dashboard)
+  for (const manager of managers) {
+    if (!tiles.some((tile) => tile.manager?.id === manager.id)) tiles.push({ nickname: manager.alias || manager.firstName, manager })
+  }
+  const isMe = (tile: RivalTile) => Number(Boolean(tile.profile?.me || tile.manager?.isOwner))
+  return tiles.sort((a, b) => isMe(b) - isMe(a)
+    || Number(Boolean(b.manager)) - Number(Boolean(a.manager))
+    || a.nickname.localeCompare(b.nickname, 'it'))
+}
+
+function renderRivalTile(tile: RivalTile): string {
+  const { profile, manager } = tile
+  const me = Boolean(profile?.me || manager?.isOwner)
+  const roles = ['P', 'D', 'C', 'A'] as const
+  const person = manager ? [manager.firstName, manager.lastName].filter(Boolean).join(' ') : ''
+  const id = escapeSourceHtml(tile.nickname)
+  const subtitle = manager
+    ? `${escapeSourceHtml(person)}${manager.teamName ? ` · ${escapeSourceHtml(manager.teamName)}` : ''}`
+    : 'Profilo da completare'
+  return `<article class="rival-card${me ? ' is-me' : ''}${manager ? ' is-coach' : ''}">
+    <header>
+      <div class="rival-title"><h3>${id}</h3><p>${subtitle}</p></div>
+      ${me ? '<span class="rival-tag">Tu</span>' : manager ? '<span class="rival-tag linked">Allenatore</span>' : ''}
+      <div class="rival-menu">
+        <button type="button" class="rival-menu-button" data-rival-menu aria-label="Gestisci ${id}">⋯</button>
+        <div class="rival-menu-list" hidden>
+          <button type="button" data-rival-edit="${id}" data-manager-id="${manager?.id ?? ''}">Gestisci profilo</button>
+          <button type="button" class="danger" data-rival-delete="${id}" data-manager-id="${manager?.id ?? ''}">Elimina profilo</button>
+        </div>
+      </div>
+    </header>
+    ${profile ? `
+      <p class="rival-teams">${profile.teams.map((team) => `<span>${escapeSourceHtml(team.team)} <small>${LEAGUE_SHORT[team.league] ?? team.league} ${escapeSourceHtml(team.season)}</small></span>`).join('')}</p>
+      <div class="rival-index"><span>Spesa rispetto alla lega</span><strong class="${profile.spendIndex >= 1.05 ? 'up' : profile.spendIndex <= 0.95 ? 'down' : ''}">${pctDiff(profile.spendIndex)}</strong><small>${profile.comparisons} confronti</small></div>
+      <div class="rival-roles">${roles.map((role) => `<div><span class="role-${role.toLowerCase()}">${role}</span><strong>${pctDiff(profile.spendIndexByRole[role])}</strong><small>${Math.round(profile.distribution[role])}% budget</small></div>`).join('')}</div>
+      <p class="rival-traits">Top 3: <b>${Math.round(profile.topThreeShare * 100)}%</b> dei crediti · a 1 credito: <b>${Math.round(profile.oneCreditShare * 100)}%</b> dei giocatori</p>`
+    : '<p class="rival-empty">Nessuna asta registrata: il profilo si costruisce dalla prossima.</p>'}
+  </article>`
+}
+
 function renderRivalsSection(state: AppState): string {
-  const profiles = [...rivalProfiles().values()].sort((a, b) => Number(b.me) - Number(a.me) || b.spendIndex - a.spendIndex)
-  const linked = new Map(state.managers.filter((manager) => manager.active && !manager.archived)
-    .map((manager) => [profileForManager(manager)?.nickname, manager] as const).filter(([nickname]) => nickname))
+  const tiles = rivalTiles(state)
+  const coaches = tiles.filter((tile) => tile.manager).length
   return `<section class="data-transfer-section rivals-section">
     <div class="data-transfer-section-header">
       <div>
-        <span class="data-transfer-eyebrow">Anagrafica</span>
-        <h2>Avversari</h2>
-        <p>Ogni persona con le sue squadre negli anni e come si comporta in asta. Il soprannome deve essere quello tra virgolette in Dashboard (es. Ivan "Brosky" Sordi → Brosky): così in asta l'app riconosce chi è.</p>
+        <span class="data-transfer-eyebrow">Allenatori e storico</span>
+        <h2>Anagrafica avversari</h2>
+        <p>Ogni persona con le sue squadre negli anni e come si comporta in asta. Da ⋯ → Gestisci profilo inserisci soprannome (è l'ID, quello tra virgolette), nome e squadra: il profilo diventa un allenatore della Dashboard.</p>
       </div>
-      <span class="data-transfer-status status-ready">${profiles.length} persone</span>
+      <div class="rivals-header-actions">
+        <span class="data-transfer-status status-ready">${coaches} allenatori · ${tiles.length} profili</span>
+        <button type="button" class="data-transfer-button data-transfer-button-primary" data-rival-add>Aggiungi allenatore</button>
+      </div>
     </div>
-    <div class="rivals-grid">
-      ${profiles.map((profile) => {
-        const manager = linked.get(profile.nickname)
-        const roles = (['P', 'D', 'C', 'A'] as const)
-        return `<article class="rival-card${profile.me ? ' is-me' : ''}">
-          <header>
-            <input class="rival-name" value="${escapeSourceHtml(profile.nickname)}" data-rival-rename="${escapeSourceHtml(profile.nickname)}" aria-label="Soprannome">
-            ${profile.me ? '<span class="rival-tag">Tu</span>' : manager ? `<span class="rival-tag linked" title="Collegato all'allenatore in Dashboard">in asta</span>` : ''}
-          </header>
-          <p class="rival-teams">${profile.teams.map((team) => `<span>${escapeSourceHtml(team.team)} <small>${LEAGUE_SHORT[team.league] ?? team.league} ${escapeSourceHtml(team.season)}</small></span>`).join('')}</p>
-          <div class="rival-index"><span>Spesa rispetto alla lega</span><strong class="${profile.spendIndex >= 1.05 ? 'up' : profile.spendIndex <= 0.95 ? 'down' : ''}">${pctDiff(profile.spendIndex)}</strong><small>${profile.comparisons} confronti</small></div>
-          <div class="rival-roles">${roles.map((role) => `<div><span class="role-${role.toLowerCase()}">${role}</span><strong>${pctDiff(profile.spendIndexByRole[role])}</strong><small>${Math.round(profile.distribution[role])}% budget</small></div>`).join('')}</div>
-          <p class="rival-traits">Top 3: <b>${Math.round(profile.topThreeShare * 100)}%</b> dei crediti · a 1 credito: <b>${Math.round(profile.oneCreditShare * 100)}%</b> dei giocatori</p>
-        </article>`
-      }).join('')}
+    <div class="rivals-grid">${tiles.map(renderRivalTile).join('')}</div>
+    <div id="rivalOverlay" class="overlay hidden" aria-hidden="true">
+      <div class="overlay-backdrop" data-rival-close></div>
+      <form id="rivalForm" class="overlay-card rival-form" autocomplete="off">
+        <div class="overlay-header"><h2 id="rivalFormTitle">Profilo</h2><button type="button" class="icon-button" data-rival-close aria-label="Chiudi">×</button></div>
+        <input type="hidden" name="original"><input type="hidden" name="managerId">
+        <label><span>Soprannome (ID)</span><input name="nickname" required maxlength="40" placeholder="es. Brosky"></label>
+        <div class="rival-form-row">
+          <label><span>Nome</span><input name="firstName" required maxlength="40" placeholder="es. Ivan"></label>
+          <label><span>Cognome</span><input name="lastName" maxlength="40" placeholder="es. Sordi"></label>
+        </div>
+        <label><span>Nome squadra</span><input name="teamName" maxlength="60" placeholder="es. Arcamado"></label>
+        <label class="rival-form-check"><input type="checkbox" name="me"> <span>Sono io</span></label>
+        <div class="overlay-actions"><button type="button" class="secondary-button" data-rival-close>Annulla</button><button type="submit" class="primary-button">Salva</button></div>
+      </form>
     </div>
   </section>`
 }
 
-function bindCsvUpload(): void {
-  document.addEventListener('change', (event) => {
-    const input = event.target
-    if (!(input instanceof HTMLInputElement) || !input.dataset.rivalRename) return
-    if (renameRival(input.dataset.rivalRename, input.value)) {
-      feedback = { type: 'success', title: 'Soprannome aggiornato', message: `${input.dataset.rivalRename} → ${input.value.trim()}` }
-      input.dataset.rivalRename = input.value.trim()
-      updateDynamicUi()
+/** modifica lo stato dell'app (vive in main.ts): salva e ridisegna */
+function updateAppState(update: (current: AppState) => void): void {
+  document.dispatchEvent(new CustomEvent('mistercana:update-state', { detail: update }))
+}
+
+function rivalField(form: HTMLFormElement, name: string): HTMLInputElement {
+  return form.elements.namedItem(name) as HTMLInputElement
+}
+
+function openRivalForm(nickname: string, managerId: string): void {
+  const form = document.querySelector<HTMLFormElement>('#rivalForm')
+  const overlay = document.querySelector<HTMLElement>('#rivalOverlay')
+  if (!form || !overlay) return
+  const manager = loadState().managers.find((item) => item.id === managerId)
+  const profile = nickname ? rivalProfiles().get(nickname) : undefined
+  rivalField(form, 'original').value = profile ? nickname : ''
+  rivalField(form, 'managerId').value = managerId
+  rivalField(form, 'nickname').value = manager?.alias || nickname
+  rivalField(form, 'firstName').value = manager?.firstName ?? ''
+  rivalField(form, 'lastName').value = manager?.lastName ?? ''
+  rivalField(form, 'teamName').value = manager?.teamName || profile?.teams.at(-1)?.team || ''
+  rivalField(form, 'me').checked = Boolean(manager?.isOwner || profile?.me)
+  const title = document.querySelector('#rivalFormTitle')
+  if (title) title.textContent = nickname ? `Profilo · ${nickname}` : 'Nuovo allenatore'
+  overlay.classList.remove('hidden')
+  overlay.setAttribute('aria-hidden', 'false')
+  rivalField(form, nickname ? 'firstName' : 'nickname').focus({ preventScroll: true })
+}
+
+function closeRivalForm(): void {
+  const overlay = document.querySelector<HTMLElement>('#rivalOverlay')
+  overlay?.classList.add('hidden')
+  overlay?.setAttribute('aria-hidden', 'true')
+}
+
+function saveRivalForm(form: HTMLFormElement): void {
+  const value = (name: string) => rivalField(form, name).value.replace(/[;"\r\n]/g, '').trim()
+  const original = value('original')
+  const managerId = value('managerId')
+  const nickname = value('nickname')
+  const firstName = value('firstName')
+  if (!nickname || !firstName) return
+  const me = rivalField(form, 'me').checked
+  const taken = rivalTiles(loadState()).some((tile) =>
+    tile.nickname.toLowerCase() === nickname.toLowerCase() && tile.nickname !== original && tile.manager?.id !== managerId)
+  if (taken) {
+    window.alert(`Il soprannome "${nickname}" è già usato da un altro profilo.`)
+    return
+  }
+  if (original && original !== nickname) renameRival(original, nickname)
+  closeRivalForm()
+  updateAppState((state) => {
+    if (me) state.managers.forEach((manager) => { manager.isOwner = false })
+    const data = { alias: nickname, firstName, lastName: value('lastName'), teamName: value('teamName'), isOwner: me, archived: false }
+    const manager = state.managers.find((item) => item.id === managerId)
+    if (manager) Object.assign(manager, data)
+    else state.managers.push({ id: `manager-${Date.now().toString(36)}`, active: true, ...data })
+  })
+}
+
+function deleteRival(nickname: string, managerId: string): void {
+  const message = `Eliminare il profilo "${nickname}"?\n\nSparisce dall'anagrafica e dagli allenatori della Dashboard. Le sue aste restano nello storico, ma non più collegate a lui.`
+  if (!window.confirm(message)) return
+  removeRival(nickname)
+  updateAppState((state) => {
+    const index = state.managers.findIndex((item) => item.id === managerId)
+    if (index < 0) return
+    // con acquisti già registrati l'allenatore resta nell'asta, ma archiviato
+    if (state.auctionAssignments.some((item) => item.managerId === managerId)) state.managers[index].archived = true
+    else state.managers.splice(index, 1)
+  })
+}
+
+let rivalsBound = false
+
+function bindRivals(): void {
+  if (rivalsBound) return
+  rivalsBound = true
+  const closeMenus = () => document.querySelectorAll<HTMLElement>('.rival-menu-list').forEach((menu) => { menu.hidden = true })
+  document.addEventListener('click', (event) => {
+    const target = event.target as HTMLElement | null
+    if (!target?.closest('.rivals-section')) {
+      closeMenus()
+      return
+    }
+    const menuButton = target.closest<HTMLElement>('[data-rival-menu]')
+    if (menuButton) {
+      const list = menuButton.nextElementSibling as HTMLElement | null
+      const wasHidden = list?.hidden
+      closeMenus()
+      if (list && wasHidden) list.hidden = false
+      return
+    }
+    closeMenus()
+    const edit = target.closest<HTMLElement>('[data-rival-edit]')
+    if (edit) return openRivalForm(edit.dataset.rivalEdit ?? '', edit.dataset.managerId ?? '')
+    const remove = target.closest<HTMLElement>('[data-rival-delete]')
+    if (remove) return deleteRival(remove.dataset.rivalDelete ?? '', remove.dataset.managerId ?? '')
+    if (target.closest('[data-rival-add]')) return openRivalForm('', '')
+    if (target.closest('[data-rival-close]')) closeRivalForm()
+  })
+  document.addEventListener('submit', (event) => {
+    const form = event.target
+    if (form instanceof HTMLFormElement && form.id === 'rivalForm') {
+      event.preventDefault()
+      saveRivalForm(form)
     }
   })
+}
+
+function bindCsvUpload(): void {
+  bindRivals()
   document.addEventListener('toggle', (event) => {
     if (event.target instanceof HTMLDetailsElement && event.target.id === 'saggiCreatorsBox' && event.target.open) void loadCreatorOptions()
   }, true)
@@ -1462,7 +1621,7 @@ export function renderImportExportPage():
       >
         <div>
           <h1>
-            Import / Export
+            Dati
           </h1>
 
           <p>

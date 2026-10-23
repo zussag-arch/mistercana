@@ -53,3 +53,11 @@ export function renameRival(from: string, to: string): boolean {
   const next = [header, ...lines.map((line) => line.startsWith(`${from};`) ? `${name}${line.slice(from.length)}` : line)].join('\n') + '\n'
   return saveCsvOverrides({ avversari: { fileName: 'avversari.csv', content: next, loadedAt: new Date().toISOString() } })
 }
+
+/** toglie una persona dall'anagrafica (le sue aste restano nello storico, ma non più collegate) */
+export function removeRival(nickname: string): boolean {
+  const text = getCsv('avversari', rivalsCsvBundled).replace(/^\uFEFF/, '')
+  const [header, ...lines] = text.split(/\r?\n/).filter((line) => line.trim())
+  const next = [header, ...lines.filter((line) => !line.startsWith(`${nickname};`))].join('\n') + '\n'
+  return saveCsvOverrides({ avversari: { fileName: 'avversari.csv', content: next, loadedAt: new Date().toISOString() } })
+}

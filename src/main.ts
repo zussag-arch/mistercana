@@ -1,4 +1,5 @@
 import { profileForManager } from './data/rivals'
+import type { AppState } from './app/state'
 import './style.css'
 
 import './styles/dashboard.css'
@@ -1048,6 +1049,15 @@ function bindNavigationEvents():
 /* =========================
    RENDER
 ========================= */
+
+// la pagina Dati (anagrafica avversari) modifica gli allenatori: lo stato vive qui, in memoria
+document.addEventListener('mistercana:update-state', (event) => {
+  const update = (event as CustomEvent<(current: AppState) => void>).detail
+  if (typeof update !== 'function') return
+  update(state)
+  saveState(state)
+  render()
+})
 
 function render():
   void {

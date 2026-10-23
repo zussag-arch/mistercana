@@ -67,7 +67,7 @@ export function renderNavigation(
     },
     {
       id: 'importExport',
-      label: 'IMPORT/EXPORT',
+      label: 'DATI',
     },
   ]
 
