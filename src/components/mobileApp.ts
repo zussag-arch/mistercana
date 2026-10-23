@@ -47,6 +47,10 @@ function syncTabButtons(): void {
   if (!document.querySelector('.player-full-page-v3')) {
     document.querySelectorAll('.sheet-back-portal').forEach((item) => item.remove())
   }
+  // finestra aperta: l'area contenuti deve stare sopra le barre (vedi app-shell.css)
+  document.documentElement.classList.toggle('overlay-open', Boolean(document.querySelector(
+    '.app-main .overlay:not(.hidden), .app-main .player-detail-overlay, .app-main .goalkeeper-matrix-overlay:not([hidden])',
+  )))
   const root = document.documentElement.dataset
   document.querySelectorAll<HTMLElement>('button[data-auction-tab]').forEach((button) => {
     button.setAttribute('aria-selected', String(button.dataset.auctionTab === (root.auctionTab ?? 'call')))
@@ -88,5 +92,5 @@ export function initMobileApp(): void {
       pending = false
       syncTabButtons()
     })
-  }).observe(document.getElementById('app') ?? document.body, { childList: true, subtree: true })
+  }).observe(document.getElementById('app') ?? document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'hidden'] })
 }

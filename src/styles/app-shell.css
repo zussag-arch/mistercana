@@ -218,6 +218,7 @@ body { background-attachment: scroll !important; }
 
 /* finestre aperte (scheda giocatore, recap, matrici…): su iPhone l'area che scorre è un livello
    a sé e le barre fisse le passerebbero sopra. Mentre una finestra è aperta, l'area sale sopra le barre. */
+html.overlay-open .app-main,
 .app-main:has(.overlay:not(.hidden), .player-detail-overlay, .goalkeeper-matrix-overlay:not([hidden])) {
   position: relative;
   z-index: 9000;
