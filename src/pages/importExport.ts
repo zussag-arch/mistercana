@@ -20,6 +20,9 @@ import { getDataSources, getLastDataUpdate } from '../data/dataSources'
 import { getICaV3Results } from '../data/icaV3Data'
 import { localPlayers } from '../services/fantalabLocal'
 import { getCachedPlayersDataset } from '../services/playerRepository'
+import { getAssignmentFldaId } from '../services/auctionPlayerResolver'
+import { buildLeagueRosters } from '../domain/leagueExport'
+import type { ExportPlayer } from '../domain/leagueExport'
 import {
   players,
 } from '../data/players'
@@ -988,6 +991,28 @@ function getSafeFileStamp():
    DOWNLOAD
 ========================= */
 
+function exportLeagueRosters(): void {
+  const state = loadState()
+  const players = new Map<string, ExportPlayer>(localPlayers().players.filter((player) => player.player_id).map((player) => [String(player.player_id), {
+    fantalabId: String(player.player_id), fantacalcioId: player.fantacalcio_id, name: player.name, role: player.role.toUpperCase(),
+  }]))
+  const result = buildLeagueRosters(state, players, getAssignmentFldaId)
+  if (!state.auctionAssignments.length) {
+    feedback = { type: 'info', title: 'Nessun dato da esportare', message: 'L’asta corrente non contiene ancora acquisti.' }
+    updateDynamicUi()
+    return
+  }
+  if (result.errors.length) {
+    feedback = { type: 'error', title: 'Rose non esportate', message: result.errors.slice(0, 6).join(' ') + (result.errors.length > 6 ? ` …e altri ${result.errors.length - 6}.` : '') }
+    updateDynamicUi()
+    return
+  }
+  if (result.warnings.length && !window.confirm(`Alcune rose non sono complete:\n\n${result.warnings.join('\n')}\n\nEsportare lo stesso?`)) return
+  downloadTextFile(`rose-${getSafeFileStamp()}.csv`, result.csv, 'text/csv;charset=utf-8')
+  feedback = { type: 'success', title: 'Rose esportate', message: `${result.players} giocatori di ${result.teams} squadre, pronti per l’import.` }
+  updateDynamicUi()
+}
+
 function downloadTextFile(
   fileName: string,
   content: string,
@@ -1658,7 +1683,7 @@ export function renderImportExportPage():
         <div
           class="
             data-transfer-grid
-            data-transfer-grid-single
+            data-transfer-grid-double
           "
         >
           <article
@@ -1748,6 +1773,20 @@ export function renderImportExportPage():
               >
                 Esporta asta
               </button>
+            </div>
+          </article>
+          <article class="data-transfer-card">
+            <div class="data-transfer-card-header">
+              <div class="data-transfer-icon data-transfer-icon-export">↑</div>
+              <span class="data-transfer-status ${hasCurrentAuctionData ? 'status-ready' : 'status-neutral'}">${hasCurrentAuctionData ? 'Pronto' : 'Vuoto'}</span>
+            </div>
+            <div class="data-transfer-card-body">
+              <h3>Rose per l'app della stagione</h3>
+              <p>Il file da importare nell'app che gestisce campionato e competizioni: per ogni squadra ID fantacalcio e prezzo. Prima controlla che non manchi nulla.</p>
+            </div>
+            <div class="data-transfer-card-footer">
+              <div><span>Formato</span><strong>CSV rose · $,$,$</strong></div>
+              <button type="button" class="data-transfer-button ${hasCurrentAuctionData ? 'data-transfer-button-primary' : ''}" data-export-league ${hasCurrentAuctionData ? '' : 'disabled'}>Esporta rose</button>
             </div>
           </article>
         </div>
@@ -2213,6 +2252,11 @@ function bindImportExportEvents():
       ) {
         exportCurrentAuction()
 
+        return
+      }
+
+      if (target.closest('[data-export-league]')) {
+        exportLeagueRosters()
         return
       }
 
