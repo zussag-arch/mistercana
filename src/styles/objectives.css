@@ -320,6 +320,8 @@
   border: 0;
   outline: 0;
 
+  background: transparent;
+
   color: var(--text);
 
   font-size: 11px;
@@ -700,24 +702,32 @@
   border:
     1px solid
     color-mix(in srgb, var(--yellow) 34%, transparent);
+
+  color: var(--yellow);
 }
 
 .role-badge.role-d {
   border:
     1px solid
     color-mix(in srgb, var(--blue) 34%, transparent);
+
+  color: var(--blue);
 }
 
 .role-badge.role-c {
   border:
     1px solid
     color-mix(in srgb, var(--accent) 32%, transparent);
+
+  color: var(--accent);
 }
 
 .role-badge.role-a {
   border:
     1px solid
     color-mix(in srgb, var(--red) 34%, transparent);
+
+  color: var(--red);
 }
 
 /* =========================
@@ -749,6 +759,8 @@
   border-bottom:
     1px solid
     rgba(var(--ink-rgb), 0.05);
+
+  color: var(--muted);
 
   font-size: 11px;
   font-weight: 800;
@@ -1020,8 +1032,18 @@
       space-between;
   }
 
+  .objectives-auction-nav-button {
+    min-height: 40px;
+
+    padding:
+      0
+      16px;
+  }
+
   .objectives-search-panel {
     padding: 8px;
+
+    border-radius: 19px;
   }
 
   .objectives-search-row {
@@ -1041,6 +1063,10 @@
 
   .objectives-role-grid {
     grid-template-columns: 1fr;
+  }
+
+  .objective-role-column {
+    border-radius: 22px;
   }
 
   .objective-add-button {
