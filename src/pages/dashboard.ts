@@ -283,52 +283,6 @@ function renderManagerCard(
           </div>
         </div>
 
-        <div
-          class="
-            manager-menu-wrapper
-          "
-        >
-          <button
-            type="button"
-            class="
-              manager-menu-button
-            "
-            data-manager-menu-button="${manager.id}"
-            aria-label="Apri menu"
-            ${
-              locked
-                ? 'disabled'
-                : ''
-            }
-          >
-            ⋯
-          </button>
-
-          <div
-            class="
-              manager-menu
-              hidden
-            "
-            id="managerMenu-${manager.id}"
-          >
-            <button
-              type="button"
-              data-manager-edit-id="${manager.id}"
-            >
-              Modifica
-            </button>
-
-            <button
-              type="button"
-              data-manager-archive-id="${manager.id}"
-              class="
-                archive-menu-action
-              "
-            >
-              Archivia
-            </button>
-          </div>
-        </div>
       </div>
 
       <div

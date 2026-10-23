@@ -890,7 +890,6 @@ async function loadCreatorOptions(): Promise<void> {
 ========================= */
 
 const pctDiff = (index: number) => { const value = Math.round((index - 1) * 100); return value === 0 ? "0%" : `${value > 0 ? "+" : "−"}${Math.abs(value)}%` }
-const LEAGUE_SHORT: Record<string, string> = { SERIE_A: 'A', SERIE_B: 'B' }
 
 type Profile = ReturnType<typeof rivalProfiles> extends Map<string, infer P> ? P : never
 
@@ -914,7 +913,12 @@ function rivalTiles(state: AppState): RivalTile[] {
   const isMe = (tile: RivalTile) => Number(Boolean(tile.profile?.me || tile.manager?.isOwner))
   return tiles.sort((a, b) => isMe(b) - isMe(a)
     || Number(Boolean(b.manager)) - Number(Boolean(a.manager))
-    || a.nickname.localeCompare(b.nickname, 'it'))
+    || tileTitle(a).localeCompare(tileTitle(b), 'it'))
+}
+
+function tileTitle(tile: RivalTile): string {
+  const latest = tile.profile ? [...tile.profile.teams].sort((a, b) => a.season.localeCompare(b.season)).at(-1)?.team : undefined
+  return tile.manager?.teamName || latest || tile.nickname
 }
 
 function renderRivalTile(tile: RivalTile): string {
@@ -923,15 +927,16 @@ function renderRivalTile(tile: RivalTile): string {
   const roles = ['P', 'D', 'C', 'A'] as const
   const person = manager ? [manager.firstName, manager.lastName].filter(Boolean).join(' ') : ''
   const id = escapeSourceHtml(tile.nickname)
-  const subtitle = manager
-    ? `${escapeSourceHtml(person)}${manager.teamName ? ` · ${escapeSourceHtml(manager.teamName)}` : ''}`
-    : 'Profilo da completare'
+  // titolo = nome della squadra (si cambia solo da ⋯ → Gestisci profilo); sotto nome e cognome
+  const latestTeam = profile ? [...profile.teams].sort((a, b) => a.season.localeCompare(b.season)).at(-1)?.team : undefined
+  const title = escapeSourceHtml(manager?.teamName || latestTeam || tile.nickname)
+  const subtitle = person ? escapeSourceHtml(person) : 'Profilo da completare'
   return `<article class="rival-card${me ? ' is-me' : ''}${manager ? ' is-coach' : ''}">
     <header>
-      <div class="rival-title"><h3>${id}</h3><p>${subtitle}</p></div>
+      <div class="rival-title"><h3>${title}</h3><p>${subtitle}</p></div>
       ${me ? '<span class="rival-tag">Tu</span>' : manager ? '<span class="rival-tag linked">Allenatore</span>' : ''}
       <div class="rival-menu">
-        <button type="button" class="rival-menu-button" data-rival-menu aria-label="Gestisci ${id}">⋯</button>
+        <button type="button" class="rival-menu-button" data-rival-menu aria-label="Gestisci ${title}">⋯</button>
         <div class="rival-menu-list" hidden>
           <button type="button" data-rival-edit="${id}" data-manager-id="${manager?.id ?? ''}">Gestisci profilo</button>
           <button type="button" class="danger" data-rival-delete="${id}" data-manager-id="${manager?.id ?? ''}">Elimina profilo</button>
@@ -939,7 +944,7 @@ function renderRivalTile(tile: RivalTile): string {
       </div>
     </header>
     ${profile ? `
-      <p class="rival-teams">${profile.teams.map((team) => `<span>${escapeSourceHtml(team.team)} <small>${LEAGUE_SHORT[team.league] ?? team.league} ${escapeSourceHtml(team.season)}</small></span>`).join('')}</p>
+      <p class="rival-history">Storico: <b>${profile.seasons.length} ${profile.seasons.length === 1 ? 'stagione' : 'stagioni'}</b> in archivio</p>
       <div class="rival-index"><span>Spesa rispetto alla lega</span><strong class="${profile.spendIndex >= 1.05 ? 'up' : profile.spendIndex <= 0.95 ? 'down' : ''}">${pctDiff(profile.spendIndex)}</strong><small>${profile.comparisons} confronti</small></div>
       <div class="rival-roles">${roles.map((role) => `<div><span class="role-${role.toLowerCase()}">${role}</span><strong>${pctDiff(profile.spendIndexByRole[role])}</strong><small>${Math.round(profile.distribution[role])}% budget</small></div>`).join('')}</div>
       <p class="rival-traits">Top 3: <b>${Math.round(profile.topThreeShare * 100)}%</b> dei crediti · a 1 credito: <b>${Math.round(profile.oneCreditShare * 100)}%</b> dei giocatori</p>`
