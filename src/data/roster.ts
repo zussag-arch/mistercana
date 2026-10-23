@@ -101,7 +101,7 @@ export interface Probable {
 
 let probableCache: Map<string, Probable> | null = null
 
-function probables(): Map<string, Probable> {
+export function probables(): Map<string, Probable> {
   if (probableCache) return probableCache
   probableCache = new Map(parseCsv(probabiliCsv).map((row) => [row['ID FantaLab'], {
     matchday: num(row['Giornata']),

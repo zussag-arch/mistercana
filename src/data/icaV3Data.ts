@@ -41,7 +41,7 @@ function gridEase(csv: string): Map<string, { mean: number; index: number }> {
   return new Map([...means].map(([team, mean]) => [team, { mean, index: spread > 0 ? (mean - center) / spread : 0 }]))
 }
 
-function buildInputs(): ICaV3Input[] {
+export function buildICaInputs(): ICaV3Input[] {
   const page = localPlayers()
   const history = new Map(localBulkHistory().players.map((item) => [item.player_id, item.history[0]]))
   const previous = new Map(listone
@@ -115,7 +115,7 @@ let cache: Map<string, ICaV3Result> | null = null
 
 /** Risultati iCà 3 per ID FantaLab (calcolati una volta per sessione). */
 export function getICaV3Results(): Map<string, ICaV3Result> {
-  if (!cache) cache = calculateICaV3(buildInputs())
+  if (!cache) cache = calculateICaV3(buildICaInputs())
   return cache
 }
 
