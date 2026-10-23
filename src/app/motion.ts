@@ -44,7 +44,7 @@ function parseDuration(
   return DEFAULT_EXIT_MOTION_MS
 }
 
-export function prefersReducedMotion():
+function prefersReducedMotion():
   boolean {
   return (
     typeof window !==
@@ -55,7 +55,7 @@ export function prefersReducedMotion():
   )
 }
 
-export function getExitMotionDuration():
+function getExitMotionDuration():
   number {
   if (
     typeof window ===

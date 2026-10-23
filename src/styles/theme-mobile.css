@@ -243,8 +243,7 @@
 @media (max-width: 700px) {
   /* Chiamata compatta: il tetto deve stare nella prima schermata */
   .auction-player-card::before,
-  .auction-player-card [data-role-word],
-  .auction-player-card .auction-role-word {
+  .auction-player-card [data-role-word] {
     display: none !important;
   }
   .auction-player-header h2 { font-size: 30px !important; }
@@ -263,8 +262,7 @@
     grid-template-columns: 1fr auto !important;
     gap: 8px !important;
   }
-  .auction-recommendation-primary strong,
-  .auction-recommendation .auction-ceiling-value { font-size: 40px !important; }
+  .auction-recommendation-primary strong { font-size: 40px !important; }
   .auction-price-limits {
     grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
     gap: 6px !important;
@@ -274,7 +272,6 @@
   .auction-price-limit small:not(:first-of-type) { display: none; }
 
   /* avversari: due per riga, essenziali */
-  .auction-competitor-grid,
   .auction-competitors-section > div:last-child {
     display: grid !important;
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
@@ -502,7 +499,6 @@
   .players-filters {
     gap: 8px !important;
   }
-  .players-search,
   .players-toolbar input[type="search"] {
     flex: 1 1 100% !important;
     width: 100% !important;
@@ -644,34 +640,8 @@
 /* --- pulsante "Indietro" delle schede giocatore ---
    sul computer: nella scheda rapida resta la ×; nella completa un pulsante normale
    su telefono: sempre in alto a sinistra, fisso, ben visibile, uguale nelle due schede */
-.sheet-back {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  min-height: 38px;
-  padding: 0 14px 0 8px;
-  border: 1px solid var(--line-1);
-  border-radius: 999px !important;
-  background: var(--surface);
-  color: var(--text);
-  font-family: var(--font-ui);
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-}
-.sheet-back svg {
-  width: 20px;
-  height: 20px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2.4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.player-quick-card > .sheet-back { display: none; }
 
 @media (max-width: 700px) {
-  .player-quick-card > .sheet-back,
   .sheet-back-portal {
     position: fixed;
     top: calc(env(safe-area-inset-top) + 10px);

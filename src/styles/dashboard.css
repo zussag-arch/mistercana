@@ -997,51 +997,6 @@ input:focus {
    RECAP
 ========================= */
 
-.dashboard-secondary-footer-button {
-  min-height: 46px;
-
-  padding: 0 18px;
-
-  border:
-    1px solid
-    rgba(var(--ink-rgb), 0.1);
-
-  border-radius: 18px;
-
-  background: var(--surface);
-
-  color: var(--text);
-
-  font-size: 12px;
-  font-weight: 700;
-
-  cursor: pointer;
-
-  transition:
-    border-color
-      var(--motion-fast)
-      var(--ease-standard),
-    background
-      var(--motion-fast)
-      var(--ease-standard),
-    transform
-      var(--motion-instant)
-      var(--ease-out);
-}
-
-.dashboard-secondary-footer-button:active {
-  transform: scale(0.97);
-}
-
-@media (hover: hover) {
-  .dashboard-secondary-footer-button:hover {
-    border-color:
-      rgba(var(--ink-rgb), 0.18);
-
-    background: var(--surface-light);
-  }
-}
-
 .dashboard-recap-kpis {
   display: grid;
 
@@ -1287,7 +1242,6 @@ input:focus {
 ) {
   .dashboard-cta-button,
   .dashboard-add-manager-card,
-  .dashboard-secondary-footer-button,
   .dashboard-page
   .budget-field,
   .dashboard-page

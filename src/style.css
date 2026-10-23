@@ -592,24 +592,6 @@ button:disabled {
   gli spazi propri dell'header.
 */
 
-.topbar-page-actions
-.page-actions,
-.topbar-page-actions
-.page-heading-actions,
-.topbar-page-actions
-.players-actions,
-.topbar-page-actions
-.objectives-actions,
-.topbar-page-actions
-.insights-actions {
-  margin: 0;
-
-  display: flex;
-  align-items: center;
-
-  gap: 7px;
-}
-
 /* =========================
    GLOBAL PAGE LAYOUT
 ========================= */
@@ -632,19 +614,6 @@ button:disabled {
   componenti legacy che usano
   ancora .app-content.
 */
-
-.app-content {
-  width: 100%;
-
-  padding:
-    16px
-    clamp(
-      20px,
-      3vw,
-      48px
-    )
-    70px;
-}
 
 .page {
   width: 100%;
@@ -706,24 +675,6 @@ button:disabled {
   margin: 0;
 
   font-size: 16px;
-}
-
-.panel-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-
-  gap: 18px;
-
-  margin-bottom: 14px;
-}
-
-.panel-header p {
-  margin: 5px 0 0;
-
-  color: var(--muted);
-
-  font-size: 12px;
 }
 
 .muted-text {
@@ -797,10 +748,6 @@ button:disabled {
 .field input:disabled,
 .field select:disabled {
   opacity: 0.65;
-}
-
-.compact-field {
-  width: 135px;
 }
 
 /* =========================
@@ -976,128 +923,12 @@ button:disabled {
   color: var(--muted);
 }
 
-.budget-total {
-  display: flex;
-  align-items: center;
-
-  gap: 7px;
-
-  margin-top: 14px;
-
-  font-size: 11px;
-}
-
-.budget-total.valid strong {
-  color: var(--green);
-}
-
-.budget-total.invalid {
-  color: var(--red);
-}
-
 /* =========================
    MANAGERS
 ========================= */
 
-.manager-counter {
-  color: var(--muted);
-
-  font-size: 11px;
-}
-
-.manager-grid {
-  display: grid;
-
-  grid-template-columns:
-    repeat(
-      4,
-      minmax(190px, 1fr)
-    );
-
-  gap: 12px;
-}
-
-.manager-card {
-  min-height: 104px;
-
-  position: relative;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-
-  gap: 12px;
-
-  padding: 12px;
-
-  border:
-    1px solid var(--border);
-
-  border-radius:
-    var(--radius-md);
-
-  background:
-    var(--surface-control);
-}
-
-.manager-card-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-
-  gap: 10px;
-}
-
 .manager-info {
   min-width: 0;
-}
-
-.manager-name-row {
-  display: flex;
-  align-items: center;
-
-  gap: 7px;
-
-  font-size: 13px;
-}
-
-.manager-team {
-  margin-top: 6px;
-
-  color: var(--muted);
-
-  font-size: 11px;
-
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.owner-badge {
-  padding: 3px 7px;
-
-  border-radius:
-    var(--radius-pill);
-
-  background: var(--surface-raised);
-
-  color: var(--text-soft);
-
-  font-size: 11px;
-}
-
-.manager-card-bottom {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  gap: 10px;
-}
-
-.manager-participation-label {
-  color: var(--muted);
-
-  font-size: 11px;
 }
 
 /* =========================
@@ -1255,46 +1086,6 @@ button:disabled {
    ADD MANAGER
 ========================= */
 
-.add-manager-card {
-  align-items: center;
-  justify-content: center;
-
-  flex-direction: row;
-
-  color: var(--muted);
-
-  cursor: pointer;
-
-  transition:
-    color
-    var(--motion-fast)
-    var(--ease-standard),
-    background
-    var(--motion-fast)
-    var(--ease-standard),
-    border-color
-    var(--motion-fast)
-    var(--ease-standard),
-    transform
-    var(--motion-instant)
-    var(--ease-standard);
-}
-
-.add-manager-card:hover {
-  color: var(--text);
-
-  border-color: var(--line-1);
-}
-
-.add-manager-card:active {
-  transform:
-    scale(0.985);
-}
-
-.add-manager-icon {
-  font-size: 21px;
-}
-
 /* =========================
    SWITCH
 ========================= */
@@ -1397,16 +1188,6 @@ input:disabled
    ACTIONS
 ========================= */
 
-.dashboard-actions,
-.auction-actions {
-  display: flex;
-  justify-content: flex-end;
-
-  gap: 9px;
-
-  margin-top: 20px;
-}
-
 .secondary-button {
   border:
     1px solid var(--border);
@@ -1465,11 +1246,8 @@ input:disabled
    STATUS
 ========================= */
 
-.auction-state-badge,
 .live-badge,
-.finalizing-badge,
-.archived-badge,
-.discarded-badge {
+.finalizing-badge {
   padding: 4px 8px;
 
   border-radius:
@@ -1479,17 +1257,14 @@ input:disabled
   font-weight: 800;
 }
 
-.auction-state-badge,
-.finalizing-badge,
-.discarded-badge {
+.finalizing-badge {
   color: var(--red);
 
   background:
     color-mix(in srgb, var(--red) 12%, transparent);
 }
 
-.live-badge,
-.archived-badge {
+.live-badge {
   color: var(--accent);
 
   background:
@@ -1499,48 +1274,6 @@ input:disabled
 /* =========================
    FINALIZATION
 ========================= */
-
-.finalization-panel {
-  display: flex;
-  align-items: flex-start;
-
-  gap: 17px;
-}
-
-.finalization-icon {
-  width: 40px;
-  height: 40px;
-
-  flex: 0 0 auto;
-
-  display: grid;
-  place-items: center;
-
-  border:
-    1px solid var(--orange);
-
-  border-radius:
-    var(--radius-pill);
-
-  background: color-mix(in srgb, var(--orange) 14%, var(--surface));
-  color: var(--orange);
-
-  font-weight: 900;
-}
-
-.finalization-copy h2 {
-  margin-bottom: 8px;
-}
-
-.finalization-copy p {
-  max-width: 700px;
-
-  margin: 5px 0;
-
-  color: var(--muted);
-
-  font-size: 12px;
-}
 
 /* =========================
    OVERLAY
@@ -1788,38 +1521,6 @@ input:disabled
   }
 }
 
-.recap-grid {
-  display: grid;
-
-  grid-template-columns:
-    repeat(
-      2,
-      minmax(0, 1fr)
-    );
-
-  gap: 9px;
-}
-
-.recap-item {
-  display: flex;
-  justify-content: space-between;
-
-  gap: 10px;
-
-  padding: 12px;
-
-  border-radius:
-    var(--radius-sm);
-
-  background: var(--surface);
-
-  font-size: 11px;
-}
-
-.recap-item span {
-  color: var(--muted);
-}
-
 .recap-managers {
   margin-top: 20px;
 }
@@ -2010,8 +1711,7 @@ input:disabled
       10px;
   }
 
-  .app-main,
-  .app-content {
+  .app-main {
     padding:
       14px
       24px
@@ -2023,14 +1723,6 @@ input:disabled
       repeat(
         2,
         minmax(120px, 1fr)
-      );
-  }
-
-  .manager-grid {
-    grid-template-columns:
-      repeat(
-        2,
-        minmax(190px, 1fr)
       );
   }
 }
@@ -2091,8 +1783,7 @@ input:disabled
     min-height: 31px;
   }
 
-  .app-main,
-  .app-content {
+  .app-main {
     padding:
       12px
       14px

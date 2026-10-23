@@ -101,7 +101,7 @@ export interface Probable {
 
 let probableCache: Map<string, Probable> | null = null
 
-export function probables(): Map<string, Probable> {
+function probables(): Map<string, Probable> {
   if (probableCache) return probableCache
   probableCache = new Map(parseCsv(probabiliCsv).map((row) => [row['ID FantaLab'], {
     matchday: num(row['Giornata']),
@@ -126,11 +126,11 @@ export function probables(): Map<string, Probable> {
    SOS FANTA: probabili aggiornate (con ballottaggi) e consigli fascia per fascia
 ========================= */
 
-export interface SosInfo { probability?: number; duel?: string; fascia?: number; fasciaDay?: number }
+interface SosInfo { probability?: number; duel?: string; fascia?: number; fasciaDay?: number }
 
 let sosCache: Map<string, SosInfo> | null = null
 
-export function sosInfo(playerId: string): SosInfo | undefined {
+function sosInfo(playerId: string): SosInfo | undefined {
   if (!sosCache) {
     sosCache = new Map()
     for (const row of parseCsv(sosProbabiliCsv)) {
@@ -240,7 +240,7 @@ export function evaluatePick(player: FldaPlayer, price: number): MatchdayPick {
    FORMAZIONE CONSIGLIATA
 ========================= */
 
-export const MODULES = ['3-4-3', '3-5-2', '4-3-3', '4-4-2', '4-5-1', '5-3-2', '5-4-1'] as const
+const MODULES = ['3-4-3', '3-5-2', '4-3-3', '4-4-2', '4-5-1', '5-3-2', '5-4-1'] as const
 
 export interface LineupSuggestion {
   module: string

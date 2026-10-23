@@ -9,8 +9,6 @@ export type AuctionPhase =
   | 'archived'
   | 'discarded'
 
-export type BudgetRole =
-  | 'P'
   | 'D'
   | 'C'
   | 'A'
@@ -21,7 +19,7 @@ export type BudgetProfile =
   | 'aggressiva'
   | 'personalizzata'
 
-export interface BudgetDistribution {
+interface BudgetDistribution {
   P: number
   D: number
   C: number

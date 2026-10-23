@@ -390,19 +390,6 @@
   z-index: 1;
 }
 
-.auction-waiting-name {
-  font-family: var(--font-ui);
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0;
-  text-align: left;
-}
-
-.auction-waiting-recap {
-  width: min(460px, 100%);
-  margin-inline: auto;
-}
-
 /* pagina Asta riordinata: storico sotto la concorrenza, Top iCà nella colonna destra */
 .auction-workspace-main { display: flex; flex-direction: column; gap: 12px; }
 .auction-history-slot { order: 10; }

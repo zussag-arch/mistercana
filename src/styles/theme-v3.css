@@ -79,9 +79,7 @@ h1 {
 
 .page-heading h1::after,
 .auction-live-title h1::after,
-.player-full-section h2::after,
-.player-section h2::after,
-.auction-section h2::after {
+.player-full-section h2::after {
   content: ".";
   color: var(--accent);
 }
@@ -101,7 +99,6 @@ td.n {
 .auction-toolbar-stat strong,
 .auction-roster-metric-values strong,
 .auction-history-count,
-.budget-total,
 .auction-selector-player em {
   font-family: var(--font-display);
   letter-spacing: -0.04em;
@@ -131,21 +128,16 @@ td.n {
 /* ---------- contenitori ---------- */
 
 .auction-player-card,
-.auction-panel,
-.auction-section,
 .auction-search-strip,
 .auction-participants-section,
 .auction-history-section,
-.player-section,
 .player-full-section,
 .player-data-section,
 .player-detail-card,
 .players-table-card,
 .data-transfer-card,
 .data-transfer-section,
-.flda-panel,
 .flda-dataset-card,
-.data-integrity-panel,
 .overlay-card,
 .panel {
   border-radius: var(--radius-xl);
@@ -258,51 +250,6 @@ input[type="search"]:focus,
 
 /* ---------- attesa prossima chiamata (BETA-020) ---------- */
 
-.auction-waiting-recap {
-  margin-top: 18px;
-  padding: 14px 16px;
-  border-radius: var(--radius-md);
-  background: var(--surface-light);
-}
-
-.auction-waiting-recap ol {
-  display: grid;
-  gap: 4px;
-  margin: 10px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.auction-waiting-row {
-  display: grid;
-  grid-template-columns: 25px minmax(0, 1fr) minmax(0, auto) 36px;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 4px;
-}
-
-.auction-waiting-name {
-  overflow: hidden;
-  font-weight: 700;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.auction-waiting-manager {
-  overflow: hidden;
-  color: var(--muted);
-  font-size: 12px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.auction-waiting-row strong {
-  font-family: var(--font-display);
-  text-align: right;
-  letter-spacing: -0.04em;
-  color: var(--accent);
-}
-
 @media (prefers-reduced-motion: reduce) {
   .auction-role-badge.large { transform: none; }
   .primary-button,
@@ -375,7 +322,6 @@ input[type="search"]:focus,
 
 /* titoli di sezione: grandi, stretti, col punto verde */
 .dashboard-panel-header-row h2,
-.dashboard-hero-title,
 .auction-section-heading h2,
 .auction-panel-title,
 .auction-history-heading h3,
@@ -403,7 +349,6 @@ input[type="search"]:focus,
 }
 
 .dashboard-panel-header-row h2::after,
-.dashboard-hero-title::after,
 .auction-section-heading h2::after,
 .auction-history-heading h3::after,
 .auction-competitors-heading h2::after,
@@ -475,8 +420,7 @@ input[type="search"]:focus,
   background: var(--surface-light);
 }
 
-.dashboard-add-manager-card,
-.add-manager-card {
+.dashboard-add-manager-card {
   border: 1.5px dashed rgba(var(--ink-rgb), 0.13);
   border-radius: var(--radius-md);
   background: transparent;
@@ -542,15 +486,13 @@ input:focus {
 .dashboard-budget-total-pill,
 .dashboard-live-pill,
 .dashboard-cta-button,
-.dashboard-secondary-footer-button,
 .danger-button,
 .archive-button,
 .profile-button {
   border-radius: var(--radius-pill);
 }
 
-.dashboard-budget-total-pill,
-.budget-total.valid {
+.dashboard-budget-total-pill {
   border: 0;
   background: var(--accent-soft);
   color: var(--accent-ink);
@@ -596,7 +538,6 @@ input:focus {
 .auction-live-title h1,
 .panel h2,
 .dashboard-panel h2,
-.dashboard-hero-title,
 .auction-section-heading h2,
 .auction-history-heading h3,
 .auction-competitors-heading h2,
@@ -607,9 +548,7 @@ input:focus {
 .insight-section-header h2,
 .data-transfer-section-header h2,
 .player-section-heading h2,
-.player-full-section h2,
-.player-section h2,
-.auction-section h2 {
+.player-full-section h2 {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
@@ -1474,58 +1413,6 @@ input:focus {
   font-size: 0;
 }
 
-.coach-macro-role-list {
-  display: grid;
-  gap: 2px;
-}
-
-.coach-macro-role-row {
-  min-height: 0;
-  padding: 3px 6px;
-  border: 0;
-  border-radius: 8px;
-  background: none;
-}
-
-.coach-macro-role-row:hover {
-  background: var(--surface);
-}
-
-.coach-macro-role-name {
-  gap: 8px;
-}
-
-.coach-macro-role-name strong {
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.coach-macro-role-name small {
-  display: none;
-}
-
-.coach-role-dot {
-  width: 22px;
-  height: 22px;
-  font-size: 11px;
-}
-
-.coach-impact-value {
-  min-width: 52px;
-  padding: 2px 8px;
-  border-radius: var(--radius-pill);
-  font-family: var(--font-display);
-  font-size: 12.5px;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  text-align: right;
-}
-
-.coach-impact-neutral {
-  color: var(--muted-soft);
-  background: none;
-}
-
 /* battitori */
 .set-piece-card {
   padding: 14px 16px;
@@ -2115,11 +2002,6 @@ input:focus {
 .player-history-section .chart-dot-mv { fill: var(--blue); }
 .player-history-section .chart-dot-fmv { fill: var(--accent); }
 
-.player-history-section .chart-value {
-  fill: var(--text);
-  font-weight: 700;
-}
-
 .player-chart-grid > .player-history-section {
   border-color: rgba(var(--ink-rgb), 0.12);
   background:
@@ -2313,14 +2195,6 @@ input:focus {
 
 .players-ica {
   font-size: 18px;
-}
-
-.players-ica-v2 {
-  font-family: var(--font-ui);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0;
-  color: var(--muted-soft);
 }
 
 .players-affare {

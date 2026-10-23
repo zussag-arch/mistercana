@@ -221,7 +221,7 @@ function parseGoalkeeperHierarchyCsv(
    DATABASE
 ========================= */
 
-export const goalkeeperHierarchies:
+const goalkeeperHierarchies:
   GoalkeeperHierarchyRecord[] =
   parseGoalkeeperHierarchyCsv(
     goalkeeperHierarchyCsv,
@@ -257,14 +257,4 @@ export function getGoalkeeperHierarchy(
     if (record) return record
   }
   return undefined
-}
-
-export function getGoalkeeperHierarchyValue(
-  playerId: string,
-):
-  | GoalkeeperHierarchy
-  | undefined {
-  return getGoalkeeperHierarchy(
-    playerId,
-  )?.hierarchy
 }

@@ -296,8 +296,7 @@
 .player-current-metrics > div,
 .player-role-stats > div,
 .player-guide-summary > div,
-.player-advanced-grid > div,
-.player-previous-price {
+.player-advanced-grid > div {
   padding: 12px;
 
   border:
@@ -316,8 +315,7 @@
 .player-current-metrics span,
 .player-role-stats span,
 .player-guide-summary span,
-.player-advanced-grid span,
-.player-previous-price span {
+.player-advanced-grid span {
   display: block;
 
   color: var(--muted);
@@ -333,8 +331,7 @@
 .player-current-metrics strong,
 .player-role-stats strong,
 .player-guide-summary strong,
-.player-advanced-grid strong,
-.player-previous-price strong {
+.player-advanced-grid strong {
   display: block;
 
   margin-top: 4px;
@@ -518,13 +515,7 @@
   stroke-width: 1;
 }
 
-.chart-bar {
-  fill: var(--accent);
-}
-
-.chart-value,
 .chart-label,
-.chart-average-label,
 .chart-legend {
   fill: var(--text-soft);
 
@@ -544,35 +535,6 @@
 
 .chart-axis-title {
   font-weight: 700;
-}
-
-.chart-average-line {
-  stroke: var(--yellow);
-
-  stroke-width: 3;
-
-  stroke-dasharray:
-    8
-    4;
-}
-
-.chart-average-label {
-  fill: var(--orange);
-}
-
-.chart-average-value {
-  fill: var(--yellow);
-
-  stroke: var(--line-2);
-
-  stroke-width: 3px;
-
-  paint-order:
-    stroke
-    fill;
-
-  font-size: 12px;
-  font-weight: 900;
 }
 
 .chart-line {
@@ -633,31 +595,6 @@
 /* =========================
    CHIPS
 ========================= */
-
-.player-chip-list {
-  display: flex;
-  flex-wrap: wrap;
-
-  gap: 7px;
-}
-
-.player-chip-list > span {
-  padding:
-    7px
-    10px;
-
-  border:
-    1px solid
-    rgba(var(--ink-rgb), 0.055);
-
-  border-radius: 11px;
-
-  background: var(--surface-raised);
-
-  color: var(--text-soft);
-
-  font-size: 11px;
-}
 
 /* =========================
    ROLE / GUIDE / ADVANCED
@@ -837,10 +774,6 @@
   color: var(--text-soft);
 
   line-height: 1.55;
-}
-
-.player-previous-price {
-  margin-top: 9px;
 }
 
 /* =========================

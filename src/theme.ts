@@ -1,6 +1,6 @@
 // Selettore tema: scuro (predefinito) o chiaro "bianco caldo".
 // La scelta resta salvata nel browser e si applica su <html data-theme>.
-export type Theme = 'dark' | 'light'
+type Theme = 'dark' | 'light'
 
 const THEME_KEY = 'mistercana_theme_v1'
 
@@ -12,7 +12,7 @@ function savedTheme(): Theme {
   }
 }
 
-export function applyTheme(theme: Theme): void {
+function applyTheme(theme: Theme): void {
   document.documentElement.dataset.theme = theme
   // interruttore: acceso = tema scuro
   document.querySelectorAll('[data-theme-toggle]').forEach((button) => {

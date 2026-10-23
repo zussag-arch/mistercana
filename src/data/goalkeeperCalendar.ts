@@ -4,12 +4,12 @@ import { getCsv } from './csvOverrides'
 // CSV caricato da Import/Export (o scaricato da FantaLab), altrimenti quello del progetto
 const goalkeeperCalendarCsv = getCsv('portieri_calendario', goalkeeperCalendarCsvBundled)
 
-export type GoalkeeperMatchupValue =
+type GoalkeeperMatchupValue =
   | 0
   | 1
   | 2
 
-export interface GoalkeeperCalendarTeam {
+interface GoalkeeperCalendarTeam {
   team: string
 
   matchups:
@@ -209,7 +209,7 @@ function parseGoalkeeperCalendar(
    DATABASE
 ========================= */
 
-export const goalkeeperCalendar =
+const goalkeeperCalendar =
   parseGoalkeeperCalendar(
     goalkeeperCalendarCsv,
   )
@@ -225,7 +225,7 @@ export const goalkeeperCalendarTeams =
    LOOKUP
 ========================= */
 
-export function getGoalkeeperTeamCalendar(
+function getGoalkeeperTeamCalendar(
   team: string,
 ):
   | GoalkeeperCalendarTeam
@@ -418,29 +418,3 @@ export function calculateGoalkeeperPairCoverage(
 /* =========================
    TRIPLES
 ========================= */
-
-export function calculateGoalkeeperTripleCoverage(
-  firstTeam: string,
-  secondTeam: string,
-  thirdTeam: string,
-):
-  GoalkeeperCoverage | null {
-  const teams =
-    [
-      firstTeam,
-      secondTeam,
-      thirdTeam,
-    ]
-
-  if (
-    new Set(
-      teams,
-    ).size !== 3
-  ) {
-    return null
-  }
-
-  return calculateGoalkeeperCoverage(
-    teams,
-  )
-}

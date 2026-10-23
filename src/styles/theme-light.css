@@ -65,7 +65,6 @@
 /* ombre più leggere su fondo chiaro */
 /* solo i veri riquadri: niente selettori generici su "panel" o "card",
    che finivano anche su righe interne (es. la testata di Distribuzione budget) */
-:root[data-theme="light"] .card,
 :root[data-theme="light"] .panel,
 :root[data-theme="light"] .auction-player-card,
 :root[data-theme="light"] .auction-next-panel,
@@ -92,25 +91,7 @@
   place-items: center;
   transition: background 0.2s, transform 0.2s, border-color 0.2s;
 }
-.theme-toggle:hover {
-  border-color: var(--accent);
-  transform: translateY(-1px);
-}
 /* luna nel tema scuro, sole in quello chiaro */
-.theme-toggle-icon {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  box-shadow: inset -5px -3px 0 0 var(--yellow);
-  transform: rotate(-20deg);
-}
-:root[data-theme="light"] .theme-toggle-icon {
-  background: var(--yellow);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--yellow) 35%, transparent);
-  transform: none;
-  width: 12px;
-  height: 12px;
-}
 
 /* il pulsante tema sta in fondo alla topbar */
 @media (min-width: 901px) {

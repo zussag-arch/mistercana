@@ -1397,8 +1397,7 @@
 
 /* P - GIALLO */
 
-.coach-player-p,
-.coach-role-p {
+.coach-player-p {
   border-color:
     color-mix(in srgb, var(--yellow) 72%, transparent);
 
@@ -1409,8 +1408,7 @@
 
 /* D - BLU */
 
-.coach-player-d,
-.coach-role-d {
+.coach-player-d {
   border-color:
     color-mix(in srgb, var(--blue) 75%, transparent);
 
@@ -1421,8 +1419,7 @@
 
 /* C - VERDE */
 
-.coach-player-c,
-.coach-role-c {
+.coach-player-c {
   border-color:
     color-mix(in srgb, var(--accent) 72%, transparent);
 
@@ -1433,8 +1430,7 @@
 
 /* A - ROSSO */
 
-.coach-player-a,
-.coach-role-a {
+.coach-player-a {
   border-color:
     color-mix(in srgb, var(--red) 75%, transparent);
 
@@ -1446,163 +1442,6 @@
 /* =========================
    COACH MACRO ROLES
 ========================= */
-
-.coach-macro-role-list {
-  display: grid;
-
-  gap: 6px;
-}
-
-.coach-macro-role-row {
-  min-height: 35px;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  gap: 10px;
-
-  padding: 5px 8px;
-
-  border:
-    1px solid
-    rgba(var(--ink-rgb), 0.055);
-
-  border-radius: 14px;
-
-  background: var(--surface);
-
-  transition:
-    border-color
-      var(--motion-fast)
-      var(--ease-standard),
-    background
-      var(--motion-fast)
-      var(--ease-standard);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .coach-macro-role-row:hover {
-    border-color:
-      rgba(var(--ink-rgb), 0.09);
-
-    background: var(--surface-light);
-  }
-}
-
-.coach-macro-role-name {
-  min-width: 0;
-
-  display: flex;
-  align-items: center;
-
-  gap: 8px;
-}
-
-.coach-macro-role-name > div {
-  min-width: 0;
-}
-
-.coach-macro-role-name strong {
-  display: block;
-
-  overflow: hidden;
-
-  color: var(--text-soft);
-
-  font-size: 11px;
-
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.coach-macro-role-name small {
-  display: block;
-
-  margin-top: 2px;
-
-  color: var(--muted-soft);
-
-  font-size: 11px;
-}
-
-.coach-role-dot {
-  width: 27px;
-  height: 27px;
-
-  flex: 0 0 auto;
-
-  display: grid;
-  place-items: center;
-
-  border: 1px solid;
-
-  border-radius: 50%;
-
-  font-size: 11px;
-  font-weight: 900;
-}
-
-.coach-impact-value {
-  min-width: 49px;
-
-  padding: 4px 7px;
-
-  border-radius:
-    var(--radius-pill);
-
-  text-align: center;
-
-  font-size: 11px;
-  font-weight: 800;
-
-  font-variant-numeric:
-    tabular-nums;
-
-  transition:
-    color
-      var(--motion-fast)
-      var(--ease-standard),
-    border-color
-      var(--motion-fast)
-      var(--ease-standard),
-    background
-      var(--motion-fast)
-      var(--ease-standard);
-}
-
-.coach-impact-positive {
-  border:
-    1px solid
-    color-mix(in srgb, var(--accent) 14%, transparent);
-
-  background:
-    color-mix(in srgb, var(--accent) 8%, transparent);
-
-  color: var(--accent);
-}
-
-.coach-impact-negative {
-  border:
-    1px solid
-    color-mix(in srgb, var(--red) 14%, transparent);
-
-  background:
-    color-mix(in srgb, var(--red) 8%, transparent);
-
-  color: var(--red);
-}
-
-.coach-impact-neutral {
-  border:
-    1px solid
-    rgba(var(--ink-rgb), 0.06);
-
-  background:
-    rgba(var(--ink-rgb), 0.025);
-
-  color: var(--muted);
-}
 
 /* =========================
    GENERIC EMPTY
@@ -1777,9 +1616,7 @@
   .goalkeeper-matrix-close,
   .goalkeeper-matrix-table td,
   .set-piece-card,
-  .coach-card,
-  .coach-macro-role-row,
-  .coach-impact-value {
+  .coach-card {
     transition: none;
   }
 

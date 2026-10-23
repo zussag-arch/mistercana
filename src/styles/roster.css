@@ -2,8 +2,6 @@
    LA MIA ROSA
 ========================= */
 .roster-page { width: 100%; max-width: 1280px; margin-inline: auto; display: grid; gap: 16px; }
-.roster-header h1 { margin: 0; font-size: 34px; }
-.roster-header p { margin: 4px 0 0; color: var(--muted); }
 
 .roster-picker { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .roster-league { display: inline-flex; padding: 4px; border-radius: 999px; background: var(--surface-light); }
@@ -24,25 +22,6 @@
 .roster-section-head span { color: var(--muted); font-size: 13px; }
 .roster-bench-title { margin: 18px 0 8px; font-size: 15px; color: var(--muted); }
 .roster-note { margin: 14px 0 0; color: var(--muted); font-size: 12px; }
-.roster-list { display: grid; }
-.roster-list + .roster-list { margin-top: 14px; }
-
-.roster-row {
-  display: grid;
-  grid-template-columns: 30px minmax(0, 1.6fr) minmax(0, 1.4fr) 110px 56px 60px minmax(0, 1.3fr);
-  align-items: center; gap: 12px;
-  width: 100%; padding: 10px 6px;
-  border: 0 !important; border-bottom: 1px solid var(--line-2) !important; border-radius: 0 !important;
-  background: none; color: var(--text); text-align: left; font: inherit; cursor: pointer;
-}
-.roster-row:hover { background: rgba(var(--ink-rgb), .03); }
-.roster-row.starter .roster-name strong::before { content: "●"; margin-right: 6px; color: var(--accent); font-size: 10px; vertical-align: 2px; }
-.roster-row.out { opacity: .55; }
-.roster-name { display: grid; min-width: 0; }
-.roster-name strong { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.roster-name small { color: var(--muted); font-size: 12px; }
-.roster-opponent { color: var(--text-soft); font-weight: 600; }
-.roster-muted { color: var(--muted); }
 
 .roster-form { display: inline-flex; gap: 3px; }
 .roster-form i {
@@ -54,39 +33,13 @@
 .roster-form i.ok { background: color-mix(in srgb, var(--yellow) 45%, var(--surface)); color: var(--text); }
 .roster-form i.bad { background: color-mix(in srgb, var(--red) 55%, var(--surface)); color: var(--text); }
 .roster-form i.sv { background: var(--surface-light); color: var(--muted); }
-
-.roster-prob { position: relative; display: block; height: 22px; border-radius: 999px; background: var(--surface-light); overflow: hidden; }
-.roster-prob b { position: absolute; inset: 0 auto 0 0; border-radius: 999px; }
-.roster-prob.high b { background: color-mix(in srgb, var(--green) 70%, transparent); }
-.roster-prob.mid b { background: color-mix(in srgb, var(--yellow) 70%, transparent); }
-.roster-prob.low b, .roster-prob.out b { background: color-mix(in srgb, var(--red) 60%, transparent); }
-.roster-prob em { position: relative; display: block; text-align: center; font-style: normal; font-size: 11px; font-weight: 700; line-height: 22px; color: var(--text); }
-.roster-ica, .roster-expected { font-family: var(--font-display); font-size: 16px; }
-.roster-expected { color: var(--accent); }
-.roster-status { display: flex; flex-wrap: wrap; gap: 4px; }
-.roster-chip, .roster-reason { padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+.roster-chip { padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; }
 .roster-chip.bad { background: color-mix(in srgb, var(--red) 20%, transparent); color: var(--red); }
 .roster-chip.warn { background: color-mix(in srgb, var(--yellow) 22%, transparent); color: color-mix(in srgb, var(--yellow) 60%, var(--text)); }
-.roster-reason { background: var(--surface-light); color: var(--text-soft); font-weight: 600; }
 
 @media (max-width: 700px) {
   .roster-section { padding: 16px 14px; }
   .roster-team { flex: 1 1 100%; min-width: 0; }
-  .roster-row {
-    grid-template-columns: 30px minmax(0, 1fr) auto;
-    grid-template-areas:
-      "badge name expected"
-      "badge form prob"
-      "badge status status";
-    row-gap: 6px;
-  }
-  .roster-row > .role-badge { grid-area: badge; align-self: start; }
-  .roster-name { grid-area: name; }
-  .roster-row > [data-label="Forma"] { grid-area: form; }
-  .roster-row > [data-label="Titolare"] { grid-area: prob; width: 90px; }
-  .roster-row > .roster-ica { display: none; }
-  .roster-row > .roster-expected { grid-area: expected; }
-  .roster-status { grid-area: status; }
   .roster-form i { width: 26px; }
 }
 .roster-section-head h2 { display: block; }
@@ -125,21 +78,6 @@
   display: flex; flex-direction: column; align-items: center; gap: 4px;
   min-width: 0; width: 72px; padding: 0; border: 0 !important; background: none; cursor: pointer;
 }
-.rpitch-dot-circle {
-  position: relative;
-  display: grid; place-items: center;
-  width: 48px; height: 48px; border-radius: 50%;
-  border: 3px solid #fff;
-  font: 800 14px var(--font-ui); color: #1b1e21;
-  box-shadow: 0 4px 10px rgba(0,0,0,.25);
-  transition: transform .15s;
-}
-.rpitch-dot:hover .rpitch-dot-circle, .rpitch-dot:focus-visible .rpitch-dot-circle { transform: scale(1.08); }
-.rpitch-dot.role-p .rpitch-dot-circle { background: var(--role-p); }
-.rpitch-dot.role-d .rpitch-dot-circle { background: var(--role-d); }
-.rpitch-dot.role-c .rpitch-dot-circle { background: var(--role-c); }
-.rpitch-dot.role-a .rpitch-dot-circle { background: var(--role-a); }
-.rpitch-dot.out .rpitch-dot-circle { filter: grayscale(1); opacity: .6; }
 .rpitch-dot-name {
   max-width: 100%; padding: 2px 8px; border-radius: 999px;
   background: rgba(0,0,0,.55); color: #fff; font-size: 11px; font-weight: 700;
@@ -151,7 +89,6 @@
 
 .bench { display: flex; flex-wrap: wrap; gap: 10px 4px; padding: 12px 6px; border-radius: 18px; background: var(--surface-light); }
 .bench .rpitch-dot-name { background: var(--surface); color: var(--text); }
-.bench .rpitch-dot-circle { width: 40px; height: 40px; font-size: 12px; border-color: var(--surface); }
 
 /* ---------- riquadro del giocatore ---------- */
 .roster-pop {
@@ -199,7 +136,6 @@
 @media (max-width: 700px) {
   .rpitch { padding: 20px 4px; gap: 14px; }
   .rpitch-dot { width: 64px; }
-  .rpitch-dot-circle { width: 42px; height: 42px; font-size: 13px; }
 }
 
 /* segnalino a pentagono stondato */
@@ -214,7 +150,6 @@
 .rpitch-dot:hover .rpitch-dot-marker, .rpitch-dot:focus-visible .rpitch-dot-marker { transform: translateY(-2px); }
 .rpitch-dot.out .rpitch-dot-marker { filter: grayscale(1); opacity: .6; }
 .rpitch-dot-marker .rpitch-dot-flag { top: -2px; right: 0; }
-.rpitch-dot-circle { display: none; }
 .bench .rpitch-dot-marker { width: 44px; height: 44px; }
 .bench .rpitch-dot-marker b { font-size: 12px; }
 .bench .rpitch-dot-shape { stroke: var(--surface); }

@@ -76,11 +76,7 @@ button,
   letter-spacing: 0.01em;
 }
 /* restano in Unbounded solo titoli e numeri "eroe" */
-h1, h2, h3,
-.brand,
-.auction-ceiling-value,
-.dashboard-live-kpi strong,
-.auction-main-value strong {
+h1, h2, h3, .brand, .dashboard-live-kpi strong, .auction-main-value strong {
   font-family: var(--font-display);
 }
 
@@ -356,9 +352,6 @@ body {
 .md-legend-fmv { fill: var(--green); }
 
 /* scheda completa su computer: "Indietro" come pillola normale */
-@media (min-width: 701px) {
-  .player-full-back.sheet-back { width: auto !important; height: 38px !important; padding: 0 14px 0 8px !important; }
-}
 /* grafico giornate: misura contenuta, area ben visibile */
 .md-chart { max-width: 760px; margin: 0 auto; }
 .md-stop-top { stop-color: var(--green); stop-opacity: 0.55; }

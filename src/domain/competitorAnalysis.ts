@@ -18,19 +18,19 @@ import type {
   PlayerRole,
 } from './player'
 
-export type CompetitorRisk =
+type CompetitorRisk =
   | 'high'
   | 'medium'
   | 'low'
 
-export type CompetitorEstimateSource =
+type CompetitorEstimateSource =
   | 'manager-role'
   | 'manager-overall'
   | 'market-role'
   | 'market-overall'
   | 'baseline'
 
-export interface CompetitorAnalysis {
+interface CompetitorAnalysis {
   managerId: string
   managerName: string
   teamName: string
@@ -478,7 +478,7 @@ function getEstimateSourceLabel(
    MAIN ANALYSIS
 ========================= */
 
-export function calculateCompetitors(
+function calculateCompetitors(
   state: AppState,
   player: Player,
   allPlayers: Player[],

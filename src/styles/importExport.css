@@ -260,17 +260,6 @@
       var(--ease-standard);
 }
 
-.status-pending {
-  border:
-    1px solid
-    color-mix(in srgb, var(--orange) 14%, transparent);
-
-  background:
-    color-mix(in srgb, var(--orange) 10%, transparent);
-
-  color: var(--orange);
-}
-
 .status-ready {
   border:
     1px solid
@@ -915,71 +904,6 @@
    DATA INTEGRITY
 ========================= */
 
-.data-integrity-panel {
-  display: flex;
-  align-items: flex-start;
-
-  gap: 15px;
-
-  padding: 18px;
-
-  border:
-    1px solid
-    color-mix(in srgb, var(--accent) 16%, transparent);
-
-  border-radius: 24px;
-
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--accent) 4%, transparent),
-      color-mix(in srgb, var(--accent) 2%, transparent)
-    ),
-    var(--surface);
-}
-
-.data-integrity-icon {
-  width: 36px;
-  height: 36px;
-
-  flex: 0 0 auto;
-
-  display: grid;
-  place-items: center;
-
-  border:
-    1px solid
-    color-mix(in srgb, var(--accent) 28%, transparent);
-
-  border-radius:
-    var(--radius-pill);
-
-  background:
-    color-mix(in srgb, var(--accent) 8%, transparent);
-
-  color: var(--accent);
-
-  font-size: 12px;
-  font-weight: 850;
-}
-
-.data-integrity-panel h2 {
-  margin: 4px 0 0;
-
-  font-size: 13px;
-}
-
-.data-integrity-panel p {
-  max-width: 800px;
-
-  margin: 7px 0 0;
-
-  color: var(--muted);
-
-  font-size: 11px;
-  line-height: 1.6;
-}
-
 /* =========================
    RESPONSIVE
 ========================= */
@@ -1067,10 +991,6 @@
   }
 
   .restore-preview-actions {
-    flex-direction: column;
-  }
-
-  .data-integrity-panel {
     flex-direction: column;
   }
 }

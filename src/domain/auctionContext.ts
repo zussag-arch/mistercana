@@ -93,7 +93,7 @@ export function getPlayerById(
   )
 }
 
-export function getActiveManagers(
+function getActiveManagers(
   state: AppState,
 ) {
   return state.managers.filter(
@@ -118,7 +118,7 @@ export function getOwnerManagerId(
   )?.id
 }
 
-export function getManagerAssignments(
+function getManagerAssignments(
   state: AppState,
   managerId: string,
 ) {
@@ -259,7 +259,7 @@ function sortedRoleEntry(
   return entry
 }
 
-export function getSortedRolePlayers(
+function getSortedRolePlayers(
   role: PlayerRole,
   allPlayers: Player[],
   initialCredits: number,
@@ -393,7 +393,7 @@ export function getSlotBenchmark(
   return median(values)
 }
 
-export function getManagerRolePlayers(
+function getManagerRolePlayers(
   state: AppState,
   allPlayers: Player[],
   managerId: string,
@@ -547,7 +547,7 @@ function coverRemainingSlots(
   return remaining
 }
 
-export function getRemainingStrategicSlotsForManager(
+function getRemainingStrategicSlotsForManager(
   state: AppState,
   role: PlayerRole,
   allPlayers: Player[],

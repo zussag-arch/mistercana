@@ -248,7 +248,7 @@ function parseSaggiCsv(
     )
 }
 
-export const saggi:
+const saggi:
   SaggioRecord[] =
   parseSaggiCsv(
     saggiCsv,

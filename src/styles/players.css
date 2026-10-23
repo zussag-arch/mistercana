@@ -75,64 +75,6 @@
    QUICK AUCTION NAV
 ========================= */
 
-.players-auction-nav-button {
-  min-height: 38px;
-
-  padding: 0 14px;
-
-  border:
-    1px solid
-    color-mix(in srgb, var(--accent) 24%, transparent);
-
-  border-radius: 16px;
-
-  background:
-    color-mix(in srgb, var(--accent) 7%, transparent);
-
-  color: var(--accent);
-
-  font-size: 11px;
-  font-weight: 800;
-
-  cursor: pointer;
-
-  transition:
-    border-color
-      var(--motion-fast)
-      var(--ease-standard),
-    background
-      var(--motion-fast)
-      var(--ease-standard),
-    color
-      var(--motion-fast)
-      var(--ease-standard),
-    transform
-      var(--motion-instant)
-      var(--ease-out);
-}
-
-.players-auction-nav-button:disabled {
-  opacity: 0.45;
-
-  cursor: default;
-}
-
-.players-auction-nav-button:active:not(:disabled) {
-  transform: scale(0.97);
-}
-
-@media (hover: hover) {
-  .players-auction-nav-button:hover:not(:disabled) {
-    border-color:
-      color-mix(in srgb, var(--accent) 42%, transparent);
-
-    background:
-      color-mix(in srgb, var(--accent) 12%, transparent);
-
-    color: var(--accent);
-  }
-}
-
 /* =========================
    TOOLBAR
 ========================= */
@@ -166,7 +108,6 @@
 .players-toolbar button,
 .players-toolbar select,
 .players-toolbar input,
-.players-simple-toggle,
 .players-filters > summary,
 .players-team-filter > summary {
   min-height: 38px;
@@ -209,7 +150,6 @@
 .players-toolbar button,
 .players-toolbar select,
 .players-toolbar input,
-.players-simple-toggle,
 .players-filters > summary,
 .players-team-filter > summary {
   transition:
@@ -245,7 +185,6 @@
 @media (hover: hover) {
   .players-toolbar button:hover:not(:disabled),
   .players-toolbar select:hover:not(:disabled),
-  .players-simple-toggle:hover,
   .players-filters > summary:hover,
   .players-team-filter > summary:hover {
     border-color:
@@ -326,15 +265,6 @@ input[type="search"] {
 /* =========================
    SIMPLE TOGGLE
 ========================= */
-
-.players-simple-toggle {
-  display: flex;
-  align-items: center;
-
-  gap: 7px;
-
-  padding: 0 10px;
-}
 
 /* =========================
    EXTRA FILTER MENU
@@ -1103,8 +1033,7 @@ input[type="search"] {
       );
   }
 
-  .players-toolbar select,
-  .players-simple-toggle {
+  .players-toolbar select {
     min-width: 0;
   }
 }
@@ -1118,11 +1047,9 @@ input[type="search"] {
   reduce
 ) {
   .players-table-row,
-  .players-auction-nav-button,
   .players-toolbar button,
   .players-toolbar select,
   .players-toolbar input,
-  .players-simple-toggle,
   .players-filters > summary,
   .players-team-filter > summary {
     transition: none;

@@ -4,7 +4,7 @@ export type PlayerRole =
   | 'C'
   | 'A'
 
-export type PlayerStatus =
+type PlayerStatus =
   | 'free'
   | 'assigned'
 
