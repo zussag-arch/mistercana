@@ -1,3 +1,4 @@
+import { profileForManager } from './data/rivals'
 import './style.css'
 
 import './styles/dashboard.css'
@@ -594,6 +595,7 @@ function mountAuctionCompetitors(
       strategy.state,
       player,
       strategy.players,
+      profileForManager,
     )
 
   if (!markup.trim()) {

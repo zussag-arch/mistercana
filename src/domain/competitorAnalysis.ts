@@ -484,10 +484,19 @@ function getEstimateSourceLabel(
    MAIN ANALYSIS
 ========================= */
 
+/** comportamento storico di un avversario (dalle aste degli anni passati) */
+export interface RivalHistory {
+  /** quanto paga rispetto alla sua lega, per ruolo (1 = in linea) */
+  spendIndexByRole: Record<PlayerRole, number>
+  /** come divide i crediti tra i reparti, in % */
+  distribution: Record<PlayerRole, number>
+}
+
 export function calculateCompetitors(
   state: AppState,
   player: Player,
   allPlayers: Player[],
+  historyFor?: (manager: AppState['managers'][number]) => RivalHistory | undefined,
 ): CompetitorAnalysis[] {
   const playerMap =
     getPlayerMap(
@@ -668,13 +677,21 @@ export function calculateCompetitors(
           return null
         }
 
-        const estimate =
+        const observed =
           getEstimateFactor(
             state,
             manager.id,
             player.role,
             allPlayers,
           )
+        // comportamento negli anni: corregge la stima. Se in quest'asta ci sono già suoi acquisti
+        // nel ruolo, conta a metà (radice); altrimenti per intero.
+        const history = historyFor?.(manager)
+        const historyIndex = history?.spendIndexByRole[player.role] ?? 1
+        const estimate = {
+          ...observed,
+          factor: observed.factor * (observed.source.startsWith('manager') ? Math.sqrt(historyIndex) : historyIndex),
+        }
 
         /*
           Puntata stimata grezza:
@@ -754,7 +771,7 @@ export function calculateCompetitors(
             weightedRoleBudget(
               remainingCredits,
               Object.fromEntries(ROLE_ORDER.map((role) => [role, assignments.filter((assignment) => playerMap.get(assignment.playerId ?? '')?.role === role).length])) as Record<PlayerRole, number>,
-              state.budgetDistribution,
+              history?.distribution ?? state.budgetDistribution,
               player.role,
             ),
 
@@ -860,6 +877,7 @@ export function renderCompetitorAnalysis(
   state: AppState,
   player: Player,
   allPlayers: Player[],
+  historyFor?: (manager: AppState['managers'][number]) => RivalHistory | undefined,
 ): string {
   const alreadyAssigned =
     state.auctionAssignments.some(
@@ -877,6 +895,7 @@ export function renderCompetitorAnalysis(
       state,
       player,
       allPlayers,
+      historyFor,
     )
 
   const visibleCompetitors =

@@ -12,6 +12,7 @@ import bundledAuctionsCsv from '../../database/aste.csv?raw'
 import bundledProbablesCsv from '../../database/probabili.csv?raw'
 import bundledSosProbablesCsv from '../../database/sos_probabili.csv?raw'
 import bundledSosAdviceCsv from '../../database/sos_consigli.csv?raw'
+import bundledRivalsCsv from '../../database/avversari.csv?raw'
 import { CSV_LABELS, clearCsvOverrides, getCsv, getCsvOverrides, saveCsvOverrides } from '../data/csvOverrides'
 import type { CsvKey, CsvOverride } from '../data/csvOverrides'
 import { analyzeCsv } from '../data/csvImport'
@@ -21,6 +22,7 @@ import { getICaV3Results } from '../data/icaV3Data'
 import { localPlayers } from '../services/fantalabLocal'
 import { getCachedPlayersDataset } from '../services/playerRepository'
 import { getAssignmentFldaId } from '../services/auctionPlayerResolver'
+import { profileForManager, renameRival, rivalProfiles } from '../data/rivals'
 import { buildLeagueRosters } from '../domain/leagueExport'
 import type { ExportPlayer } from '../domain/leagueExport'
 import {
@@ -622,6 +624,7 @@ const BUNDLED_CSV: Record<CsvKey, string> = {
   probabili: bundledProbablesCsv,
   sos_probabili: bundledSosProbablesCsv,
   sos_consigli: bundledSosAdviceCsv,
+  avversari: bundledRivalsCsv,
 }
 
 function renderCsvUpload(): string {
@@ -882,7 +885,55 @@ async function loadCreatorOptions(): Promise<void> {
     </div>`
 }
 
+/* =========================
+   ANAGRAFICA AVVERSARI
+========================= */
+
+const pctDiff = (index: number) => { const value = Math.round((index - 1) * 100); return value === 0 ? "0%" : `${value > 0 ? "+" : "−"}${Math.abs(value)}%` }
+const LEAGUE_SHORT: Record<string, string> = { SERIE_A: 'A', SERIE_B: 'B' }
+
+function renderRivalsSection(state: AppState): string {
+  const profiles = [...rivalProfiles().values()].sort((a, b) => Number(b.me) - Number(a.me) || b.spendIndex - a.spendIndex)
+  const linked = new Map(state.managers.filter((manager) => manager.active && !manager.archived)
+    .map((manager) => [profileForManager(manager)?.nickname, manager] as const).filter(([nickname]) => nickname))
+  return `<section class="data-transfer-section rivals-section">
+    <div class="data-transfer-section-header">
+      <div>
+        <span class="data-transfer-eyebrow">Anagrafica</span>
+        <h2>Avversari</h2>
+        <p>Ogni persona con le sue squadre negli anni e come si comporta in asta. Il soprannome deve essere quello tra virgolette in Dashboard (es. Ivan "Brosky" Sordi → Brosky): così in asta l'app riconosce chi è.</p>
+      </div>
+      <span class="data-transfer-status status-ready">${profiles.length} persone</span>
+    </div>
+    <div class="rivals-grid">
+      ${profiles.map((profile) => {
+        const manager = linked.get(profile.nickname)
+        const roles = (['P', 'D', 'C', 'A'] as const)
+        return `<article class="rival-card${profile.me ? ' is-me' : ''}">
+          <header>
+            <input class="rival-name" value="${escapeSourceHtml(profile.nickname)}" data-rival-rename="${escapeSourceHtml(profile.nickname)}" aria-label="Soprannome">
+            ${profile.me ? '<span class="rival-tag">Tu</span>' : manager ? `<span class="rival-tag linked" title="Collegato all'allenatore in Dashboard">in asta</span>` : ''}
+          </header>
+          <p class="rival-teams">${profile.teams.map((team) => `<span>${escapeSourceHtml(team.team)} <small>${LEAGUE_SHORT[team.league] ?? team.league} ${escapeSourceHtml(team.season)}</small></span>`).join('')}</p>
+          <div class="rival-index"><span>Spesa rispetto alla lega</span><strong class="${profile.spendIndex >= 1.05 ? 'up' : profile.spendIndex <= 0.95 ? 'down' : ''}">${pctDiff(profile.spendIndex)}</strong><small>${profile.comparisons} confronti</small></div>
+          <div class="rival-roles">${roles.map((role) => `<div><span class="role-${role.toLowerCase()}">${role}</span><strong>${pctDiff(profile.spendIndexByRole[role])}</strong><small>${Math.round(profile.distribution[role])}% budget</small></div>`).join('')}</div>
+          <p class="rival-traits">Top 3: <b>${Math.round(profile.topThreeShare * 100)}%</b> dei crediti · a 1 credito: <b>${Math.round(profile.oneCreditShare * 100)}%</b> dei giocatori</p>
+        </article>`
+      }).join('')}
+    </div>
+  </section>`
+}
+
 function bindCsvUpload(): void {
+  document.addEventListener('change', (event) => {
+    const input = event.target
+    if (!(input instanceof HTMLInputElement) || !input.dataset.rivalRename) return
+    if (renameRival(input.dataset.rivalRename, input.value)) {
+      feedback = { type: 'success', title: 'Soprannome aggiornato', message: `${input.dataset.rivalRename} → ${input.value.trim()}` }
+      input.dataset.rivalRename = input.value.trim()
+      updateDynamicUi()
+    }
+  })
   document.addEventListener('toggle', (event) => {
     if (event.target instanceof HTMLDetailsElement && event.target.id === 'saggiCreatorsBox' && event.target.open) void loadCreatorOptions()
   }, true)
@@ -1791,6 +1842,7 @@ export function renderImportExportPage():
           </article>
         </div>
       </section>
+      ${renderRivalsSection(state)}
       <section class="data-transfer-section">
         <div class="data-transfer-section-header">
           <div>

@@ -46,6 +46,7 @@ import type { AuctionStrategyContext } from '../services/auctionStrategyAdapter'
 import { decideBid } from '../domain/bidDecision'
 import type { BidDecision } from '../domain/bidDecision'
 import { calculateCompetitors } from '../domain/competitorAnalysis'
+import { profileForManager } from '../data/rivals'
 import { getOwnerManagerId, weightedRoleBudget } from '../domain/auctionContext'
 
 const loadingHistoricalPrices = new Set<string>()
@@ -550,7 +551,7 @@ function bidDecisionFor(
     ? strategy.players.filter((item) => item.role === player.role && item.id !== player.id && !assigned.has(item.id)
       && (getICaV3(item.fantalabId)?.score ?? -Infinity) >= (ica.score ?? 0) - 5).length
     : 0
-  const rivals = calculateCompetitors(strategy.state, player, strategy.players)
+  const rivals = calculateCompetitors(strategy.state, player, strategy.players, profileForManager)
     .map((rival) => ({ name: rival.nickname, capacity: rival.weightedCapacity, estimatedBid: rival.estimatedBid }))
   return decideBid({
     role: player.role,

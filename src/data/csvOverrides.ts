@@ -17,6 +17,7 @@ export type CsvKey =
   | 'probabili'
   | 'sos_probabili'
   | 'sos_consigli'
+  | 'avversari'
 
 export const CSV_LABELS: Record<CsvKey, string> = {
   fantalab_giocatori: 'Listone giocatori',
@@ -33,6 +34,7 @@ export const CSV_LABELS: Record<CsvKey, string> = {
   probabili: 'Formazioni probabili',
   sos_probabili: 'Probabili SOS Fanta',
   sos_consigli: 'Consigli SOS Fanta',
+  avversari: 'Anagrafica avversari',
 }
 
 export interface CsvOverride {
