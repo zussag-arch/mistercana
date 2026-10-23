@@ -47,9 +47,8 @@ function snapshot(): Record<string, string> {
   return data
 }
 
-async function push(): Promise<void> {
+async function upload(): Promise<void> {
   if (!session) return
-  setStatus('syncing')
   const updatedAt = new Date().toISOString()
   const { error } = await supabase.from('app_state')
     .upsert({ user_id: session.user.id, data: snapshot(), updated_at: updatedAt })
@@ -59,30 +58,49 @@ async function push(): Promise<void> {
   setStatus('synced')
 }
 
-/** All'avvio (o dopo il login): copia online più recente → si scarica e si ricarica l'app;
- *  copia locale più recente (o online vuota, al primo accesso) → si carica online. */
-async function reconcile(): Promise<void> {
-  if (!session) return
-  setStatus('syncing')
-  const { data, error } = await supabase.from('app_state').select('data, updated_at').maybeSingle()
-  if (error) return setStatus('error', error.message)
-  // date confrontate come numeri: Supabase e il browser le scrivono in formati diversi
-  const time = (value: string | null | undefined) => (value ? Date.parse(value) : 0) || 0
-  const localModified = time(read(MODIFIED_KEY))
-  const remoteAt = time(data?.updated_at)
-  if (data && remoteAt > localModified && remoteAt !== time(read(SYNCED_KEY))) {
-    const remote = (data.data ?? {}) as Record<string, string>
-    for (const key of SYNCED_KEYS) {
-      if (typeof remote[key] === 'string') write(key, remote[key])
-      else { try { localStorage.removeItem(key) } catch { /* niente */ } }
-    }
-    write(SYNCED_KEY, data.updated_at)
-    write(MODIFIED_KEY, data.updated_at)
-    window.location.reload()
-    return
+function download(remote: Record<string, string>, updatedAt: string): void {
+  for (const key of SYNCED_KEYS) {
+    if (typeof remote[key] === 'string') write(key, remote[key])
+    else { try { localStorage.removeItem(key) } catch { /* niente */ } }
   }
-  if (!data || localModified > remoteAt) return push()
-  setStatus('synced')
+  write(SYNCED_KEY, updatedAt)
+  write(MODIFIED_KEY, updatedAt)
+  window.location.reload()
+}
+
+let running = false
+
+/** Allinea questo dispositivo con la copia online (all'avvio, al rientro nell'app, dopo le modifiche):
+ *  - online cambiato da un altro dispositivo, qui niente di nuovo → si scarica e si ricarica l'app;
+ *  - qui modifiche nuove, online fermo → si carica online;
+ *  - cambiati entrambi → si chiede quale tenere, invece di sovrascrivere. */
+async function sync(): Promise<void> {
+  if (!session || running) return
+  running = true
+  try {
+    setStatus('syncing')
+    const { data, error } = await supabase.from('app_state').select('data, updated_at').maybeSingle()
+    if (error) return setStatus('error', error.message)
+    if (!data) return await upload()
+    // date confrontate come numeri: Supabase e il browser le scrivono in formati diversi
+    const time = (value: string | null | undefined) => (value ? Date.parse(value) : 0) || 0
+    const synced = time(read(SYNCED_KEY))
+    const localChanged = time(read(MODIFIED_KEY)) > synced
+    const remoteChanged = time(data.updated_at) !== synced
+    const remote = (data.data ?? {}) as Record<string, string>
+    if (remoteChanged && !localChanged) return download(remote, data.updated_at)
+    if (remoteChanged && localChanged) {
+      const when = new Date(data.updated_at).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' })
+      const useOnline = window.confirm(
+        `I dati online sono stati modificati da un altro dispositivo (${when}), ma anche qui ci sono modifiche non ancora salvate online.\n\n` +
+        'OK = usa i dati online (si perdono le modifiche fatte qui)\nAnnulla = tieni i dati di questo dispositivo (sostituiscono quelli online)')
+      return useOnline ? download(remote, data.updated_at) : await upload()
+    }
+    if (localChanged) return await upload()
+    setStatus('synced')
+  } finally {
+    running = false
+  }
 }
 
 /** da chiamare dopo ogni salvataggio locale */
@@ -90,7 +108,7 @@ export function markLocalChange(): void {
   write(MODIFIED_KEY, new Date().toISOString())
   if (!session) return
   window.clearTimeout(timer)
-  timer = window.setTimeout(() => { void push() }, PUSH_DELAY_MS)
+  timer = window.setTimeout(() => { timer = undefined; void sync() }, PUSH_DELAY_MS)
 }
 
 export async function sendLoginLink(email: string): Promise<string | null> {
@@ -119,14 +137,17 @@ export async function logout(): Promise<void> {
 
 export function initCloud(): void {
   window.addEventListener('mistercana:saved', markLocalChange)
-  // prima di chiudere l'app si prova a mandare le ultime modifiche
+  // uscendo dall'app si mandano subito le ultime modifiche; rientrando si controlla se online c'è di nuovo
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden' && timer !== undefined) { window.clearTimeout(timer); timer = undefined; void push() }
+    if (document.visibilityState === 'hidden' && timer === undefined) return
+    window.clearTimeout(timer)
+    timer = undefined
+    void sync()
   })
   supabase.auth.onAuthStateChange((event, next) => {
     session = next
     if (!next) return setStatus('off')
-    if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') void reconcile()
+    if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') void sync()
     else document.dispatchEvent(new CustomEvent('mistercana:cloud-status'))
   })
 }
