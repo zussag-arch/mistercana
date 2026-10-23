@@ -531,3 +531,8 @@
 }
 #rivalOverlay:not(.hidden) { display: grid !important; place-items: center !important; padding: 16px !important; }
 #rivalOverlay .rival-form { margin: 0 !important; }
+#rivalForm, #rivalForm * { box-sizing: border-box; }
+#rivalForm label, #rivalForm .rival-form-row > * { min-width: 0; }
+#rivalForm input:not([type="checkbox"]) { width: 100% !important; min-width: 0 !important; max-width: 100% !important; }
+#rivalForm .overlay-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+#rivalForm .overlay-header h2 { margin: 0; min-width: 0; }
