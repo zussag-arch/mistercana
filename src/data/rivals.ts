@@ -2,6 +2,7 @@
 import asteCsvBundled from '../../database/aste.csv?raw'
 import rivalsCsvBundled from '../../database/avversari.csv?raw'
 import { getCsv, saveCsvOverrides } from './csvOverrides'
+import { loadState } from '../app/storage'
 import { buildRivalProfiles, findProfile } from '../domain/rivalProfiles'
 import type { Purchase, RegistryRow, RivalProfile } from '../domain/rivalProfiles'
 import type { AppState } from '../app/state'
@@ -60,4 +61,16 @@ export function removeRival(nickname: string): boolean {
   const [header, ...lines] = text.split(/\r?\n/).filter((line) => line.trim())
   const next = [header, ...lines.filter((line) => !line.startsWith(`${nickname};`))].join('\n') + '\n'
   return saveCsvOverrides({ avversari: { fileName: 'avversari.csv', content: next, loadedAt: new Date().toISOString() } })
+}
+
+/** le mie squadre per lega (stagione più recente): da "Sono io" sulle card allenatori, o dalla colonna Io dell'anagrafica */
+export function myTeams(): Partial<Record<'SERIE_A' | 'SERIE_B', string>> {
+  const owner = loadState().managers.find((manager) => manager.isOwner)
+  const nickname = owner ? profileForManager(owner)?.nickname : undefined
+  const rows = rivalRegistry().filter((row) => (nickname ? row.nickname === nickname : row.me))
+    .sort((a, b) => a.season.localeCompare(b.season))
+  const out: Partial<Record<'SERIE_A' | 'SERIE_B', string>> = {}
+  for (const row of rows) out[row.league === 'SERIE_B' ? 'SERIE_B' : 'SERIE_A'] = row.team
+  if (owner?.teamName && !Object.keys(out).length) out.SERIE_A = owner.teamName
+  return out
 }

@@ -130,6 +130,19 @@ export function probables(): Map<string, Probable> {
 interface SosInfo { probability?: number; duel?: string; fascia?: number; fasciaDay?: number }
 
 let sosCache: Map<string, SosInfo> | null = null
+/** "squadra|nome" di chi è citato come alternativa → titolare indicato (es. Inter|calhanoglu → Zielinski) */
+let duelOthers: Map<string, string> | null = null
+
+function duelFor(team: string | undefined, name: string | undefined): string | undefined {
+  if (!duelOthers) {
+    duelOthers = new Map()
+    for (const row of parseCsv(sosProbabiliCsv)) {
+      const other = (row['Ballottaggio'] ?? '').replace(/\s*\(\d+%\)\s*$/, '').trim().toLowerCase()
+      if (other) duelOthers.set(`${row['Squadra']}|${other}`, row['Nome'])
+    }
+  }
+  return duelOthers.get(`${team}|${(name ?? '').trim().toLowerCase()}`)
+}
 
 function sosInfo(playerId: string): SosInfo | undefined {
   if (!sosCache) {
@@ -239,7 +252,8 @@ export function evaluatePick(player: FldaPlayer, price: number): MatchdayPick {
   if (form !== undefined && form >= usualFm + 0.75) reasons.push(`in forma (${form.toFixed(1).replace('.', ',')})`)
   if (form !== undefined && form <= usualFm - 0.75) reasons.push('fuori forma')
   if (player.penalty_rank === 1) reasons.push('rigorista')
-  if (sos?.duel) reasons.push(`ballottaggio con ${sos.duel}`)
+  const duel = sos?.duel ?? duelFor(player.team, player.name)
+  if (duel) reasons.push(`ballottaggio con ${duel}`)
 
   const out = Boolean(probable && (probable.injured || probable.suspended || probable.unavailable))
   const probability = out ? 0
@@ -270,20 +284,37 @@ export interface LineupSuggestion {
   total: number
 }
 
+/**
+ * Valore di un titolare: se gioca porta il suo FVA, se non gioca entra il primo panchinaro del ruolo.
+ *   valore = probabilità × FVA + (1 − probabilità) × resa del panchinaro
+ * Così un giocatore forte in ballottaggio (es. 49%) non vale la metà del suo FVA: se resta fuori
+ * la partita la gioca comunque qualcun altro.
+ */
+function pickRole(candidates: MatchdayPick[], slots: number): { chosen: MatchdayPick[]; value: number } {
+  const byExpected = [...candidates].sort((a, b) => b.expected - a.expected)
+  let reserve = byExpected[slots]?.expected ?? 0
+  let chosen = byExpected.slice(0, slots)
+  for (let round = 0; round < 3; round++) {
+    const worth = (pick: MatchdayPick) => pick.probability * pick.fva + (1 - pick.probability) * reserve
+    chosen = [...candidates].sort((a, b) => worth(b) - worth(a)).slice(0, slots)
+    const next = Math.max(0, ...candidates.filter((pick) => !chosen.includes(pick)).map((pick) => pick.expected))
+    if (next === reserve) break
+    reserve = next
+  }
+  const value = chosen.reduce((sum, pick) => sum + pick.probability * pick.fva + (1 - pick.probability) * reserve, 0)
+  return { chosen: chosen.sort((a, b) => b.expected - a.expected), value }
+}
+
 export function suggestLineup(picks: MatchdayPick[]): LineupSuggestion | undefined {
   const byRole = (role: string) => picks.filter((pick) => pick.player.role === role)
-    .sort((a, b) => b.expected - a.expected)
-  const goalkeepers = byRole('P')
-  if (!goalkeepers.length) return undefined
+  if (!byRole('P').length) return undefined
   let best: LineupSuggestion | undefined
   for (const module of MODULES) {
     const [d, c, a] = module.split('-').map(Number)
-    const defenders = byRole('D').slice(0, d)
-    const midfielders = byRole('C').slice(0, c)
-    const forwards = byRole('A').slice(0, a)
-    if (defenders.length < d || midfielders.length < c || forwards.length < a) continue
-    const starters = [goalkeepers[0], ...defenders, ...midfielders, ...forwards]
-    const total = starters.reduce((sum, pick) => sum + pick.expected, 0)
+    if (byRole('D').length < d || byRole('C').length < c || byRole('A').length < a) continue
+    const roles = [pickRole(byRole('P'), 1), pickRole(byRole('D'), d), pickRole(byRole('C'), c), pickRole(byRole('A'), a)]
+    const starters = roles.flatMap((role) => role.chosen)
+    const total = roles.reduce((sum, role) => sum + role.value, 0)
     if (!best || total > best.total) {
       const chosen = new Set(starters)
       const bench = picks.filter((pick) => !chosen.has(pick))
