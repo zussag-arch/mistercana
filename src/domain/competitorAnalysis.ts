@@ -478,7 +478,7 @@ function getEstimateSourceLabel(
    MAIN ANALYSIS
 ========================= */
 
-function calculateCompetitors(
+export function calculateCompetitors(
   state: AppState,
   player: Player,
   allPlayers: Player[],

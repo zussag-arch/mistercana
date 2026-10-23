@@ -42,6 +42,11 @@ import type { CanonicalAuctionPlayer } from '../services/auctionPlayerResolver'
 import { calculateRosterMetrics } from '../domain/rosterMetrics'
 import type { RosterMetricPlayer, RosterMetrics } from '../domain/rosterMetrics'
 import { buildAuctionStrategyContext } from '../services/auctionStrategyAdapter'
+import type { AuctionStrategyContext } from '../services/auctionStrategyAdapter'
+import { decideBid } from '../domain/bidDecision'
+import type { BidDecision } from '../domain/bidDecision'
+import { calculateCompetitors } from '../domain/competitorAnalysis'
+import { getOwnerManagerId } from '../domain/auctionContext'
 
 const loadingHistoricalPrices = new Set<string>()
 const attemptedHistoricalPrices = new Set<string>()
@@ -523,6 +528,71 @@ function callPlayer(
   actions.onStateChange()
 }
 
+
+/* =========================
+   DECISIONE: COMPRA / RILANCIA FINO A / PASSA
+========================= */
+
+function bidDecisionFor(
+  strategy: AuctionStrategyContext,
+  advice: PriceAdvice,
+  currentPrice: number,
+): BidDecision | undefined {
+  const player = strategy.currentPlayer
+  if (!player) return undefined
+  const roleOf = new Map(strategy.players.map((item) => [item.id, item.role]))
+  const assigned = new Set(strategy.state.auctionAssignments.map((item) => item.playerId))
+  const ownerId = getOwnerManagerId(strategy.state)
+  const ownerInRole = strategy.state.auctionAssignments
+    .filter((item) => item.managerId === ownerId && roleOf.get(item.playerId ?? '') === player.role).length
+  const ica = getICaV3(player.fantalabId)
+  const alternatives = typeof ica?.score === 'number'
+    ? strategy.players.filter((item) => item.role === player.role && item.id !== player.id && !assigned.has(item.id)
+      && (getICaV3(item.fantalabId)?.score ?? -Infinity) >= (ica.score ?? 0) - 5).length
+    : 0
+  const rivals = calculateCompetitors(strategy.state, player, strategy.players)
+    .map((rival) => ({ name: rival.managerName, capacity: rival.financialCapacity, estimatedBid: rival.estimatedBid }))
+  return decideBid({
+    role: player.role,
+    currentPrice,
+    ceiling: advice.recommendedCeiling,
+    financialLimit: advice.financialLimit,
+    value: advice.valueLimit,
+    ownerRoleOpen: ROSTER_SLOT_LIMITS[player.role] - ownerInRole,
+    alternatives,
+    rolePercentile: ica?.rolePercentile,
+    rivals,
+  })
+}
+
+function renderBidDecisionContent(decision: BidDecision): string {
+  const label = decision.action === 'RILANCIA' ? 'Rilancia fino a' : decision.action === 'COMPRA' ? 'Compra' : 'Passa'
+  const amount = decision.action === 'RILANCIA' ? `<strong class="bid-amount">${decision.maxBid} cr</strong>` : ''
+  return `<div class="bid-head"><span class="bid-action">${label}</span>${amount}<span class="bid-confidence">sicurezza ${decision.confidence}</span></div>
+    <ul class="bid-reasons">${decision.reasons.map((reason) => `<li>${escapeHtml(reason)}</li>`).join('')}</ul>
+    ${decision.threats.length ? `<p class="bid-threats">${decision.threats.slice(0, 5).map((rival) => `<span>${escapeHtml(rival.name)} <b>max ${rival.capacity}</b></span>`).join('')}</p>` : ''}`
+}
+
+function renderBidDecision(decision: BidDecision | undefined): string {
+  if (!decision) return ''
+  return `<div id="auctionBidDecision" class="auction-bid-decision" data-action="${decision.action}">${renderBidDecisionContent(decision)}</div>`
+}
+
+function updateBidDecision(state: AppState, currentPrice: number): void {
+  const element = document.querySelector<HTMLElement>('#auctionBidDecision')
+  if (!element) return
+  const strategy = buildAuctionStrategyContext(state, getCachedPlayersDataset())
+  if (!strategy.currentPlayer) return
+  const advice = calculatePriceAdvice(strategy.state, strategy.currentPlayer, strategy.players)
+  const decision = bidDecisionFor(strategy, advice, currentPrice)
+  if (!decision) return
+  if (element.dataset.action !== decision.action) {
+    element.classList.remove('is-changing'); void element.offsetWidth; element.classList.add('is-changing')
+  }
+  element.dataset.action = decision.action
+  element.innerHTML = renderBidDecisionContent(decision)
+}
+
 /* =========================
    BID SIGNAL
 ========================= */
@@ -813,6 +883,7 @@ function updateLiveBidPrice(
       strategy.players,
     )
     updateBidSignalElement(advice, next)
+    updateBidDecision(state, next)
   }
 }
 
@@ -1737,9 +1808,11 @@ function renderPlayerCard(
             </small>
           </div>
 
-          ${renderBidSignal(
-            priceAdvice,
-          )}
+          ${(() => {
+            const strategy = buildAuctionStrategyContext(state, getCachedPlayersDataset())
+            const decision = strategy.currentPlayer ? bidDecisionFor(strategy, priceAdvice, 0) : undefined
+            return decision ? renderBidDecision(decision) : renderBidSignal(priceAdvice)
+          })()}
         </div>
 
         <div
@@ -3043,6 +3116,9 @@ function renderParticipants(
                   state,
                   activeRole,
                 )
+              // massimo che può offrire ora: tiene 1 cr per ogni altro slot ancora vuoto
+              const emptySlots = ROLE_ORDER.reduce((total, role) => total + Math.max(0, ROSTER_SLOT_LIMITS[role] - participant.slots[role]), 0)
+              const maxBid = emptySlots > 0 ? Math.max(0, remaining - (emptySlots - 1)) : 0
 
               return `
                 <article
@@ -3065,7 +3141,7 @@ function renderParticipants(
                     </strong>
 
                     <span>
-                      ${remaining}
+                      ${remaining}<small class="auction-participant-max" title="Offerta massima possibile ora">max ${maxBid}</small>
                     </span>
                   </div>
 
@@ -4640,6 +4716,7 @@ export function bindAuctionEvents(
             ? currentPrice
             : 0,
         )
+        updateBidDecision(state, Number.isFinite(currentPrice) ? currentPrice : 0)
       },
     )
 
@@ -5438,8 +5515,8 @@ function renderFldaPlayerCard(
         <div class="auction-recommendation">
           <div class="auction-price-summary">
             <div class="auction-recommendation-primary"><span>Tetto consigliato</span><strong>${formatCredits(priceAdvice.recommendedCeiling)}</strong><small>motore strategico corrente</small></div>
-            ${renderBidSignal(priceAdvice)}
           </div>
+          ${strategyPlayer ? renderBidDecision(bidDecisionFor(strategy, priceAdvice, 0)) : ''}
           <div class="auction-price-limits">
             <div class="auction-price-limit value"><span>Valore asta</span><strong>${formatCredits(priceAdvice.valueLimit)}</strong><small>PMA ${formatCredits(priceAdvice.pmaCredits)}</small></div>
             <div class="auction-price-limit role"><span>Limite reparto</span><strong>${formatCredits(priceAdvice.roleLimit)}</strong><small>strategia ${player.role}</small></div>
