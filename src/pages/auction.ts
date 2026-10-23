@@ -1206,9 +1206,9 @@ function renderSelector(
         Boolean(
           player.player_id,
         ) &&
-        (selectorMode === 'player' ||
-          player.role ===
-            activeRole) &&
+        // sia per squadra sia con la ricerca: solo il ruolo selezionato
+        player.role ===
+          activeRole &&
         !isFldaPlayerAssigned(
           state.auctionAssignments,
           player.player_id!,
@@ -1322,7 +1322,7 @@ function renderSelector(
                 <input
                   id="auctionSelectorSearch"
                   type="search"
-                  placeholder="Cerca giocatore..."
+                  placeholder="Cerca tra i ${({ P: 'portieri', D: 'difensori', C: 'centrocampisti', A: 'attaccanti' } as Record<string, string>)[activeRole] ?? 'giocatori'}…"
                   autocomplete="off"
                 >
               </div>

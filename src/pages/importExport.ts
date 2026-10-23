@@ -559,8 +559,9 @@ function renderRivalTile(tile: RivalTile): string {
   const subtitle = person ? escapeSourceHtml(person) : 'Profilo da completare'
   return `<article class="rival-card${me ? ' is-me' : ''}${manager ? ' is-coach' : ''}">
     <header>
-      <div class="rival-title"><h3>${title}</h3><p>${subtitle}</p></div>
-      ${me ? '<span class="rival-tag">Tu</span>' : manager ? '<span class="rival-tag linked">Allenatore</span>' : ''}
+      <div class="rival-title"><h3>${title}</h3>
+        <div class="rival-subline"><p>${subtitle}</p>${me ? '<span class="rival-tag">Tu</span>' : manager ? '<span class="rival-tag linked">Allenatore</span>' : ''}</div>
+      </div>
       <div class="rival-menu">
         <button type="button" class="rival-menu-button" data-rival-menu aria-label="Gestisci ${title}">⋯</button>
         <div class="rival-menu-list" hidden>

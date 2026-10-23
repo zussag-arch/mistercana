@@ -58,14 +58,41 @@ function readAll(): Partial<Record<CsvKey, CsvOverride>> {
   }
 }
 
+/**
+ * Dati della TUA lega: storico aste e anagrafica avversari. Non sono dati del progetto ma dell'utente:
+ * vivono solo qui (e online con il login), un'app appena installata parte senza.
+ */
+export const PRIVATE_KEYS: CsvKey[] = ['aste', 'avversari']
+
+/** Passaggio una tantum: chi usava già l'app (ha allenatori, aste archiviate o un'anagrafica
+ *  caricata) riceve come dati propri lo storico che prima era incluso nel progetto. */
+function shouldAdoptBundled(): boolean {
+  try {
+    if (readAll().avversari) return true
+    const state = JSON.parse(window.localStorage.getItem('mistercana_app_state_v1') ?? 'null')
+    return Boolean(state?.managers?.length || state?.archivedAuctions?.length)
+  } catch {
+    return false
+  }
+}
+
 /** CSV da usare: quello caricato dall'utente se presente, altrimenti quello del progetto. */
 export function getCsv(key: CsvKey, bundled: string): string {
   if (typeof window === 'undefined') return bundled
-  return readAll()[key]?.content ?? bundled
+  const own = readAll()[key]?.content
+  if (own !== undefined) return own
+  if (!PRIVATE_KEYS.includes(key)) return bundled
+  if (!bundled || !shouldAdoptBundled()) return ''
+  saveCsvOverrides({ [key]: { fileName: `${key}.csv`, content: bundled, loadedAt: new Date().toISOString() } })
+  // il salvataggio online parte prima di questo punto: si segna la modifica a mano
+  try { window.localStorage.setItem('mistercana_cloud_modified_at', new Date().toISOString()) } catch { /* niente */ }
+  return bundled
 }
 
+/** tabelle del progetto sostituite da file caricati (storico aste e anagrafica esclusi: sono dati tuoi) */
 export function getCsvOverrides(): Partial<Record<CsvKey, CsvOverride>> {
-  return typeof window === 'undefined' ? {} : readAll()
+  if (typeof window === 'undefined') return {}
+  return Object.fromEntries(Object.entries(readAll()).filter(([key]) => !PRIVATE_KEYS.includes(key as CsvKey)))
 }
 
 /** Salva i CSV caricati; false se la memoria del dispositivo è piena o bloccata. */
@@ -79,7 +106,10 @@ export function saveCsvOverrides(files: Partial<Record<CsvKey, CsvOverride>>): b
   }
 }
 
+/** torna ai dati del progetto; storico aste e anagrafica sono dati tuoi e restano */
 export function clearCsvOverrides(): void {
-  window.localStorage.removeItem(STORAGE_KEY)
+  const keep = Object.fromEntries(Object.entries(readAll()).filter(([key]) => PRIVATE_KEYS.includes(key as CsvKey)))
+  if (Object.keys(keep).length) window.localStorage.setItem(STORAGE_KEY, JSON.stringify(keep))
+  else window.localStorage.removeItem(STORAGE_KEY)
   if (typeof window !== 'undefined') window.dispatchEvent(new Event('mistercana:saved'))
 }

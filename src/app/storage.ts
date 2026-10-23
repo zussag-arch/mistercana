@@ -777,6 +777,11 @@ function normalizeState(
 
     pmaConfiguration,
 
+    auctionLeague:
+      parsed.auctionLeague === 'SERIE_A' || parsed.auctionLeague === 'SERIE_B'
+        ? parsed.auctionLeague
+        : undefined,
+
     budgetProfile:
       parsed.budgetProfile ??
       defaultState.budgetProfile,

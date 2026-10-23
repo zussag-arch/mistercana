@@ -509,3 +509,9 @@
 .rival-history { margin: 0; color: var(--muted); font-size: 12.5px; }
 .rival-history b { color: var(--text); }
 
+
+/* nome squadra intero (va a capo); pillola Tu / Allenatore nella riga sotto, accanto a nome e cognome */
+.rival-title h3 { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; line-height: 1.15; }
+.rival-subline { display: flex; align-items: center; gap: 8px; min-width: 0; margin-top: 4px; }
+.rival-subline p { margin: 0; min-width: 0; }
+.rival-subline .rival-tag { margin-top: 0; }
