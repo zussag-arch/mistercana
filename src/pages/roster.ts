@@ -62,14 +62,25 @@ function formDots(values: Array<number | null>): string {
   }).join('')}</span>`
 }
 
-function statusLabel(p?: Probable): { text: string; tone: 'bad' | 'warn' } | undefined {
+type StatusKind = 'injured' | 'suspended' | 'unavailable' | 'doubtful' | 'warned'
+
+function statusLabel(p?: Probable): { text: string; tone: 'bad' | 'warn'; kind: StatusKind } | undefined {
   if (!p) return undefined
-  if (p.injured) return { text: 'infortunato', tone: 'bad' }
-  if (p.suspended) return { text: 'squalificato', tone: 'bad' }
-  if (p.unavailable) return { text: 'indisponibile', tone: 'bad' }
-  if (p.doubtful) return { text: 'in dubbio', tone: 'warn' }
-  if (p.warned) return { text: 'diffidato', tone: 'warn' }
+  if (p.injured) return { text: 'infortunato', tone: 'bad', kind: 'injured' }
+  if (p.suspended) return { text: 'squalificato', tone: 'bad', kind: 'suspended' }
+  if (p.unavailable) return { text: 'indisponibile', tone: 'bad', kind: 'unavailable' }
+  if (p.doubtful) return { text: 'in dubbio', tone: 'warn', kind: 'doubtful' }
+  if (p.warned) return { text: 'diffidato', tone: 'warn', kind: 'warned' }
   return undefined
+}
+
+/** segnale sul pallino: croce rossa, cartellino rosso/giallo, punto di domanda, trattino */
+function statusFlag(status: { text: string; kind: StatusKind }): string {
+  const mark = status.kind === 'injured' ? '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M3.6 1h2.8v2.6H9v2.8H6.4V9H3.6V6.4H1V3.6h2.6z"/></svg>'
+    : status.kind === 'doubtful' ? '?'
+    : status.kind === 'unavailable' ? '–'
+    : ''
+  return `<i class="rpitch-dot-flag flag-${status.kind}" title="${status.text}">${mark}</i>`
 }
 
 function returnText(p: Probable, day?: number): string {
@@ -110,7 +121,7 @@ function dot(pick: MatchdayPick): string {
     <span class="rpitch-dot-marker">
       <svg viewBox="0 0 40 40" aria-hidden="true"><path class="rpitch-dot-shape" d="M23.18 5.21 Q29.49 8.44 34.51 13.44 Q37.69 15.75 36.47 19.50 Q35.36 26.49 32.15 32.80 Q30.93 36.55 27.00 36.55 Q20.00 37.65 13.00 36.55 Q9.07 36.55 7.85 32.80 Q4.64 26.49 3.53 19.50 Q2.31 15.75 5.49 13.44 Q10.51 8.44 16.82 5.21 Q20.00 2.90 23.18 5.21 Z"/></svg>
       <b>${display(pick.fva, 2)}</b>
-      ${status ? `<i class="rpitch-dot-flag ${status.tone}" title="${status.text}"></i>` : ''}
+      ${status ? statusFlag(status) : ''}
     </span>
     <span class="rpitch-dot-name">${escapePlayerHtml(surname)}</span>
   </button>`

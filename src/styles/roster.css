@@ -84,8 +84,18 @@
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .rpitch-dot-flag { position: absolute; top: -4px; right: -4px; width: 14px; height: 14px; border-radius: 50%; border: 2px solid #fff; }
-.rpitch-dot-flag.bad { background: var(--red); }
-.rpitch-dot-flag.warn { background: var(--yellow); }
+.rpitch-dot-flag { display: grid; place-items: center; font-style: normal; font: 800 10px/1 system-ui, sans-serif; color: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.35); }
+/* infortunato: croce rossa su fondo bianco */
+.rpitch-dot-flag.flag-injured { background: #fff; border-color: #fff; }
+.rpitch-dot-flag.flag-injured svg { width: 10px; height: 10px; fill: #e53935; }
+/* squalificato / diffidato: cartellino */
+.rpitch-dot-flag.flag-suspended, .rpitch-dot-flag.flag-warned { width: 10px; height: 14px; border-radius: 2px; border-width: 1px; transform: rotate(12deg); }
+.rpitch-dot-flag.flag-suspended { background: #e53935; }
+.rpitch-dot-flag.flag-warned { background: #fdd835; }
+/* in dubbio: punto di domanda */
+.rpitch-dot-flag.flag-doubtful { background: #fb8c00; }
+/* indisponibile: trattino */
+.rpitch-dot-flag.flag-unavailable { background: #757575; }
 
 .bench { display: flex; flex-wrap: wrap; gap: 10px 4px; padding: 12px 6px; border-radius: 18px; background: var(--surface-light); }
 .bench .rpitch-dot-name { background: var(--surface); color: var(--text); }
