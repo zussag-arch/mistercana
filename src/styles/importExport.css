@@ -849,3 +849,13 @@
     animation: none;
   }
 }
+
+/* salvataggio online */
+.cloud-section .data-transfer-card { display: grid; gap: 10px; }
+.cloud-section p { margin: 0; }
+.cloud-login { display: flex; gap: 8px; flex-wrap: wrap; }
+.cloud-login input { flex: 1 1 220px; min-width: 0; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border, rgba(255,255,255,.15)); background: transparent; color: inherit; font: inherit; }
+.cloud-message:empty { display: none; }
+.cloud-state { font-weight: 600; }
+.cloud-state-synced { color: #3ecf8e; }
+.cloud-state-error { color: #f06a6a; }

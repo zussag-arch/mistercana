@@ -72,6 +72,7 @@ export function getCsvOverrides(): Partial<Record<CsvKey, CsvOverride>> {
 export function saveCsvOverrides(files: Partial<Record<CsvKey, CsvOverride>>): boolean {
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...readAll(), ...files }))
+    if (typeof window !== 'undefined') window.dispatchEvent(new Event('mistercana:saved'))
     return true
   } catch {
     return false
@@ -80,4 +81,5 @@ export function saveCsvOverrides(files: Partial<Record<CsvKey, CsvOverride>>): b
 
 export function clearCsvOverrides(): void {
   window.localStorage.removeItem(STORAGE_KEY)
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event('mistercana:saved'))
 }

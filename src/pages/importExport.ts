@@ -1,3 +1,4 @@
+import { cloudInfo, logout, sendLoginLink } from '../services/cloud'
 import bundledPlayersCsv from '../../database/fantalab_giocatori.csv?raw'
 import bundledCoachesCsv from '../../database/fantalab_allenatori.csv?raw'
 import bundledGoalkeeperGridCsv from '../../database/griglia_portieri.csv?raw'
@@ -195,7 +196,7 @@ function renderDataSourcesPanel(): string {
           <span class="data-transfer-eyebrow">Dati</span>
           <h2>Fonti dati</h2>
           <p>Gli archivi che l'app sta usando, con i numeri reali. Si trovano nella cartella <code>database/</code> del progetto.</p>
-          <p class="install-link-row">Link per installare l'app su Android: <code>zussag-arch.github.io/mistercana/?installa</code> <button type="button" class="install-open-button" data-install-open>Installa l'app</button></p>
+          <p class="install-link-row">Link per installare l'app su Android: <code>${typeof location === 'undefined' ? '' : location.host + location.pathname}?installa</code> <button type="button" class="install-open-button" data-install-open>Installa l'app</button></p>
           <p class="data-last-update">Ultimo aggiornamento dati: <strong>${escapeSourceHtml(lastUpdate.date)}</strong> · ${escapeSourceHtml(lastUpdate.source)}</p>
           <p class="data-last-update">Versione app: <strong>${new Date(__BUILD_DATE__).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' })}</strong></p>
         </div>
@@ -1248,6 +1249,7 @@ export function renderImportExportPage():
         </div>
       </div>
 
+      ${renderCloudPanel()}
       ${renderDataSourcesPanel()}
 
       <section
@@ -1890,6 +1892,57 @@ function confirmRestore():
    EVENTS
 ========================= */
 
+/* =========================
+   ACCOUNT (salvataggio online)
+========================= */
+
+function renderCloudPanel(): string {
+  const info = cloudInfo()
+  const when = info.syncedAt ? new Date(info.syncedAt).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' }) : 'mai'
+  const label = { off: '', syncing: 'Sincronizzazione…', synced: `Salvato online · ${when}`, error: `Errore: ${info.lastError}` }[info.status]
+  const body = info.email
+    ? `<p class="cloud-state cloud-state-${info.status}">${escapeCloud(label)}</p>
+       <p>Collegato come <b>${escapeCloud(info.email)}</b>. Le modifiche si salvano anche online e si ritrovano su ogni dispositivo.</p>
+       <button type="button" class="data-transfer-button data-transfer-button-secondary" id="cloudLogoutButton">Esci</button>`
+    : `<p>Accedi per salvare i dati online e ritrovarli su telefono e computer. Ti arriva un link via email, niente password.</p>
+       <form class="cloud-login" id="cloudLoginForm">
+         <input type="email" name="email" required placeholder="la tua email" autocomplete="email" />
+         <button type="submit" class="data-transfer-button data-transfer-button-primary">Invia link</button>
+       </form>
+       <p class="cloud-message" id="cloudMessage"></p>`
+  return `<section class="data-transfer-section cloud-section" id="cloudPanel">
+    <div class="data-transfer-section-header"><div>
+      <span class="data-transfer-eyebrow">Account</span>
+      <h2>Salvataggio online</h2>
+    </div></div>
+    <article class="data-transfer-card">${body}</article>
+  </section>`
+}
+
+const escapeCloud = (text: string) => text.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c] as string)
+
+function bindCloudPanel(): void {
+  document.addEventListener('mistercana:cloud-status', () => {
+    const panel = document.querySelector('#cloudPanel')
+    if (panel) panel.outerHTML = renderCloudPanel()
+  })
+  document.addEventListener('submit', async (event) => {
+    const form = event.target
+    if (!(form instanceof HTMLFormElement) || form.id !== 'cloudLoginForm') return
+    event.preventDefault()
+    const email = String(new FormData(form).get('email') ?? '').trim()
+    const message = document.querySelector('#cloudMessage')
+    if (message) message.textContent = 'Invio…'
+    const error = await sendLoginLink(email)
+    if (message) message.textContent = error
+      ? (/signups not allowed|not found/i.test(error) ? 'Questa email non è abilitata.' : `Invio non riuscito: ${error}`)
+      : `Link inviato a ${email}: aprilo da questo dispositivo.`
+  })
+  document.addEventListener('click', (event) => {
+    if (event.target instanceof Element && event.target.closest('#cloudLogoutButton')) void logout()
+  })
+}
+
 function bindImportExportEvents():
   void {
   if (
@@ -1905,6 +1958,7 @@ function bindImportExportEvents():
     if (event.target instanceof Element && event.target.closest('#exportPlayerRatingsButton')) exportPlayerRatings()
   })
   bindCsvUpload()
+  bindCloudPanel()
 
   document.addEventListener(
     'click',

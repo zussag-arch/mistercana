@@ -102,6 +102,7 @@ export function saveState(
       STORAGE_KEY,
       JSON.stringify(state),
     )
+    if (typeof window !== 'undefined') window.dispatchEvent(new Event('mistercana:saved'))
     return true
   } catch {
     return false
