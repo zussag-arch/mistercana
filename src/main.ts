@@ -21,12 +21,14 @@ import './styles/theme-refine.css'
 import './styles/theme-mobile.css'
 import './styles/app-shell.css'
 import { initTheme } from './theme'
+import { initCloud } from './services/cloud'
 import { initRoundSelects } from './components/roundSelect'
 import { initAuctionShortcuts } from './components/auctionShortcuts'
 import { initMobileApp } from './components/mobileApp'
 import { initInstallPrompt } from './components/installPrompt'
 
 initTheme()
+initCloud()
 initRoundSelects()
 initAuctionShortcuts()
 initMobileApp()
