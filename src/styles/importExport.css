@@ -851,10 +851,11 @@
 }
 
 /* salvataggio online */
-.cloud-section .data-transfer-card { display: grid; gap: 10px; }
+.cloud-section .data-transfer-card { display: grid; gap: 10px; align-content: start; min-height: 0; height: auto; }
 .cloud-section p { margin: 0; }
-.cloud-login { display: flex; gap: 8px; flex-wrap: wrap; }
-.cloud-login input { flex: 1 1 220px; min-width: 0; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border, rgba(255,255,255,.15)); background: transparent; color: inherit; font: inherit; }
+.cloud-login { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; max-width: 560px; }
+.cloud-login input { flex: 1 1 220px; min-width: 0; height: 40px; min-height: 0; padding: 0 14px; border-radius: 12px; border: 1px solid rgba(var(--ink-rgb), 0.14); background: rgba(var(--ink-rgb), 0.04); color: inherit; font: inherit; font-size: 14px; }
+.cloud-section .data-transfer-button { height: 40px; min-height: 0; width: auto; aspect-ratio: auto; padding: 0 18px; border-radius: 12px; justify-self: start; }
 .cloud-message:empty { display: none; }
 .cloud-state { font-weight: 600; }
 .cloud-state-synced { color: #3ecf8e; }
