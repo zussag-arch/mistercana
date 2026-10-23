@@ -514,3 +514,56 @@
   padding: 0 14px;
   font-size: 12px;
 }
+
+/* =========================
+   DECISIONE: COMPRA / RILANCIA FINO A / PASSA
+========================= */
+.auction-bid-decision {
+  --bid-color: var(--accent);
+  margin-top: 12px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 2px solid color-mix(in srgb, var(--bid-color) 70%, transparent);
+  background: color-mix(in srgb, var(--bid-color) 10%, transparent);
+  display: grid;
+  gap: 8px;
+}
+
+.auction-bid-decision.is-changing { animation: bid-pop 0.28s ease; }
+@keyframes bid-pop { from { transform: scale(0.97); } to { transform: scale(1); } }
+.auction-bid-decision .bid-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; }
+.auction-bid-decision .bid-action {
+  color: var(--bid-color);
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.auction-bid-decision .bid-amount { color: var(--bid-color); font-family: var(--font-display); font-size: 26px; }
+.auction-bid-decision .bid-confidence {
+  margin-left: auto;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(var(--ink-rgb), 0.08);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+.auction-bid-decision .bid-reasons { margin: 0; padding-left: 18px; display: grid; gap: 3px; font-size: 13.5px; }
+.auction-bid-decision .bid-threats { margin: 0; display: flex; flex-wrap: wrap; gap: 6px; font-size: 12px; color: var(--muted); }
+.auction-bid-decision .bid-threats span { padding: 3px 9px; border-radius: 999px; background: rgba(var(--ink-rgb), 0.06); }
+.auction-bid-decision .bid-threats b { color: var(--text); }
+.auction-price-summary .auction-bid-decision { margin-top: 0; align-content: center; }
+/* la decisione contiene già il tetto: prende tutta la riga */
+.auction-price-summary:has(.auction-bid-decision) { display: block !important; }
+.auction-price-summary:has(.auction-bid-decision) > .auction-recommendation-primary { display: none !important; }
+.auction-bid-decision .bid-reasons { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); column-gap: 24px; }
+@media (max-width: 700px) {
+  .auction-bid-decision .bid-threats { display: flex !important; }
+  .auction-bid-decision .bid-threats span { display: inline-block !important; width: auto !important; }
+  .auction-bid-decision .bid-threats span:nth-child(n + 4) { display: none !important; }
+  .auction-bid-decision .bid-action { font-size: 19px; }
+}
+.auction-participant-top > span { display: inline-flex; align-items: baseline; gap: 6px; }
+.auction-participant-max { color: var(--muted); font-size: 11px; font-weight: 700; }

@@ -1,3 +1,5 @@
+import { profileForManager } from './data/rivals'
+import type { AppState } from './app/state'
 import './style.css'
 
 import './styles/dashboard.css'
@@ -48,6 +50,7 @@ import {
   renderPlayersPage,
   bindPlayersEvents,
   setPlayersRoleFilter,
+  showObservedPlayers,
 } from './pages/players'
 
 import {
@@ -55,10 +58,6 @@ import {
   bindFullPlayerPage,
 } from './pages/playerDetail'
 
-import {
-  renderObjectivesPage,
-  bindObjectivesEvents,
-} from './pages/objectives'
 
 import {
   renderInsightsPage,
@@ -180,11 +179,6 @@ function getPageContent(
     case 'playerDetail':
       return renderFullPlayerPage(
         selectedPlayerReference,
-        state,
-      )
-
-    case 'objectives':
-      return renderObjectivesPage(
         state,
       )
 
@@ -393,55 +387,6 @@ function compactPlayersChrome(
   header.remove()
 }
 
-/* =========================
-   OBJECTIVES
-========================= */
-
-function compactObjectivesChrome(
-  target: HTMLElement,
-): void {
-  const header =
-    document.querySelector<HTMLElement>(
-      '.objectives-page-header',
-    )
-
-  if (!header) {
-    return
-  }
-
-  /*
-    Il totale obiettivi è una
-    informazione operativa breve:
-    lo conserviamo in topbar.
-
-    Conserviamo anche il pulsante
-    Asta.
-
-    Titolo, eyebrow e descrizione
-    vengono invece eliminati.
-  */
-  const total =
-    header.querySelector<HTMLElement>(
-      '.objectives-total',
-    )
-
-  const auctionButton =
-    header.querySelector<HTMLElement>(
-      '#objectivesGoToAuctionButton',
-    )
-
-  moveElementToTopbar(
-    total,
-    target,
-  )
-
-  moveElementToTopbar(
-    auctionButton,
-    target,
-  )
-
-  header.remove()
-}
 
 /* =========================
    INSIGHTS
@@ -524,12 +469,6 @@ function compactPageChrome(
     case 'playerDetail':
       break
 
-    case 'objectives':
-      compactObjectivesChrome(
-        target,
-      )
-      break
-
     case 'insights':
       compactInsightsChrome()
       break
@@ -594,6 +533,7 @@ function mountAuctionCompetitors(
       strategy.state,
       player,
       strategy.players,
+      profileForManager,
     )
 
   if (!markup.trim()) {
@@ -879,8 +819,9 @@ function bindPageEvents(
 
           onGoToObjectives:
             () => {
+              showObservedPlayers()
               navigateAndRender(
-                'objectives',
+                'players',
               )
             },
 
@@ -951,30 +892,6 @@ function bindPageEvents(
 
       break
 
-    case 'objectives':
-      bindObjectivesEvents(
-        state,
-        {
-          onStateChange:
-            saveAndRender,
-
-          onGoToAuction:
-            () => {
-              if (
-                state.auctionPhase !==
-                'live'
-              ) {
-                return
-              }
-
-              navigateAndRender(
-                'auction',
-              )
-            },
-        },
-      )
-
-      break
 
     case 'roster':
       bindRosterEvents({
@@ -1046,6 +963,15 @@ function bindNavigationEvents():
 /* =========================
    RENDER
 ========================= */
+
+// la pagina Dati (anagrafica avversari) modifica gli allenatori: lo stato vive qui, in memoria
+document.addEventListener('mistercana:update-state', (event) => {
+  const update = (event as CustomEvent<(current: AppState) => void>).detail
+  if (typeof update !== 'function') return
+  update(state)
+  saveState(state)
+  render()
+})
 
 function render():
   void {

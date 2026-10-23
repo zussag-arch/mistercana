@@ -12,6 +12,7 @@ import bundledAuctionsCsv from '../../database/aste.csv?raw'
 import bundledProbablesCsv from '../../database/probabili.csv?raw'
 import bundledSosProbablesCsv from '../../database/sos_probabili.csv?raw'
 import bundledSosAdviceCsv from '../../database/sos_consigli.csv?raw'
+import bundledRivalsCsv from '../../database/avversari.csv?raw'
 import { CSV_LABELS, clearCsvOverrides, getCsv, getCsvOverrides, saveCsvOverrides } from '../data/csvOverrides'
 import type { CsvKey, CsvOverride } from '../data/csvOverrides'
 import { analyzeCsv } from '../data/csvImport'
@@ -20,6 +21,10 @@ import { getDataSources, getLastDataUpdate } from '../data/dataSources'
 import { getICaV3Results } from '../data/icaV3Data'
 import { localPlayers } from '../services/fantalabLocal'
 import { getCachedPlayersDataset } from '../services/playerRepository'
+import { getAssignmentFldaId } from '../services/auctionPlayerResolver'
+import { profileForManager, removeRival, renameRival, rivalProfiles } from '../data/rivals'
+import { buildLeagueRosters } from '../domain/leagueExport'
+import type { ExportPlayer } from '../domain/leagueExport'
 import {
   players,
 } from '../data/players'
@@ -32,18 +37,7 @@ import {
 } from '../app/storage'
 
 import {
-  FLDA_API_URL,
-  FldaApiError,
-  getFldaHealth,
-  getFldaStatus,
   isFldaLocalMode,
-  updateFlda,
-} from '../services/flda'
-
-import type {
-  FldaDatasetState,
-  FldaHealth,
-  FldaUpdateTarget,
 } from '../services/flda'
 
 import type {
@@ -76,20 +70,6 @@ interface PendingRestore {
   exportedAt: string
 }
 
-type FldaConnectionState =
-  | 'loading'
-  | 'connected'
-  | 'unreachable'
-  | 'api-error'
-
-interface FldaDatasetDefinition {
-  key: string
-  label: string
-  updateTarget?: FldaUpdateTarget
-  updateLabel?: string
-  note?: string
-}
-
 /* =========================
    LOCAL UI STATE
 ========================= */
@@ -102,64 +82,6 @@ let pendingRestore:
 
 let importExportEventsBound =
   false
-
-let fldaConnection:
-  FldaConnectionState = 'loading'
-
-let fldaHealth:
-  FldaHealth | null = null
-
-let fldaDatasets:
-  FldaDatasetState[] = []
-
-let fldaError:
-  string | null = null
-
-let fldaFeedback:
-  FeedbackState | null = null
-
-let fldaUpdating:
-  FldaUpdateTarget | 'all' | null = null
-
-let fldaLoading = false
-
-const FLDA_DATASETS:
-  FldaDatasetDefinition[] = [
-    {
-      key: 'players_current',
-      label: 'Listone',
-      updateTarget: 'players',
-      updateLabel: 'Aggiorna Listone',
-    },
-    {
-      key: 'guide',
-      label: 'Guida Asta',
-      updateTarget: 'guide',
-      updateLabel: 'Aggiorna Guida',
-    },
-    {
-      key: 'hierarchies',
-      label: 'Gerarchie',
-      note: 'Aggiornate insieme alla Guida',
-    },
-    {
-      key: 'calendar_grid',
-      label: 'Calendario / Griglie',
-      updateTarget: 'grid',
-      updateLabel: 'Aggiorna Calendario',
-    },
-    {
-      key: 'history',
-      label: 'Storico',
-      updateTarget: 'history',
-      updateLabel: 'Aggiorna Storico',
-    },
-    {
-      key: 'saggi',
-      label: 'Saggi',
-      note: 'Gestito da FLDA, non aggiornabile da questa pagina',
-    },
-  ]
 
 /* =========================
    HTML
@@ -219,302 +141,6 @@ function formatDateTime(
         'short',
     },
   ).format(date)
-}
-
-function normalizeFldaStatus(
-  value: string | undefined,
-): FldaDatasetState['status'] {
-  switch (value) {
-    case 'success':
-    case 'warning':
-    case 'failed':
-    case 'never':
-      return value
-
-    default:
-      return 'never'
-  }
-}
-
-function getFldaStatusLabel(
-  status: FldaDatasetState['status'],
-): string {
-  switch (status) {
-    case 'success':
-      return 'Aggiornato'
-
-    case 'warning':
-      return 'Con avvisi'
-
-    case 'failed':
-      return 'Errore'
-
-    case 'never':
-      return 'Mai aggiornato'
-  }
-}
-
-function getFldaDataset(
-  key: string,
-): FldaDatasetState {
-  const dataset =
-    fldaDatasets.find(
-      (candidate) =>
-        candidate.dataset_name === key,
-    )
-
-  if (!dataset) {
-    return {
-      dataset_name: key,
-      status: 'never',
-      record_count: 0,
-      warning_count: 0,
-      blocking_count: 0,
-      last_success_at: null,
-    }
-  }
-
-  return {
-    ...dataset,
-    status: normalizeFldaStatus(
-      dataset.status,
-    ),
-  }
-}
-
-function renderFldaFeedback(): string {
-  if (!fldaFeedback) {
-    return ''
-  }
-
-  return `
-    <div
-      class="
-        data-transfer-feedback
-        data-transfer-feedback-${fldaFeedback.type}
-      "
-      role="status"
-    >
-      <strong>
-        ${escapeHtml(fldaFeedback.title)}
-      </strong>
-
-      <span>
-        ${escapeHtml(fldaFeedback.message)}
-      </span>
-    </div>
-  `
-}
-
-function renderFldaDatasetCard(
-  definition: FldaDatasetDefinition,
-): string {
-  const dataset =
-    getFldaDataset(definition.key)
-
-  const updating =
-    fldaUpdating === 'all' ||
-    fldaUpdating === definition.updateTarget
-
-  const lastSuccess =
-    dataset.last_success_at
-      ? formatDateTime(
-          dataset.last_success_at,
-        )
-      : 'Non disponibile'
-
-  return `
-    <article class="flda-dataset-card">
-      <div class="flda-dataset-heading">
-        <div>
-          <h3>
-            ${escapeHtml(definition.label)}
-          </h3>
-
-          ${
-            definition.note
-              ? `<p>${escapeHtml(definition.note)}</p>`
-              : ''
-          }
-        </div>
-
-        <span
-          class="
-            data-transfer-status
-            flda-status-${dataset.status}
-          "
-        >
-          ${getFldaStatusLabel(dataset.status)}
-        </span>
-      </div>
-
-      <dl class="flda-dataset-metrics">
-        <div>
-          <dt>Record</dt>
-          <dd>${dataset.record_count}</dd>
-        </div>
-
-        <div>
-          <dt>Warning</dt>
-          <dd>${dataset.warning_count}</dd>
-        </div>
-
-        <div>
-          <dt>Bloccanti</dt>
-          <dd>${dataset.blocking_count}</dd>
-        </div>
-      </dl>
-
-      <div class="flda-dataset-footer">
-        <span>
-          Ultimo aggiornamento riuscito
-        </span>
-
-        <strong>
-          ${escapeHtml(lastSuccess)}
-        </strong>
-
-        ${
-          definition.updateTarget
-            ? `
-              <button
-                type="button"
-                class="
-                  data-transfer-button
-                  data-transfer-button-secondary
-                "
-                data-flda-update="${definition.updateTarget}"
-                ${
-                  fldaConnection !== 'connected' ||
-                  fldaUpdating
-                    ? 'disabled'
-                    : ''
-                }
-              >
-                ${
-                  updating
-                    ? 'Aggiornamento...'
-                    : definition.updateLabel
-                }
-              </button>
-            `
-            : ''
-        }
-      </div>
-    </article>
-  `
-}
-
-function renderFldaPanel(): string {
-  const connected =
-    fldaConnection === 'connected'
-
-  const connectionLabel =
-    fldaConnection === 'loading'
-      ? 'Verifica in corso'
-      : connected
-        ? 'FLDA connesso'
-        : fldaConnection === 'unreachable'
-          ? 'FLDA non raggiungibile'
-          : 'Errore API FLDA'
-
-  const connectionClass =
-    fldaConnection === 'loading'
-      ? 'status-neutral'
-      : connected
-        ? 'status-ready'
-        : 'flda-status-failed'
-
-  return `
-    <section
-      id="fldaPanel"
-      class="data-transfer-section"
-    >
-      <div class="data-transfer-section-header">
-        <div>
-          <span class="data-transfer-eyebrow">
-            DATI FLDA
-          </span>
-
-          <h2>
-            Fonti dati locali
-          </h2>
-
-          <p>
-            Stato e aggiornamento dei dataset gestiti da FLDA.
-            Questi dati sono separati dal backup dell'app.
-          </p>
-
-          <code class="flda-api-url">
-            ${escapeHtml(FLDA_API_URL)}
-          </code>
-        </div>
-
-        <div class="flda-panel-actions">
-          <span
-            class="
-              data-transfer-status
-              ${connectionClass}
-            "
-          >
-            ${connectionLabel}
-          </span>
-
-          <button
-            type="button"
-            class="
-              data-transfer-button
-              data-transfer-button-primary
-            "
-            data-flda-update="all"
-            ${
-              !connected || fldaUpdating
-                ? 'disabled'
-                : ''
-            }
-          >
-            ${
-              fldaUpdating === 'all'
-                ? 'Aggiornamento...'
-                : 'Aggiorna tutto'
-            }
-          </button>
-        </div>
-      </div>
-
-      ${
-        fldaHealth?.version
-          ? `
-            <p class="flda-service-meta">
-              API FLDA ${escapeHtml(fldaHealth.version)}
-            </p>
-          `
-          : ''
-      }
-
-      ${
-        fldaError
-          ? `
-            <div class="flda-connection-error" role="alert">
-              ${escapeHtml(fldaError)}
-            </div>
-          `
-          : ''
-      }
-
-      <div class="flda-dataset-grid">
-        ${
-          FLDA_DATASETS
-            .map(renderFldaDatasetCard)
-            .join('')
-        }
-      </div>
-
-      <div id="fldaFeedback">
-        ${renderFldaFeedback()}
-      </div>
-    </section>
-  `
 }
 
 function getManagerName(
@@ -619,6 +245,7 @@ const BUNDLED_CSV: Record<CsvKey, string> = {
   probabili: bundledProbablesCsv,
   sos_probabili: bundledSosProbablesCsv,
   sos_consigli: bundledSosAdviceCsv,
+  avversari: bundledRivalsCsv,
 }
 
 function renderCsvUpload(): string {
@@ -879,7 +506,219 @@ async function loadCreatorOptions(): Promise<void> {
     </div>`
 }
 
+/* =========================
+   ANAGRAFICA AVVERSARI
+========================= */
+
+const pctDiff = (index: number) => { const value = Math.round((index - 1) * 100); return value === 0 ? "0%" : `${value > 0 ? "+" : "−"}${Math.abs(value)}%` }
+
+type Profile = ReturnType<typeof rivalProfiles> extends Map<string, infer P> ? P : never
+
+interface RivalTile {
+  nickname: string
+  profile?: Profile
+  manager?: Manager
+}
+
+function rivalTiles(state: AppState): RivalTile[] {
+  const managers = state.managers.filter((manager) => !manager.archived)
+  const tiles: RivalTile[] = [...rivalProfiles().values()].map((profile) => ({
+    nickname: profile.nickname,
+    profile,
+    manager: managers.find((manager) => profileForManager(manager)?.nickname === profile.nickname),
+  }))
+  // allenatori senza storico (nuovi ingressi aggiunti da qui o già presenti in Dashboard)
+  for (const manager of managers) {
+    if (!tiles.some((tile) => tile.manager?.id === manager.id)) tiles.push({ nickname: manager.alias || manager.firstName, manager })
+  }
+  const isMe = (tile: RivalTile) => Number(Boolean(tile.profile?.me || tile.manager?.isOwner))
+  return tiles.sort((a, b) => isMe(b) - isMe(a)
+    || Number(Boolean(b.manager)) - Number(Boolean(a.manager))
+    || tileTitle(a).localeCompare(tileTitle(b), 'it'))
+}
+
+function tileTitle(tile: RivalTile): string {
+  const latest = tile.profile ? [...tile.profile.teams].sort((a, b) => a.season.localeCompare(b.season)).at(-1)?.team : undefined
+  return tile.manager?.teamName || latest || tile.nickname
+}
+
+function renderRivalTile(tile: RivalTile): string {
+  const { profile, manager } = tile
+  const me = Boolean(profile?.me || manager?.isOwner)
+  const roles = ['P', 'D', 'C', 'A'] as const
+  const person = manager ? [manager.firstName, manager.lastName].filter(Boolean).join(' ') : ''
+  const id = escapeSourceHtml(tile.nickname)
+  // titolo = nome della squadra (si cambia solo da ⋯ → Gestisci profilo); sotto nome e cognome
+  const latestTeam = profile ? [...profile.teams].sort((a, b) => a.season.localeCompare(b.season)).at(-1)?.team : undefined
+  const title = escapeSourceHtml(manager?.teamName || latestTeam || tile.nickname)
+  const subtitle = person ? escapeSourceHtml(person) : 'Profilo da completare'
+  return `<article class="rival-card${me ? ' is-me' : ''}${manager ? ' is-coach' : ''}">
+    <header>
+      <div class="rival-title"><h3>${title}</h3><p>${subtitle}</p></div>
+      ${me ? '<span class="rival-tag">Tu</span>' : manager ? '<span class="rival-tag linked">Allenatore</span>' : ''}
+      <div class="rival-menu">
+        <button type="button" class="rival-menu-button" data-rival-menu aria-label="Gestisci ${title}">⋯</button>
+        <div class="rival-menu-list" hidden>
+          <button type="button" data-rival-edit="${id}" data-manager-id="${manager?.id ?? ''}">Gestisci profilo</button>
+          <button type="button" class="danger" data-rival-delete="${id}" data-manager-id="${manager?.id ?? ''}">Elimina profilo</button>
+        </div>
+      </div>
+    </header>
+    ${profile ? `
+      <p class="rival-history">Storico: <b>${profile.seasons.length} ${profile.seasons.length === 1 ? 'stagione' : 'stagioni'}</b> in archivio</p>
+      <div class="rival-index"><span>Spesa rispetto alla lega</span><strong class="${profile.spendIndex >= 1.05 ? 'up' : profile.spendIndex <= 0.95 ? 'down' : ''}">${pctDiff(profile.spendIndex)}</strong><small>${profile.comparisons} confronti</small></div>
+      <div class="rival-roles">${roles.map((role) => `<div><span class="role-${role.toLowerCase()}">${role}</span><strong>${pctDiff(profile.spendIndexByRole[role])}</strong><small>${Math.round(profile.distribution[role])}% budget</small></div>`).join('')}</div>
+      <p class="rival-traits">Top 3: <b>${Math.round(profile.topThreeShare * 100)}%</b> dei crediti · a 1 credito: <b>${Math.round(profile.oneCreditShare * 100)}%</b> dei giocatori</p>`
+    : '<p class="rival-empty">Nessuna asta registrata: il profilo si costruisce dalla prossima.</p>'}
+  </article>`
+}
+
+function renderRivalsSection(state: AppState): string {
+  const tiles = rivalTiles(state)
+  const coaches = tiles.filter((tile) => tile.manager).length
+  return `<section class="data-transfer-section rivals-section">
+    <div class="data-transfer-section-header">
+      <div>
+        <span class="data-transfer-eyebrow">Allenatori e storico</span>
+        <h2>Anagrafica avversari</h2>
+        <p>Ogni persona con le sue squadre negli anni e come si comporta in asta. Da ⋯ → Gestisci profilo inserisci soprannome (è l'ID, quello tra virgolette), nome e squadra: il profilo diventa un allenatore della Dashboard.</p>
+      </div>
+      <div class="rivals-header-actions">
+        <span class="data-transfer-status status-ready">${coaches} allenatori · ${tiles.length} profili</span>
+        <button type="button" class="data-transfer-button data-transfer-button-primary" data-rival-add>Aggiungi allenatore</button>
+      </div>
+    </div>
+    <div class="rivals-grid">${tiles.map(renderRivalTile).join('')}</div>
+    <div id="rivalOverlay" class="overlay hidden" aria-hidden="true">
+      <div class="overlay-backdrop" data-rival-close></div>
+      <form id="rivalForm" class="overlay-card rival-form" autocomplete="off">
+        <div class="overlay-header"><h2 id="rivalFormTitle">Profilo</h2><button type="button" class="icon-button" data-rival-close aria-label="Chiudi">×</button></div>
+        <input type="hidden" name="original"><input type="hidden" name="managerId">
+        <label><span>Soprannome (ID)</span><input name="nickname" required maxlength="40" placeholder="es. Brosky"></label>
+        <div class="rival-form-row">
+          <label><span>Nome</span><input name="firstName" required maxlength="40" placeholder="es. Ivan"></label>
+          <label><span>Cognome</span><input name="lastName" maxlength="40" placeholder="es. Sordi"></label>
+        </div>
+        <label><span>Nome squadra</span><input name="teamName" maxlength="60" placeholder="es. Arcamado"></label>
+        <label class="rival-form-check"><input type="checkbox" name="me"> <span>Sono io</span></label>
+        <div class="overlay-actions"><button type="button" class="secondary-button" data-rival-close>Annulla</button><button type="submit" class="primary-button">Salva</button></div>
+      </form>
+    </div>
+  </section>`
+}
+
+/** modifica lo stato dell'app (vive in main.ts): salva e ridisegna */
+function updateAppState(update: (current: AppState) => void): void {
+  document.dispatchEvent(new CustomEvent('mistercana:update-state', { detail: update }))
+}
+
+function rivalField(form: HTMLFormElement, name: string): HTMLInputElement {
+  return form.elements.namedItem(name) as HTMLInputElement
+}
+
+function openRivalForm(nickname: string, managerId: string): void {
+  const form = document.querySelector<HTMLFormElement>('#rivalForm')
+  const overlay = document.querySelector<HTMLElement>('#rivalOverlay')
+  if (!form || !overlay) return
+  const manager = loadState().managers.find((item) => item.id === managerId)
+  const profile = nickname ? rivalProfiles().get(nickname) : undefined
+  rivalField(form, 'original').value = profile ? nickname : ''
+  rivalField(form, 'managerId').value = managerId
+  rivalField(form, 'nickname').value = manager?.alias || nickname
+  rivalField(form, 'firstName').value = manager?.firstName ?? ''
+  rivalField(form, 'lastName').value = manager?.lastName ?? ''
+  rivalField(form, 'teamName').value = manager?.teamName || profile?.teams.at(-1)?.team || ''
+  rivalField(form, 'me').checked = Boolean(manager?.isOwner || profile?.me)
+  const title = document.querySelector('#rivalFormTitle')
+  if (title) title.textContent = nickname ? `Profilo · ${nickname}` : 'Nuovo allenatore'
+  overlay.classList.remove('hidden')
+  overlay.setAttribute('aria-hidden', 'false')
+  rivalField(form, nickname ? 'firstName' : 'nickname').focus({ preventScroll: true })
+}
+
+function closeRivalForm(): void {
+  const overlay = document.querySelector<HTMLElement>('#rivalOverlay')
+  overlay?.classList.add('hidden')
+  overlay?.setAttribute('aria-hidden', 'true')
+}
+
+function saveRivalForm(form: HTMLFormElement): void {
+  const value = (name: string) => rivalField(form, name).value.replace(/[;"\r\n]/g, '').trim()
+  const original = value('original')
+  const managerId = value('managerId')
+  const nickname = value('nickname')
+  const firstName = value('firstName')
+  if (!nickname || !firstName) return
+  const me = rivalField(form, 'me').checked
+  const taken = rivalTiles(loadState()).some((tile) =>
+    tile.nickname.toLowerCase() === nickname.toLowerCase() && tile.nickname !== original && tile.manager?.id !== managerId)
+  if (taken) {
+    window.alert(`Il soprannome "${nickname}" è già usato da un altro profilo.`)
+    return
+  }
+  if (original && original !== nickname) renameRival(original, nickname)
+  closeRivalForm()
+  updateAppState((state) => {
+    if (me) state.managers.forEach((manager) => { manager.isOwner = false })
+    const data = { alias: nickname, firstName, lastName: value('lastName'), teamName: value('teamName'), isOwner: me, archived: false }
+    const manager = state.managers.find((item) => item.id === managerId)
+    if (manager) Object.assign(manager, data)
+    else state.managers.push({ id: `manager-${Date.now().toString(36)}`, active: true, ...data })
+  })
+}
+
+function deleteRival(nickname: string, managerId: string): void {
+  const message = `Eliminare il profilo "${nickname}"?\n\nSparisce dall'anagrafica e dagli allenatori della Dashboard. Le sue aste restano nello storico, ma non più collegate a lui.`
+  if (!window.confirm(message)) return
+  removeRival(nickname)
+  updateAppState((state) => {
+    const index = state.managers.findIndex((item) => item.id === managerId)
+    if (index < 0) return
+    // con acquisti già registrati l'allenatore resta nell'asta, ma archiviato
+    if (state.auctionAssignments.some((item) => item.managerId === managerId)) state.managers[index].archived = true
+    else state.managers.splice(index, 1)
+  })
+}
+
+let rivalsBound = false
+
+function bindRivals(): void {
+  if (rivalsBound) return
+  rivalsBound = true
+  const closeMenus = () => document.querySelectorAll<HTMLElement>('.rival-menu-list').forEach((menu) => { menu.hidden = true })
+  document.addEventListener('click', (event) => {
+    const target = event.target as HTMLElement | null
+    if (!target?.closest('.rivals-section')) {
+      closeMenus()
+      return
+    }
+    const menuButton = target.closest<HTMLElement>('[data-rival-menu]')
+    if (menuButton) {
+      const list = menuButton.nextElementSibling as HTMLElement | null
+      const wasHidden = list?.hidden
+      closeMenus()
+      if (list && wasHidden) list.hidden = false
+      return
+    }
+    closeMenus()
+    const edit = target.closest<HTMLElement>('[data-rival-edit]')
+    if (edit) return openRivalForm(edit.dataset.rivalEdit ?? '', edit.dataset.managerId ?? '')
+    const remove = target.closest<HTMLElement>('[data-rival-delete]')
+    if (remove) return deleteRival(remove.dataset.rivalDelete ?? '', remove.dataset.managerId ?? '')
+    if (target.closest('[data-rival-add]')) return openRivalForm('', '')
+    if (target.closest('[data-rival-close]')) closeRivalForm()
+  })
+  document.addEventListener('submit', (event) => {
+    const form = event.target
+    if (form instanceof HTMLFormElement && form.id === 'rivalForm') {
+      event.preventDefault()
+      saveRivalForm(form)
+    }
+  })
+}
+
 function bindCsvUpload(): void {
+  bindRivals()
   document.addEventListener('toggle', (event) => {
     if (event.target instanceof HTMLDetailsElement && event.target.id === 'saggiCreatorsBox' && event.target.open) void loadCreatorOptions()
   }, true)
@@ -987,6 +826,28 @@ function getSafeFileStamp():
 /* =========================
    DOWNLOAD
 ========================= */
+
+function exportLeagueRosters(): void {
+  const state = loadState()
+  const players = new Map<string, ExportPlayer>(localPlayers().players.filter((player) => player.player_id).map((player) => [String(player.player_id), {
+    fantalabId: String(player.player_id), fantacalcioId: player.fantacalcio_id, name: player.name, role: player.role.toUpperCase(),
+  }]))
+  const result = buildLeagueRosters(state, players, getAssignmentFldaId)
+  if (!state.auctionAssignments.length) {
+    feedback = { type: 'info', title: 'Nessun dato da esportare', message: 'L’asta corrente non contiene ancora acquisti.' }
+    updateDynamicUi()
+    return
+  }
+  if (result.errors.length) {
+    feedback = { type: 'error', title: 'Rose non esportate', message: result.errors.slice(0, 6).join(' ') + (result.errors.length > 6 ? ` …e altri ${result.errors.length - 6}.` : '') }
+    updateDynamicUi()
+    return
+  }
+  if (result.warnings.length && !window.confirm(`Alcune rose non sono complete:\n\n${result.warnings.join('\n')}\n\nEsportare lo stesso?`)) return
+  downloadTextFile(`rose-${getSafeFileStamp()}.csv`, result.csv, 'text/csv;charset=utf-8')
+  feedback = { type: 'success', title: 'Rose esportate', message: `${result.players} giocatori di ${result.teams} squadre, pronti per l’import.` }
+  updateDynamicUi()
+}
 
 function downloadTextFile(
   fileName: string,
@@ -1359,19 +1220,6 @@ export function renderImportExportPage():
     state.auctionAssignments
       .length > 0
 
-  window.setTimeout(
-    () => {
-      if (
-        document.querySelector(
-          '#fldaPanel',
-        )
-      ) {
-        void refreshFldaData()
-      }
-    },
-    0,
-  )
-
   return `
     <section
       class="
@@ -1386,7 +1234,7 @@ export function renderImportExportPage():
       >
         <div>
           <h1>
-            Import / Export
+            Dati
           </h1>
 
           <p>
@@ -1397,14 +1245,6 @@ export function renderImportExportPage():
       </div>
 
       ${renderDataSourcesPanel()}
-
-      <details class="flda-optional">
-        <summary>
-          <span>Servizio FLDA <small>facoltativo</small></span>
-          <small>${isFldaLocalMode() ? 'non in uso: l\'app usa le tabelle FantaLab' : 'apri per stato e aggiornamenti'}</small>
-        </summary>
-        ${renderFldaPanel()}
-      </details>
 
       <section
         class="data-transfer-section"
@@ -1658,7 +1498,7 @@ export function renderImportExportPage():
         <div
           class="
             data-transfer-grid
-            data-transfer-grid-single
+            data-transfer-grid-double
           "
         >
           <article
@@ -1750,8 +1590,23 @@ export function renderImportExportPage():
               </button>
             </div>
           </article>
+          <article class="data-transfer-card">
+            <div class="data-transfer-card-header">
+              <div class="data-transfer-icon data-transfer-icon-export">↑</div>
+              <span class="data-transfer-status ${hasCurrentAuctionData ? 'status-ready' : 'status-neutral'}">${hasCurrentAuctionData ? 'Pronto' : 'Vuoto'}</span>
+            </div>
+            <div class="data-transfer-card-body">
+              <h3>Rose per l'app della stagione</h3>
+              <p>Il file da importare nell'app che gestisce campionato e competizioni: per ogni squadra ID fantacalcio e prezzo. Prima controlla che non manchi nulla.</p>
+            </div>
+            <div class="data-transfer-card-footer">
+              <div><span>Formato</span><strong>CSV rose · $,$,$</strong></div>
+              <button type="button" class="data-transfer-button ${hasCurrentAuctionData ? 'data-transfer-button-primary' : ''}" data-export-league ${hasCurrentAuctionData ? '' : 'disabled'}>Esporta rose</button>
+            </div>
+          </article>
         </div>
       </section>
+      ${renderRivalsSection(state)}
       <section class="data-transfer-section">
         <div class="data-transfer-section-header">
           <div>
@@ -1808,117 +1663,8 @@ function updateDynamicUi():
   }
 }
 
-function updateFldaUi(): void {
-  const panel =
-    document.querySelector<HTMLElement>(
-      '#fldaPanel',
-    )
 
-  if (panel) {
-    panel.outerHTML =
-      renderFldaPanel()
-  }
-}
 
-async function refreshFldaData():
-  Promise<void> {
-  if (fldaLoading) {
-    return
-  }
-
-  fldaLoading = true
-  fldaConnection = 'loading'
-  fldaError = null
-  updateFldaUi()
-
-  try {
-    const [health, datasets] =
-      await Promise.all([
-        getFldaHealth(),
-        getFldaStatus(),
-      ])
-
-    fldaHealth = health
-    fldaDatasets = datasets
-
-    if (health.status === 'ok') {
-      fldaConnection = 'connected'
-    } else {
-      fldaConnection = 'api-error'
-      fldaError =
-        `FLDA segnala lo stato “${health.status}”.`
-    }
-  } catch (error) {
-    fldaHealth = null
-
-    if (
-      error instanceof FldaApiError &&
-      (
-        error.kind === 'unreachable' ||
-        error.kind === 'timeout'
-      )
-    ) {
-      fldaConnection = 'unreachable'
-    } else {
-      fldaConnection = 'api-error'
-    }
-
-    fldaError =
-      error instanceof Error
-        ? error.message
-        : 'Errore imprevisto durante il collegamento a FLDA.'
-  } finally {
-    fldaLoading = false
-    updateFldaUi()
-  }
-}
-
-async function runFldaUpdate(
-  target: FldaUpdateTarget | 'all',
-): Promise<void> {
-  if (
-    fldaUpdating ||
-    fldaConnection !== 'connected'
-  ) {
-    return
-  }
-
-  fldaUpdating = target
-  fldaFeedback = {
-    type: 'info',
-    title: 'Aggiornamento in corso',
-    message:
-      'FLDA sta aggiornando i dataset richiesti.',
-  }
-  updateFldaUi()
-
-  try {
-    await updateFlda(
-      target === 'all'
-        ? undefined
-        : target,
-    )
-
-    fldaFeedback = {
-      type: 'success',
-      title: 'Aggiornamento completato',
-      message:
-        'Lo stato dei dataset è stato ricaricato da FLDA.',
-    }
-  } catch (error) {
-    fldaFeedback = {
-      type: 'error',
-      title: 'Aggiornamento fallito',
-      message:
-        error instanceof Error
-          ? error.message
-          : 'FLDA non ha completato l’aggiornamento.',
-    }
-  } finally {
-    fldaUpdating = null
-    await refreshFldaData()
-  }
-}
 
 /* =========================
    ACTIONS
@@ -2181,31 +1927,6 @@ function bindImportExportEvents():
         return
       }
 
-      const fldaUpdateButton =
-        target.closest<HTMLElement>(
-          '[data-flda-update]',
-        )
-
-      if (fldaUpdateButton) {
-        const updateTarget =
-          fldaUpdateButton.dataset
-            .fldaUpdate
-
-        if (
-          updateTarget === 'all' ||
-          updateTarget === 'players' ||
-          updateTarget === 'guide' ||
-          updateTarget === 'grid' ||
-          updateTarget === 'history'
-        ) {
-          void runFldaUpdate(
-            updateTarget,
-          )
-        }
-
-        return
-      }
-
       if (
         target.closest(
           '[data-export-auction]',
@@ -2213,6 +1934,11 @@ function bindImportExportEvents():
       ) {
         exportCurrentAuction()
 
+        return
+      }
+
+      if (target.closest('[data-export-league]')) {
+        exportLeagueRosters()
         return
       }
 

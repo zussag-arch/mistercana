@@ -136,7 +136,6 @@ td.n {
 .players-table-card,
 .data-transfer-card,
 .data-transfer-section,
-.flda-dataset-card,
 .overlay-card,
 .panel {
   border-radius: var(--radius-xl);
@@ -268,7 +267,6 @@ input[type="search"]:focus,
 .dashboard-stat-label,
 .dashboard-manager-label,
 .players-eyebrow,
-.objectives-eyebrow,
 .insight-eyebrow,
 .data-transfer-eyebrow,
 .player-detail-eyebrow,
@@ -289,7 +287,6 @@ input[type="search"]:focus,
 .dashboard-eyebrow::before,
 .dashboard-stat-label::before,
 .players-eyebrow::before,
-.objectives-eyebrow::before,
 .insight-eyebrow::before,
 .data-transfer-eyebrow::before,
 .player-detail-eyebrow::before,
@@ -324,12 +321,10 @@ input[type="search"]:focus,
 .auction-history-heading h3,
 .auction-competitors-heading h2,
 .players-page-header h1,
-.objectives-page-header h1,
 .insights-page-header h1,
 .import-export-page-header h1,
 .insight-section-header h2,
 .data-transfer-section-header h2,
-.objective-role-title,
 .player-section-heading h2 {
   font-family: var(--font-display);
   font-size: 26px;
@@ -339,7 +334,6 @@ input[type="search"]:focus,
 }
 
 .players-page-header h1,
-.objectives-page-header h1,
 .insights-page-header h1,
 .import-export-page-header h1 {
   font-size: clamp(28px, 4vw, 44px);
@@ -350,7 +344,6 @@ input[type="search"]:focus,
 .auction-history-heading h3::after,
 .auction-competitors-heading h2::after,
 .players-page-header h1::after,
-.objectives-page-header h1::after,
 .insights-page-header h1::after,
 .import-export-page-header h1::after,
 .insight-section-header h2::after,
@@ -392,11 +385,9 @@ input[type="search"]:focus,
 .dashboard-panel,
 .dashboard-hero,
 .insight-section,
-.objective-priority-section,
 .auction-competitors-section,
 .coach-card,
-.set-piece-card,
-.objective-player-card {
+.set-piece-card {
   border: 1px solid rgba(var(--ink-rgb), 0.07);
   border-radius: var(--radius-xl);
   background: var(--surface);
@@ -411,15 +402,8 @@ input[type="search"]:focus,
   background: var(--surface-light);
 }
 
-.dashboard-add-manager-card {
-  border: 1.5px dashed rgba(var(--ink-rgb), 0.13);
-  border-radius: var(--radius-md);
-  background: transparent;
-}
-
 /* testata della pagina Asta e scheda giocatore: sfumatura + cerchi tratteggiati */
 .auction-player-card,
-.player-full-header,
 .player-detail-header,
 .dashboard-hero {
   position: relative;
@@ -429,8 +413,7 @@ input[type="search"]:focus,
     linear-gradient(135deg, var(--surface-light), var(--surface));
 }
 
-.auction-player-card::after,
-.player-full-header::after {
+.auction-player-card::after {
   content: "";
   position: absolute;
   right: -140px;
@@ -442,8 +425,7 @@ input[type="search"]:focus,
   pointer-events: none;
 }
 
-.auction-player-card > *,
-.player-full-header > * {
+.auction-player-card > * {
   position: relative;
   z-index: 1;
 }
@@ -533,7 +515,6 @@ input:focus {
 .auction-history-heading h3,
 .auction-competitors-heading h2,
 .players-page-header h1,
-.objectives-page-header h1,
 .insights-page-header h1,
 .import-export-page-header h1,
 .insight-section-header h2,
@@ -760,20 +741,6 @@ input:focus {
   margin-top: 8px;
   color: var(--text-soft);
   font-size: 15px;
-}
-
-.player-detail-call-button {
-  border-radius: 0;
-  border: 1.5px solid var(--accent);
-  background: var(--accent);
-  color: var(--accent-ink);
-  font-weight: 800;
-  text-transform: lowercase;
-}
-
-.player-detail-call-button:hover:not(:disabled) {
-  transform: translate(-2px, -2px);
-  box-shadow: 4px 4px 0 var(--accent-soft);
 }
 
 .player-detail-close-button {
@@ -1094,107 +1061,7 @@ input:focus {
   margin: 0;
 }
 
-.player-full-page-v3 .player-full-header {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 20px;
-  padding: 28px;
-  border: 1px solid rgba(var(--ink-rgb), 0.07);
-  border-radius: var(--radius-xl);
-  background:
-    radial-gradient(520px 260px at 100% 0%, color-mix(in srgb, var(--rc) 26%, transparent), transparent 70%),
-    linear-gradient(135deg, var(--surface-light), var(--surface));
-}
-
 /* la parola del ruolo, gigante e solo contorno, sul fondo della testata */
-.player-full-page-v3 .player-full-header::before {
-  content: attr(data-role-word);
-  position: absolute;
-  right: -10px;
-  bottom: -0.22em;
-  font-family: var(--font-display);
-  font-size: clamp(64px, 11vw, 150px);
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: -0.06em;
-  color: transparent;
-  -webkit-text-stroke: 1px color-mix(in srgb, var(--rc) 35%, transparent);
-  white-space: nowrap;
-  pointer-events: none;
-}
-
-.player-full-page-v3 .player-full-identity {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  min-width: 0;
-  text-align: left;
-}
-
-.player-full-page-v3 .player-full-identity small {
-  display: block;
-  font-family: var(--font-ui);
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  text-transform: none;
-  color: var(--muted);
-}
-
-.player-full-page-v3 .player-full-identity small::before {
-  content: "";
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  margin-right: 7px;
-  border-radius: 2px;
-  background: var(--rc);
-  transform: rotate(45deg) translateY(-1px);
-}
-
-.player-full-page-v3 .player-full-identity h1 {
-  display: block;
-  margin: 4px 0 0;
-  font-size: clamp(32px, 5vw, 56px);
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: -0.055em;
-  text-wrap: balance;
-}
-
-.player-full-page-v3 .player-full-identity h1::after {
-  content: ".";
-  color: var(--rc);
-}
-
-.player-full-page-v3 .player-full-identity p {
-  margin: 8px 0 12px;
-  color: var(--text-soft);
-  font-size: 15px;
-}
-
-.player-full-page-v3 .player-full-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.player-full-back {
-  width: 44px;
-  height: 44px;
-  border: 0;
-  border-radius: var(--radius-pill);
-  background: rgba(var(--ink-rgb), 0.08);
-  font-size: 17px;
-  cursor: pointer;
-  transition: background var(--motion-fast), color var(--motion-fast);
-}
-
-.player-full-back:hover {
-  background: var(--accent);
-  color: var(--accent-ink);
-}
 
 /* numeri chiave in fila sotto la testata */
 .player-full-page-v3 > .player-current-metrics {
@@ -1305,21 +1172,12 @@ input:focus {
 }
 
 @media (max-width: 820px) {
-  .player-full-page-v3 .player-full-header {
-    grid-template-columns: minmax(0, 1fr);
-    padding: 22px;
-  }
-
-  .player-full-page-v3 .player-full-actions {
-    justify-content: flex-end;
-  }
 
   .player-full-page-v3 .player-full-section {
     padding: 18px;
   }
 }
 
-.player-full-page-v3 .player-full-identity h1.no-dot::after,
 .player-detail-header h2.no-dot::after {
   content: none;
 }
@@ -2408,7 +2266,6 @@ input:focus {
    "spostamento + ombra" al passaggio del mouse */
 .primary-button,
 .dashboard-cta-button,
-.player-detail-call-button,
 .player-detail-full-button {
   border-radius: var(--radius-md);
   transition: transform var(--motion-fast), box-shadow var(--motion-fast);
@@ -2500,3 +2357,35 @@ input:focus {
 @media (max-width: 700px) {
   .goalkeeper-team-chips { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
+
+/* =========================
+   GIOCATORI: switch Listone / Osservati e colonna Scout
+========================= */
+.players-page-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.players-list-switch { display: inline-flex; padding: 4px; border-radius: 999px; background: rgba(var(--ink-rgb), 0.07); gap: 2px; }
+.players-list-switch button {
+  min-height: 38px; padding: 0 18px; border: 0 !important; border-radius: 999px !important;
+  background: transparent !important; color: var(--muted) !important; font: inherit; font-weight: 800; font-size: 14px; cursor: pointer;
+}
+.players-list-switch button[aria-selected="true"] { background: var(--surface) !important; color: var(--text) !important; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18); }
+.players-list-switch small { margin-left: 4px; padding: 1px 7px; border-radius: 999px; background: rgba(var(--ink-rgb), 0.1); font-size: 11px; }
+
+.players-table-header,
+.players-table-row { grid-template-columns: minmax(220px, 2fr) repeat(5, minmax(70px, 1fr)) minmax(120px, 1.2fr) minmax(90px, 1fr) !important; }
+.players-table-row { cursor: pointer; }
+.players-table-row:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.players-scout-select {
+  width: 100%; max-width: 140px; min-height: 32px; padding: 0 26px 0 10px; border-radius: 999px;
+  border: 1px solid rgba(var(--ink-rgb), 0.14); background-color: rgba(var(--ink-rgb), 0.04); color: var(--muted);
+  font: inherit; font-size: 12.5px; font-weight: 800; cursor: pointer;
+}
+.players-scout-select.scout-primary { color: #1f9d55; border-color: color-mix(in srgb, #1f9d55 50%, transparent); background-color: color-mix(in srgb, #1f9d55 12%, transparent); }
+.players-scout-select.scout-secondary { color: #3b82c4; border-color: color-mix(in srgb, #3b82c4 50%, transparent); background-color: color-mix(in srgb, #3b82c4 12%, transparent); }
+.players-scout-select.scout-third { color: #c99a1e; border-color: color-mix(in srgb, #c99a1e 50%, transparent); background-color: color-mix(in srgb, #c99a1e 12%, transparent); }
+.players-scout-select.scout-fourth { color: #8a6fd1; border-color: color-mix(in srgb, #8a6fd1 50%, transparent); background-color: color-mix(in srgb, #8a6fd1 12%, transparent); }
+.players-scout-select.scout-bet { color: #e05a5a; border-color: color-mix(in srgb, #e05a5a 50%, transparent); background-color: color-mix(in srgb, #e05a5a 12%, transparent); }
+.players-toolbar .players-list-switch { flex: none; }
+.players-scout-select { padding-right: 22px !important; font-size: 12px !important; }
+.players-table-header, .players-table-row { grid-template-columns: minmax(220px, 2fr) repeat(5, minmax(66px, 1fr)) minmax(132px, 1.25fr) minmax(90px, 1fr) !important; }
+.players-table-header, .players-table-row { grid-template-columns: minmax(210px, 2fr) repeat(5, minmax(64px, 1fr)) minmax(146px, 1.3fr) minmax(90px, 1fr) !important; }
+.players-scout-select { padding-left: 10px !important; max-width: 146px; }

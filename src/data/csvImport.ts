@@ -40,6 +40,7 @@ const COACH_COLUMNS = ['Squadra', 'Allenatore', 'Modulo', 'Ruoli chiave', 'Rigor
 
 function detectKey(fileName: string, header: string[]): CsvKey | undefined {
   const name = fileName.toLowerCase()
+  if (header.includes('Soprannome') && header.includes('Squadra') && header.includes('Stagione')) return 'avversari'
   if (header.includes('Fascia') && header.includes('Fonte')) return 'sos_consigli'
   if (header.includes('Ballottaggio') && header.includes('Probabilità')) return 'sos_probabili'
   if (header.includes('Probabilità') && header.includes('Avversario')) return 'probabili'
@@ -139,6 +140,33 @@ function analyzeGoalkeepers(key: CsvKey, rows: Row[]): { errors: string[]; summa
   return { errors, summary: [`${rows.length} portieri di ${teams.size} squadre`] }
 }
 
+// File "a elenco" (una riga per giocatore, voto, acquisto…): colonne indispensabili e un riepilogo
+const LIST_COLUMNS: Partial<Record<CsvKey, string[]>> = {
+  stagione_precedente: ['ID FantaLab', 'Nome', 'Squadra', 'Ruolo'],
+  voti_giornate: ['ID Fantacalcio', 'Nome', 'Giornata', 'Voto'],
+  storico_stagioni: ['ID Fantacalcio', 'Nome', 'Stagione', 'MV', 'FMV'],
+  aste: ['Stagione', 'Lega', 'Squadra', 'ID Fantacalcio', 'Prezzo'],
+  probabili: ['ID FantaLab', 'Giornata', 'Avversario'],
+  sos_probabili: ['ID FantaLab', 'Squadra', 'Probabilità'],
+  sos_consigli: ['ID FantaLab', 'Ruolo', 'Fascia'],
+  avversari: ['Soprannome', 'Stagione', 'Lega', 'Squadra'],
+}
+
+function analyzeList(key: CsvKey, rows: Row[], current: Row[]): { errors: string[]; summary: string[] } {
+  const errors = rows.length ? [] : ['Il file non contiene righe.']
+  const distinct = (column: string) => [...new Set(rows.map((row) => row[column]).filter(Boolean))]
+  const summary = [`${current.length} → ${rows.length} righe`]
+  if (key === 'voti_giornate') {
+    const days = distinct('Giornata').map(Number).filter(Number.isFinite)
+    if (days.length) summary.push(`giornate ${Math.min(...days)}–${Math.max(...days)}, ${distinct('ID Fantacalcio').length} giocatori`)
+  }
+  if (key === 'storico_stagioni' || key === 'aste' || key === 'avversari') summary.push(`stagioni: ${distinct('Stagione').sort().join(', ')}`)
+  if (key === 'probabili') summary.push(`giornata ${distinct('Giornata').join(', ')}`)
+  if (key === 'sos_consigli') summary.push(`${distinct('Ruolo').length} ruoli, giornata ${distinct('Giornata').join(', ') || '—'}`)
+  if (key === 'sos_probabili' || key === 'stagione_precedente') summary.push(`${distinct('Squadra').length} squadre`)
+  return { errors, summary }
+}
+
 export function analyzeCsv(fileName: string, content: string, current: (key: CsvKey) => string): CsvAnalysis {
   const { header, rows } = parseRows(content)
   const key = detectKey(fileName, header)
@@ -152,7 +180,7 @@ export function analyzeCsv(fileName: string, content: string, current: (key: Csv
     : key === 'fantalab_allenatori' ? COACH_COLUMNS
       : key === 'saggi' ? ['id_giocatore', 'Saggio', 'Fascia_Originale', 'Prezzo']
         : key === 'portieri_gerarchie' ? ['id_giocatore', 'Giocatore', 'Squadra', 'Gerarchia']
-          : ['Squadra']
+          : LIST_COLUMNS[key] ?? ['Squadra']
   const missing = missingColumns(header, required)
   if (missing.length) {
     return { fileName, key, content, ok: false, summary: [], errors: [`Colonne mancanti: ${missing.join(', ')}.`] }
@@ -162,6 +190,7 @@ export function analyzeCsv(fileName: string, content: string, current: (key: Csv
     : key === 'fantalab_allenatori' ? analyzeCoaches(rows, currentRows)
       : key === 'saggi' ? analyzeSaggi(rows, currentRows)
         : key === 'portieri_calendario' || key === 'portieri_gerarchie' ? analyzeGoalkeepers(key, rows)
-          : analyzeGrid(header, rows)
+          : LIST_COLUMNS[key] ? analyzeList(key, rows, currentRows)
+            : analyzeGrid(header, rows)
   return { fileName, key, content, ok: result.errors.length === 0, ...result }
 }

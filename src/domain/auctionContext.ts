@@ -23,6 +23,28 @@ export const ROLE_ORDER:
     'A',
   ]
 
+/**
+ * Spesa massima "ponderata" per un ruolo: i crediti rimasti vengono divisi tra i reparti ancora
+ * aperti secondo la distribuzione del budget (P/D/C/A %) e la quota di slot liberi in ciascuno;
+ * della quota del ruolo si tiene 1 cr per ogni altro slot libero dello stesso ruolo.
+ * Non supera mai il massimo assoluto (crediti meno 1 per ogni altro slot vuoto della rosa).
+ */
+export function weightedRoleBudget(
+  remainingCredits: number,
+  filled: Record<PlayerRole, number>,
+  distribution: Record<PlayerRole, number>,
+  role: PlayerRole,
+): number {
+  const open = (r: PlayerRole) => Math.max(0, ROSTER_SLOT_LIMITS[r] - (filled[r] ?? 0))
+  if (open(role) <= 0) return 0
+  const weight = (r: PlayerRole) => (distribution[r] ?? 0) * open(r) / ROSTER_SLOT_LIMITS[r]
+  const total = ROLE_ORDER.reduce((sum, r) => sum + weight(r), 0)
+  const share = total > 0 ? remainingCredits * weight(role) / total : remainingCredits
+  const emptySlots = ROLE_ORDER.reduce((sum, r) => sum + open(r), 0)
+  const absolute = Math.max(0, remainingCredits - (emptySlots - 1))
+  return Math.max(1, Math.min(absolute, Math.floor(share - (open(role) - 1))))
+}
+
 export function median(
   values: number[],
 ): number | undefined {

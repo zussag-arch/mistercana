@@ -83,19 +83,14 @@
 
 .player-detail-header,
 .player-detail-identity,
-.player-detail-header-actions,
-.player-detail-actions,
-.player-full-header,
-.player-full-identity,
-.player-full-actions {
+.player-detail-actions {
   display: flex;
   align-items: center;
 
   gap: 12px;
 }
 
-.player-detail-header,
-.player-full-header {
+.player-detail-header {
   justify-content:
     space-between;
 }
@@ -112,23 +107,20 @@
     rgba(var(--ink-rgb), 0.07);
 }
 
-.player-detail-header h2,
-.player-full-header h1 {
+.player-detail-header h2 {
   margin: 2px 0;
 
   letter-spacing:
     -0.02em;
 }
 
-.player-detail-header p,
-.player-full-header p {
+.player-detail-header p {
   margin: 0;
 
   color: var(--muted);
 }
 
 .player-detail-eyebrow,
-.player-full-header small,
 .player-section-heading > span {
   color: var(--accent);
 
@@ -604,9 +596,7 @@
   margin-top: 13px;
 }
 
-.player-detail-actions button,
-.player-detail-header-actions button,
-.player-full-header button {
+.player-detail-actions button {
   min-height: 42px;
 
   padding: 0 15px;
@@ -641,51 +631,23 @@
       var(--ease-out);
 }
 
-.player-detail-call-button:not(:disabled),
-.player-full-actions button:not(:disabled) {
-  border-color:
-    color-mix(in srgb, var(--accent) 36%, transparent);
-
-  background:
-    color-mix(in srgb, var(--accent) 10%, transparent);
-
-  color: var(--accent);
-}
-
-.player-detail-actions button:disabled,
-.player-detail-header-actions button:disabled,
-.player-full-header button:disabled {
+.player-detail-actions button:disabled {
   opacity: 0.45;
 
   cursor: default;
 }
 
-.player-detail-actions button:active:not(:disabled),
-.player-detail-header-actions button:active:not(:disabled),
-.player-full-header button:active:not(:disabled) {
+.player-detail-actions button:active:not(:disabled) {
   transform:
     scale(0.97);
 }
 
 @media (hover: hover) {
-  .player-detail-actions button:hover:not(:disabled),
-  .player-detail-header-actions button:hover:not(:disabled),
-  .player-full-header button:hover:not(:disabled) {
+  .player-detail-actions button:hover:not(:disabled) {
     border-color:
       rgba(var(--ink-rgb), 0.18);
 
     background: var(--surface-raised);
-  }
-
-  .player-detail-call-button:hover:not(:disabled),
-  .player-full-actions button:hover:not(:disabled) {
-    border-color:
-      color-mix(in srgb, var(--accent) 52%, transparent);
-
-    background:
-      color-mix(in srgb, var(--accent) 15%, transparent);
-
-    color: var(--accent);
   }
 }
 
@@ -698,36 +660,6 @@
   max-width: 1180px;
 
   margin: 0 auto;
-}
-
-.player-full-header {
-  margin-bottom: 15px;
-
-  padding: 15px;
-
-  border:
-    1px solid
-    rgba(var(--ink-rgb), 0.08);
-
-  border-radius: 24px;
-
-  background:
-    linear-gradient(
-      180deg,
-      rgba(var(--ink-rgb), 0.018),
-      rgba(var(--ink-rgb), 0.006)
-    ),
-    var(--bg);
-
-  box-shadow:
-    inset 0 1px 0
-    rgba(var(--ink-rgb), 0.025);
-}
-
-.player-full-header
-> div
-> div {
-  min-width: 0;
 }
 
 .player-full-section {
@@ -924,16 +856,6 @@ summary em::after {
     align-items: flex-start;
   }
 
-  .player-detail-header-actions {
-
-    justify-content: flex-end;
-  }
-
-  .player-detail-header-actions
-  .player-status {
-    order: 2;
-  }
-
   .player-current-metrics {
     grid-template-columns:
       repeat(
@@ -983,24 +905,6 @@ summary em::after {
     flex: 1;
   }
 
-  .player-full-header {
-    align-items: flex-start;
-
-    flex-wrap: wrap;
-
-    border-radius: 20px;
-  }
-
-  .player-full-identity {
-    order: -1;
-
-    flex-basis: 100%;
-  }
-
-  .player-full-actions {
-    margin-left: auto;
-  }
-
   .player-full-page {
     min-width: 0;
   }
@@ -1019,17 +923,6 @@ summary em::after {
 }
 
 @media (max-width: 420px) {
-  .player-detail-header-actions
-  .player-detail-call-button {
-    display: none;
-  }
-
-  .player-full-actions {
-    width: 100%;
-
-    justify-content:
-      space-between;
-  }
 
   .player-current-metrics {
     grid-template-columns:
@@ -1063,9 +956,7 @@ summary em::after {
   .player-detail-overlay,
   .player-detail-card,
   .player-detail-close-button,
-  .player-detail-actions button,
-  .player-detail-header-actions button,
-  .player-full-header button {
+  .player-detail-actions button {
     animation: none !important;
 
     transition: none !important;

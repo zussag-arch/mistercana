@@ -7,7 +7,6 @@ export type PageId =
   | 'auction'
   | 'players'
   | 'playerDetail'
-  | 'objectives'
   | 'insights'
   | 'roster'
   | 'importExport'
@@ -54,10 +53,6 @@ export function renderNavigation(
       label: 'GIOCATORI',
     },
     {
-      id: 'objectives',
-      label: 'OBIETTIVI',
-    },
-    {
       id: 'roster',
       label: 'ROSA',
     },
@@ -67,7 +62,7 @@ export function renderNavigation(
     },
     {
       id: 'importExport',
-      label: 'IMPORT/EXPORT',
+      label: 'DATI',
     },
   ]
 
@@ -176,7 +171,6 @@ const TAB_ICONS: Record<string, string> = {
   dashboard: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/>',
   auction: '<path d="m14 13-7.5 7.5a2.1 2.1 0 0 1-3-3L11 10"/><path d="m16 16 6-6"/><path d="m8 8 6-6"/><path d="m9 7 8 8"/><path d="m21 11-8-8"/>',
   players: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
-  objectives: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
   roster: '<path d="M6 3h12l2 5-3 2v11H7V10L4 8l2-5Z"/><path d="M10 3a2 2 0 0 0 4 0"/>',
   insights: '<path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 5-6"/>',
   importExport: '<path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>',
@@ -191,7 +185,6 @@ function renderMobileTabbar(
     ['dashboard', 'Home'],
     ['auction', 'Asta'],
     ['players', 'Giocatori'],
-    ['objectives', 'Obiettivi'],
     ['roster', 'Rosa'],
     ['insights', 'Insights'],
     ['importExport', 'Dati'],

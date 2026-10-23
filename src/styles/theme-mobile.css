@@ -624,7 +624,6 @@
 @media (max-width: 700px) {
   .sheet-back-portal { display: inline-flex; }
   /* nella scheda completa su telefono resta solo il pulsante fisso */
-  .player-full-back { display: none !important; }
 }
 
 /* Asta: Giocatori e Obiettivi sono già nel menu, niente doppioni in alto */
@@ -644,8 +643,7 @@ html, body { touch-action: manipulation; }
    CHIUSURA SCHEDE (sostituisce "Indietro")
    Una sola × tonda, uguale nelle due schede, in alto a destra nella testata.
 ========================= */
-.player-quick-card .player-detail-close-button,
-.player-full-back.sheet-close {
+.player-quick-card .player-detail-close-button {
   display: inline-grid !important;
   place-items: center;
   width: 40px !important;
@@ -671,32 +669,31 @@ html, body { touch-action: manipulation; }
   .player-full-page-v3 { padding-top: 0 !important; }
 
   /* Scheda completa e × sulla stessa riga, alla stessa altezza */
-  .player-detail-header-actions { display: flex !important; align-items: center; gap: 8px; flex-wrap: nowrap; }
-  .player-detail-header-actions .player-detail-full-button {
-    display: inline-flex !important;
-    align-items: center;
-    height: 40px;
-    min-height: 40px;
-    padding: 0 14px;
-    white-space: nowrap;
-  }
 
 }
 @media (max-width: 700px) {
   .player-quick-card .player-detail-header { flex-wrap: wrap !important; row-gap: 10px; }
-  .player-quick-card .player-detail-header-actions {
-    order: -1;
-    flex-basis: 100%;
-    justify-content: flex-end;
-  }
-  .player-quick-card .player-detail-header-actions .player-detail-full-button,
   .player-quick-card .player-detail-close-button { height: 36px !important; min-height: 36px; width: auto; }
   .player-quick-card .player-detail-close-button { width: 36px !important; }
-  .player-quick-card .player-detail-header-actions .player-detail-full-button { font-size: 13px; line-height: 1; }
 }
 @media (max-width: 700px) {
   /* tutto un po' più in basso: il logo esce dalla fascia della barra di stato */
   .topbar { padding-top: calc(env(safe-area-inset-top) + 24px) !important; }
   .app-shell[data-view="playerDetail"] .page { padding-top: calc(env(safe-area-inset-top) + 40px); }
   .player-detail-overlay { padding-top: calc(env(safe-area-inset-top) + 28px) !important; }
+}
+@media (max-width: 700px) {
+  .players-table-row {
+    grid-template-areas:
+      "player player ica"
+      "pma xfm tit"
+      "mv scout status" !important;
+  }
+  .players-table-row > [data-label="Scout"] { grid-area: scout; }
+  .players-list-switch { width: 100%; }
+  .players-list-switch button { flex: 1; }
+}
+@media (max-width: 700px) {
+  .players-scout-select { font-size: 12px !important; min-height: 30px !important; max-width: 100% !important; }
+  .players-toolbar .players-list-switch { order: -1; width: 100%; }
 }

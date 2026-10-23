@@ -106,9 +106,6 @@
 }
 
 /* etichette pastello usate come testo: più scure sul bianco */
-:root[data-theme="light"] .objective-priority-header span {
-  color: color-mix(in srgb, var(--pc) 55%, var(--text));
-}
 
 /* con l'accento rosso, ciò che è "buono" o "centrocampo" resta verde */
 .dashboard-page .budget-field:nth-child(3)::before { background: var(--role-c); }
@@ -242,7 +239,6 @@ button:not([class*="card"]):not([class*="backdrop"]):not([class*="tile"]):not([c
 
 /* tema chiaro: la parola del ruolo bordata (Portiere, Difensore…) più marcata */
 :root[data-theme="light"] .auction-player-card:not(.auction-no-player)::before,
-:root[data-theme="light"] .player-full-page-v3 .player-full-header::before,
 :root[data-theme="light"] .player-detail-header::before {
   -webkit-text-stroke: 1.5px color-mix(in srgb, var(--rc, var(--accent)) 70%, transparent);
   opacity: 1;

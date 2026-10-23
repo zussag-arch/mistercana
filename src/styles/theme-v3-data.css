@@ -82,8 +82,7 @@
   background: var(--surface-light);
 }
 
-.data-sources-howto summary,
-.flda-optional > summary {
+.data-sources-howto summary {
   cursor: pointer;
   font-weight: 700;
 }
@@ -98,56 +97,6 @@
 }
 
 /* FLDA: facoltativo, chiuso di default */
-.flda-optional {
-  margin-bottom: 18px;
-  border: 1px dashed rgba(var(--ink-rgb), 0.13);
-  border-radius: var(--radius-xl);
-}
-
-.flda-optional > summary {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 16px 22px;
-  list-style: none;
-}
-
-.flda-optional > summary::-webkit-details-marker {
-  display: none;
-}
-
-.flda-optional > summary span {
-  font-family: var(--font-display);
-  font-size: 17px;
-  font-weight: 800;
-  letter-spacing: -0.04em;
-}
-
-.flda-optional > summary span small,
-.flda-optional > summary > small {
-  font-family: var(--font-ui);
-  font-size: 12.5px;
-  font-weight: 600;
-  letter-spacing: 0;
-  color: var(--muted);
-}
-
-.flda-optional > summary::after {
-  content: "apri ↓";
-  font-size: 12.5px;
-  color: var(--accent);
-}
-
-.flda-optional[open] > summary::after {
-  content: "chiudi ↑";
-}
-
-.flda-optional > .data-transfer-section {
-  margin: 0;
-  border: 0;
-}
 
 /* punti chiave allenatore (Insights) */
 .coach-key-points {
@@ -445,3 +394,117 @@
 }
 .data-last-update strong { color: var(--accent); margin-left: 4px; }
 .data-source-updated { color: var(--muted); font-size: 12px; }
+
+/* =========================
+   ANAGRAFICA AVVERSARI
+========================= */
+.rivals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.rival-card {
+  display: grid; gap: 10px; padding: 16px; border-radius: 20px;
+  border: 1px solid var(--line-2); background: var(--surface);
+}
+.rival-card.is-me { border-color: color-mix(in srgb, var(--accent) 55%, transparent); }
+.rival-card header { display: flex; align-items: center; gap: 8px; }
+.rival-tag { padding: 3px 9px; border-radius: 999px; background: var(--accent); color: var(--accent-ink); font-size: 11px; font-weight: 800; }
+.rival-tag.linked { background: rgba(var(--ink-rgb), 0.08); color: var(--muted); }
+.rival-index { display: flex; align-items: baseline; gap: 8px; }
+.rival-index span, .rival-index small { color: var(--muted); font-size: 12px; }
+.rival-index strong { font-family: var(--font-display); font-size: 22px; }
+.rival-index strong.up { color: var(--red); }
+.rival-index strong.down { color: var(--accent); }
+.rival-roles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.rival-roles div { display: grid; gap: 2px; padding: 8px; border-radius: 12px; background: rgba(var(--ink-rgb), 0.05); text-align: center; }
+.rival-roles span { font-weight: 800; font-size: 12px; }
+.rival-roles strong { font-size: 14px; }
+.rival-roles small { color: var(--muted); font-size: 11px; }
+.rival-traits { margin: 0; color: var(--muted); font-size: 12px; }
+.rival-traits b { color: var(--text); }
+.rival-card { min-width: 0; overflow: hidden; }
+.rival-roles { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.rival-index { flex-wrap: wrap; }
+
+/* anagrafica: titolo, menu ⋯, modulo profilo */
+.rivals-header-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 10px; }
+.rival-card { position: relative; overflow: visible; }
+.rival-card.is-coach { border-color: var(--line-1); }
+.rival-title { flex: 1; min-width: 0; }
+.rival-title h3 { margin: 0; font-family: var(--font-display); font-size: 18px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rival-title p { margin: 2px 0 0; color: var(--muted); font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rival-menu { position: relative; }
+.rival-menu-button {
+  width: 32px; height: 32px; padding: 0 !important; border-radius: 999px !important;
+  border: 1px solid var(--line-1) !important; background: transparent !important; color: var(--text) !important;
+  font-size: 18px; line-height: 1; cursor: pointer;
+}
+.rival-menu-list {
+  position: absolute; right: 0; top: 38px; z-index: 20; min-width: 170px; padding: 6px;
+  display: grid; gap: 2px; border-radius: 14px; border: 1px solid var(--glass-border, var(--line-1));
+  background: var(--surface); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+}
+.rival-menu-list[hidden] { display: none; }
+.rival-menu-list button {
+  padding: 9px 12px !important; border: 0 !important; border-radius: 10px !important; background: transparent !important;
+  color: var(--text) !important; text-align: left; font: inherit; font-size: 13.5px; font-weight: 700; cursor: pointer;
+}
+.rival-menu-list button:hover { background: rgba(var(--ink-rgb), 0.06) !important; }
+.rival-menu-list button.danger { color: var(--red) !important; }
+.rival-empty { margin: 0; color: var(--muted); font-size: 12.5px; }
+.rival-form { display: grid; gap: 12px; width: min(460px, 100%); }
+.rival-form label { display: grid; gap: 5px; font-size: 12.5px; color: var(--muted); font-weight: 700; }
+.rival-form input:not([type="checkbox"]) {
+  min-height: 42px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--line-1);
+  background: var(--surface-light, rgba(var(--ink-rgb), 0.04)); color: var(--text); font: inherit; font-size: 15px;
+}
+.rival-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.rival-form-check { display: flex !important; align-items: center; gap: 8px; color: var(--text) !important; }
+.dashboard-managers-hint { grid-column: 1 / -1; margin: 4px 0 0; color: var(--muted); font-size: 12.5px; }
+.rivals-grid { align-items: start; }
+.rival-card { align-content: start; }
+.rival-card header { align-items: flex-start; }
+.rival-tag { flex: none; margin-top: 4px; }
+#rivalOverlay .rival-form { width: min(460px, calc(100vw - 32px)) !important; min-width: 0 !important; max-width: calc(100vw - 32px) !important; box-sizing: border-box; }
+#rivalOverlay .overlay-actions { display: flex; justify-content: flex-end; gap: 8px; }
+@media (max-width: 700px) {
+  .rival-form-row { grid-template-columns: 1fr; }
+  .rivals-header-actions { justify-content: flex-start; }
+}
+#rivalOverlay:not(.hidden) { display: grid !important; place-items: center !important; padding: 16px !important; }
+#rivalOverlay .rival-form { margin: 0 !important; }
+#rivalForm, #rivalForm * { box-sizing: border-box; }
+#rivalForm label, #rivalForm .rival-form-row > * { min-width: 0; }
+#rivalForm input:not([type="checkbox"]) { width: 100% !important; min-width: 0 !important; max-width: 100% !important; }
+#rivalForm .overlay-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+#rivalForm .overlay-header h2 { margin: 0; min-width: 0; }
+
+/* =========================
+   ALLINEAMENTI PAGINA DATI
+========================= */
+/* fonti: 3 per riga, stessa altezza, "inclusi nell'app" sempre in fondo */
+.data-sources-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; align-items: stretch !important; }
+.data-source-card { display: flex !important; flex-direction: column; gap: 6px; height: 100%; }
+.data-source-card > p { margin: 4px 0 0; }
+.data-source-card > .data-source-updated { margin-top: auto !important; padding-top: 8px; }
+@media (max-width: 1000px) { .data-sources-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } }
+@media (max-width: 700px) { .data-sources-grid { grid-template-columns: 1fr !important; } }
+
+/* anagrafica: ogni persona è una tessera ben visibile, in entrambi i temi */
+.rival-card {
+  background: rgba(var(--ink-rgb), 0.035) !important;
+  border: 1px solid rgba(var(--ink-rgb), 0.09) !important;
+  border-radius: 24px !important;
+  padding: 18px !important;
+}
+.rival-card.is-me { border-color: color-mix(in srgb, var(--accent) 55%, transparent) !important; }
+.rival-roles div { background: rgba(var(--ink-rgb), 0.055) !important; }
+.rivals-grid { gap: 14px !important; }
+.rivals-grid { align-items: stretch !important; }
+.rival-menu-button { border: 1px solid rgba(var(--ink-rgb), 0.16) !important; }
+.rivals-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
+@media (max-width: 1200px) { .rivals-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; } }
+@media (max-width: 900px) { .rivals-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } }
+@media (max-width: 600px) { .rivals-grid { grid-template-columns: minmax(0, 1fr) !important; } }
+.rival-card, .rival-card header, .rival-title { min-width: 0 !important; }
+.rival-title h3 { display: block; max-width: 100%; }
+.rival-index { display: flex; flex-wrap: wrap; column-gap: 8px; }
+.rival-history { margin: 0; color: var(--muted); font-size: 12.5px; }
+.rival-history b { color: var(--text); }
