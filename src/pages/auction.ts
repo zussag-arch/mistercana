@@ -46,7 +46,7 @@ import type { AuctionStrategyContext } from '../services/auctionStrategyAdapter'
 import { decideBid } from '../domain/bidDecision'
 import type { BidDecision } from '../domain/bidDecision'
 import { calculateCompetitors } from '../domain/competitorAnalysis'
-import { getOwnerManagerId } from '../domain/auctionContext'
+import { getOwnerManagerId, weightedRoleBudget } from '../domain/auctionContext'
 
 const loadingHistoricalPrices = new Set<string>()
 const attemptedHistoricalPrices = new Set<string>()
@@ -551,7 +551,7 @@ function bidDecisionFor(
       && (getICaV3(item.fantalabId)?.score ?? -Infinity) >= (ica.score ?? 0) - 5).length
     : 0
   const rivals = calculateCompetitors(strategy.state, player, strategy.players)
-    .map((rival) => ({ name: rival.managerName, capacity: rival.financialCapacity, estimatedBid: rival.estimatedBid }))
+    .map((rival) => ({ name: rival.nickname, capacity: rival.weightedCapacity, estimatedBid: rival.estimatedBid }))
   return decideBid({
     role: player.role,
     currentPrice,
@@ -570,12 +570,17 @@ function renderBidDecisionContent(decision: BidDecision): string {
   const amount = decision.action === 'RILANCIA' ? `<strong class="bid-amount">${decision.maxBid} cr</strong>` : ''
   return `<div class="bid-head"><span class="bid-action">${label}</span>${amount}<span class="bid-confidence">sicurezza ${decision.confidence}</span></div>
     <ul class="bid-reasons">${decision.reasons.map((reason) => `<li>${escapeHtml(reason)}</li>`).join('')}</ul>
-    ${decision.threats.length ? `<p class="bid-threats">${decision.threats.slice(0, 5).map((rival) => `<span>${escapeHtml(rival.name)} <b>max ${rival.capacity}</b></span>`).join('')}</p>` : ''}`
+    ${decision.threats.length ? `<p class="bid-threats">${decision.threats.slice(0, 5).map((rival) => `<span title="probabilità che rilanci ora · fin dove arriva probabilmente">${escapeHtml(rival.name)} <b>${Math.round(rival.chance * 100)}%</b> · ~${rival.likely} cr</span>`).join('')}</p>` : ''}`
+}
+
+// colore dinamico: verde lontano dal tetto, poi giallo, rosso al tetto (e per PASSA)
+function bidColor(decision: BidDecision): string {
+  return `color-mix(in oklab, #e5534b ${Math.round(decision.pressure * 100)}%, #2fbf71)`
 }
 
 function renderBidDecision(decision: BidDecision | undefined): string {
   if (!decision) return ''
-  return `<div id="auctionBidDecision" class="auction-bid-decision" data-action="${decision.action}">${renderBidDecisionContent(decision)}</div>`
+  return `<div id="auctionBidDecision" class="auction-bid-decision" data-action="${decision.action}" style="--bid-color:${bidColor(decision)}">${renderBidDecisionContent(decision)}</div>`
 }
 
 function updateBidDecision(state: AppState, currentPrice: number): void {
@@ -590,6 +595,7 @@ function updateBidDecision(state: AppState, currentPrice: number): void {
     element.classList.remove('is-changing'); void element.offsetWidth; element.classList.add('is-changing')
   }
   element.dataset.action = decision.action
+  element.style.setProperty('--bid-color', bidColor(decision))
   element.innerHTML = renderBidDecisionContent(decision)
 }
 
@@ -3116,9 +3122,8 @@ function renderParticipants(
                   state,
                   activeRole,
                 )
-              // massimo che può offrire ora: tiene 1 cr per ogni altro slot ancora vuoto
-              const emptySlots = ROLE_ORDER.reduce((total, role) => total + Math.max(0, ROSTER_SLOT_LIMITS[role] - participant.slots[role]), 0)
-              const maxBid = emptySlots > 0 ? Math.max(0, remaining - (emptySlots - 1)) : 0
+              // spesa massima ponderata nel ruolo in asta (divisione dei crediti per reparto)
+              const maxBid = weightedRoleBudget(remaining, participant.slots, state.budgetDistribution, activeRole)
 
               return `
                 <article
@@ -3141,7 +3146,7 @@ function renderParticipants(
                     </strong>
 
                     <span>
-                      ${remaining}<small class="auction-participant-max" title="Offerta massima possibile ora">max ${maxBid}</small>
+                      ${remaining}<small class="auction-participant-max" title="Spesa massima ponderata per il ruolo ${activeRole}">${activeRole} fino a ${maxBid}</small>
                     </span>
                   </div>
 

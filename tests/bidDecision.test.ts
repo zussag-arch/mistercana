@@ -13,16 +13,18 @@ test('rilancia fino al tetto se qualcuno può ancora superarti', () => {
   const decision = decideBid(base)
   assert.equal(decision.action, 'RILANCIA')
   assert.equal(decision.maxBid, 55)
-  assert.equal(decision.confidence, 'alta')
+  // Davide di solito spende 84 su un giocatore così e ha potenziale: poche probabilità entro 55
+  assert.equal(decision.confidence, 'bassa')
+  assert.match(decision.reasons.join(' '), /Probabilità di prenderlo entro 55 cr: \d+%/)
   assert.ok(decision.reasons.length <= 3)
   assert.deepEqual(decision.threats.map((rival) => rival.name), ['Davide', 'Simone'])
 })
 
-test('compra se nessun avversario ha crediti per rilanciare', () => {
+test('compra se è improbabile che qualcuno rilanci', () => {
   const decision = decideBid({ ...base, currentPrice: 40, rivals: [{ name: 'Simone', capacity: 30, estimatedBid: 20 }] })
   assert.equal(decision.action, 'COMPRA')
   assert.equal(decision.maxBid, 41)
-  assert.match(decision.reasons.join(' '), /Nessun avversario/)
+  assert.match(decision.reasons.join(' '), /Probabilità che qualcuno rilanci: \d+%/)
 })
 
 test('passa oltre il tetto, oltre il limite finanziario o con il reparto pieno', () => {
@@ -35,4 +37,13 @@ test('passa oltre il tetto, oltre il limite finanziario o con il reparto pieno',
 test('il massimo consigliato non supera mai il limite finanziario', () => {
   const decision = decideBid({ ...base, ceiling: 55, financialLimit: 164 })
   assert.ok((decision.maxBid ?? 0) <= 164)
+})
+
+test('la probabilità cresce col comportamento e cala oltre il potenziale', async () => {
+  const { rivalChance } = await import('../src/domain/bidDecision.ts')
+  const spender = { name: 'A', capacity: 100, estimatedBid: 60 }
+  const saver = { name: 'B', capacity: 100, estimatedBid: 30 }
+  assert.ok(rivalChance(spender, 45) > rivalChance(saver, 45))
+  assert.ok(rivalChance({ ...spender, capacity: 40 }, 50) < rivalChance(spender, 50))
+  assert.ok(rivalChance(spender, 20) > 0.9)
 })

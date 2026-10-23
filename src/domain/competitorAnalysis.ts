@@ -11,6 +11,8 @@ import {
 
 import {
   median,
+  ROLE_ORDER,
+  weightedRoleBudget,
 } from './auctionContext'
 
 import type {
@@ -33,7 +35,11 @@ type CompetitorEstimateSource =
 interface CompetitorAnalysis {
   managerId: string
   managerName: string
+  /** soprannome (alias), altrimenti il nome */
+  nickname: string
   teamName: string
+  /** spesa massima ponderata nel ruolo (divisione dei crediti per reparto) */
+  weightedCapacity: number
 
   role: PlayerRole
 
@@ -739,6 +745,17 @@ export function calculateCompetitors(
           managerName:
             getManagerDisplayName(
               manager,
+            ),
+
+          nickname:
+            manager.alias.trim() || manager.firstName.trim() || getManagerDisplayName(manager),
+
+          weightedCapacity:
+            weightedRoleBudget(
+              remainingCredits,
+              Object.fromEntries(ROLE_ORDER.map((role) => [role, assignments.filter((assignment) => playerMap.get(assignment.playerId ?? '')?.role === role).length])) as Record<PlayerRole, number>,
+              state.budgetDistribution,
+              player.role,
             ),
 
           teamName:

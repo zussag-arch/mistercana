@@ -528,7 +528,7 @@
   display: grid;
   gap: 8px;
 }
-.auction-bid-decision[data-action="PASSA"] { --bid-color: var(--red); }
+
 .auction-bid-decision.is-changing { animation: bid-pop 0.28s ease; }
 @keyframes bid-pop { from { transform: scale(0.97); } to { transform: scale(1); } }
 .auction-bid-decision .bid-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; }
