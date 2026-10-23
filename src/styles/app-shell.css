@@ -6,10 +6,11 @@
    riquadri interni lunghi. Barre di scorrimento nascoste ovunque.
 ========================= */
 
+/* niente altezza bloccata né overflow sul documento: su iPhone (app installata) facevano
+   "accorciare" lo schermo e restava una fascia vuota sotto la barra. Non serve: #app è fisso
+   sui bordi dello schermo e il documento non ha altro da scorrere. */
 html,
 body {
-  height: 100%;
-  overflow: hidden;
   overscroll-behavior: none;
 }
 
@@ -25,6 +26,13 @@ body {
   position: fixed;
   inset: 0;
   overflow: hidden;
+  background: inherit; /* lo sfondo della pagina sta sul contenitore dell'app */
+}
+
+/* app installata sul telefono: ciò che resta sotto l'area dell'app ha il colore della barra
+   in basso, così la barra arriva visivamente fino al bordo dello schermo */
+@media (display-mode: standalone) and (max-width: 700px) {
+  html { background: var(--surface) !important; }
 }
 .app-shell {
   height: 100%;
