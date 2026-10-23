@@ -536,3 +536,36 @@
 #rivalForm input:not([type="checkbox"]) { width: 100% !important; min-width: 0 !important; max-width: 100% !important; }
 #rivalForm .overlay-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 #rivalForm .overlay-header h2 { margin: 0; min-width: 0; }
+
+/* =========================
+   ALLINEAMENTI PAGINA DATI
+========================= */
+/* fonti: 3 per riga, stessa altezza, "inclusi nell'app" sempre in fondo */
+.data-sources-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; align-items: stretch !important; }
+.data-source-card { display: flex !important; flex-direction: column; gap: 6px; height: 100%; }
+.data-source-card > p { margin: 4px 0 0; }
+.data-source-card > .data-source-updated { margin-top: auto !important; padding-top: 8px; }
+@media (max-width: 1000px) { .data-sources-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } }
+@media (max-width: 700px) { .data-sources-grid { grid-template-columns: 1fr !important; } }
+
+/* anagrafica: ogni persona è una tessera ben visibile, in entrambi i temi */
+.rival-card {
+  background: rgba(var(--ink-rgb), 0.035) !important;
+  border: 1px solid rgba(var(--ink-rgb), 0.09) !important;
+  border-radius: 24px !important;
+  padding: 18px !important;
+}
+.rival-card.is-me { border-color: color-mix(in srgb, var(--accent) 55%, transparent) !important; }
+.rival-roles div { background: rgba(var(--ink-rgb), 0.055) !important; }
+.rival-teams span { background: rgba(var(--ink-rgb), 0.07) !important; }
+.rivals-grid { gap: 14px !important; }
+.rivals-grid { align-items: stretch !important; }
+.rival-teams { min-height: 54px; align-content: flex-start; }
+.rival-menu-button { border: 1px solid rgba(var(--ink-rgb), 0.16) !important; }
+.rivals-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
+@media (max-width: 1200px) { .rivals-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; } }
+@media (max-width: 900px) { .rivals-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } }
+@media (max-width: 600px) { .rivals-grid { grid-template-columns: minmax(0, 1fr) !important; } }
+.rival-card, .rival-card header, .rival-title { min-width: 0 !important; }
+.rival-title h3 { display: block; max-width: 100%; }
+.rival-index { display: flex; flex-wrap: wrap; column-gap: 8px; }
