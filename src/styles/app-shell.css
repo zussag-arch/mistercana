@@ -38,7 +38,6 @@ body {
   overflow-y: auto;
   overflow-x: hidden;
   overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
 }
 
 /* niente barre di scorrimento visibili (si scorre lo stesso) */
@@ -216,3 +215,10 @@ body { background-attachment: scroll !important; }
 }
 .auction-workspace,
 .roster-layout { gap: var(--space-cards) !important; }
+
+/* finestre aperte (scheda giocatore, recap, matrici…): su iPhone l'area che scorre è un livello
+   a sé e le barre fisse le passerebbero sopra. Mentre una finestra è aperta, l'area sale sopra le barre. */
+.app-main:has(.overlay:not(.hidden), .player-detail-overlay, .goalkeeper-matrix-overlay:not([hidden])) {
+  position: relative;
+  z-index: 9000;
+}
