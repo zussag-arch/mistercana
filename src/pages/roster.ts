@@ -6,6 +6,7 @@ import {
 } from '../data/roster'
 import type { League, MatchdayPick, Probable } from '../data/roster'
 import { getICa } from '../data/ica'
+import { myTeams } from '../data/rivals'
 import { getCachedPlayersDataset } from '../services/playerRepository'
 import { display, escapePlayerHtml } from '../components/playerDataView'
 import type { FldaPlayer } from '../services/flda'
@@ -15,11 +16,21 @@ const LEAGUE_LABEL: Record<League, string> = { SERIE_A: 'Serie A', SERIE_B: 'Ser
 
 interface Choice { league: League; team: string }
 
+// squadre scelte a mano in questa sessione (per lega); all'apertura dell'app si parte dalla propria squadra
+const picked: Partial<Record<League, string>> = {}
+
+function mine(item: League): string | undefined {
+  const team = myTeams()[item]
+  return team && leagueTeams(item).includes(team) ? team : undefined
+}
+
 function loadChoice(): Choice | null {
+  const team = picked[league] ?? mine(league)
+  if (team && leagueTeams(league).includes(team)) return { league, team }
   try {
     const raw = window.localStorage.getItem(CHOICE_KEY)
     const parsed = raw ? JSON.parse(raw) as Choice : null
-    return parsed && leagueTeams(parsed.league).includes(parsed.team) ? parsed : null
+    return parsed && parsed.league === league && leagueTeams(parsed.league).includes(parsed.team) ? parsed : null
   } catch {
     return null
   }
@@ -29,7 +40,12 @@ function saveChoice(choice: Choice): void {
   try { window.localStorage.setItem(CHOICE_KEY, JSON.stringify(choice)) } catch { /* solo comodità */ }
 }
 
-let league: League = loadChoice()?.league ?? 'SERIE_A'
+let league: League = 'SERIE_A'
+// si apre sulla lega della propria squadra (Serie A se c'è), altrimenti sull'ultima scelta
+try {
+  const saved = JSON.parse(window.localStorage.getItem(CHOICE_KEY) ?? 'null') as Choice | null
+  league = mine('SERIE_A') ? 'SERIE_A' : mine('SERIE_B') ? 'SERIE_B' : saved?.league ?? 'SERIE_A'
+} catch { /* resta Serie A */ }
 // dati dei pallini per il riquadro, ricostruiti a ogni disegno della pagina
 let picksById = new Map<string, MatchdayPick>()
 let hidePopOnScroll: () => void = () => {}
@@ -199,7 +215,7 @@ export function bindRosterEvents(actions: RosterActions): void {
   }))
   document.querySelector<HTMLSelectElement>('[data-roster-team]')?.addEventListener('change', (event) => {
     const team = (event.currentTarget as HTMLSelectElement).value
-    if (team) saveChoice({ league, team })
+    if (team) { picked[league] = team; saveChoice({ league, team }) }
     actions.onRender()
   })
 
