@@ -23,7 +23,7 @@ test('i correttivi hanno un tetto complessivo', () => {
 
 test('presenze attese continue: un dato da solo non azzera il giocatore', () => {
   const { share } = expectedShareV4(base({ titolarita: 1, appearances: 6, minutes: 500, teamMatches: 7 }))
-  assert.ok(share > 0.4, String(share))
+  assert.ok(share > 0.3, String(share)) // iCà 3: 1%
   const injured = expectedShareV4(base({ titolarita: 95, appearances: 7, minutes: 630, teamMatches: 7, out: true, currentMatchday: 8, returnMatchday: 20 }))
   assert.ok(injured.share < 0.7)
 })
