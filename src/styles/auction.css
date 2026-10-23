@@ -3078,3 +3078,5 @@ button.danger {
     animation: none;
   }
 }
+/* ricerca nella chiamata: i giocatori che non corrispondono spariscono davvero */
+.auction-selector-player[hidden] { display: none !important; }
