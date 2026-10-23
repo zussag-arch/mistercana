@@ -191,9 +191,16 @@ function startBlinking():
     )
 }
 
+// Sui dispositivi touch (iPhone, iPad, Android) l'icona non si tocca: Safari 26 per l'icona della Home
+// usa anche quella della scheda, e un SVG (il pallino) lo fa ripiegare su una lettera "M".
+// Il pallino serve solo nella scheda del browser sul computer.
+const touchDevice =
+  typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
+
 export function syncFavicon(
   auctionIsLive: boolean,
 ): void {
+  if (touchDevice) return
   if (
     auctionIsLive ===
     isLive
@@ -215,6 +222,7 @@ export function syncFavicon(
 export function initializeFavicon(
   auctionIsLive: boolean,
 ): void {
+  if (touchDevice) return
   isLive =
     auctionIsLive
 
