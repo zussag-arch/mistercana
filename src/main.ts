@@ -106,6 +106,15 @@ import type {
 const state =
   loadState()
 
+// "Sono io": se nessun allenatore è segnato, vale quello che l'anagrafica (colonna Io) indica come te
+if (!state.managers.some((manager) => manager.isOwner)) {
+  const me = state.managers.find((manager) => !manager.archived && profileForManager(manager)?.me)
+  if (me) {
+    me.isOwner = true
+    saveState(state)
+  }
+}
+
 let selectedPlayerReference: string | null = null
 
 initializeFavicon(
