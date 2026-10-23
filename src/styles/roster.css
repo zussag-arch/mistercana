@@ -1,12 +1,12 @@
 /* =========================
    LA MIA ROSA
 ========================= */
-.roster-page { width: 100%; max-width: 1280px; margin-inline: auto; display: grid; gap: 16px; }
+.roster-page { width: 100%; max-width: 1280px; margin-inline: auto; display: grid; }
 
 .roster-picker { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .roster-league { display: inline-flex; padding: 4px; border-radius: 999px; background: var(--surface-light); }
 .roster-league button {
-  min-height: 36px; padding: 0 16px; border: 0; border-radius: 999px !important;
+  min-height: 36px; padding: 0 16px; border: 0;
   background: none; color: var(--muted); font-weight: 700; cursor: pointer;
 }
 .roster-league button[aria-selected="true"] { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,.18); }
@@ -46,7 +46,7 @@
 .roster-section-head h2::after { display: inline; }
 
 /* ---------- impaginazione: campetto a sinistra, infermeria a destra ---------- */
-.roster-layout { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.roster-layout { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: start; }
 @media (max-width: 1000px) { .roster-layout { grid-template-columns: 1fr; } }
 
 /* ---------- campetto ---------- */
@@ -83,7 +83,7 @@
   background: rgba(0,0,0,.55); color: #fff; font-size: 11px; font-weight: 700;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.rpitch-dot-flag { position: absolute; top: -4px; right: -4px; width: 14px; height: 14px; border-radius: 50%; border: 2px solid #fff; }
+.rpitch-dot-flag { position: absolute; width: 14px; height: 14px; border-radius: 50%; border: 2px solid #fff; }
 .rpitch-dot-flag.bad { background: var(--red); }
 .rpitch-dot-flag.warn { background: var(--yellow); }
 
@@ -115,7 +115,7 @@
 .roster-pop-form { display: grid; gap: 4px; }
 .roster-pop-reasons { display: flex; flex-wrap: wrap; gap: 4px; }
 .roster-pop-reasons span { padding: 2px 8px; border-radius: 999px; background: var(--surface-light); color: var(--text-soft); font-size: 11px; font-weight: 600; }
-.roster-pop-open { min-height: 36px; border: 1px solid var(--line-1); background: var(--surface-light); color: var(--text); font-weight: 700; cursor: pointer; }
+.roster-pop-open { min-height: 36px; border: 1px solid var(--line-1); color: var(--text); font-weight: 700; cursor: pointer; }
 
 /* ---------- infermeria ---------- */
 .infirmary-list { display: grid; }
@@ -141,7 +141,7 @@
 /* segnalino a pentagono stondato */
 .rpitch-dot-marker { position: relative; display: grid; place-items: center; width: 52px; height: 52px; transition: transform .15s; }
 .rpitch-dot-marker svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 4px 6px rgba(0,0,0,.28)); }
-.rpitch-dot-shape { stroke: #fff; stroke-width: 2.5; stroke-linejoin: round; fill: var(--surface-raised); }
+.rpitch-dot-shape { stroke: #fff; stroke-width: 2.5; stroke-linejoin: round; }
 .rpitch-dot.role-p .rpitch-dot-shape { fill: var(--role-p); }
 .rpitch-dot.role-d .rpitch-dot-shape { fill: var(--role-d); }
 .rpitch-dot.role-c .rpitch-dot-shape { fill: var(--role-c); }

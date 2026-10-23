@@ -1,6 +1,5 @@
 .dashboard-page {
   display: grid;
-  gap: 22px;
 }
 
 /* =========================
@@ -8,16 +7,8 @@
 ========================= */
 
 .dashboard-eyebrow {
-  display: inline-block;
 
   margin-bottom: 8px;
-
-  color: var(--muted);
-
-  font-size: 11px;
-  font-weight: 800;
-
-  letter-spacing: 0.18em;
 }
 
 .dashboard-hero {
@@ -123,17 +114,6 @@
   box-shadow:
     0 12px 26px
     color-mix(in srgb, var(--accent) 18%, transparent);
-
-  transition:
-    transform
-      var(--motion-instant)
-      var(--ease-out),
-    border-color
-      var(--motion-fast)
-      var(--ease-standard),
-    box-shadow
-      var(--motion-fast)
-      var(--ease-standard);
 }
 
 .dashboard-cta-button:active:not(:disabled) {
@@ -160,26 +140,9 @@
       4,
       minmax(0, 1fr)
     );
-
-  gap: 14px;
 }
 
 .dashboard-stat-card {
-  padding: 18px;
-
-  border:
-    1px solid
-    rgba(var(--ink-rgb), 0.08);
-
-  border-radius: 26px;
-
-  background:
-    linear-gradient(
-      180deg,
-      rgba(var(--ink-rgb), 0.025),
-      rgba(var(--ink-rgb), 0.008)
-    ),
-    var(--bg);
 
   box-shadow:
     inset 0 1px 0
@@ -189,29 +152,12 @@
 .dashboard-stat-card.is-positive {
   border-color:
     color-mix(in srgb, var(--accent) 18%, transparent);
-
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--accent) 70%, transparent),
-      color-mix(in srgb, var(--bg) 85%, transparent)
-    ),
-    var(--bg);
 }
 
 .dashboard-stat-label {
   display: block;
 
   margin-bottom: 10px;
-
-  color: var(--muted);
-
-  font-size: 11px;
-  font-weight: 700;
-
-  text-transform: uppercase;
-
-  letter-spacing: 0.06em;
 }
 
 .dashboard-stat-value {
@@ -234,21 +180,6 @@
    MAIN PANELS
 ========================= */
 
-.dashboard-panel {
-  border-radius: 28px;
-
-  background:
-    linear-gradient(
-      180deg,
-      rgba(var(--ink-rgb), 0.018),
-      rgba(var(--ink-rgb), 0.008)
-    ),
-    var(--bg);
-
-  border-color:
-    rgba(var(--ink-rgb), 0.08);
-}
-
 .dashboard-panel-header-row {
   display: flex;
   align-items: flex-start;
@@ -261,8 +192,6 @@
 
 .dashboard-panel-header-row h2 {
   margin: 0;
-
-  font-size: 21px;
 }
 
 .dashboard-panel-header-row p {
@@ -385,11 +314,6 @@
 /* =========================
    BUDGET ROLE CARDS
 ========================= */
-
-.dashboard-page
-.budget-grid {
-  gap: 12px;
-}
 
 .dashboard-page
 .budget-field {
@@ -731,8 +655,6 @@ input:focus {
   min-height: 40px;
 
   padding: 0 15px;
-
-  border-radius: 16px;
 }
 
 /* =========================
@@ -740,13 +662,7 @@ input:focus {
 ========================= */
 
 .dashboard-manager-header {
-  display: flex;
-  align-items: center;
   justify-content: space-between;
-
-  gap: 16px;
-
-  margin-bottom: 16px;
 }
 
 .dashboard-manager-counter {
@@ -779,16 +695,6 @@ input:focus {
   border:
     1px solid
     rgba(var(--ink-rgb), 0.08);
-
-  border-radius: 24px;
-
-  background:
-    linear-gradient(
-      180deg,
-      rgba(var(--ink-rgb), 0.02),
-      rgba(var(--ink-rgb), 0.007)
-    ),
-    var(--surface);
 
   box-shadow:
     inset 0 1px 0
@@ -883,12 +789,6 @@ input:focus {
   margin-top: 18px;
 }
 
-.dashboard-manager-label {
-  color: var(--muted);
-
-  font-size: 11px;
-}
-
 /* =========================
    ADD MANAGER
 ========================= */
@@ -968,18 +868,6 @@ input:focus {
   gap: 10px;
 }
 
-.dashboard-recap-kpi {
-  padding: 14px;
-
-  border:
-    1px solid
-    rgba(var(--ink-rgb), 0.06);
-
-  border-radius: 20px;
-
-  background: var(--surface);
-}
-
 .dashboard-recap-kpi span {
   display: block;
 
@@ -1004,11 +892,6 @@ input:focus {
 }
 
 .dashboard-page
-.manager-menu button {
-  border-radius: 14px;
-}
-
-.dashboard-page
 .field input,
 .dashboard-page
 .field select {
@@ -1030,22 +913,6 @@ input:focus {
 .dashboard-page
 .danger-panel {
   border-radius: 20px;
-}
-
-.dashboard-page
-.icon-button {
-  border-radius: 14px;
-}
-
-.dashboard-page
-.secondary-button,
-.dashboard-page
-.primary-button,
-.dashboard-page
-.archive-button,
-.dashboard-page
-.danger-button {
-  border-radius: 16px;
 }
 
 /* =========================
@@ -1120,16 +987,6 @@ input:focus {
 }
 
 @media (max-width: 560px) {
-  .dashboard-page
-  .budget-grid {
-    grid-template-columns:
-      repeat(
-        2,
-        minmax(0, 1fr)
-      );
-
-    gap: 8px;
-  }
 
   .dashboard-page
   .budget-field {
@@ -1173,8 +1030,6 @@ input:focus {
       25px
       0
       8px;
-
-    font-size: 17px;
     line-height: 34px;
   }
 

@@ -90,11 +90,7 @@
   }
 }
 @media (max-width: 900px) {
-  .topbar {
-    position: relative;
-  }
   .theme-switch {
-    position: absolute;
     top: 10px;
     right: 12px;
   }
@@ -186,7 +182,6 @@ button:not([class*="card"]):not([class*="backdrop"]):not([class*="tile"]):not([c
   align-items: center;
   justify-content: space-between;
   border: 1px solid var(--line-1);
-  border-radius: 999px !important;
   background: var(--surface-light);
   cursor: pointer;
   transition: border-color 0.2s;

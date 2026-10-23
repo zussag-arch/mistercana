@@ -74,7 +74,6 @@
 
 /* sezione priorità: niente scatola, solo intestazione colorata */
 .objective-priority-section {
-  --pc: var(--muted);
   padding: 0;
   border: 0;
   border-radius: 0;
