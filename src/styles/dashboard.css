@@ -893,65 +893,6 @@ input:focus {
    ADD MANAGER
 ========================= */
 
-.dashboard-add-manager-card {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  min-height: 132px;
-
-  color: var(--muted);
-
-  cursor: pointer;
-
-  transition:
-    border-color
-      var(--motion-fast)
-      var(--ease-standard),
-    background
-      var(--motion-fast)
-      var(--ease-standard),
-    color
-      var(--motion-fast)
-      var(--ease-standard),
-    transform
-      var(--motion-instant)
-      var(--ease-out);
-}
-
-.dashboard-add-manager-card:active:not(:disabled) {
-  transform: scale(0.98);
-}
-
-@media (hover: hover) {
-  .dashboard-add-manager-card:hover:not(:disabled) {
-    border-color:
-      color-mix(in srgb, var(--accent) 28%, transparent);
-
-    background:
-      color-mix(in srgb, var(--accent) 4%, transparent);
-
-    color: var(--text);
-  }
-}
-
-.dashboard-add-manager-card:disabled {
-  cursor: default;
-}
-
-.dashboard-add-manager-inner {
-  display: flex;
-  align-items: center;
-
-  gap: 10px;
-
-  font-weight: 700;
-}
-
-.dashboard-add-manager-icon {
-  font-size: 22px;
-}
-
 /* =========================
    RECAP
 ========================= */
@@ -1200,7 +1141,6 @@ input:focus {
   reduce
 ) {
   .dashboard-cta-button,
-  .dashboard-add-manager-card,
   .dashboard-page
   .budget-field,
   .dashboard-page

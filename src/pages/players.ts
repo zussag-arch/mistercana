@@ -15,6 +15,8 @@ import { renderPlayerDetailOverlay } from '../components/playerDetailOverlay'
 import type { PlayerViewModel } from '../components/playerDataView'
 import { auctionStatusClass, display, escapePlayerHtml, icaHue, renderPlayerBadges } from '../components/playerDataView'
 import { getFldaPma } from '../domain/pma'
+import type { ObjectivePriority } from '../domain/objective'
+import { saveState } from '../app/storage'
 
 type RoleFilter = 'ALL' | PlayerRole
 type SortKey = 'default' | 'name' | 'team' | 'fm_exp' | 'titolarita_display' | 'mv_fmv' | 'ica' | 'status'
@@ -24,6 +26,11 @@ interface PlayersActions {
   onCallPlayer: (legacyId: string) => void
   onGoToAuction: () => void
   onOpenFullPlayer: (reference: string) => void
+}
+
+/** apre la pagina Giocatori sull'elenco degli osservati (ex pagina Obiettivi) */
+export function showObservedPlayers(): void {
+  viewState.list = 'osservati'
 }
 
 // Passaggio contestuale Asta → Players: allinea il filtro al ruolo attivo dell'asta.
@@ -43,6 +50,41 @@ const viewState = {
   search: '',
   sortKey: 'default' as SortKey,
   sortDirection: 'desc' as 'asc' | 'desc',
+  /** Listone = tutti; Osservati = solo i giocatori con un tag scout */
+  list: 'listone' as 'listone' | 'osservati',
+}
+
+/* =========================
+   SCOUT: tag per giocatore (sono gli "obiettivi" usati dai consigli in Asta)
+========================= */
+const SCOUT_TAGS: Array<[ObjectivePriority, string]> = [
+  ['primary', 'Primari'], ['secondary', 'Secondari'], ['third', 'Terzi'], ['fourth', 'Quarti'], ['bet', 'Scommesse'],
+]
+const SCOUT_ORDER = SCOUT_TAGS.map(([tag]) => tag)
+
+/** chiave con cui l'asta riconosce il giocatore: codice storico se c'è, altrimenti ID FantaLab */
+function scoutKey(player: FldaPlayer): string {
+  return legacyIdFor(player) ?? player.player_id ?? ''
+}
+
+function scoutTag(state: AppState, player: FldaPlayer): ObjectivePriority | undefined {
+  const key = scoutKey(player)
+  return key ? state.objectives.find((item) => item.playerId === key)?.priority : undefined
+}
+
+function setScoutTag(state: AppState, player: FldaPlayer, tag: ObjectivePriority | ''): void {
+  const key = scoutKey(player)
+  if (!key) return
+  state.objectives = state.objectives.filter((item) => item.playerId !== key)
+  if (tag) state.objectives.push({ playerId: key, priority: tag, weight: 1 })
+  saveState(state)
+}
+
+function renderScoutSelect(state: AppState, player: FldaPlayer): string {
+  const tag = scoutTag(state, player)
+  return `<select class="players-scout-select${tag ? ` scout-${tag}` : ''}" data-scout-player="${escapePlayerHtml(fldaReference(player))}" aria-label="Tag scout di ${escapePlayerHtml(player.name)}">
+    <option value="">—</option>${SCOUT_TAGS.map(([value, label]) => `<option value="${value}"${tag === value ? ' selected' : ''}>${label}</option>`).join('')}
+  </select>`
 }
 
 let loadingBulk = false
@@ -100,8 +142,13 @@ function filteredPlayers(state: AppState, source: FldaPlayer[]): FldaPlayer[] {
     if (viewState.penalty && !player.penalty_rank) return false
     if (viewState.freeKick && !player.free_kick_rank) return false
     if (viewState.corner && !player.corner_rank) return false
+    if (viewState.list === 'osservati' && !scoutTag(state, player)) return false
     return !query || `${player.name} ${player.team}`.toLocaleLowerCase('it').includes(query)
   }).sort((a, b) => {
+    if (viewState.list === 'osservati' && viewState.sortKey === 'default') {
+      const tagResult = SCOUT_ORDER.indexOf(scoutTag(state, a)!) - SCOUT_ORDER.indexOf(scoutTag(state, b)!)
+      if (tagResult) return tagResult
+    }
     if (viewState.sortKey === 'default') {
       const roleOrder = ['P', 'D', 'C', 'A']
       const roleResult = roleOrder.indexOf(a.role.toUpperCase()) - roleOrder.indexOf(b.role.toUpperCase())
@@ -183,15 +230,16 @@ function renderRow(state: AppState, player: FldaPlayer): string {
   }
   const pma = getFldaPma(player, state.pmaConfiguration)
   const iCa = fldaICa(player)
-  return `<button type="button" class="players-table-row" data-player-ref="${escapePlayerHtml(fldaReference(player))}">
+  return `<div class="players-table-row" role="button" tabindex="0" data-player-ref="${escapePlayerHtml(fldaReference(player))}">
     <div class="players-player-cell"><span class="role-badge role-${player.role.toLowerCase()}">${escapePlayerHtml(player.role)}</span><span><span class="players-name-line"><strong>${escapePlayerHtml(player.name)}</strong>${renderPlayerBadges(view)}</span><small>${escapePlayerHtml(player.team)}</small></span></div>
     <div data-label="iCà"><span class="players-ica" style="--ica-hue:${icaHue(getICaV3(player.player_id)?.rolePercentile)}">${display(iCa, 1)}</span></div>
     <div data-label="PMA">${typeof pma === 'number' ? `${display(pma, 1)}%` : '—'}${affareChip(getICaV3(player.player_id)?.affare)}</div>
     <div data-label="xFM">${display(player.fm_exp, 2)}</div>
     <div data-label="Titolarità">${display(player.titolarita_display, 0)}${typeof player.titolarita_display === 'number' ? '%' : ''}</div>
     <div data-label="MV/FMV"><span class="players-dual-value">${display(legacy?.mv, 2)} <small>/</small> ${display(legacy?.fmv, 2)}</span></div>
+    <div data-label="Scout" class="players-scout-cell">${renderScoutSelect(state, player)}</div>
     <div data-label="Stato"><span class="player-status player-status-${auctionStatusClass(view)}">${status}</span></div>
-  </button>`
+  </div>`
 }
 
 function sortButton(label: string, key: SortKey): string {
@@ -217,6 +265,10 @@ export function renderPlayersPage(state: AppState): string {
   return `<section class="page players-page">
     <div class="players-page-header"><div><span class="players-eyebrow">DATABASE FLDA</span><h1>Giocatori</h1><p><span data-players-count>${rows.length}</span> di ${source.length}</p></div></div>
     <div class="players-toolbar">
+      <div class="players-list-switch" role="tablist" aria-label="Elenco">
+        <button type="button" role="tab" data-player-list="listone" aria-selected="${viewState.list === 'listone'}">Listone</button>
+        <button type="button" role="tab" data-player-list="osservati" aria-selected="${viewState.list === 'osservati'}">Osservati <small>${state.objectives.length}</small></button>
+      </div>
       <div class="players-role-filter">${(['ALL','P','D','C','A'] as RoleFilter[]).map((role) => `<button type="button" data-player-role="${role}" class="players-filter-button ${viewState.role === role ? 'selected' : ''}">${role === 'ALL' ? 'Tutti' : role}</button>`).join('')}</div>
       <details class="players-team-filter"><summary aria-label="Seleziona squadra">${viewState.team === 'ALL' ? 'Tutte' : escapePlayerHtml(viewState.team)}</summary><div class="auction-team-selector" role="group" aria-label="Filtra per squadra"><button type="button" class="auction-team-choice ${viewState.team === 'ALL' ? 'selected' : ''}" data-player-team="ALL">Tutte</button>${teams.map((team) => `<button type="button" class="auction-team-choice ${viewState.team === team ? 'selected' : ''}" data-player-team="${escapePlayerHtml(team)}">${escapePlayerHtml(team)}</button>`).join('')}</div></details>
       <input id="playersSearch" type="search" value="${escapePlayerHtml(viewState.search)}" placeholder="Cerca nome o squadra…" aria-label="Cerca giocatore per nome o squadra">
@@ -232,7 +284,7 @@ export function renderPlayersPage(state: AppState): string {
       ${dataset?.source === 'legacy' ? '<button id="retryPlayers" type="button">Riprova</button>' : ''}
     </div>
     ${dataset?.source === 'legacy' ? `<div class="players-source-warning">FLDA non raggiungibile. Fallback legacy attivo. ${escapePlayerHtml(dataset.error)}</div>` : ''}
-    ${!dataset ? '<div class="players-loading">Caricamento giocatori FLDA…</div>' : `<div class="players-table-card"><div class="players-table-header"><span>Giocatore</span>${sortButton('iCà','ica')}<span>PMA</span>${sortButton('xFM','fm_exp')}${sortButton('Titolarità','titolarita_display')}${sortButton('MV/FMV','mv_fmv')}${sortButton('Stato','status')}</div><div class="players-table-body">${rows.map((player) => renderRow(state, player)).join('') || '<div class="players-empty">Nessun giocatore corrisponde ai filtri.</div>'}</div></div>`}
+    ${!dataset ? '<div class="players-loading">Caricamento giocatori FLDA…</div>' : `<div class="players-table-card"><div class="players-table-header"><span>Giocatore</span>${sortButton('iCà','ica')}<span>PMA</span>${sortButton('xFM','fm_exp')}${sortButton('Titolarità','titolarita_display')}${sortButton('MV/FMV','mv_fmv')}<span>Scout</span>${sortButton('Stato','status')}</div><div class="players-table-body">${rows.map((player) => renderRow(state, player)).join('') || (viewState.list === 'osservati' ? '<div class="players-empty">Nessun osservato: assegna un tag dalla colonna Scout del Listone.</div>' : '<div class="players-empty">Nessun giocatore corrisponde ai filtri.</div>')}</div></div>`}
     <div class="players-footer-info"><span><span data-players-count>${rows.length}</span> giocatori</span><span>${dataset?.source !== 'flda' ? 'Fonte: vecchio listone' : isFldaLocalMode() ? 'Fonte: tabelle FantaLab' : 'Fonte: FLDA'}</span></div>
     ${renderOverlay(state, source)}
   </section>`
@@ -255,13 +307,29 @@ function refreshFilterControls(): void {
   if (clear) clear.disabled = active === 0
 }
 
-function bindPlayerRows(_state: AppState, actions: PlayersActions): void {
-  document.querySelectorAll<HTMLElement>('[data-player-ref]').forEach((row) => row.addEventListener('click', () => {
+function bindPlayerRows(state: AppState, actions: PlayersActions): void {
+  const open = (row: HTMLElement) => {
     const ref = row.dataset.playerRef
     if (!ref) return
     previewReference = ref
     actions.onRender()
     void loadPreview(ref, actions)
+  }
+  document.querySelectorAll<HTMLElement>('.players-table-row[data-player-ref]').forEach((row) => {
+    // il menu Scout non apre la scheda
+    row.addEventListener('click', (event) => { if (!(event.target as HTMLElement).closest('.players-scout-cell')) open(row) })
+    row.addEventListener('keydown', (event) => {
+      if ((event.key === 'Enter' || event.key === ' ') && event.target === row) { event.preventDefault(); open(row) }
+    })
+  })
+  document.querySelectorAll<HTMLSelectElement>('[data-scout-player]').forEach((select) => select.addEventListener('change', () => {
+    const player = getCachedPlayersDataset()?.players.find((item) => fldaReference(item) === select.dataset.scoutPlayer)
+    if (!player) return
+    setScoutTag(state, player, select.value as ObjectivePriority | '')
+    select.className = `players-scout-select${select.value ? ` scout-${select.value}` : ''}`
+    const count = document.querySelector('[data-player-list="osservati"] small')
+    if (count) count.textContent = String(state.objectives.length)
+    if (viewState.list === 'osservati') refreshPlayerResults(state, actions)
   }))
 }
 
@@ -284,6 +352,10 @@ let playersLoadedListening = false
 let latestPlayersRender: () => void = () => {}
 
 export function bindPlayersEvents(state: AppState, actions: PlayersActions): void {
+  document.querySelectorAll<HTMLElement>('[data-player-list]').forEach((button) => button.addEventListener('click', () => {
+    viewState.list = button.dataset.playerList === 'osservati' ? 'osservati' : 'listone'
+    actions.onRender()
+  }))
   // un solo ascoltatore in attesa dei dati (non uno per ogni ridisegno)
   latestPlayersRender = actions.onRender
   if (!playersLoadedListening) {

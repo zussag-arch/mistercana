@@ -456,16 +456,8 @@
 }
 .rival-card.is-me { border-color: color-mix(in srgb, var(--accent) 55%, transparent); }
 .rival-card header { display: flex; align-items: center; gap: 8px; }
-.rival-name {
-  flex: 1; min-width: 0; padding: 4px 8px; margin-left: -8px; border: 1px solid transparent; border-radius: 10px;
-  background: transparent; color: var(--text); font-family: var(--font-display); font-size: 17px; font-weight: 800;
-}
-.rival-name:hover, .rival-name:focus { border-color: var(--line-1); background: rgba(var(--ink-rgb), 0.04); outline: none; }
 .rival-tag { padding: 3px 9px; border-radius: 999px; background: var(--accent); color: var(--accent-ink); font-size: 11px; font-weight: 800; }
 .rival-tag.linked { background: rgba(var(--ink-rgb), 0.08); color: var(--muted); }
-.rival-teams { margin: 0; display: flex; flex-wrap: wrap; gap: 6px; font-size: 12px; }
-.rival-teams span { padding: 3px 9px; border-radius: 999px; background: rgba(var(--ink-rgb), 0.06); }
-.rival-teams small { color: var(--muted); }
 .rival-index { display: flex; align-items: baseline; gap: 8px; }
 .rival-index span, .rival-index small { color: var(--muted); font-size: 12px; }
 .rival-index strong { font-family: var(--font-display); font-size: 22px; }
@@ -479,8 +471,6 @@
 .rival-traits { margin: 0; color: var(--muted); font-size: 12px; }
 .rival-traits b { color: var(--text); }
 .rival-card { min-width: 0; overflow: hidden; }
-.rival-card .rival-name { width: 100% !important; min-height: 0 !important; height: auto !important; border-color: transparent !important; background: transparent !important; box-shadow: none !important; padding: 4px 8px !important; }
-.rival-card .rival-name:focus { border-color: var(--line-1) !important; background: rgba(var(--ink-rgb), 0.04) !important; }
 .rival-roles { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .rival-index { flex-wrap: wrap; }
 
@@ -557,10 +547,8 @@
 }
 .rival-card.is-me { border-color: color-mix(in srgb, var(--accent) 55%, transparent) !important; }
 .rival-roles div { background: rgba(var(--ink-rgb), 0.055) !important; }
-.rival-teams span { background: rgba(var(--ink-rgb), 0.07) !important; }
 .rivals-grid { gap: 14px !important; }
 .rivals-grid { align-items: stretch !important; }
-.rival-teams { min-height: 54px; align-content: flex-start; }
 .rival-menu-button { border: 1px solid rgba(var(--ink-rgb), 0.16) !important; }
 .rivals-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
 @media (max-width: 1200px) { .rivals-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; } }
