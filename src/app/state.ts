@@ -72,6 +72,8 @@ export interface ArchivedAuction {
 }
 
 export interface AppState {
+  /** lega dell'asta in corso: serve per aggiungerla allo storico quando si archivia */
+  auctionLeague?: 'SERIE_A' | 'SERIE_B'
   auctionPhase: AuctionPhase
 
   currentAuctionPlayerId:

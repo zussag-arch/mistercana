@@ -10,7 +10,6 @@ import { calculateFva, roleMeans } from '../domain/fva'
 import type { FvaResult, FvaRole, FvaRoleMeans, FvaSeason } from '../domain/fva'
 import type { FldaPlayer } from '../services/flda'
 
-const asteCsv = getCsv('aste', asteCsvBundled)
 const probabiliCsv = getCsv('probabili', probabiliCsvBundled)
 const sosProbabiliCsv = getCsv('sos_probabili', sosProbabiliCsvBundled)
 const sosConsigliCsv = getCsv('sos_consigli', sosConsigliCsvBundled)
@@ -52,9 +51,13 @@ function rosterKey(league: League, team: string): string {
   return `${league}|${team}`
 }
 
+let rosterText = ''
+
 function rosters(): Map<string, RosterEntry[]> {
-  if (rosterCache) return rosterCache
-  const rows = parseCsv(asteCsv)
+  const text = getCsv('aste', asteCsvBundled)
+  if (rosterCache && rosterText === text) return rosterCache
+  rosterText = text
+  const rows = parseCsv(text)
   const latest = rows.map((row) => row['Stagione']).sort().pop()
   rosterCache = new Map()
   for (const row of rows) {

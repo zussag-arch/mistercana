@@ -1,4 +1,5 @@
 import { renderAuctionParticipantsCard } from './auction'
+import { saveState } from '../app/storage'
 import { getCachedPlayersDataset, loadPlayersDataset } from '../services/playerRepository'
 import { summarizeManagerAssignments } from '../services/auctionPlayerResolver'
 import { ROSTER_SLOT_LIMITS } from '../domain/auctionContext'
@@ -148,7 +149,8 @@ function canStartAuction(
     ) === 100 &&
     getActiveManagers(
       state,
-    ).length > 0
+    ).length > 0 &&
+    Boolean(state.auctionLeague)
   )
 }
 
@@ -758,6 +760,15 @@ function renderRecapOverlay(
             </strong>
           </div>
 
+          <div class="dashboard-recap-kpi">
+            <span>Lega</span>
+            <select id="recapLeagueInput" class="auction-league-select" ${isSetup ? '' : 'disabled'}>
+              <option value="" ${state.auctionLeague ? '' : 'selected'}>Scegli…</option>
+              <option value="SERIE_A" ${state.auctionLeague === 'SERIE_A' ? 'selected' : ''}>Serie A</option>
+              <option value="SERIE_B" ${state.auctionLeague === 'SERIE_B' ? 'selected' : ''}>Serie B</option>
+            </select>
+          </div>
+
           <div
             class="
               dashboard-recap-kpi
@@ -848,7 +859,7 @@ function renderRecapOverlay(
           isSetup &&
           !startAllowed
             ? `
-              <div
+              <div id="recapStartWarning"
                 class="
                   warning-panel
                   dashboard-recap-warning
@@ -858,8 +869,9 @@ function renderRecapOverlay(
                   Per avviare l’asta
                   servono una
                   distribuzione budget
-                  pari al 100% e almeno
-                  un partecipante attivo.
+                  pari al 100%, almeno
+                  un partecipante attivo
+                  e la lega scelta.
                 </p>
               </div>
             `
@@ -1267,6 +1279,17 @@ export function renderDashboardPage(
                 dashboard-settings-inline
               "
             >
+              <div class="dashboard-toggle-chip">
+                <span class="dashboard-toggle-copy">
+                  <span class="dashboard-toggle-label">Lega</span>
+                  <span class="dashboard-toggle-hint">L'asta finisce nello storico di questa lega</span>
+                </span>
+                <select id="auctionLeagueInput" class="auction-league-select" ${locked ? 'disabled' : ''}>
+                  <option value="" ${state.auctionLeague ? '' : 'selected'}>Scegli…</option>
+                  <option value="SERIE_A" ${state.auctionLeague === 'SERIE_A' ? 'selected' : ''}>Serie A</option>
+                  <option value="SERIE_B" ${state.auctionLeague === 'SERIE_B' ? 'selected' : ''}>Serie B</option>
+                </select>
+              </div>
               <div
                 class="
                   dashboard-toggle-chip
@@ -1786,6 +1809,26 @@ export function bindDashboardEvents(
           actions.onStateChange()
         },
       )
+
+    document.querySelector<HTMLSelectElement>('#recapLeagueInput')
+      ?.addEventListener('change', (event) => {
+        const value = (event.currentTarget as HTMLSelectElement).value
+        state.auctionLeague = value === 'SERIE_A' || value === 'SERIE_B' ? value : undefined
+        saveState(state)
+        const allowed = canStartAuction(state)
+        const button = document.querySelector<HTMLButtonElement>('#recapStartAuctionButton')
+        if (button) button.disabled = !allowed
+        document.querySelector('#recapStartWarning')?.toggleAttribute('hidden', allowed)
+        const other = document.querySelector<HTMLSelectElement>('#auctionLeagueInput')
+        if (other) other.value = value
+      })
+
+    document.querySelector<HTMLSelectElement>('#auctionLeagueInput')
+      ?.addEventListener('change', (event) => {
+        const value = (event.currentTarget as HTMLSelectElement).value
+        state.auctionLeague = value === 'SERIE_A' || value === 'SERIE_B' ? value : undefined
+        actions.onStateChange()
+      })
 
     const defenseModifierInput =
       document.querySelector<HTMLInputElement>(

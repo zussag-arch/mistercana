@@ -22,6 +22,7 @@ import './styles/theme-mobile.css'
 import './styles/app-shell.css'
 import { initTheme } from './theme'
 import { initCloud } from './services/cloud'
+import { addAuctionToHistory } from './data/leagueHistory'
 import { initRoundSelects } from './components/roundSelect'
 import { initAuctionShortcuts } from './components/auctionShortcuts'
 import { initMobileApp } from './components/mobileApp'
@@ -671,6 +672,10 @@ function startAuction():
     return
   }
 
+  if (!state.auctionLeague) {
+    return
+  }
+
   state.auctionAssignments = []
 
   state.currentAuctionPlayerId =
@@ -729,6 +734,9 @@ function archiveAuction():
       ),
   })
 
+  // gli acquisti entrano nello storico della lega: i profili degli avversari si aggiornano
+  addAuctionToHistory(state, state.auctionAssignments)
+
   state.auctionAssignments = []
 
   state.currentAuctionPlayerId =
@@ -737,6 +745,7 @@ function archiveAuction():
 
   state.auctionPhase =
     'setup'
+  state.auctionLeague = undefined
 
   navigateTo('dashboard')
 
