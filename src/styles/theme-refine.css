@@ -511,3 +511,17 @@ body {
 @media (max-width: 700px) {
   .player-full-page .player-full-shell { margin-top: calc(env(safe-area-inset-top) + 14px); }
 }
+
+/* scheda completa: tessere su righe da 4 (non 8 strette); i numeri non escono mai dalla tessera */
+.player-full-card .player-current-metrics { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
+.player-current-metrics > div { min-width: 0; overflow: hidden; }
+.player-current-metrics > div strong { display: block; max-width: 100%; white-space: nowrap; font-size: clamp(22px, 2.6vw, 34px) !important; }
+.player-current-metrics .player-metric-history strong { font-size: clamp(20px, 2.2vw, 30px) !important; }
+@media (max-width: 700px) {
+  .player-full-card .player-current-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .player-current-metrics > div strong { font-size: 26px !important; }
+  .player-current-metrics .player-metric-history strong { font-size: 22px !important; }
+}
+@media (max-width: 700px) {
+  .player-current-metrics .player-metric-history strong { font-size: 19px !important; }
+}
