@@ -923,7 +923,12 @@ const ROLE_NAMES: Record<BudgetRole, string> = { P: 'Portieri', D: 'Difensori', 
 // Durante l'asta: situazione dell'owner (crediti, slot, previsto contro speso per reparto).
 function renderLiveSummary(state: AppState): string {
   const owner = state.managers.find((manager) => manager.isOwner)
-  if (!owner) return ''
+  // il riquadro c'è sempre: l'impaginazione della Dashboard in asta si basa su di lui
+  if (!owner) {
+    return `<section class="dashboard-live-summary">
+      <p class="dashboard-live-empty">Per vedere qui crediti, rilancio massimo e reparti della tua squadra, in <b>Dati</b> apri la tua scheda allenatore (⋯ → Gestisci profilo) e spunta <b>Sono io</b>.</p>
+    </section>`
+  }
   const { spent, slots } = summarizeManagerAssignments(state.auctionAssignments, owner.id, getCachedPlayersDataset())
   const roles: BudgetRole[] = ['P', 'D', 'C', 'A']
   const totalSpent = roles.reduce((sum, role) => sum + spent[role], 0)
