@@ -470,3 +470,44 @@ body {
   /* scheda a tutta larghezza: la × resta dentro lo schermo */
   .player-detail-shell .player-detail-close-button.sheet-x { right: 6px !important; top: -6px !important; }
 }
+
+/* =========================
+   TESTATA COMUNE (scheda ridotta e completa): nome grande, contesto, badge, pulsante sotto
+========================= */
+.player-head .player-detail-identity { align-items: center; }
+.player-head .player-detail-identity > div { display: grid; gap: 6px; justify-items: start; min-width: 0; }
+.player-head .player-detail-identity h2 { margin: 0; }
+.player-head .player-detail-identity p { margin: 0; }
+.player-head .player-head-full {
+  margin-top: 6px;
+  min-height: 34px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* scheda completa: stessa cornice della ridotta, ma lunga quanto serve (scorre la pagina) */
+.player-full-page .player-full-shell {
+  width: min(1080px, 100%);
+  max-height: none;
+  margin: 18px auto 0;
+}
+.player-full-page .player-full-card {
+  max-height: none !important;
+  overflow: visible !important;
+  display: grid;
+  gap: 16px;
+}
+@media (max-width: 700px) {
+  .player-full-page .player-full-shell { margin-top: 14px; }
+}
+.player-current-metrics .player-metric-history strong { font-size: clamp(22px, 2.4vw, 30px) !important; white-space: nowrap; }
+@media (max-width: 700px) {
+  .player-full-page .player-full-shell { margin-top: calc(env(safe-area-inset-top) + 14px); }
+}

@@ -10,7 +10,7 @@ import { getAssignmentFldaId } from '../services/auctionPlayerResolver'
 import {
   display, displayCount, escapePlayerHtml,
   field, latestHistory, renderCurrentMetrics,
-  renderPerformanceChart, renderMatchdayChart, renderPlayerBadges, renderSageSection, renderICaV3Explanation,
+  renderPerformanceChart, renderMatchdayChart, renderPlayerHead, renderSageSection, renderICaV3Explanation,
 } from '../components/playerDataView'
 import type { PlayerViewModel } from '../components/playerDataView'
 import { displayHistoricalAuctionPrices } from '../domain/historicalAuctionPrice'
@@ -164,16 +164,13 @@ export function renderFullPlayerPage(reference: string | null, state: AppState):
   // statistiche avanzate: la stagione scorsa, completa (quella in corso è ancora breve)
   const previousSeason = detail?.history?.[1]
   const roleName = roleNames[role] ?? role
-  const context = [flda.team, field(guide, 'coach'), field(guide, 'module')]
-    .filter((item) => typeof item === 'string' && item.trim())
-    .map((item) => escapePlayerHtml(item)).join(' · ')
   return `<section class="page player-full-page player-full-page-v3 player-tone-${role.toLowerCase()}">
-    <header class="player-full-header" data-role-word="${escapePlayerHtml(roleName)}">
-      <div class="player-full-identity"><span class="player-detail-role player-detail-role-${role.toLowerCase()}">${escapePlayerHtml(role)}</span><div><small>${escapePlayerHtml(roleName)}</small><h1${flda.name.trim().endsWith('.') ? ' class="no-dot"' : ''}>${escapePlayerHtml(flda.name)}</h1><p>${context}</p>${renderPlayerBadges(view)}</div></div>
-      <div class="player-full-actions"><button type="button" class="player-full-back sheet-close" data-player-detail-back aria-label="Chiudi">×</button></div>
-    </header>
+    <div class="player-detail-shell player-full-shell">
+    <button type="button" class="player-detail-close-button sheet-x" data-player-detail-back aria-label="Chiudi">×</button>
+    <div class="player-detail-card player-quick-card player-full-card">
+    ${renderPlayerHead(view)}
     ${!view.identityAvailable ? '<p class="player-data-alert">Dati FLDA non disponibili per questa identità.</p>' : ''}${detailError ? `<p class="player-data-alert">${escapePlayerHtml(detailError)}</p>` : ''}
-    ${renderCurrentMetrics(view, true, displayHistoricalAuctionPrices(detail))}
+    ${renderCurrentMetrics(view, false, displayHistoricalAuctionPrices(detail) ?? '')}
     <section class="player-full-section player-ica-section"><div class="player-section-heading"><span>Valutazione</span><h2>Perché questo iCà</h2></div>${renderICaV3Explanation(view)}</section>
     <section class="player-full-section"><div class="player-section-heading"><span>Prestazioni</span><h2>Come sta andando</h2></div>${latestKpis(role, latest)}</section>
     <section class="player-full-section player-sage-section"><div class="player-section-heading"><span>Asta</span><h2>Prezzo e Saggi</h2></div>${renderSageSection(view)}</section>
@@ -182,6 +179,8 @@ export function renderFullPlayerPage(reference: string | null, state: AppState):
     ${guideSummary(guide)}
     ${qualitativeGuide(view, guide)}
     <section class="player-full-section player-advanced"><div class="player-section-heading"><span>Stagione ${escapePlayerHtml(String(field(previousSeason, 'season') ?? 'precedente'))}</span><h2>Statistiche avanzate</h2></div>${advancedStats(previousSeason)}</section>
+    </div>
+    </div>
   </section>`
 }
 
