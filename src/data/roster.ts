@@ -5,8 +5,9 @@ import probabiliCsvBundled from '../../database/probabili.csv?raw'
 import sosProbabiliCsvBundled from '../../database/sos_probabili.csv?raw'
 import sosConsigliCsvBundled from '../../database/sos_consigli.csv?raw'
 import { getCsv } from './csvOverrides'
-import { getICa } from './ica'
-import { localPlayerDetail, localTeamGuide } from '../services/fantalabLocal'
+import { localPlayerDetail, localPlayers, localTeamGuide } from '../services/fantalabLocal'
+import { calculateFva, roleMeans } from '../domain/fva'
+import type { FvaResult, FvaRole, FvaRoleMeans, FvaSeason } from '../domain/fva'
 import type { FldaPlayer } from '../services/flda'
 
 const asteCsv = getCsv('aste', asteCsvBundled)
@@ -144,8 +145,6 @@ function sosInfo(playerId: string): SosInfo | undefined {
   return sosCache.get(playerId)
 }
 
-// fascia SOS (1 = da schierare sempre … 9 = da evitare) → correzione dei fantapunti attesi
-const FASCIA_BONUS: Record<number, number> = { 1: 0.5, 2: 0.3, 3: 0.15, 4: 0, 5: -0.1, 6: -0.2, 7: -0.3, 8: -0.4, 9: -0.5, 10: -0.5 }
 
 export function nextMatchday(): number | undefined {
   return [...probables().values()].map((item) => item.matchday).find((day) => day !== undefined)
@@ -153,12 +152,9 @@ export function nextMatchday(): number | undefined {
 
 /* =========================
    VALUTAZIONE PER LA GIORNATA
-   Fantapunti attesi nella prossima partita:
-     base   = fantamedia corretta iCà (70%) + forma ultime 5 (30%)
-     ± avversario: forza in attacco (P/D) o in difesa (C/A) dalla Guida, ±0,15 per punto
-     + 0,10 in casa
-     × probabilità di partire titolare (probabili; altrimenti titolarità Guida)
-     = 0 se infortunato, squalificato o indisponibile
+   FVA = fantavoto atteso se gioca (domain/fva.ts): voto + bonus/malus attesi contro quell'avversario.
+   Per scegliere la formazione conta FVA × probabilità di partire titolare (SOS Fanta → FantaLab →
+   titolarità Guida); 0 se infortunato, squalificato o indisponibile.
 ========================= */
 
 export interface MatchdayPick {
@@ -167,6 +163,10 @@ export interface MatchdayPick {
   probable?: Probable
   form?: number
   recent: Array<number | null>
+  /** fantavoto atteso se gioca */
+  fva: number
+  fvaDetail?: FvaResult
+  /** FVA × probabilità di giocare: ordina la formazione */
   expected: number
   probability: number
   out: boolean
@@ -181,48 +181,67 @@ function lastVotes(playerId: string): Array<number | null> {
   }
 }
 
+function fvaSeasons(playerId: string): FvaSeason[] {
+  try {
+    return (localPlayerDetail(playerId).history ?? []).slice(0, 2).map((row) => ({
+      appearances: num(String(row.presenze ?? '')), minutes: num(String(row.min_playing_time ?? '')), mv: num(String(row.mv ?? '')),
+      goals: num(String(row.gol_fatti ?? '')), assists: num(String(row.assist ?? '')),
+      xg: num(String(row.xg ?? '')), xa: num(String(row.xa ?? '')),
+      yellow: num(String(row.amm ?? '')), red: num(String(row.esp ?? '')), conceded: num(String(row.gol_subiti ?? '')),
+    }))
+  } catch {
+    return []
+  }
+}
+
+let meansCache: Record<FvaRole, FvaRoleMeans> | null = null
+function fvaMeans(): Record<FvaRole, FvaRoleMeans> {
+  if (!meansCache) {
+    meansCache = roleMeans(localPlayers().players.filter((player) => player.player_id && 'PDCA'.includes(player.role))
+      .map((player) => ({ role: player.role as FvaRole, seasons: fvaSeasons(player.player_id as string) })))
+  }
+  return meansCache
+}
+
 export function evaluatePick(player: FldaPlayer, price: number): MatchdayPick {
   const id = player.player_id ?? ''
   const probable = probables().get(id)
-  const ica = getICa(id)
   const recent = lastVotes(id)
   const voted = recent.filter((value): value is number => typeof value === 'number')
   const form = voted.length >= 2 ? voted.reduce((sum, value) => sum + value, 0) / voted.length : undefined
-  const seasonFm = ica?.adjustedFm ?? player.fm_exp ?? 6
-  let base = form === undefined ? seasonFm : seasonFm * 0.7 + form * 0.3
   const reasons: string[] = []
+  const role = (player.role as FvaRole)
 
+  // forza dell'avversario: il suo attacco per portieri, la sua difesa per gli altri
+  let opponentIndex: number | undefined
   if (probable?.opponent) {
     const guide = localTeamGuide(probable.opponent)
-    const defensive = player.role === 'P' || player.role === 'D'
-    const strength = Number(defensive ? guide.team_attack_index : guide.team_defense_index)
+    const strength = Number(role === 'P' ? guide.team_attack_index : guide.team_defense_index)
     if (Number.isFinite(strength)) {
-      const delta = (3 - strength) * 0.15
-      base += delta
-      if (strength <= 2) reasons.push(`${probable.opponent} debole ${defensive ? 'in attacco' : 'in difesa'}`)
-      if (strength >= 4) reasons.push(`${probable.opponent} forte ${defensive ? 'in attacco' : 'in difesa'}`)
-    }
-    if (probable.home) {
-      base += 0.1
+      opponentIndex = strength
+      const defensive = role === 'P' || role === 'D'
+      const attackIdx = Number(guide.team_attack_index)
+      if (defensive && Number.isFinite(attackIdx)) {
+        if (attackIdx <= 2) reasons.push(`${probable.opponent} debole in attacco`)
+        if (attackIdx >= 4) reasons.push(`${probable.opponent} forte in attacco`)
+      } else if (!defensive) {
+        if (strength <= 2) reasons.push(`${probable.opponent} debole in difesa`)
+        if (strength >= 4) reasons.push(`${probable.opponent} forte in difesa`)
+      }
     }
   }
-  // forma: confronto con la fantamedia "normale" (senza i correttivi iCà)
-  const usualFm = ica?.expectedFm ?? player.fm_exp ?? 6
+  const sos = sosInfo(id)
+  const day = nextMatchday()
+  const fascia = sos?.fascia && (!day || !sos.fasciaDay || sos.fasciaDay === day) ? sos.fascia : undefined
+  const detail = calculateFva({ role, seasons: fvaSeasons(id), opponentIndex, home: probable?.home, sosFascia: fascia }, fvaMeans()[role])
+  if (fascia) reasons.push(`SOS ${fascia}ª fascia`)
+  const usualFm = player.fm_exp ?? detail.fva
   if (form !== undefined && form >= usualFm + 0.75) reasons.push(`in forma (${form.toFixed(1).replace('.', ',')})`)
   if (form !== undefined && form <= usualFm - 0.75) reasons.push('fuori forma')
   if (player.penalty_rank === 1) reasons.push('rigorista')
-
-  // SOS Fanta: fascia della giornata (solo se riferita alla prossima giornata)
-  const sos = sosInfo(id)
-  const day = nextMatchday()
-  if (sos?.fascia && (!day || !sos.fasciaDay || sos.fasciaDay === day)) {
-    base += FASCIA_BONUS[sos.fascia] ?? 0
-    reasons.push(`SOS ${sos.fascia}ª fascia`)
-  }
   if (sos?.duel) reasons.push(`ballottaggio con ${sos.duel}`)
 
   const out = Boolean(probable && (probable.injured || probable.suspended || probable.unavailable))
-  // probabilità: SOS Fanta (più aggiornata), poi FantaLab, poi titolarità Guida
   const probability = out ? 0
     : typeof sos?.probability === 'number' ? sos.probability / 100
     : typeof probable?.probability === 'number' ? probable.probability / 100
@@ -233,7 +252,9 @@ export function evaluatePick(player: FldaPlayer, price: number): MatchdayPick {
   if (probable?.unavailable && !probable.injured && !probable.suspended) reasons.unshift('indisponibile')
   if (probable?.doubtful) reasons.unshift('in dubbio')
 
-  return { player, price, probable, form, recent, expected: base * probability, probability, out, reasons }
+  // l'FVA resta "se gioca" anche per chi è fuori: è la probabilità (0) a escluderlo dalla formazione
+  const fva = detail.fva
+  return { player, price, probable, form, recent, fva, fvaDetail: detail, expected: fva * probability, probability, out, reasons }
 }
 
 /* =========================
