@@ -102,7 +102,7 @@ function dot(pick: MatchdayPick): string {
 function renderPitch(starters: MatchdayPick[]): string {
   const line = (role: string) => `<div class="rpitch-line">${starters.filter((pick) => pick.player.role === role).map(dot).join('')}</div>`
   return `<div class="rpitch">
-    <div class="rpitch-marks" aria-hidden="true"><span class="rpitch-half"></span><span class="rpitch-circle"></span><span class="rpitch-box top"></span><span class="rpitch-box bottom"></span></div>
+    <div class="rpitch-marks" aria-hidden="true"><span class="rpitch-half"></span><span class="rpitch-circle"></span><span class="rpitch-spot"></span><span class="rpitch-box top"></span><span class="rpitch-box bottom"></span><span class="rpitch-small top"></span><span class="rpitch-small bottom"></span></div>
     ${line('A')}${line('C')}${line('D')}${line('P')}
   </div>`
 }

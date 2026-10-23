@@ -483,31 +483,49 @@ const POSITIONS: Record<string, string> = {
 }
 const positionLabel = (value: string) => POSITIONS[value.trim().toLowerCase()] ?? value
 
+/** linee del campo 105 × 68 (attacco verso destra), riusate anche dal campetto della Rosa */
+export function pitchLines(): string {
+  return `<g class="pitch-mark" fill="none">
+    <rect x="0" y="0" width="105" height="68" rx="1.5"/>
+    <line x1="52.5" y1="0" x2="52.5" y2="68"/><circle cx="52.5" cy="34" r="9.15"/><circle cx="52.5" cy="34" r="0.5" class="spot"/>
+    <rect x="0" y="13.84" width="16.5" height="40.32"/><rect x="88.5" y="13.84" width="16.5" height="40.32"/>
+    <rect x="0" y="24.84" width="5.5" height="18.32"/><rect x="99.5" y="24.84" width="5.5" height="18.32"/>
+    <path d="M16.5 26.7 A9.15 9.15 0 0 1 16.5 41.3"/><path d="M88.5 26.7 A9.15 9.15 0 0 0 88.5 41.3"/>
+  </g>`
+}
+
 export function renderHeatmap(fantalabId: string | null | undefined): string {
   const map = heatmapFor(fantalabId)
   if (!map) return '<p class="player-data-empty">Heatmap non disponibile per questo giocatore.</p>'
   const w = 105 / HEATMAP_COLUMNS
   const h = 68 / HEATMAP_ROWS
-  const cells = map.cells.map((value, index) => {
-    if (!value) return ''
-    const x = (index % HEATMAP_COLUMNS) * w
-    const y = Math.floor(index / HEATMAP_COLUMNS) * h
-    return `<rect x="${(x - w * 0.2).toFixed(2)}" y="${(y - h * 0.2).toFixed(2)}" width="${(w * 1.4).toFixed(2)}" height="${(h * 1.4).toFixed(2)}" rx="3" class="heat-${value}"/>`
-  }).join('')
-  const id = `heatblur-${String(fantalabId).replace(/[^a-z0-9]/gi, '').slice(0, 12)}`
+  // celle in scala di grigi (opacità = intensità): il filtro le sfuma e le colora come FotMob
+  const cells = map.cells.map((value, index) => value
+    ? `<rect x="${((index % HEATMAP_COLUMNS) * w).toFixed(2)}" y="${(Math.floor(index / HEATMAP_COLUMNS) * h).toFixed(2)}" width="${w.toFixed(2)}" height="${h.toFixed(2)}" fill-opacity="${(value / 9).toFixed(2)}"/>`
+    : '').join('')
+  const id = `heat-${String(fantalabId).replace(/[^a-z0-9]/gi, '').slice(0, 12)}`
   return `<figure class="player-heatmap">
-    <svg viewBox="-2 -2 109 72" role="img" aria-label="Heatmap della stagione">
-      <defs><filter id="${id}" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3.2"/></filter><clipPath id="${id}-clip"><rect x="0" y="0" width="105" height="68" rx="2"/></clipPath></defs>
-      <rect x="0" y="0" width="105" height="68" rx="2" class="heat-pitch"/>
-      <g clip-path="url(#${id}-clip)"><g filter="url(#${id})">${cells}</g></g>
-      <g class="heat-lines" fill="none">
-        <rect x="0" y="0" width="105" height="68" rx="2"/>
-        <line x1="52.5" y1="0" x2="52.5" y2="68"/><circle cx="52.5" cy="34" r="9.15"/>
-        <rect x="0" y="13.84" width="16.5" height="40.32"/><rect x="88.5" y="13.84" width="16.5" height="40.32"/>
-        <rect x="0" y="24.84" width="5.5" height="18.32"/><rect x="99.5" y="24.84" width="5.5" height="18.32"/>
-      </g>
+    ${typeof map.touches === 'number' ? `<figcaption><span>Tocchi di palla: ${map.touches}</span></figcaption>` : ''}
+    <svg viewBox="-1.5 -4.5 108 74" role="img" aria-label="Heatmap della stagione">
+      <defs>
+        <filter id="${id}" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
+          <feGaussianBlur stdDeviation="2.6" result="blur"/>
+          <feColorMatrix type="matrix" values="0 0 0 2.2 0  0 0 0 2.2 0  0 0 0 2.2 0  0 0 0 2.2 0"/>
+          <feComponentTransfer>
+            <feFuncR type="table" tableValues="0 0.05 0.12 0.55 0.93 0.96 0.92"/>
+            <feFuncG type="table" tableValues="0 0.55 0.66 0.78 0.66 0.42 0.22"/>
+            <feFuncB type="table" tableValues="0 0.38 0.40 0.25 0.10 0.08 0.10"/>
+            <feFuncA type="table" tableValues="0 0 0.55 0.8 0.9 0.95 1"/>
+          </feComponentTransfer>
+        </filter>
+        <clipPath id="${id}-clip"><rect x="0" y="0" width="105" height="68" rx="1.5"/></clipPath>
+      </defs>
+      <rect x="0" y="0" width="105" height="68" rx="1.5" class="pitch-turf"/>
+      <g clip-path="url(#${id}-clip)"><g filter="url(#${id})" fill="#000">${cells}</g></g>
+      ${pitchLines()}
+      <path d="M50 -3.2 h4.5 l1.6 1.6 -1.6 1.6 h-4.5 l1.6 -1.6 z" class="pitch-arrow"/>
     </svg>
-    <figcaption>${escapePlayerHtml(positionLabel(map.position))}${map.season ? ` · stagione ${escapePlayerHtml(map.season)}` : ''} · attacca verso destra · fonte FotMob</figcaption>
+    <small>${escapePlayerHtml(positionLabel(map.position))}${map.season ? ` · stagione ${escapePlayerHtml(map.season)}` : ''} · attacca verso destra · fonte FotMob</small>
   </figure>`
 }
 

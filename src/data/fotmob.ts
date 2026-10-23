@@ -15,15 +15,23 @@ function parseCsv(text: string): Row[] {
   })
 }
 
+const num = (value: string | undefined) => {
+  if (!value) return undefined
+  const parsed = Number(value.replace(',', '.'))
+  return Number.isFinite(parsed) ? parsed : undefined
+}
+
 export interface Heatmap {
   season: string
   position: string
-  /** 12 × 8 celle, intensità 0-9, riga per riga */
+  /** tocchi di palla nella stagione */
+  touches?: number
+  /** 30 × 20 celle, intensità 0-9, riga per riga */
   cells: number[]
 }
 
-export const HEATMAP_COLUMNS = 12
-export const HEATMAP_ROWS = 8
+export const HEATMAP_COLUMNS = 30
+export const HEATMAP_ROWS = 20
 
 let heatmaps: Map<string, Heatmap> | null = null
 
@@ -32,7 +40,7 @@ export function heatmapFor(fantalabId: string | null | undefined): Heatmap | und
   if (!heatmaps) {
     heatmaps = new Map(parseCsv(getCsv('heatmap', heatmapCsvBundled))
       .filter((row) => row['Griglia']?.length === HEATMAP_COLUMNS * HEATMAP_ROWS)
-      .map((row) => [row['ID FantaLab'], { season: row['Stagione'], position: row['Ruolo'], cells: [...row['Griglia']].map(Number) }]))
+      .map((row) => [row['ID FantaLab'], { season: row['Stagione'], position: row['Ruolo'], touches: num(row['Tocchi']), cells: [...row['Griglia']].map(Number) }]))
   }
   return heatmaps.get(fantalabId)
 }
@@ -48,11 +56,6 @@ export interface CareerSeason {
 }
 
 let careers: Map<string, CareerSeason[]> | null = null
-const num = (value: string | undefined) => {
-  if (!value) return undefined
-  const parsed = Number(value.replace(',', '.'))
-  return Number.isFinite(parsed) ? parsed : undefined
-}
 
 export function careerFor(fantalabId: string | null | undefined): CareerSeason[] {
   if (!fantalabId) return []
