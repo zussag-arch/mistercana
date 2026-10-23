@@ -102,6 +102,12 @@ export async function sendLoginLink(email: string): Promise<string | null> {
   return error ? error.message : null
 }
 
+/** codice a 6 cifre della stessa email: serve sull'app installata su iPhone, dove il link si aprirebbe in Safari */
+export async function verifyLoginCode(email: string, token: string): Promise<string | null> {
+  const { error } = await supabase.auth.verifyOtp({ email, token, type: 'email' })
+  return error ? error.message : null
+}
+
 export async function logout(): Promise<void> {
   await supabase.auth.signOut()
 }

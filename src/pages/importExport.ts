@@ -1,4 +1,4 @@
-import { cloudInfo, logout, sendLoginLink } from '../services/cloud'
+import { cloudInfo, logout, sendLoginLink, verifyLoginCode } from '../services/cloud'
 import bundledPlayersCsv from '../../database/fantalab_giocatori.csv?raw'
 import bundledCoachesCsv from '../../database/fantalab_allenatori.csv?raw'
 import bundledGoalkeeperGridCsv from '../../database/griglia_portieri.csv?raw'
@@ -1909,6 +1909,10 @@ function renderCloudPanel(): string {
          <input type="email" name="email" required placeholder="la tua email" autocomplete="email" />
          <button type="submit" class="data-transfer-button data-transfer-button-primary">Invia link</button>
        </form>
+       <form class="cloud-login" id="cloudCodeForm" hidden>
+         <input type="text" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,8}" required placeholder="codice dalla email" />
+         <button type="submit" class="data-transfer-button data-transfer-button-primary">Entra</button>
+       </form>
        <p class="cloud-message" id="cloudMessage"></p>`
   return `<section class="data-transfer-section cloud-section" id="cloudPanel">
     <div class="data-transfer-section-header"><div>
@@ -1921,6 +1925,8 @@ function renderCloudPanel(): string {
 
 const escapeCloud = (text: string) => text.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c] as string)
 
+let cloudEmail = ''
+
 function bindCloudPanel(): void {
   document.addEventListener('mistercana:cloud-status', () => {
     const panel = document.querySelector('#cloudPanel')
@@ -1928,7 +1934,16 @@ function bindCloudPanel(): void {
   })
   document.addEventListener('submit', async (event) => {
     const form = event.target
-    if (!(form instanceof HTMLFormElement) || form.id !== 'cloudLoginForm') return
+    if (!(form instanceof HTMLFormElement)) return
+    if (form.id === 'cloudCodeForm') {
+      event.preventDefault()
+      const message = document.querySelector('#cloudMessage')
+      if (message) message.textContent = 'Verifica…'
+      const error = await verifyLoginCode(cloudEmail, String(new FormData(form).get('code') ?? '').trim())
+      if (error && message) message.textContent = 'Codice non valido o scaduto: richiedine un altro.'
+      return
+    }
+    if (form.id !== 'cloudLoginForm') return
     event.preventDefault()
     const email = String(new FormData(form).get('email') ?? '').trim()
     const message = document.querySelector('#cloudMessage')
@@ -1936,7 +1951,11 @@ function bindCloudPanel(): void {
     const error = await sendLoginLink(email)
     if (message) message.textContent = error
       ? (/signups not allowed|not found/i.test(error) ? 'Questa email non è abilitata.' : `Invio non riuscito: ${error}`)
-      : `Link inviato a ${email}: aprilo da questo dispositivo.`
+      : `Email inviata a ${email}: apri il link oppure scrivi qui il codice.`
+    if (!error) {
+      cloudEmail = email
+      document.querySelector<HTMLFormElement>('#cloudCodeForm')?.removeAttribute('hidden')
+    }
   })
   document.addEventListener('click', (event) => {
     if (event.target instanceof Element && event.target.closest('#cloudLogoutButton')) void logout()

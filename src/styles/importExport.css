@@ -860,3 +860,4 @@
 .cloud-state { font-weight: 600; }
 .cloud-state-synced { color: #3ecf8e; }
 .cloud-state-error { color: #f06a6a; }
+.cloud-login[hidden] { display: none; }
