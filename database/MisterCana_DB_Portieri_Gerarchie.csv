@@ -1,62 +1,66 @@
-id_giocatore;Giocatore;Squadra;Gerarchia
-0001;Carnesecchi;Atalanta;1
-0002;Sportiello;Atalanta;2
-0003;Vismara;Atalanta;3
-0027;Happonen;Bologna;3
-0026;Pessina Mas.;Bologna;2
-0025;Skorupski;Bologna;1
-0049;Caprile;Cagliari;1
-0050;Radunovic;Cagliari;3
-0051;Sherri;Cagliari;2
-0076;Butez;Como;1
-0077;Tornqvist;Como;2
-0078;Vigorito;Como;3
-0106;Christensen O.;Fiorentina;3
-0105;De Gea;Fiorentina;1
-0107;Lezzerini;Fiorentina;2
-0128;Desplanches;Frosinone;2
-0130;Lolic;Frosinone;3
-0129;Palmisani;Frosinone;1
-0131;Pisseri;Frosinone;4
-0158;Bijlow;Genoa;1
-0159;Sommariva;Genoa;3
-0160;Stolz;Genoa;2
-0185;Di Gennaro;Inter;3
-0183;Martinez Jo.;Inter;1
-0184;Provedel;Inter;2
-0206;Di Gregorio;Juventus;1
-0207;Perin;Juventus;2
-0208;Pinsoglio;Juventus;3
-0233;Mandas;Lazio;1
-0234;Motta;Lazio;2
-0235;Renzetti;Lazio;3
-0259;Falcone;Lecce;1
-0260;Penev;Lecce;2
-0280;Maignan;Milan;1
-0281;Terracciano;Milan;3
-0282;Torriani;Milan;2
-0308;Pizzignacco;Monza;1
-0309;Strajnar;Monza;3
-0307;Thiam;Monza;2
-0331;Contini;Napoli;3
-0329;Meret;Napoli;1
-0330;Milinkovic-Savic V.;Napoli;2
-0355;Corvi;Parma;2
-0357;Daffara;Parma;3
-0356;Suzuki;Parma;1
-0380;De Marzi;Roma;2
-0381;Gollini;Roma;3
-0379;Svilar;Roma;1
-0401;Muric;Sassuolo;1
-0403;Russo A.;Sassuolo;3
-0404;Satalino;Sassuolo;4
-0402;Turati;Sassuolo;2
-0428;Mascardi;Torino;2
-0427;Paleari;Torino;1
-0429;Siviero;Torino;3
-0451;Okoye;Udinese;1
-0452;Padelli;Udinese;2
-0453;Piana;Udinese;3
-0479;Grandi;Venezia;2
-0480;Pozzi;Venezia;3
-0478;Stankovic F.;Venezia;1
+﻿id_giocatore;Giocatore;Squadra;Gerarchia
+0e05ec77-0d73-452e-8d72-7ddf162ced52;Carnesecchi;Atalanta;1
+a19762d0-1aeb-4d65-af0b-a0df2c8dcc6a;Pompei;Atalanta;2
+04926b8a-8079-4e32-a538-8e08c8898540;Sportiello;Atalanta;3
+ab0c501a-2374-4942-8133-781cf2c60a8e;Skorupski;Bologna;1
+80ce5ddd-aff9-41f7-90d7-2f39513370bd;Pessina Mas.;Bologna;2
+180c9fdc-84bd-45a0-8cee-0dabd9a321c3;Happonen;Bologna;3
+e81593ae-46a8-4fe1-9624-44dd35e63ee9;Caprile;Cagliari;1
+b90080cb-e2fd-464d-a856-23b99f8c119c;Radunovic;Cagliari;2
+5dc700e9-cd9d-493b-a143-94fbad6152b7;Sherri;Cagliari;3
+05ed0add-6a0f-4ae8-aa97-eba61ba71d30;Butez;Como;1
+4861bf31-26b9-4827-9718-9a6787414277;Sanchez Ro.;Como;2
+f1c0e033-83ec-4745-b8c7-cc6a43d6cb21;Vigorito;Como;3
+287aea48-e990-419a-8744-9753b369dd13;De Gea;Fiorentina;1
+18e725c3-54bb-40f6-95e2-96d2d058fb12;Christensen O.;Fiorentina;2
+307a60c0-42d3-4540-845e-461bdb360a9a;Lezzerini;Fiorentina;3
+806328ab-7895-4972-a29d-b73f77580592;Palmisani;Frosinone;1
+98549edb-5890-4d13-9027-43d228b85ca8;Desplanches;Frosinone;2
+00dce0c7-d5a8-4d18-b22c-3c83c47670a3;Lolic;Frosinone;3
+76e3292b-5798-4db6-a13f-ae24813061aa;Pisseri;Frosinone;4
+43ee7850-9ecc-4539-aef0-e38d7627642a;Bijlow;Genoa;1
+7fa392f2-d52e-4a8f-8f57-8f80d1cb3985;Sommariva;Genoa;2
+19a2efc3-c0a3-4931-ac50-e091bbe19836;Stolz;Genoa;3
+909ba55e-54d3-40d3-acc4-9cc0113a8ed5;Martinez Jo.;Inter;1
+5b821b6a-1de9-4678-8dda-2cca3ddfda02;Provedel;Inter;2
+b610c091-be19-455b-9407-3e900cd50db2;Di Gennaro;Inter;3
+e962868a-c447-43cd-8306-5378a88ee2d3;Vicario;Juventus;1
+f33242f6-3341-4541-a2f8-bb241f018742;Grabara;Juventus;2
+bb2086fc-abc8-45f0-b298-95dc4cecde1e;Neto;Juventus;3
+352e6596-1e54-4044-8873-6f7310c2bd66;Pinsoglio;Juventus;4
+c005a40e-c9d9-4673-94b5-1c85551c4460;Mandas;Lazio;1
+22363a5f-0f79-4599-8866-33c2e4d63857;Motta;Lazio;2
+91b6ce45-5fd3-4f81-bdcf-771427e7205d;Renzetti;Lazio;3
+b5bd1c96-73a5-4302-afd4-84f4139f1f2b;Falcone;Lecce;1
+42c5eae5-f919-49c9-8a2f-5725fd1c07a5;Bleve;Lecce;2
+7f1897b4-80fd-479c-9c47-e760d97a4a4b;Penev;Lecce;3
+9f7a6ad7-d230-41f0-aa72-12933ab90027;Maignan;Milan;1
+67c692f0-c0e9-4124-bcb1-db52e1c6022f;Terracciano;Milan;2
+4c0cefbf-1439-4815-9004-9bfdb5c41023;Torriani;Milan;3
+b4537b2c-643d-4182-9c88-5669bb11e7f6;Tornqvist;Monza;1
+8a42bb83-261c-4d0b-aa2a-ecf87a361d96;Thiam;Monza;2
+b99d0657-4f2a-4b37-90ba-9a43926e55be;Strajnar;Monza;3
+1bef666d-d305-4795-af71-2e946eb6ab0e;Meret;Napoli;1
+85575d07-92d4-4504-962b-b60be45e68a6;Milinkovic-Savic V.;Napoli;2
+a780281a-3e2a-4faa-9f08-602ebd935a61;Contini;Napoli;3
+2d677888-6808-453b-976b-a9bde9d6c7e4;Corvi;Parma;1
+52bad1f3-96f7-40d7-a473-fada24de2f93;Daffara;Parma;2
+0de4b321-e19f-4d43-83a8-4fcae5ebc658;Ghidotti;Parma;3
+b832c4ec-72cf-4c4b-8c6a-203912e87e4d;Svilar;Roma;1
+27551bf1-46ae-44f8-bac1-825be51116f8;De Marzi;Roma;2
+d5c0c1d2-f0d1-4e02-88f4-ba6d59dfc8f7;Gollini;Roma;3
+7aefa97c-be70-402f-8095-4ffb6928e2ad;Vasquez D.;Roma;4
+9c483384-d40d-4152-aa37-d7fd00624646;Muric;Sassuolo;1
+c824abfd-1f86-4d6f-a395-b9ed4661dc73;Turati;Sassuolo;2
+8952b9a9-20a7-430e-86c8-5a1eae9250fe;Russo A.;Sassuolo;3
+478637a0-1f89-4ed5-9b39-e138e6d39235;Satalino;Sassuolo;4
+36a9825a-5980-4cda-8103-62cc944e7a83;Perri;Torino;1
+9f507758-5805-4ea3-9f4b-6158c66feefd;Mascardi;Torino;2
+ca1d5381-2b54-4f76-8a2b-c52cda474dc8;Siviero;Torino;3
+cbe2156e-f2a7-4e4d-9d46-472bf9c4a258;Okoye;Udinese;1
+8a5a5842-7203-4d33-b95b-10bc1ab6eb7b;Mrozek;Udinese;2
+7615a481-1f3d-4179-9e9d-a4f148bb1b82;Padelli;Udinese;3
+ec99ae79-a018-4cd8-a4b1-1fe2f703553b;Stankovic F.;Venezia;1
+2142c7e8-d27c-4c26-a133-363d0f634812;Grandi;Venezia;2
+d34d0df3-4b44-4cdd-8bfb-fdd5fcdfa14f;Montipò;Venezia;3
+f74767ab-b1d1-4341-852a-5ba85a0326c5;Pozzi;Venezia;4

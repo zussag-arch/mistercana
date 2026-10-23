@@ -12,25 +12,25 @@ eedbf897-636b-42dc-9a40-fefd10c30051;Torino;Ismajli;3-4-1-2;95;
 d24218a4-0bbc-4dd6-b01d-cf9d0a9a90d5;Torino;Simeone;3-4-1-2;95;
 b4537b2c-643d-4182-9c88-5669bb11e7f6;Monza;Tornqvist;3-4-2-1;95;
 9b9115fc-6b78-47ec-9924-c974e8b83378;Monza;Kouadio;3-4-2-1;95;
-cff37405-7da7-494e-b4c4-34296cb8be1f;Monza;Goglichidze;3-4-2-1;51;Carboni A. (49%)
-b6596869-9189-4e7e-910b-d56d056ee034;Monza;Lucchesi;3-4-2-1;95;
+cff37405-7da7-494e-b4c4-34296cb8be1f;Monza;Goglichidze;3-4-2-1;95;
+f729e4bf-bf18-4e1d-827a-20ef37865b8a;Monza;Carboni A.;3-4-2-1;95;
 76ccd152-fe9d-440b-a890-6c9adef778ec;Monza;Birindelli;3-4-2-1;95;
 fd980a09-99b1-4174-81e5-60cbcd1fbb49;Monza;Akinsanmiro;3-4-2-1;95;
 5e559083-6456-4918-8130-ba0af7bab6dc;Monza;Foe Ondoa;3-4-2-1;51;Folorunsho (49%)
 d47bf2f7-f320-4340-9845-33ef2f94d175;Monza;Mangas;3-4-2-1;95;
 6a2d0ee2-6bae-42d1-9cfd-06994a361b3d;Monza;Robinson J.;3-4-2-1;60;Colpani (40%)
-88893e63-f3f6-4224-838b-8e189ef9f312;Monza;Mota;3-4-2-1;60;Cutrone (40%)
+88893e63-f3f6-4224-838b-8e189ef9f312;Monza;Mota;3-4-2-1;55;Cutrone (45%)
 0053b230-688b-4fef-90f5-b823c64ea378;Monza;Varela G.;3-4-2-1;95;
 e81593ae-46a8-4fe1-9624-44dd35e63ee9;Cagliari;Caprile;4-3-2-1;95;
 5d4bd759-1210-413a-8cd0-5b7ba268c802;Cagliari;Zè Pedro;4-3-2-1;60;Sugawara (40%)
-1a88a4d7-81a0-42c2-911f-33ffef2551c6;Cagliari;Mina;4-3-2-1;55;Deiola (45%)
+1a88a4d7-81a0-42c2-911f-33ffef2551c6;Cagliari;Mina;4-3-2-1;51;Deiola (49%)
 ce5b19a3-93bc-4d98-b799-c466274df41a;Cagliari;Rodriguez Ju.;4-3-2-1;95;
 c9566c48-86e0-42ff-8820-d01b0d55efd7;Cagliari;Obert;4-3-2-1;95;
 4d65afcd-dc9b-4804-ac3e-1fd5d688c48c;Cagliari;Adopo;4-3-2-1;95;
 dd49cb6b-4769-4e5f-ab8c-a90ad7e100a8;Cagliari;Winks;4-3-2-1;95;
 e750e65a-2285-401b-b7ad-a0fea8d2c498;Cagliari;Romano;4-3-2-1;95;
 af9f364b-0c1d-47fa-aa9a-c74fc9d5e06b;Cagliari;Maldini;4-3-2-1;95;
-b5b204ae-aa93-48b4-a220-73953eb4aa27;Cagliari;Fazzini;4-3-2-1;51;Nzola (49%)
+b5b204ae-aa93-48b4-a220-73953eb4aa27;Cagliari;Fazzini;4-3-2-1;51;Massolin (49%)
 6332fc72-c508-4e04-bca1-db35ddda3e94;Cagliari;Mendy P.;4-3-2-1;95;
 ab0c501a-2374-4942-8133-781cf2c60a8e;Bologna;Skorupski;3-4-3;95;
 3b28787f-10ec-4f94-a072-b11caee629a0;Bologna;Darmian;3-4-3;95;
@@ -41,7 +41,7 @@ c07a5ed0-b1db-429b-9291-2998365fffc3;Bologna;Pobega;3-4-3;60;Moro N. (40%)
 d796b194-efcc-4186-9291-2a8afcbf35ae;Bologna;Ferguson;3-4-3;95;
 c904108e-6a70-494d-9732-b39d2fc8264a;Bologna;Miranda J.;3-4-3;95;
 c3763cc2-a3d9-403f-8f5a-856896a47c5d;Bologna;Bernardeschi;3-4-3;95;
-efbaff18-54de-44ce-a386-2c3dab6d1e7a;Bologna;Enem;3-4-3;55;Dovbyk (45%)
+0a11fe1e-7041-4409-9752-cbbd637f6aca;Bologna;Odgaard;3-4-3;51;Enem (49%)
 5232e236-cf75-4f0c-baf3-47c6c2e2887a;Bologna;Cambiaghi;3-4-3;95;
 05ed0add-6a0f-4ae8-aa97-eba61ba71d30;Como;Butez;4-2-3-1;70;Sanchez Ro. (30%)
 d0d30a5a-3355-45a8-ad09-a29513473dae;Como;Couto;4-2-3-1;51;Smolcic I. (49%)
@@ -55,7 +55,7 @@ b6e4d803-fb64-4bf4-9771-3673e4c4dc9a;Como;Paz N.;4-2-3-1;95;
 883a53f2-3f11-4cc7-bbcc-ec7d21a99f74;Como;Baturina;4-2-3-1;95;
 21aae13c-0a10-4bf2-aa9a-0a44c6cec6b2;Como;Douvikas;4-2-3-1;95;
 9c483384-d40d-4152-aa37-d7fd00624646;Sassuolo;Muric;4-3-3;51;Turati (49%)
-d190b87f-14d2-4a26-b57d-a8b2803d175e;Sassuolo;Van Der Brempt;4-3-3;55;Cinquegrano (45%)
+76cabc00-f29e-402b-aa35-b88bacfd8aae;Sassuolo;Cinquegrano;4-3-3;51;Van Der Brempt (49%)
 409ec215-c1df-4c66-b5f6-11e32645341d;Sassuolo;Caleta-Car;4-3-3;95;
 daf219f9-e5fb-4f2a-a7bf-808a15402abe;Sassuolo;Odenthal;4-3-3;95;
 371edc7e-8557-4af7-ac46-3481c7601c38;Sassuolo;Doig;4-3-3;60;Obrador (40%)
@@ -67,15 +67,15 @@ dc221c49-a187-478c-b460-b8daab6631e2;Sassuolo;Thorstvedt;4-3-3;51;Adzic (49%)
 1d67bb6d-6ae0-4f03-99cd-d2e064abdca8;Sassuolo;Laurientè;4-3-3;95;
 1bef666d-d305-4795-af71-2e946eb6ab0e;Napoli;Meret;4-3-3;95;
 dbd256fc-4861-493d-8fc6-8abc4503c061;Napoli;Di Lorenzo;4-3-3;51;
-f61d5ce5-111a-4f71-b6f7-dfe4393621d3;Napoli;Rrahmani;4-3-3;51;Beukema (49%)
-9974d5bb-0599-421d-8ee6-2aebf34143f8;Napoli;Badiashile;4-3-3;95;
+f61d5ce5-111a-4f71-b6f7-dfe4393621d3;Napoli;Rrahmani;4-3-3;51;Badiashile (49%)
+3cbf391b-c091-4b2f-a391-23c8fa6b4eb3;Napoli;Marin R.;4-3-3;95;
 732b19cf-3340-4588-ba8a-85459261b4c1;Napoli;Olivera;4-3-3;51;Spinazzola (49%)
 f06f2f39-13e2-4cda-8319-dffd25ec0cbd;Napoli;De Bruyne;4-3-3;95;
 a411c282-00be-4e2f-8599-e0a2e5da85bf;Napoli;Lobotka;4-3-3;55;Zambo Anguissa (45%)
 f7f99d6a-c8e0-4ec8-a434-1ffba0253b41;Napoli;Mctominay;4-3-3;95;
 e3ca6a3a-4c39-4307-ab09-0520b0f066db;Napoli;Politano;4-3-3;60;Giovane (40%)
 4c72a8d4-8416-4a9b-b70f-810f16af86ff;Napoli;Hojlund;4-3-3;95;
-0a63d021-85fa-49ab-82af-fb94cdc997a1;Napoli;Lang;4-3-3;95;
+0a63d021-85fa-49ab-82af-fb94cdc997a1;Napoli;Lang;4-3-3;60;Giovane (40%)
 d5c0c1d2-f0d1-4e02-88f4-ba6d59dfc8f7;Roma;Gollini;3-4-2-1;95;
 0e4a800a-f8df-4bc4-8ddc-fe32b660a537;Roma;Mancini;3-4-2-1;95;
 56047277-ecee-44df-a949-782ccdb20a4b;Roma;N'Dicka;3-4-2-1;60;Balerdi (40%)
@@ -109,38 +109,38 @@ f1421f6f-3f6a-436b-9ed3-997e353873e0;Parma;Bernabè;3-4-2-1;95;
 72b2eb13-c625-4fd5-b0e1-349d05f9e2e6;Parma;Fabbian;3-4-2-1;51;Lontani (49%)
 280d15dc-3cf6-47ec-ad41-19b983b09d20;Parma;Tourè E.;3-4-2-1;95;
 eb01cf4b-a689-4016-8c30-0e7b058d0210;Parma;Romero D.;3-4-2-1;95;
-909ba55e-54d3-40d3-acc4-9cc0113a8ed5;Inter;Martinez Jo.;3-5-2;60;Provedel (40%)
-ffc0d828-4c6d-497f-b1c3-206e4ee92cae;Inter;Akanji;3-5-2;95;
+909ba55e-54d3-40d3-acc4-9cc0113a8ed5;Inter;Martinez Jo.;3-5-2;55;Provedel (45%)
 8f888400-a95b-41f9-8dec-d65060204690;Inter;Bisseck;3-5-2;95;
+ffc0d828-4c6d-497f-b1c3-206e4ee92cae;Inter;Akanji;3-5-2;95;
 df794a25-46b5-4bec-be5f-396198bb9d99;Inter;Bastoni;3-5-2;51;Carlos Augusto (49%)
-ccaa3ad6-fe10-4ac8-b1c0-51d7b0f902aa;Inter;Diouf;3-5-2;51;Luis Henrique (49%)
+ccaa3ad6-fe10-4ac8-b1c0-51d7b0f902aa;Inter;Diouf;3-5-2;95;
 776c5c30-c674-4570-b9d6-03d0004fd4f2;Inter;Barella;3-5-2;95;
-23393734-3e5a-473f-a4c0-20eba7e3f08a;Inter;Zielinski;3-5-2;51;Calhanoglu (49%)
-ca464bbb-fe09-461d-a32f-8e235178752f;Inter;Sucic P.;3-5-2;51;Mkhitaryan (49%)
+46cdde29-6808-4c58-aee5-4bcfffce0c2f;Inter;Calhanoglu;3-5-2;51;Zielinski (49%)
+089aed7d-e2c7-4bfa-bbc0-d7780d6bdecc;Inter;Mkhitaryan;3-5-2;51;Zielinski (49%)
 8479a96e-18ca-4c21-9813-ec0cc992dcf6;Inter;Dimarco;3-5-2;51;Carlos Augusto (49%)
-79e0486c-5861-4fb0-ba5c-f35bc19df8c3;Inter;Thuram;3-5-2;95;
-3ea15d31-a7de-40ae-af2e-702157929bb2;Inter;Esposito F.P.;3-5-2;51;Bonny (49%)
-287aea48-e990-419a-8744-9753b369dd13;Fiorentina;De Gea;4-2-3-1;95;
-1d2a470a-c2dd-4e85-9269-2432dab4989e;Fiorentina;Jimenez A.;4-2-3-1;95;
-5e421a0d-6a2a-4d1c-9767-174ee24c9631;Fiorentina;Dragusin;4-2-3-1;95;
-31786ff3-11ce-42f4-b5e3-a5ced40ae0b6;Fiorentina;Pongracic;4-2-3-1;95;
-92bcdaf9-6420-4fb2-b3f5-ab7faca6f35f;Fiorentina;Viery;4-2-3-1;55;Valdepenas (45%)
-40b7cab1-faa3-4b57-a7ae-a775c8b35c97;Fiorentina;Ndour;4-2-3-1;95;
-b7ea8289-af1f-4f8d-8722-329bd42eca4b;Fiorentina;Fagioli;4-2-3-1;95;
-dc1712b1-57f3-433e-991a-2174387b8d39;Fiorentina;Mastantuono;4-2-3-1;95;
-21a58529-376d-41b3-9bf8-2444f31c8a86;Fiorentina;Goncalves P.;4-2-3-1;51;Brescianini (49%)
-81dda297-825d-419f-bdc1-dadd2d326b6c;Fiorentina;Njie;4-2-3-1;51;Gnonto (49%)
-f5c4b009-851b-4901-b6b4-0f66ec783639;Fiorentina;Pellegrino M.;4-2-3-1;51;Beto (49%)
+79e0486c-5861-4fb0-ba5c-f35bc19df8c3;Inter;Thuram;3-5-2;60;Bonny (40%)
+3ea15d31-a7de-40ae-af2e-702157929bb2;Inter;Esposito F.P.;3-5-2;95;
+287aea48-e990-419a-8744-9753b369dd13;Fiorentina;De Gea;4-3-2-1;95;
+1d2a470a-c2dd-4e85-9269-2432dab4989e;Fiorentina;Jimenez A.;4-3-2-1;95;
+5e421a0d-6a2a-4d1c-9767-174ee24c9631;Fiorentina;Dragusin;4-3-2-1;95;
+31786ff3-11ce-42f4-b5e3-a5ced40ae0b6;Fiorentina;Pongracic;4-3-2-1;95;
+92bcdaf9-6420-4fb2-b3f5-ab7faca6f35f;Fiorentina;Viery;4-3-2-1;55;Valdepenas (45%)
+40b7cab1-faa3-4b57-a7ae-a775c8b35c97;Fiorentina;Ndour;4-3-2-1;95;
+b7ea8289-af1f-4f8d-8722-329bd42eca4b;Fiorentina;Fagioli;4-3-2-1;95;
+38941855-dc42-4bba-923a-ff9515a68f2a;Fiorentina;Oulai;4-3-2-1;51;Brescianini (49%)
+dc1712b1-57f3-433e-991a-2174387b8d39;Fiorentina;Mastantuono;4-3-2-1;95;
+f5c4b009-851b-4901-b6b4-0f66ec783639;Fiorentina;Pellegrino M.;4-3-2-1;51;Beto (49%)
+81dda297-825d-419f-bdc1-dadd2d326b6c;Fiorentina;Njie;4-3-2-1;51;Gnonto (49%)
 0e05ec77-0d73-452e-8d72-7ddf162ced52;Atalanta;Carnesecchi;4-3-3;95;
 bde8b7a8-9307-4d1e-a3cc-430c5bee432b;Atalanta;Bellanova;4-3-3;95;
 e8093c47-4f1a-4bcb-83b1-0c64385cddbe;Atalanta;Kristensen T.;4-3-3;95;
-0d9e70de-d2ad-4074-9298-4bceda5b52dc;Atalanta;Obric;4-3-3;95;
+0d9e70de-d2ad-4074-9298-4bceda5b52dc;Atalanta;Obric;4-3-3;51;Zappacosta (49%)
 e12cb1ac-c451-4b75-bbe1-94bb602aa355;Atalanta;Bernasconi;4-3-3;51;Zappacosta (49%)
 7b7af6aa-db5d-495d-9b60-74ead0f6dff8;Atalanta;Samardzic;4-3-3;51;Pasalic (49%)
 4f923ea1-81ed-468d-84e7-bc8adf85055f;Atalanta;Gaetano;4-3-3;95;
 c56c787c-4c3c-40e6-873f-596cffcd773e;Atalanta;Ederson D.S.;4-3-3;95;
 387c9a81-4702-47ce-a0d6-1791bed95221;Atalanta;De Ketelaere;4-3-3;55;Elmas (45%)
-a2a9196a-3c70-4680-8e40-951ee6a10a22;Atalanta;Krstovic;4-3-3;60;Scamacca (40%)
+a2a9196a-3c70-4680-8e40-951ee6a10a22;Atalanta;Krstovic;4-3-3;70;Scamacca (30%)
 5f28f5f6-550d-4329-ae56-01f2db6e9e28;Atalanta;Rowe;4-3-3;55;Elmas (45%)
 806328ab-7895-4972-a29d-b73f77580592;Frosinone;Palmisani;4-2-3-1;95;
 16d2f113-676b-4106-a457-67da034246c5;Frosinone;Oyono A.;4-2-3-1;95;
@@ -160,7 +160,7 @@ b86d1013-2a20-417e-b5a9-1bd4b97427df;Frosinone;Schmid;4-2-3-1;95;
 72dbbe00-ef42-4579-ba5e-74ac1cc06c8c;Genoa;Ellertsson;3-4-2-1;95;
 a694ffa3-522e-4fb2-bbb0-074554dcec12;Genoa;Frendrup;3-4-2-1;95;
 965c9759-e219-4f4d-a30c-18a8db5cc2b8;Genoa;Traorè Hj.;3-4-2-1;51;Amorim (49%)
-4e6addce-b231-4f62-a054-3979cf1f4563;Genoa;Puczka;3-4-2-1;70;Mitaj (30%)
+4e6addce-b231-4f62-a054-3979cf1f4563;Genoa;Puczka;3-4-2-1;51;Baldanzi (49%)
 05a6d08b-b086-46f1-82ee-bdd2ca64ae31;Genoa;Messias;3-4-2-1;51;Baldanzi (49%)
 0992e869-48bb-4438-9aa9-d212c238371c;Genoa;El Shaarawy;3-4-2-1;51;Vitinha O. (49%)
 16bd57cd-1af6-42ea-abfd-23a1051c73c1;Genoa;Osmajic;3-4-2-1;95;
@@ -188,21 +188,21 @@ b71cb6d6-95ef-45c1-af79-1871010c0466;Lecce;Maleh;4-3-3;95;
 fe4dd59e-c29f-4618-9ae7-8df11a3bfbbc;Lecce;Fatah;4-3-3;55;Monteiro J. (45%)
 e962868a-c447-43cd-8306-5378a88ee2d3;Juventus;Vicario;3-4-2-1;95;
 25f782b5-3764-4a4e-8e32-6e950a038870;Juventus;Kalulu;3-4-2-1;95;
-a3420003-4392-4db8-ae31-712523234361;Juventus;Bremer;3-4-2-1;60;Gatti (40%)
+a3420003-4392-4db8-ae31-712523234361;Juventus;Bremer;3-4-2-1;95;
 85fe85c2-887d-490b-804b-8b0ff085e63f;Juventus;Lucumì;3-4-2-1;55;Kelly L. (45%)
 30e4cb57-632d-4f52-b027-97d390efaf3f;Juventus;Mckennie;3-4-2-1;95;
 484337f8-bd3c-4565-9573-242728f35aa7;Juventus;Douglas Luiz;3-4-2-1;60;Koopmeiners (40%)
 b5caebe6-a205-4fb2-bbd4-16e49bb20a36;Juventus;Sarr P.;3-4-2-1;95;
 8ec42d80-ac4b-427d-83c1-9bfd15526f0d;Juventus;Cambiaso;3-4-2-1;95;
 d7febbfe-c61b-41d3-bc27-b98784322078;Juventus;Gonzalez N.;3-4-2-1;51;Zhegrova (49%)
-ace2a71a-be65-4788-aa2b-21036dfac576;Juventus;Alajbegovic;3-4-2-1;60;Woltemade (40%)
+ace2a71a-be65-4788-aa2b-21036dfac576;Juventus;Alajbegovic;3-4-2-1;51;Woltemade (49%)
 5a4cd663-45d1-4860-a750-c36684a2399b;Juventus;Kolo Muani;3-4-2-1;95;
 cbe2156e-f2a7-4e4d-9d46-472bf9c4a258;Udinese;Okoye;3-4-2-1;95;
-a778e4d5-7591-4341-93cc-3fedebf36602;Udinese;Palma;3-4-2-1;51;Abankwah (49%)
+a778e4d5-7591-4341-93cc-3fedebf36602;Udinese;Palma;3-4-2-1;51;Bertola (49%)
 21898bcb-7bbf-46c7-9892-8e05475fcb53;Udinese;Solet;3-4-2-1;95;
 6bff9424-1ae3-4bba-b1d5-0ccfbafb3afa;Udinese;Ebosse;3-4-2-1;95;
 38215a52-f2bd-4088-964f-fec353964b85;Udinese;Vojvoda;3-4-2-1;95;
-6f1fa3c2-5ce5-4273-97e3-0fcb5c647657;Udinese;Piotrowski;3-4-2-1;51;Zarraga (49%)
+6f1fa3c2-5ce5-4273-97e3-0fcb5c647657;Udinese;Piotrowski;3-4-2-1;55;Zarraga (45%)
 c936ac6a-f383-43a3-8568-182189db11a8;Udinese;Karlstrom;3-4-2-1;95;
 56ee78ba-2510-4d61-9f05-0756220a9156;Udinese;Kamara H.;3-4-2-1;95;
 7b207af5-acdb-4021-9633-5b6fd9e29fa6;Udinese;Chakvetadze;3-4-2-1;51;Unai Gomez (49%)
@@ -212,10 +212,10 @@ c936ac6a-f383-43a3-8568-182189db11a8;Udinese;Karlstrom;3-4-2-1;95;
 7d117aaa-3a1c-4eb2-b76a-e4b784e21e06;Milan;Gila;3-4-2-1;95;
 f5b1b43f-45be-4ebb-bed8-811434235418;Milan;De Winter;3-4-2-1;95;
 0442eaa9-c6ac-4a7b-9135-8fd7ee6b2312;Milan;Pavlovic;3-4-2-1;95;
-854680bd-ac74-4895-bd1b-f439d2315b67;Milan;Hutchinson;3-4-2-1;60;Estupinan (40%)
+854680bd-ac74-4895-bd1b-f439d2315b67;Milan;Hutchinson;3-4-2-1;55;Estupinan (45%)
 6ada201e-02d6-4da0-b333-4b3149daaab4;Milan;Musah;3-4-2-1;95;
 f0cc9638-e365-41ec-a8d0-d55c37c876df;Milan;Modric;3-4-2-1;95;
 a22c4fed-ed14-4567-bb53-c672d5bf5a5a;Milan;Moreira;3-4-2-1;95;
 c35852ca-fb1c-4449-b6a1-026f9628d99e;Milan;Pulisic;3-4-2-1;95;
 912f7b0d-01d8-45e0-b7c3-62ba2037a649;Milan;Rabiot;3-4-2-1;95;
-03943eb7-aa1e-4daf-b816-f2722e9e46ce;Milan;Camarda;3-4-2-1;51;Cissè A. (49%)
+faff68a8-6487-469e-add5-36912ee075a1;Milan;Cissè A.;3-4-2-1;51;Camarda (49%)
