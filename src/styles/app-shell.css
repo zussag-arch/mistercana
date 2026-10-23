@@ -34,6 +34,14 @@ body {
 @media (display-mode: standalone) and (max-width: 700px) {
   html { background: var(--surface) !important; }
 }
+
+/* iOS 26, app installata (WebKit bug 301108): se la pagina è più corta dello schermo, iOS accorcia
+   lo schermo dell'altezza della barra di stato e resta una fascia vuota in fondo. Una pagina alta
+   almeno quanto lo schermo riceve lo schermo intero. Il min() evita uno scorrimento dove la barra
+   di stato non è trasparente (lì l'inset in alto è 0). */
+@media (display-mode: standalone) {
+  html { min-height: min(100lvh, calc(100% + env(safe-area-inset-top))); }
+}
 .app-shell {
   height: 100%;
   display: flex;

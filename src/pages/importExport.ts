@@ -195,7 +195,7 @@ function renderDataSourcesPanel(): string {
           <p>Gli archivi che l'app sta usando, con i numeri reali. Si trovano nella cartella <code>database/</code> del progetto.</p>
           <p class="install-link-row">Link per installare l'app su Android: <code>zussag-arch.github.io/mistercana/?installa</code> <button type="button" class="install-open-button" data-install-open>Installa l'app</button></p>
           <p class="data-last-update">Ultimo aggiornamento dati: <strong>${escapeSourceHtml(lastUpdate.date)}</strong> · ${escapeSourceHtml(lastUpdate.source)}</p>
-          <p class="data-last-update">Versione app: <strong>${new Date(__BUILD_DATE__).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' })}</strong> · schermo ${window.innerHeight}/${Math.max(screen.height, screen.width)} · scarto ${document.documentElement.style.getPropertyValue('--screen-gap') || '0px'}</p>
+          <p class="data-last-update">Versione app: <strong>${new Date(__BUILD_DATE__).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' })}</strong></p>
         </div>
         <span class="data-source-active">In uso: ${escapeSourceHtml(label)}</span>
       </div>

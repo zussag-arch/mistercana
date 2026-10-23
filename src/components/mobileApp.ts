@@ -83,22 +83,7 @@ function syncTabButtons(): void {
   })
 }
 
-// iPhone, app installata con barra di stato trasparente: Safari considera lo schermo più corto
-// (circa 50 punti) e lascia vuota la parte in fondo. Si misura quanto manca al fondo reale dello
-// schermo e la barra in basso scende di tanto (vedi --screen-gap in theme-mobile.css).
-function syncScreenGap(): void {
-  const standalone = window.matchMedia('(display-mode: standalone)').matches
-    || (navigator as Navigator & { standalone?: boolean }).standalone === true
-  const portrait = window.innerHeight >= window.innerWidth
-  const screenHeight = portrait ? Math.max(screen.height, screen.width) : Math.min(screen.height, screen.width)
-  const gap = standalone ? Math.max(0, Math.min(80, Math.round(screenHeight - window.innerHeight))) : 0
-  document.documentElement.style.setProperty('--screen-gap', `${gap}px`)
-}
-
 export function initMobileApp(): void {
-  syncScreenGap()
-  window.addEventListener('resize', syncScreenGap)
-  window.addEventListener('orientationchange', () => window.setTimeout(syncScreenGap, 300))
 
 
   document.documentElement.dataset.auctionTab = currentTab()
