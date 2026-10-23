@@ -42,15 +42,38 @@ function setDashTab(tab: DashTab): void {
   document.querySelector('.app-main')?.scrollTo({ top: 0 })
 }
 
+// Finestra aperta (scheda giocatore, recap, matrici…). Su iPhone una finestra fissa dentro un'area
+// che scorre viene ritagliata ai bordi di quell'area (sotto la testata, sopra la barra in basso):
+// mentre è aperta l'area contenuti smette di scorrere (vedi app-shell.css). Lo scorrimento della
+// pagina sotto viene conservato spostando il contenuto, e ripristinato alla chiusura.
+let frozenScroll: number | null = null
+
+function syncOverlayOpen(): void {
+  const main = document.querySelector<HTMLElement>('.app-main')
+  const open = Boolean(main?.querySelector(
+    '.overlay:not(.hidden), .player-detail-overlay, .goalkeeper-matrix-overlay:not([hidden])',
+  ))
+  const root = document.documentElement
+  if (open && frozenScroll === null && main) {
+    frozenScroll = main.scrollTop
+    root.style.setProperty('--frozen-scroll', `${-frozenScroll}px`)
+    root.classList.add('overlay-open')
+  } else if (!open && frozenScroll !== null) {
+    const y = frozenScroll
+    frozenScroll = null
+    root.classList.remove('overlay-open')
+    root.style.removeProperty('--frozen-scroll')
+    main?.scrollTo({ top: y })
+  }
+}
+
 function syncTabButtons(): void {
   // il pulsante Indietro della scheda completa sparisce quando si esce dalla scheda
   if (!document.querySelector('.player-full-page-v3')) {
     document.querySelectorAll('.sheet-back-portal').forEach((item) => item.remove())
   }
   // finestra aperta: l'area contenuti deve stare sopra le barre (vedi app-shell.css)
-  document.documentElement.classList.toggle('overlay-open', Boolean(document.querySelector(
-    '.app-main .overlay:not(.hidden), .app-main .player-detail-overlay, .app-main .goalkeeper-matrix-overlay:not([hidden])',
-  )))
+  syncOverlayOpen()
   const root = document.documentElement.dataset
   document.querySelectorAll<HTMLElement>('button[data-auction-tab]').forEach((button) => {
     button.setAttribute('aria-selected', String(button.dataset.auctionTab === (root.auctionTab ?? 'call')))

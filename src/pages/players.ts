@@ -311,7 +311,7 @@ export function bindPlayersEvents(state: AppState, actions: PlayersActions): voi
   document.querySelector<HTMLElement>('[data-player-detail-call]')?.addEventListener('click', (event) => { const id = (event.currentTarget as HTMLElement).dataset.playerDetailCall; if (id) actions.onCallPlayer(id) })
   document.querySelector<HTMLElement>('[data-open-full-player]')?.addEventListener('click', (event) => { const ref = (event.currentTarget as HTMLElement).dataset.openFullPlayer; if (ref) { previewReference = null; actions.onOpenFullPlayer(ref) } })
   const dialog = document.querySelector<HTMLElement>('.player-quick-card')
-  dialog?.focus()
+  dialog?.focus({ preventScroll: true })
   dialog?.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') close()
     if (event.key === 'Tab') {

@@ -1069,6 +1069,14 @@ function render():
   // la pagina attiva (data-view) decide se il contenuto è fisso (Dashboard, Asta, Rosa) o scorre.
   // L'attributo sta su un contenitore ricreato a ogni disegno: cambiarlo sul documento
   // rallentava progressivamente il browser a ogni cambio pagina.
+  // ridisegnando la stessa pagina si resta dove si era: l'area contenuti e i riquadri interni
+  // che scorrono (colonne di Asta, Rosa, Dashboard su computer) tornerebbero altrimenti in cima
+  const scrollers = ['.app-main', '.auction-workspace-main', '.auction-side-panels', '.roster-section', '.dashboard-page > div', '.dashboard-participants']
+  const samePage = app.querySelector<HTMLElement>('.app-shell')?.dataset.view === activePage
+  const savedScroll = samePage
+    ? scrollers.map((selector) => [...app.querySelectorAll<HTMLElement>(selector)].map((element) => element.scrollTop))
+    : []
+
   app.innerHTML = `<div class="app-shell" data-view="${activePage}">
     ${renderNavigation(
       activePage,
@@ -1081,6 +1089,13 @@ function render():
       )}
     </main>
   </div>`
+
+  // a disegno finito (dopo lo spostamento delle azioni e la rimozione delle testate doppie)
+  queueMicrotask(() => savedScroll.forEach((values, which) => {
+    app.querySelectorAll<HTMLElement>(scrollers[which]).forEach((element, index) => {
+      if (values[index]) element.scrollTop = values[index]
+    })
+  }))
 
   /*
     ORDINE IMPORTANTE
