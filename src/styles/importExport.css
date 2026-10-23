@@ -282,159 +282,9 @@
   color: var(--muted);
 }
 
-.flda-status-success {
-  border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
-  background: color-mix(in srgb, var(--accent) 9%, transparent);
-  color: var(--accent);
-}
-
-.flda-status-warning {
-  border: 1px solid color-mix(in srgb, var(--orange) 20%, transparent);
-  background: color-mix(in srgb, var(--orange) 9%, transparent);
-  color: var(--orange);
-}
-
-.flda-status-failed {
-  border: 1px solid color-mix(in srgb, var(--red) 22%, transparent);
-  background: color-mix(in srgb, var(--red) 9%, transparent);
-  color: var(--red);
-}
-
-.flda-status-never {
-  border: 1px solid rgba(var(--ink-rgb), 0.08);
-  background: rgba(var(--ink-rgb), 0.035);
-  color: var(--muted);
-}
-
 /* =========================
    FLDA
 ========================= */
-
-.flda-panel-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
-.flda-api-url {
-  display: inline-block;
-  max-width: 100%;
-  margin-top: 9px;
-  color: var(--muted);
-  font-family: inherit;
-  font-size: 11px;
-  overflow-wrap: anywhere;
-}
-
-.flda-service-meta {
-  margin: -5px 0 12px;
-  color: var(--muted);
-  font-size: 11px;
-}
-
-.flda-connection-error {
-  margin-bottom: 12px;
-  padding: 10px 12px;
-  border: 1px solid color-mix(in srgb, var(--red) 18%, transparent);
-  border-radius: 16px;
-  background: color-mix(in srgb, var(--red) 6%, transparent);
-  color: var(--red);
-  font-size: 11px;
-  line-height: 1.5;
-}
-
-.flda-dataset-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.flda-dataset-card {
-  min-width: 0;
-  padding: 13px;
-  border: 1px solid rgba(var(--ink-rgb), 0.065);
-  border-radius: 18px;
-  background: var(--surface);
-}
-
-.flda-dataset-heading {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.flda-dataset-heading > div {
-  min-width: 0;
-}
-
-.flda-dataset-heading h3 {
-  margin: 0;
-  font-size: 11px;
-}
-
-.flda-dataset-heading p {
-  margin: 5px 0 0;
-  color: var(--muted);
-  font-size: 11px;
-  line-height: 1.4;
-}
-
-.flda-dataset-metrics {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 6px;
-  margin: 12px 0 0;
-}
-
-.flda-dataset-metrics > div {
-  min-width: 0;
-  padding: 8px;
-  border-radius: 12px;
-  background: rgba(var(--ink-rgb), 0.025);
-}
-
-.flda-dataset-metrics dt {
-  color: var(--muted-soft);
-  font-size: 11px;
-}
-
-.flda-dataset-metrics dd {
-  margin: 4px 0 0;
-  color: var(--text-soft);
-  font-size: 11px;
-  font-weight: 750;
-  font-variant-numeric: tabular-nums;
-}
-
-.flda-dataset-footer {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: end;
-  gap: 4px 10px;
-  margin-top: 11px;
-}
-
-.flda-dataset-footer > span {
-  color: var(--muted-soft);
-  font-size: 11px;
-}
-
-.flda-dataset-footer > strong {
-  min-width: 0;
-  overflow: hidden;
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 650;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.flda-dataset-footer .data-transfer-button {
-  grid-column: 2;
-  grid-row: 1 / span 2;
-}
 
 /* =========================
    CARD BODY
@@ -916,10 +766,6 @@
   .data-transfer-grid-single {
     max-width: none;
   }
-
-  .flda-dataset-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (max-width: 620px) {
@@ -933,26 +779,6 @@
     flex-direction: column;
 
     gap: 10px;
-  }
-
-  .flda-panel-actions {
-    width: 100%;
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .flda-panel-actions .data-transfer-status {
-    align-self: flex-start;
-  }
-
-  .flda-dataset-footer {
-    grid-template-columns: 1fr;
-  }
-
-  .flda-dataset-footer .data-transfer-button {
-    grid-column: 1;
-    grid-row: auto;
-    margin-top: 6px;
   }
 
   .data-transfer-card {

@@ -10,7 +10,7 @@
 //   - quota di giocatori presi a 1 credito
 // Le stagioni più recenti pesano di più; con pochi confronti l'indice viene avvicinato a 1 (prudenza).
 
-export type Role = 'P' | 'D' | 'C' | 'A'
+type Role = 'P' | 'D' | 'C' | 'A'
 const ROLES: Role[] = ['P', 'D', 'C', 'A']
 
 export interface Purchase {

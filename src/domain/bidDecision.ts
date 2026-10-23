@@ -7,8 +7,8 @@
 //
 // Motivi (al massimo 3): fabbisogno nel ruolo, probabilità, avversari più probabili.
 
-export type BidAction = 'COMPRA' | 'RILANCIA' | 'PASSA'
-export type BidConfidence = 'alta' | 'media' | 'bassa'
+type BidAction = 'COMPRA' | 'RILANCIA' | 'PASSA'
+type BidConfidence = 'alta' | 'media' | 'bassa'
 
 export interface BidRival {
   name: string
@@ -18,7 +18,7 @@ export interface BidRival {
   estimatedBid: number
 }
 
-export interface BidThreat extends BidRival {
+interface BidThreat extends BidRival {
   /** probabilità che rilanci sul prezzo attuale */
   chance: number
   /** prezzo fino al quale arriva con probabilità almeno del 50% */

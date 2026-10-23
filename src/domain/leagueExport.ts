@@ -23,7 +23,7 @@ export interface LeagueExport {
   warnings: string[]
 }
 
-export function teamLabel(manager: AppState['managers'][number]): string {
+function teamLabel(manager: AppState['managers'][number]): string {
   return manager.teamName.trim()
     || manager.alias.trim()
     || [manager.firstName.trim(), manager.lastName.trim()].filter(Boolean).join(' ')

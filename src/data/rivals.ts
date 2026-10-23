@@ -18,7 +18,7 @@ function parseCsv(text: string): Row[] {
   })
 }
 
-export function rivalRegistry(): RegistryRow[] {
+function rivalRegistry(): RegistryRow[] {
   return parseCsv(getCsv('avversari', rivalsCsvBundled)).map((row) => ({
     nickname: row['Soprannome'], season: row['Stagione'], league: row['Lega'], team: row['Squadra'], me: row['Io'] === 'Sì',
   })).filter((row) => row.nickname && row.team)

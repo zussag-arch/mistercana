@@ -2,40 +2,6 @@ const DEFAULT_FLDA_API_URL =
   'http://127.0.0.1:8765'
 
 const DEFAULT_TIMEOUT_MS = 8000
-const UPDATE_TIMEOUT_MS = 120000
-
-type FldaDatasetStatus =
-  | 'success'
-  | 'warning'
-  | 'failed'
-  | 'never'
-
-export type FldaUpdateTarget =
-  | 'players'
-  | 'guide'
-  | 'grid'
-  | 'history'
-
-export interface FldaHealth {
-  status: string
-  database?: string
-  version?: string
-}
-
-export interface FldaDatasetState {
-  dataset_name: string
-  status: FldaDatasetStatus
-  record_count: number
-  warning_count: number
-  blocking_count: number
-  last_attempt_at?: string | null
-  last_success_at?: string | null
-  source_mode?: string | null
-  details_json?: unknown
-}
-
-export type FldaUpdateResult =
-  Record<string, unknown>
 
 export interface FldaPlayer {
   player_id: string | null
@@ -118,13 +84,13 @@ export interface FldaPlayerDetail {
   matchdays?: Array<{ matchday: number; mv: number | null; fmv: number | null }>
 }
 
-export type FldaErrorKind =
+type FldaErrorKind =
   | 'unreachable'
   | 'timeout'
   | 'api'
   | 'invalid-response'
 
-export class FldaApiError extends Error {
+class FldaApiError extends Error {
   readonly kind: FldaErrorKind
   readonly status?: number
 
@@ -150,7 +116,7 @@ function normalizeBaseUrl(
   ).replace(/\/+$/, '')
 }
 
-export const FLDA_API_URL =
+const FLDA_API_URL =
   normalizeBaseUrl(
     import.meta.env?.VITE_FLDA_API_URL,
   )
@@ -278,29 +244,6 @@ async function withLocal<T>(
   return local(await import('./fantalabLocal'))
 }
 
-export function getFldaHealth():
-  Promise<FldaHealth> {
-  return fldaFetch<FldaHealth>(
-    '/api/health',
-  )
-}
-
-export function getFldaStatus():
-  Promise<FldaDatasetState[]> {
-  return fldaFetch<FldaDatasetState[]>(
-    '/api/status',
-  ).then((result) => {
-    if (!Array.isArray(result)) {
-      throw new FldaApiError(
-        'FLDA ha restituito uno status non valido.',
-        'invalid-response',
-      )
-    }
-
-    return result
-  })
-}
-
 export function getFldaPlayers(
   limit = 1000,
   offset = 0,
@@ -350,24 +293,5 @@ export function getFldaTeamHierarchies(
   return withLocal(
     () => fldaFetch<FldaRecord[]>(`/api/teams/${encodeURIComponent(team)}/hierarchies`),
     (source) => source.localTeamHierarchies(team),
-  )
-}
-
-export function updateFlda(
-  only?: FldaUpdateTarget,
-): Promise<FldaUpdateResult> {
-  return fldaFetch<FldaUpdateResult>(
-    '/api/update',
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type':
-          'application/json',
-      },
-      body: JSON.stringify(
-        only ? { only } : {},
-      ),
-    },
-    UPDATE_TIMEOUT_MS,
   )
 }
