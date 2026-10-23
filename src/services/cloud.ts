@@ -102,9 +102,14 @@ export async function sendLoginLink(email: string): Promise<string | null> {
   return error ? error.message : null
 }
 
-/** codice a 6 cifre della stessa email: serve sull'app installata su iPhone, dove il link si aprirebbe in Safari */
-export async function verifyLoginCode(email: string, token: string): Promise<string | null> {
-  const { error } = await supabase.auth.verifyOtp({ email, token, type: 'email' })
+/** Accesso da passare all'app installata su iPhone: lì il link dell'email si apre in Safari,
+ *  che ha una memoria separata. Si copia in Safari e si incolla nell'app. */
+export function accessCode(): string | null {
+  return session?.refresh_token ?? null
+}
+
+export async function useAccessCode(code: string): Promise<string | null> {
+  const { error } = await supabase.auth.refreshSession({ refresh_token: code })
   return error ? error.message : null
 }
 

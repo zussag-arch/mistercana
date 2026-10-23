@@ -1,4 +1,4 @@
-import { cloudInfo, logout, sendLoginLink, verifyLoginCode } from '../services/cloud'
+import { accessCode, cloudInfo, logout, sendLoginLink, useAccessCode } from '../services/cloud'
 import bundledPlayersCsv from '../../database/fantalab_giocatori.csv?raw'
 import bundledCoachesCsv from '../../database/fantalab_allenatori.csv?raw'
 import bundledGoalkeeperGridCsv from '../../database/griglia_portieri.csv?raw'
@@ -1903,16 +1903,23 @@ function renderCloudPanel(): string {
   const body = info.email
     ? `<p class="cloud-state cloud-state-${info.status}">${escapeCloud(label)}</p>
        <p>Collegato come <b>${escapeCloud(info.email)}</b>. Le modifiche si salvano anche online e si ritrovano su ogni dispositivo.</p>
-       <button type="button" class="data-transfer-button data-transfer-button-secondary" id="cloudLogoutButton">Esci</button>`
+       <div class="cloud-actions">
+         <button type="button" class="data-transfer-button data-transfer-button-secondary" id="cloudCopyAccessButton">Copia accesso per l'app installata</button>
+         <button type="button" class="data-transfer-button data-transfer-button-secondary" id="cloudLogoutButton">Esci</button>
+       </div>
+       <p class="cloud-message" id="cloudCopyMessage"></p>`
     : `<p>Accedi per salvare i dati online e ritrovarli su telefono e computer. Ti arriva un link via email, niente password.</p>
        <form class="cloud-login" id="cloudLoginForm">
          <input type="email" name="email" required placeholder="la tua email" autocomplete="email" />
          <button type="submit" class="data-transfer-button data-transfer-button-primary">Invia link</button>
        </form>
-       <form class="cloud-login" id="cloudCodeForm" hidden>
-         <input type="text" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,8}" required placeholder="codice dalla email" />
-         <button type="submit" class="data-transfer-button data-transfer-button-primary">Entra</button>
-       </form>
+       <details class="cloud-paste">
+         <summary>App installata su iPhone? Incolla l'accesso copiato da Safari</summary>
+         <form class="cloud-login" id="cloudCodeForm">
+           <input type="text" name="code" required placeholder="incolla qui" autocomplete="off" />
+           <button type="submit" class="data-transfer-button data-transfer-button-primary">Entra</button>
+         </form>
+       </details>
        <p class="cloud-message" id="cloudMessage"></p>`
   return `<section class="data-transfer-section cloud-section" id="cloudPanel">
     <div class="data-transfer-section-header"><div>
@@ -1924,8 +1931,6 @@ function renderCloudPanel(): string {
 }
 
 const escapeCloud = (text: string) => text.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c] as string)
-
-let cloudEmail = ''
 
 function bindCloudPanel(): void {
   document.addEventListener('mistercana:cloud-status', () => {
@@ -1939,8 +1944,8 @@ function bindCloudPanel(): void {
       event.preventDefault()
       const message = document.querySelector('#cloudMessage')
       if (message) message.textContent = 'Verifica…'
-      const error = await verifyLoginCode(cloudEmail, String(new FormData(form).get('code') ?? '').trim())
-      if (error && message) message.textContent = 'Codice non valido o scaduto: richiedine un altro.'
+      const error = await useAccessCode(String(new FormData(form).get('code') ?? '').trim())
+      if (error && message) message.textContent = 'Accesso non valido o già usato: copialo di nuovo da Safari.'
       return
     }
     if (form.id !== 'cloudLoginForm') return
@@ -1951,14 +1956,20 @@ function bindCloudPanel(): void {
     const error = await sendLoginLink(email)
     if (message) message.textContent = error
       ? (/signups not allowed|not found/i.test(error) ? 'Questa email non è abilitata.' : `Invio non riuscito: ${error}`)
-      : `Email inviata a ${email}: apri il link oppure scrivi qui il codice.`
-    if (!error) {
-      cloudEmail = email
-      document.querySelector<HTMLFormElement>('#cloudCodeForm')?.removeAttribute('hidden')
-    }
+      : `Link inviato a ${email}: aprilo da questo dispositivo.`
   })
   document.addEventListener('click', (event) => {
-    if (event.target instanceof Element && event.target.closest('#cloudLogoutButton')) void logout()
+    if (!(event.target instanceof Element)) return
+    if (event.target.closest('#cloudLogoutButton')) void logout()
+    if (event.target.closest('#cloudCopyAccessButton')) {
+      const code = accessCode()
+      const message = document.querySelector('#cloudCopyMessage')
+      if (!code) return
+      navigator.clipboard.writeText(code).then(
+        () => { if (message) message.textContent = "Copiato. Apri l'app dalla Home → Dati → incolla l'accesso. Non mandarlo a nessuno: vale come la tua password." },
+        () => { if (message) message.textContent = code },
+      )
+    }
   })
 }
 
