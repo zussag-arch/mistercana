@@ -718,3 +718,9 @@ html, body { touch-action: manipulation; }
     pointer-events: none;
   }
 }
+
+@media (max-width: 700px) {
+  /* la barra scende fino al fondo reale dello schermo (0 dove Safari non accorcia lo schermo) */
+  .mobile-tabbar { bottom: calc(-1 * var(--screen-gap, 0px)) !important; }
+  :root[data-auction-tab="call"] .auction-live-price-row { bottom: calc(var(--tabbar-total) - var(--screen-gap, 0px)) !important; }
+}
